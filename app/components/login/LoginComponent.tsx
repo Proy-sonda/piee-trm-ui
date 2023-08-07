@@ -5,6 +5,7 @@ import { useContext, useState } from 'react';
 import { AuthContext } from '@/app/contexts/AuthContext';
 import { UsuarioLogin } from '@/app/contexts/interfaces/types';
 import Swal from 'sweetalert2';
+import { Modal, Button } from 'react-bootstrap';
 
 
 
@@ -27,18 +28,35 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
 
     const [show, setShow] = useState('');
     const [display, setDisplay] = useState('none');
+    const [showModalRecu, setShowModalRecu] = useState(false);
+    const [showModalRecu2, setshowModalRecu2] = useState(false)
+
+     
+    const handleShowModalRecu = () => {
+        setShowModalRecu(true);
+    };
+    const handleCloseModalRecu = () => {
+        setShowModalRecu(false);
+    };
+    const handleCloseModalRecu2 = ()=> {
+        setshowModalRecu2(false)
+    }
+    const handleShowModalRecu2 = ()=> {
+        setshowModalRecu2(true);
+    }
     
 
 
 
     const { login } = useContext(AuthContext)
 
-    const { rutusuario, clave, claveanterior, clavenuevauno, clavenuevados, onInputChange } = useForm({
+    const { rutusuario, clave, claveanterior, clavenuevauno, clavenuevados, rutrecu, onInputChange, onInputValidRut } = useForm({
         claveanterior:'',
         clavenuevauno:'',
         clavenuevados:'',
         rutusuario: '',
-        clave: ''
+        clave: '',
+        rutrecu: '',
     });
 
 
@@ -55,19 +73,20 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
         if(!rutusuario || !clave) return Swal.fire('Error','Debe completar los campos', 'error');
 
         let respuesta: any = await login(usuario);
-        console.log(respuesta);
+        
+        if(respuesta?.resp == undefined ) return Swal.fire('Error', 'Ocurrió un problema en el sistema', 'error')
 
         let messageError: string = '';
         if (respuesta.resp?.statusCode == 400) {
             respuesta.resp.message.map((message: string) => {
                 if (message == "rutusuario|invalido") messageError += `<br/> Rut Invalido`;
             });
-
-
         };
+
         if (respuesta.resp.statusCode == 401) {
             if (respuesta.resp.message == 'Login/Password invalida') messageError += 'Contraseña invalida'
         }
+
         if (respuesta.resp?.statusCode == 412) {
             if (respuesta.resp.message == 'Autenticación Transitoria') {
                 setShow('show');
@@ -76,12 +95,23 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
             }
         }
 
+        if(respuesta.resp.statusCode == 200){
+            if(respuesta.resp.message.includes('Bearer')) {
+                return Swal.fire({
+                    html:'Sesión iniciada correctamente',
+                    icon:'success',
+                    timer:2000,
+                    showConfirmButton:false,
+                    
+                })
+            }
+        }
+
         if (messageError != '') Swal.fire({ title: 'Error', icon: 'error', html: messageError, confirmButtonColor: '#225F9D' });
 
-
-
-
     };
+
+   
 
 
     const ChangeTemporal = async ()=> {
@@ -96,7 +126,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
         }
 
 
-        const resp = await fetch('http://localhost:3000/auth/change',{
+        const resp = await fetch('http://10.153.106.88:3000/auth/change',{
             method:'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -104,12 +134,38 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
             body:JSON.stringify(PostVal)
         });
 
-        console.log(resp);
+        if (resp.ok) return Swal.fire({
+            html: 'Contraseña actualizada correctamente, vuelva a iniciar sesión', icon: 'success', timer: 2000, showConfirmButton: false,
+            willClose: () => {
+                OncloseModal();
+            }
+        });
 
 
     }
 
-    const OncloseModal = ()=> {
+    const validaRut = async ()=> {
+        if(rutrecu == '') return Swal.fire({html:'El campo RUT no puede estar vació', icon:'error', timer: 2000, showConfirmButton:false});
+        
+        handleCloseModalRecu();
+        const data = await fetch('http://10.153.106.88:3000/auth/recover',{
+            method:'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                rutusuario: rutrecu
+            })
+        });
+        if(data.ok) return handleShowModalRecu2();
+
+        const resp = await data.json();
+        if(resp.statusCode == 401) return Swal.fire({html:resp.message, icon:'error', showConfirmButton:false, timer:2000});
+        
+
+    }
+
+    const OncloseModal = ()=>  {
         setShow('');
         setDisplay('none');
     }
@@ -121,7 +177,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
         <>
 
             <div className={`modal fade ${show}`} style={{display:display}} id="modalclavetransitoria" tabIndex={-1} aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div className="modal-dialog modal-dialog-centered">
+                <div className="modal-dialog">
                     <div className="modal-content">
                         <div className="modal-header">
                             <h1 className="modal-title fs-5" id="exampleModalLabel">Clave Transitoria</h1>
@@ -186,10 +242,62 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
                         textDecoration: 'underline',
                         color: 'blue',
                         marginRight: '50px'
-                    }} data-bs-toggle="modal" data-bs-target="#ModalRecu" >Recuperar clave de acceso</label> &nbsp;
+                    }}  onClick={handleShowModalRecu}>Recuperar clave de acceso</label> &nbsp;
                     <button type="submit" className={'btn btn-primary'}>{buttonText}</button>
                 </div>
             </form>
+
+
+            <Modal show={showModalRecu} onHide={handleCloseModalRecu} backdrop="static"
+                keyboard={false}>
+                <Modal.Header closeButton >
+                    <Modal.Title>Recuperar Clave de acceso</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p>Escriba su rut para solicitar una nueva clave de acceso</p>
+                    <div className='row'>
+                        <div className='col-md-12'>
+                            <label>Por favor ingresa tu RUT</label>
+                            <input type='text' className='form-control' name='rutrecu' value={rutrecu} onChange={onInputValidRut} autoComplete='off'/>
+                        </div>
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleCloseModalRecu}>Cerrar</Button>
+                    <button type="button" className="btn btn-primary" onClick={validaRut}>Recuperar Clave</button>
+                </Modal.Footer>
+
+            </Modal>
+
+            <Modal show={showModalRecu2} onHide={handleCloseModalRecu2} backdrop='static' keyboard={false}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Recuperar Clave de acceso</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+
+                    <div className='row text-center' style={{
+                        textAlign: 'justify'
+                    }}>
+
+                        <p>¡Felicitaciones!</p>
+                        <p>Hemos creado tu clave para acceder al Nuevo Portal</p>
+                        <p>Esta clave tiene una vigencia de 48 horas</p>
+
+
+
+                    </div>
+
+                </Modal.Body>
+                <Modal.Footer>
+                    <button onClick={handleCloseModalRecu2} className='btn btn-primary'>Aceptar</button>
+                </Modal.Footer>
+
+
+            </Modal>
+           
+
+           
+
 
         </>
     )
