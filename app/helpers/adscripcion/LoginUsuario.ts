@@ -8,7 +8,8 @@ import { respLogin } from "@/app/interface/adscripcion";
 let respuesta:respLogin = {
     data:[],
     message:'',
-    statusCode:0
+    statusCode:0,
+    
 }
 
 
@@ -24,12 +25,26 @@ export const LoginUsuario = async (usuario: UsuarioLogin) => {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(usuario),
-        })
+        });
+
+        
+
+        if(data.ok) {
+
+            let token = await data.text();
+            console.log(token)
+
+            if (token.includes('Bearer')) return {
+                resp: {
+                    message: token,
+                    statusCode: 200
+                }
+            }
+
+        }
 
         resp = await data.json();
         
-
-
         return {
 
             resp
@@ -38,7 +53,8 @@ export const LoginUsuario = async (usuario: UsuarioLogin) => {
         
 
     } catch (error) {
-
+        console.log(error)
+       
     }
 
     

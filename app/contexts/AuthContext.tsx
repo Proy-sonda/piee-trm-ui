@@ -41,6 +41,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({children}) => {
         if(usuario.rutusuario == '') return setusuario({...usuario, error:'El usuario no puede estar Vació'});
 
         const respLogin = await LoginUsuario(usuario);
+        console.log(respLogin)
         return respLogin;
     }
 
