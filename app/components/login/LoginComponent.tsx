@@ -108,7 +108,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
                     icon:'success',
                     timer:2000,
                     showConfirmButton:false,
-                    willClose:()=>  router.push('http://localhost:3005/tramitacion')
+                    willClose:()=>  router.push('/tramitacion')
                     
                 })
             }
