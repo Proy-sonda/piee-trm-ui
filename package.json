@@ -6,7 +6,9 @@
     "dev": "next dev -p 3005",
     "build": "next build",
     "start": "next start -p 3005",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format:check": "prettier --check app",
+    "format:fix": "prettier --write app"
   },
   "dependencies": {
     "@types/node": "20.4.6",
@@ -27,5 +29,8 @@
     "rutlib": "^1.0.3",
     "sweetalert2": "^11.7.20",
     "typescript": "5.1.6"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.1"
   }
 }
