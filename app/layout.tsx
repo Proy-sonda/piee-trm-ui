@@ -13,10 +13,10 @@ import Usuario from './components/usuario/Usuario';
 
 // const inter = Inter({ subsets: ['latin'] })
 
-export const metadata = {
-  title: 'Portal Integral PIE',
-  description: 'Nuevo Portal de Integración',
-}
+// export const metadata = {
+//   title: 'Portal Integral PIE',
+//   description: 'Nuevo Portal de Integración',
+// }
 
 
 export default function RootLayout({
