@@ -32,7 +32,7 @@ export const LoginUsuario = async (usuario: UsuarioLogin) => {
         if(data.ok) {
 
             let token = await data.text();
-            console.log(token)
+            
 
             if (token.includes('Bearer')) return {
                 resp: {
@@ -59,5 +59,30 @@ export const LoginUsuario = async (usuario: UsuarioLogin) => {
 
     
 
+
+}
+
+export const CompruebaToken = async(token: string)=> {
+
+
+    try {
+
+        const resp = await fetch('http://10.153.106.88:3000/auth/islogin', {
+
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+        
+
+        if (resp.status== 200) return console.log('token valido')
+        
+        
+        
+    } catch (error) {
+        console.log('error: '+error)
+    }
+
+    
 
 }

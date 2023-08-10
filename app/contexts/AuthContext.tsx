@@ -1,7 +1,6 @@
 'use client'
-
 import { createContext, useState } from "react";
-import { ChildrenApp, UsuarioLogin } from "./interfaces/types";
+import { ChildrenApp, UserData, UsuarioLogin } from "./interfaces/types";
 import { LoginUsuario } from "../helpers/adscripcion/LoginUsuario";
 
 
@@ -10,7 +9,23 @@ type AuthContextType = {
     rutusuario: string;
     clave: string;
     error: string;
+    datosusuario:{
+        exp:number;
+        iat:number;
+        user:{
+            apellidos:string;
+            email:string;
+            nombres:string;
+            rol:{
+                idrol:number;
+                rol:string;
+            };
+            rutusuario:string
+            
+        }
+    }
     login: (usuario:UsuarioLogin) => void;
+    CompletarUsuario: (DataUsuario:UserData) => void;
 }
 
 
@@ -19,10 +34,25 @@ export const AuthContext = createContext<AuthContextType>({
     rutusuario:'',
     clave:'',
     error:'',
-    login:()=> {}
+    datosusuario:{
+        exp:0,
+        iat:0,
+        user:{
+            apellidos:'',
+            email:'',
+            nombres:'',
+            rol:{
+                idrol:0,
+                rol:'',
+            },
+            rutusuario:'',
+            
+        }
+    },
+    login:()=> {},
+    CompletarUsuario:()=> {}
+
 });
-
-
 
 
 
@@ -33,7 +63,24 @@ export const AuthProvider: React.FC<ChildrenApp> = ({children}) => {
         rutusuario:'',
         clave:'',
         error:'',
-    })
+        
+    });
+
+    const [datosUsuario, setDatosUsuario] = useState({
+        exp:0,
+        iat:0,
+        user:{
+            apellidos:'',
+            email:'',
+            nombres:'',
+            rol:{
+                idrol:0,
+                rol:'',
+            },
+            rutusuario:'',
+            
+        }
+    },)
 
 
     const Login = async (usuario:UsuarioLogin) => {
@@ -41,8 +88,15 @@ export const AuthProvider: React.FC<ChildrenApp> = ({children}) => {
         if(usuario.rutusuario == '') return setusuario({...usuario, error:'El usuario no puede estar Vació'});
 
         const respLogin = await LoginUsuario(usuario);
-        console.log(respLogin)
         return respLogin;
+    }
+
+    const DatosUser = (DataUsuario:UserData) => {
+        
+        if(!DataUsuario.user.rutusuario) return;
+        console.log(DataUsuario)
+        return setDatosUsuario(DataUsuario)
+
     }
 
 
@@ -50,7 +104,9 @@ export const AuthProvider: React.FC<ChildrenApp> = ({children}) => {
     return(
         <AuthContext.Provider value={{
             ...usuario,
-            login: Login
+            datosusuario : datosUsuario,
+            login: Login,
+            CompletarUsuario: DatosUser
         }}>
         
         

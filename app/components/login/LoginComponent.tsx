@@ -6,6 +6,9 @@ import { AuthContext } from '@/app/contexts/AuthContext';
 import { UsuarioLogin } from '@/app/contexts/interfaces/types';
 import Swal from 'sweetalert2';
 import { Modal, Button } from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import { setCookie } from 'nookies';
+
 
 
 
@@ -25,6 +28,8 @@ type changePass = {
 
 
 export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' }) => {
+
+    const router = useRouter();
 
     const [show, setShow] = useState('');
     const [display, setDisplay] = useState('none');
@@ -97,14 +102,20 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
 
         if(respuesta.resp.statusCode == 200){
             if(respuesta.resp.message.includes('Bearer')) {
+                setCookie(null,'token',respuesta.resp.message, { maxAge: 3600, path: '/' });
                 return Swal.fire({
                     html:'Sesión iniciada correctamente',
                     icon:'success',
                     timer:2000,
                     showConfirmButton:false,
+                    willClose:()=>  router.push('http://localhost:3005/tramitacion')
                     
                 })
             }
+
+            
+
+
         }
 
         if (messageError != '') Swal.fire({ title: 'Error', icon: 'error', html: messageError, confirmButtonColor: '#225F9D' });
