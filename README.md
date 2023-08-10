@@ -1,23 +1,54 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# PIEE Tramitación 
 
-## Getting Started
+## Instalación
 
-First, run the development server:
+### Requerimientos
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+- NodeJS >= 16.8
+- Yarn 1.22.29. Si se tiene una versión de yarn superior a la 2 se puede setear la versión de esta forma
+  ```
+  corepack prepare yarn@1.22.29 --activate
+  ```
+
+### Desarrollo
+
+1. Instalar las dependencias con
+
+   ```
+   yarn add --frozen-lockfile
+   ```
+
+   El flag `--frozen-lockfile` evitará que se modifique el `yarn.lock`
+
+2. Correr el proyeto con `yarn dev`
+
+3. Abrir el navegador en http://localhost:3005
+
+### Configurar prettier en VS Code
+
+1. Instalar la extensión de prettier `esbenp.prettier-vscode`. Se puede usar ese nombre en el buscador de extensiones del VS Code.
+
+2. Abrir las configuraciones en JSON del VS Code y agregar las siguientes líneas
+
+   ```json
+   "[typescriptreact]": {
+       "editor.defaultFormatter": "esbenp.prettier-vscode",
+       "editor.formatOnSave": true
+   },
+   ```
+
+   Esto formateará los archivos `.tsx` automáticamente al momento de guardar.
+
+   > Las configuraciones en JSON se encuentran apretando `F1` y escribiendo ">Open User Settings (JSON)"
+
+### Formatear código
+
+Para formatear todo el código dentro de la carpeta `/app` se puede usar el siguiente script
+
+```shell
+yarn format:fix
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
