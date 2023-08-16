@@ -8,8 +8,10 @@ import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import svg from './logo-fonasa.svg'
 import { AuthContext, AuthProvider, InscribeProvider, StepProvider } from '@/app/contexts'
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Usuario from './components/usuario/Usuario';
+import { EmpleadorProvider } from './contexts/EmpleadorContext';
+
 
 // const inter = Inter({ subsets: ['latin'] })
 
@@ -25,8 +27,19 @@ export default function RootLayout({
   children: React.ReactNode
 }, title: string, dsc: string) {
 
+  const [datoUsuario, setUsuario] = useState<string>()
+
 
   const { datosusuario:{user:{nombres}} } = useContext(AuthContext);
+
+  useEffect(() => {
+    
+      setUsuario(nombres);
+  }, [nombres])
+  
+  console.log(datoUsuario)
+
+  
   
   
 
@@ -36,6 +49,8 @@ export default function RootLayout({
       <AuthProvider>
 
         <InscribeProvider>
+        <EmpleadorProvider>
+          
           <html>
             <Head>
               <title>Portal Tramitación LME - {title} </title>
@@ -63,19 +78,21 @@ export default function RootLayout({
 
                       </Link>
                     </div>
+                   
 
                     {
                             (
-                                (nombres)
+                                (datoUsuario)
                                     ?
 
                                     // <Usuario usuario= {usuario}  />
-                                    <Usuario usuario={nombres} />
+                                    <Usuario usuario={datoUsuario} />
 
                                     :
                                     <></>
                             )
                         }
+                       
 
                   </nav>
                 </header>
@@ -117,6 +134,7 @@ export default function RootLayout({
             ></script>
 
           </html>
+          </EmpleadorProvider>
         </InscribeProvider>
 
       </AuthProvider>

@@ -3,24 +3,125 @@
 import jwt_decode from 'jwt-decode';
 import Link from 'next/link';
 import { parseCookies } from 'nookies';
-import { useContext, useState } from 'react';
-import Swal from 'sweetalert2';
+import { useState, useEffect, FormEvent, useContext } from 'react';
 import { LoginComponent } from '../components/login/LoginComponent';
 import Position from '../components/stage/Position';
-import { AuthContext } from '../contexts';
-import { CompruebaToken } from '../helpers/adscripcion/LoginUsuario';
 import styles from './page.module.css';
+import { CargaEmpleadores, Desadscribir, InscribirEmpleador, datoEmpresa } from '../helpers/tramitacion/empleadores';
+import { Empleador } from './interface/empleador';
+import Swal from 'sweetalert2';
+import { useForm } from '../hooks/useForm';
+import { CCACTLABCB, CCAFCB, CCCOMUNACB, CCREGIONCB, CCREMUNERACION, CCTAMANOCB, CCTIPOEM } from '../contexts/interfaces/types';
+import useCombo from '../hooks/useCombo';
+import { inscribeEmpleador } from './interface/inscribeEmpleador';
+import { EmpleadorContext } from '../contexts/EmpleadorContext';
+import { DatoEmpleador } from './interface/datoEmpleador';
 
-interface Trabajadores {
-  id: number;
-  value: string;
-}
+const initialComuna: CCCOMUNACB[] = [{
+  idcomuna: 0,
+  nombre: '',
+  region: {
+      idregion: 0,
+      nombre: ''
+  }
+}]
 
 const EmpleadoresPage = () => {
-  const [trabajadores, setData] = useState<any[]>([]);
+  const [empleadores, setempleadores] = useState<Empleador[]>([]);
+  let CCTIPOEMP: CCTIPOEM[] = useCombo("/tipoempleador/all");
+  let CCCOMUNA: CCCOMUNACB[] = useCombo("/comuna/all/region");
+  let CCAF: CCAFCB[] = useCombo("/ccaf/all");
+  let CCREGION: CCREGIONCB[] = useCombo("/Region/all");
+  let CCACTLAB: CCACTLABCB[] = useCombo("/actividadlaboral/all");
+  let CCREMUNERACION: CCREMUNERACION[] = useCombo("/sistemaremuneracion/all");
+  let CCTAMANOCB: CCTAMANOCB[] = useCombo("/tamanoempresa/all");
+  
+  const [ValidMail, setValidMail] = useState('');
 
-  const { CompletarUsuario } = useContext(AuthContext);
+  const { empleador, cargaEmpleador } = useContext(EmpleadorContext)
 
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      const forms = document.querySelectorAll('.needs-validation')
+      Array.from(forms).forEach((form: any) => {
+        form.addEventListener('submit', (event: Event) => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+
+          if (ValidMail == 'is-invalid') {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
+          form.classList.add('was-validated');
+
+        }, false);
+      });
+    }
+  }, []);
+  
+
+    const [region, setregion] = useState('');
+    const [comunas, setcomuna] = useState(initialComuna);
+
+  const { inscribeRun, razonsocial, templeador, ccaf,
+    alaboralemp, ccomuna, sremun,
+    npersonas, calle, numero,
+    bdep, tf1, tf2, onInputValidRut,
+    cemple, recemple, onInputChange, onInputChangeOnlyNum
+  } = useForm({
+    inscribeRun: '', razonsocial: '', templeador: '',
+    ccaf: '', alaboralemp: '', ccomuna: '',
+    npersonas: '', calle: '', numero: '',
+    bdep: '', tf1: '', tf2: '', cemple:'', recemple:''
+  })
+
+
+  useEffect(() => {
+
+    const loadEmpleador = async () => {
+      let respuesta = await CargaEmpleadores("");
+      setempleadores(respuesta);
+      cargaEmpleador(respuesta);
+    }
+    loadEmpleador();
+  }, []);
+
+  const onChangeRegion = (event: any) => {
+    setregion(event.target.value);
+    CCCOMUNA = CCCOMUNA.filter(({ region: { idregion } }) => idregion == event.target.value);
+    setcomuna(CCCOMUNA);
+}
+
+  const DesadscribirEmp = (empresa: string, rut: string) => {
+    Swal.fire({
+      title: 'Desadscribir',
+      html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
+      showCancelButton: true,
+      showConfirmButton: true,
+      cancelButtonColor: 'red',
+      cancelButtonText: 'Cancelar',
+      confirmButtonText: 'Aceptar',
+      confirmButtonColor: 'var(--color-blue)',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        let resp: Response = await Desadscribir(rut);
+        if (resp.ok) {
+          Swal.fire({ icon: 'success', html: `Entidad empleadora: ${empresa} fue eliminada con éxito`, timer: 3000, showConfirmButton: false });
+          const CargaEmpleador = async () => {
+            let respuesta = await CargaEmpleadores("");
+            setempleadores(respuesta);
+
+          }
+          CargaEmpleador();
+        } else {
+          Swal.fire({ icon: 'error', html: 'Hubo un problema en la operación' })
+        }
+      }
+    });
+  };
   let cookie = parseCookies();
   let token = cookie.token;
 
@@ -29,20 +130,71 @@ const EmpleadoresPage = () => {
   token = token.replaceAll('Bearer ', '');
   let data: any = jwt_decode(token);
 
-  CompruebaToken(token);
+  // CompruebaToken(token);
 
-  const editarEmpleador = (empresa: string, rut: string) => {
-    Swal.fire({
-      title: 'Desascribir',
-      html: `¿Esta seguro que desea desascribir: <b>${rut} - ${empresa}</b>?`,
-      showCancelButton: true,
-      showConfirmButton: true,
-      cancelButtonColor: 'red',
-      cancelButtonText: 'Cancelar',
-      confirmButtonText: 'Aceptar',
-      confirmButtonColor: 'var(--color-blue)',
-    });
-  };
+  const handleSubmit =  (event: FormEvent)=> {
+    event.preventDefault();
+    let NuevoEmp: inscribeEmpleador = {
+      rutempleador:inscribeRun,
+      razonsocial:razonsocial,
+      telefonohabitual:tf1,
+      telefonomovil:tf2,
+      email: cemple,
+      emailconfirma: recemple,
+      tipoempleador : {
+        idtipoempleador: Number(templeador),
+        tipoempleador:templeador
+      },
+      ccaf:{
+        idccaf: Number(ccaf),
+        nombre: ccaf
+      },
+      actividadlaboral:{
+        idactividadlaboral:Number(alaboralemp),
+        actividadlaboral:alaboralemp,
+      },
+      tamanoempresa:{
+        idtamanoempresa:Number(npersonas),
+        descripcion:npersonas,
+        nrotrabajadores:Number(npersonas)
+      },
+      sistemaremuneracion:{
+        idsistemaremuneracion:Number(sremun),
+        descripcion:sremun
+      },
+      direccionempleador:{
+        comuna:{
+          idcomuna:ccomuna,
+          nombre:ccomuna
+        },
+        calle:calle,
+        depto: bdep,
+        numero: numero
+      }
+    }
+
+    const Inscribir = async () => {
+      const resp = await InscribirEmpleador(NuevoEmp);
+     
+      if(resp.ok) {
+        const CargaEmpleador = async () => {
+          let respuesta = await CargaEmpleadores("");
+          setempleadores(respuesta);
+        }
+        CargaEmpleador();
+       return Swal.fire({html:'Operación realizada con éxito', icon:'success', showConfirmButton:false, timer:2000});
+      }
+      else{
+        let data = await resp.json();
+        if(data.message.includes('rutempleador|ya existe')) data.message= 'Rut empleador ya existe';
+        return Swal.fire({html:data.message, icon:'error', timer:3000, showConfirmButton:false})
+      }
+    }
+
+    Inscribir();
+
+  }
+
 
   return (
     <div className="bgads">
@@ -83,31 +235,54 @@ const EmpleadoresPage = () => {
           </div>
 
           <div className="row mt-4">
-            <div className="col-12">
+            <div className="col-md-10 col-xl-8">
               <table className="table table-hover">
-                <thead>
+                <thead className='align-middle'>
                   <tr>
-                    <th style={{ width: '200px' }}>RUT</th>
-                    <th>Razón Social</th>
-                    <th></th>
+                    <th style={{ width: '100px' }}>RUT</th>
+                    <th style={{ width: '150px' }}>Razón Social</th>
+                    <th style={{ width: '20px' }}></th>
                   </tr>
                 </thead>
-                <tbody>
-                  <tr className="align-middle">
-                    <td>
-                      <Link href={`/empleadores/datos?rut=76279970-7&razon=BONILLA Y GOMEZ LTDA.`}>
-                        76279970-7
-                      </Link>
-                    </td>
-                    <td>BONILLA Y GOMEZ LTDA.</td>
-                    <td>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => editarEmpleador('BONILLA Y GOMEZ LTDA.', '76279970-7')}>
-                        Desascribir
-                      </button>
-                    </td>
-                  </tr>
+                <tbody className='align-middle'>
+
+                  {
+                    empleadores.length > 0
+                    ?
+                    empleadores.map((value: Empleador) => (
+                      <tr key={value.rutempleador} className='align-middle'>
+                        <td>
+                          <Link href={`/empleadores/datos?rut=${value.rutempleador}&razon=${value.razonsocial}&id=${value.idempleador}`}>
+                            {value.rutempleador}
+                          </Link>
+                        </td>
+                        <td>
+                          {value.razonsocial}
+                        </td>
+                        <td className='text-center'>
+                          
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                DesadscribirEmp(value.razonsocial, value.rutempleador)
+                              }}
+                              title={`Desadscribir empleador ${value.razonsocial}`}>
+                              Desadscribir
+                            </button>
+
+                          
+
+                        </td>
+                      </tr>
+                    ))
+                    : <tr>
+                      <td>-</td>
+                      <td>-</td>
+                      <td></td>
+                    </tr>
+                  }
+
                 </tbody>
               </table>
               <div className="mt-3">
@@ -164,14 +339,13 @@ const EmpleadoresPage = () => {
               <div className="row">
                 <div className="col-md-4">
                   <label>RUT Empleador (*)</label>
-                  <input type="text" className="form-control" value={'7777792'} disabled />
+                  <input type="text" className="form-control" disabled />
                 </div>
                 <div className="col-md-4">
                   <label>Razón Social/Nombre particular (*)</label>
                   <input
                     type="text"
                     className="form-control"
-                    value={'BONILLA Y GOMEZ LTDA.'}
                     disabled
                   />
                 </div>
@@ -230,16 +404,16 @@ const EmpleadoresPage = () => {
               <div className="row mt-2">
                 <div className="col-md-3">
                   <label className="form-text">RUT</label>
-                  <input type="text" className="form-control" value={'112302239'} disabled />
+                  <input type="text" className="form-control" disabled />
                 </div>
 
                 <div className="col-md-3">
                   <label className="form-text">Nombres</label>
-                  <input type="text" className="form-control" value={'MARCELO'} />
+                  <input type="text" className="form-control" />
                 </div>
                 <div className="col-md-3">
                   <label className="form-text">Apellidos</label>
-                  <input type="text" className="form-control" value={'ORTIZ'} />
+                  <input type="text" className="form-control" />
                 </div>
                 <div className="col-md-3">
                   <label className="form-text">Rol</label>
@@ -263,7 +437,8 @@ const EmpleadoresPage = () => {
                       className="form-control"
                       id="tel1"
                       name="tf1"
-                      value={'997948811'}
+                      
+                      
                     />
                   </div>
                 </div>
@@ -280,7 +455,6 @@ const EmpleadoresPage = () => {
                       className="form-control"
                       id="tel1"
                       name="tf1"
-                      value={'222250208'}
                     />
                   </div>
                 </div>
@@ -292,7 +466,6 @@ const EmpleadoresPage = () => {
                     name="cemple"
                     className="form-control"
                     aria-describedby="cempleHelp"
-                    value={'marcelo.ortiz.silva@gmail.com'}
                     placeholder=""
                   />
                   <small id="cempleHelp" className="form-text text-muted"></small>
@@ -304,7 +477,6 @@ const EmpleadoresPage = () => {
                     name="cemple"
                     className="form-control"
                     aria-describedby="cempleHelp"
-                    value={'marcelo.ortiz.silva@gmail.com'}
                     placeholder=""
                   />
                   <small id="cempleHelp" className="form-text text-muted"></small>
@@ -345,14 +517,13 @@ const EmpleadoresPage = () => {
               <div className="row">
                 <div className="col-md-4">
                   <label>RUT Empleador (*)</label>
-                  <input type="text" className="form-control" value={'7777792'} disabled />
+                  <input type="text" className="form-control" disabled />
                 </div>
                 <div className="col-md-4">
                   <label>Razón Social/Nombre particular (*)</label>
                   <input
                     type="text"
                     className="form-control"
-                    value={'BONILLA Y GOMEZ LTDA.'}
                     disabled
                   />
                 </div>
@@ -395,12 +566,12 @@ const EmpleadoresPage = () => {
               <div className="row mt-2">
                 <div className="col-md-3">
                   <label className="form-text">Identificador Único</label>
-                  <input type="text" className="form-control" value={'1'} />
+                  <input type="text" className="form-control" />
                 </div>
 
                 <div className="col-md-3">
                   <label className="form-text">Nombre</label>
-                  <input type="text" className="form-control" value={'sarragosi'} />
+                  <input type="text" className="form-control" />
                 </div>
                 <div className="col-md-3">
                   <label className="form-text">Región</label>
@@ -419,11 +590,11 @@ const EmpleadoresPage = () => {
               <div className="row mt-2">
                 <div className="col-md-3">
                   <label className="form-text">Calle</label>
-                  <input type="text" className="form-control" value={'sarragosi'} />
+                  <input type="text" className="form-control" />
                 </div>
                 <div className="col-md-3">
                   <label className="form-text">N° casa/Departamento</label>
-                  <input type="text" className="form-control" value={'1460'} />
+                  <input type="text" className="form-control" />
                 </div>
 
                 <div className="col-md-3">
@@ -439,7 +610,6 @@ const EmpleadoresPage = () => {
                       className="form-control"
                       id="tel1"
                       name="tf1"
-                      value={'22225208'}
                     />
                   </div>
                 </div>
@@ -479,9 +649,9 @@ const EmpleadoresPage = () => {
                 data-bs-dismiss="modal"
                 aria-label="Close"></button>
             </div>
-            <div className="modal-body">
-              <div className="ms-3 me-3">
-                <form>
+            <form onSubmit={handleSubmit}>
+              <div className="modal-body">
+                <div className="ms-3 me-3">
                   <div
                     style={{
                       marginLeft: '15px',
@@ -509,34 +679,41 @@ const EmpleadoresPage = () => {
                         </label>
                         <input
                           type="text"
-                          name="rut"
+                          name="inscribeRun"
+                          maxLength={11}
+                          value={inscribeRun}
+                          onChange={onInputValidRut}
+                          autoComplete='new-custom-value'
                           className="form-control"
                           aria-describedby="rutHelp"
                         />
-                        <small
-                          id="rutHelp"
-                          className="form-text text-muted"
-                          style={{ fontSize: '10px' }}>
-                          No debe incluir guiones ni puntos (EJ: 175967044)
-                        </small>
                       </div>
                       <div className="col-md-4">
                         <div className="form-group">
                           <label htmlFor="exampleInputEmail1">Razón Social/ Nombre (*)</label>
                           <input
                             type="text"
-                            name="razon"
+                            name="razonsocial"
+                            value={razonsocial}
+                            onInput={onInputChange}
+                            minLength={4}
+                            maxLength={120}
+                            autoComplete='new-custom-value'
                             className="form-control"
                             aria-describedby="razonHelp"
                             placeholder=""
                           />
-                          <small id="razonHelp" className="form-text text-muted"></small>
                         </div>
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="templeador">Tipo de Entidad Empleadora (*)</label>
-                        <select className="form-select" id="templeador">
-                          <option>Seleccionar</option>
+                        <select className="form-select" id="templeador" name='templeador' value={templeador} onChange={onInputChange} required>
+                          <option value={''}>Seleccionar</option>
+                          {CCTIPOEMP.map(({idtipoempleador, tipoempleador}) => (
+                            <option key={idtipoempleador} value={idtipoempleador}>
+                              {tipoempleador}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
@@ -544,23 +721,40 @@ const EmpleadoresPage = () => {
                     <div className="row mt-2">
                       <div className="col-md-4">
                         <label htmlFor="ccaf">Seleccione CCAF a la cual está afiliada (*)</label>
-                        <select className="form-select" id="ccaf">
-                          <option>Seleccionar</option>
-                          <option>No Afiliada</option>
+                        <select className="form-select" id="ccaf" name='ccaf' value={ccaf} onChange={onInputChange}>
+                          <option value={''}>Seleccionar</option>
+                          {
+                            CCAF.map(({idccaf, nombre})=> (
+
+                              <option key={idccaf} value={idccaf}>
+                                  {nombre}
+                              </option>
+                            ))
+                          }
                         </select>
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="alaboralemp">
                           Actividad Laboral Entidad Empleadora (*)
                         </label>
-                        <select className="form-select" id="alaboralemp">
-                          <option>Seleccionar</option>
+                        <select className="form-select" id="alaboralemp" name='alaboralemp' value={alaboralemp} onChange={onInputChange}>
+                          <option value={''}>Seleccionar</option>
+                          {
+                            CCACTLAB.map(({idactividadlaboral, actividadlaboral})=> (
+                              <option key={idactividadlaboral} value={idactividadlaboral}>
+                                { actividadlaboral }
+                              </option>
+                            ))
+                          }
                         </select>
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="region">Región (*)</label>
-                        <select className="form-select" id="region">
-                          <option>Seleccionar</option>
+                        <select className="form-select" id="region" name='region' value={region} onChange={onChangeRegion} required>
+                          <option value={''}>Seleccionar</option>
+                          {
+                            CCREGION.map(({idregion, nombre})=><option key={idregion} value={idregion}>{nombre}</option>)
+                          }
                         </select>
                       </div>
                     </div>
@@ -568,8 +762,9 @@ const EmpleadoresPage = () => {
                     <div className="row mt-2">
                       <div className="col-md-4">
                         <label htmlFor="comuna">Comuna (*)</label>
-                        <select className="form-select" id="comuna">
-                          <option>Seleccionar</option>
+                        <select className="form-select" name='ccomuna' value={ccomuna} onChange={onInputChange} required>
+                          <option value={''}>Seleccionar</option>
+                          {comunas.map(({ idcomuna, nombre }) => (<option key={idcomuna} value={idcomuna}>{nombre}</option>))}
                         </select>
                       </div>
                       <div className="col-md-4">
@@ -577,6 +772,11 @@ const EmpleadoresPage = () => {
                         <input
                           type="text"
                           name="calle"
+                          value={calle}
+                          autoComplete='new-custom-value'
+                          minLength={2}
+                          maxLength={80}
+                          onChange={onInputChange}
                           className="form-control"
                           aria-describedby="calleHelp"
                           placeholder=""
@@ -588,6 +788,11 @@ const EmpleadoresPage = () => {
                         <input
                           type="text"
                           name="numero"
+                          value={numero}
+                          autoComplete="new-custom-value"
+                          minLength={1}
+                          maxLength={20}
+                          onChange={onInputChangeOnlyNum}
                           className="form-control"
                           aria-describedby="numHelp"
                           placeholder=""
@@ -602,6 +807,11 @@ const EmpleadoresPage = () => {
                         <input
                           type="text"
                           name="bdep"
+                          value={bdep}
+                          autoComplete="new-custom-value"
+                          minLength={1}
+                          maxLength={20}
+                          onChange={onInputChange}
                           className="form-control"
                           aria-describedby="bdepHelp"
                           placeholder=""
@@ -616,7 +826,16 @@ const EmpleadoresPage = () => {
                           <div className="input-group-prepend">
                             <div className="input-group-text">+56</div>
                           </div>
-                          <input type="text" className="form-control" id="tel1" name="tf1" />
+                          <input type="text" 
+                              className="form-control" 
+                              id="tel1"
+                              name="tf1"
+                              maxLength={9}
+                              minLength={9}
+                              autoComplete="new-custom-value"
+                              value={tf1}
+                              onChange={onInputChangeOnlyNum}
+                               />
                         </div>
                       </div>
                       <div className="col-md-4">
@@ -627,7 +846,16 @@ const EmpleadoresPage = () => {
                           <div className="input-group-prepend">
                             <div className="input-group-text">+56</div>
                           </div>
-                          <input type="text" className="form-control" id="tel2" name="tf2" />
+                          <input type="text"
+                            className="form-control"
+                            id="tel2"
+                            name="tf2"
+                            maxLength={9}
+                            minLength={9}
+                            autoComplete="new-custom-value"
+                            value={tf2}
+                            onChange={onInputChangeOnlyNum}
+                             />
                         </div>
                       </div>
                     </div>
@@ -640,6 +868,13 @@ const EmpleadoresPage = () => {
                         <input
                           type="mail"
                           name="cemple"
+                          value={cemple}
+                          onChange={onInputChange}
+                          onPaste={(e)=> e.preventDefault()}
+                          onCopy={(e)=> e.preventDefault()}
+                          minLength={3}
+                          maxLength={250}
+                          autoComplete='new-custom-value'
                           className="form-control"
                           aria-describedby="cempleHelp"
                           placeholder=""
@@ -655,6 +890,13 @@ const EmpleadoresPage = () => {
                         <input
                           type="mail"
                           name="recemple"
+                          value={recemple}
+                          onChange={onInputChange}
+                          minLength={3}
+                          maxLength={350}
+                          onPaste={(e)=> e.preventDefault()}
+                          onCopy={(e)=> e.preventDefault()}
+                          autoComplete="new-custom-value"
                           className="form-control"
                           aria-describedby="recempleHelp"
                           placeholder=""
@@ -668,10 +910,12 @@ const EmpleadoresPage = () => {
                         <div className="form-group">
                           <label htmlFor="qtrabajadores">N° de personas trabajadoras (*)</label>
 
-                          <select className="form-select" id="qtrabajadores">
-                            {trabajadores.map(({ id, value }: Trabajadores) => (
-                              <option key={id} id={id.toString()}>
-                                {value}
+                          <select className="form-select" id="qtrabajadores" name='npersonas' value={npersonas} onChange={onInputChange} required>
+                            <option value={''}>Seleccionar</option>
+                            {CCTAMANOCB.map(({ idtamanoempresa, descripcion }) => (
+                              
+                              <option key={idtamanoempresa} value={idtamanoempresa}>
+                                {descripcion}
                               </option>
                             ))}
                           </select>
@@ -679,20 +923,24 @@ const EmpleadoresPage = () => {
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="sremuneraciones">Sistema de Remuneración</label>
-                        <select className="form-select" id="sremuneraciones">
-                          <option>Seleccionar</option>
+                        <select className="form-select" id="sremuneraciones"  name='sremun' value={sremun} onChange={onInputChange} required>
+                          <option value={''}>Seleccionar</option>
+                          {
+                            CCREMUNERACION.map(({idsistemaremuneracion, descripcion})=> (<option key={idsistemaremuneracion} value={idsistemaremuneracion}> {descripcion} </option>))
+                          }
                         </select>
                       </div>
                     </div>
                   </div>
-                </form>
+
+                </div>
               </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-primary">
-                Confirmar Adscripción
-              </button>
-            </div>
+              <div className="modal-footer">
+                <button type='submit' className="btn btn-primary">
+                  Confirmar Adscripción
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

@@ -94,7 +94,6 @@ export const AuthProvider: React.FC<ChildrenApp> = ({children}) => {
     const DatosUser = (DataUsuario:UserData) => {
         
         if(!DataUsuario.user.rutusuario) return;
-        console.log(DataUsuario)
         return setDatosUsuario(DataUsuario)
 
     }
