@@ -1,12 +1,10 @@
 'use client';
 
 import jwt_decode from 'jwt-decode';
-import Link from 'next/link';
 import { parseCookies } from 'nookies';
 import { FormEvent, useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { LoginComponent } from '../components/login/LoginComponent';
-import Paginacion from '../components/paginacion/paginacion';
 import usePaginacion from '../components/paginacion/paginacion.hook';
 import Position from '../components/stage/Position';
 import { EmpleadorContext } from '../contexts/EmpleadorContext';
@@ -26,6 +24,7 @@ import {
 } from '../helpers/tramitacion/empleadores';
 import useCombo from '../hooks/useCombo';
 import { useForm } from '../hooks/useForm';
+import TablaEntidadesEmpleadoras from './(componentes)/TablaEntidadesEmpleadoras';
 import { Empleador } from './interface/empleador';
 import { inscribeEmpleador } from './interface/inscribeEmpleador';
 import styles from './page.module.css';
@@ -297,54 +296,10 @@ const EmpleadoresPage = () => {
 
           <div className="row mt-4">
             <div className="col-md-10 col-xl-8">
-              <table className="table table-hover">
-                <thead className="align-middle">
-                  <tr>
-                    <th style={{ width: '100px' }}>RUT</th>
-                    <th style={{ width: '150px' }}>Razón Social</th>
-                    <th style={{ width: '20px' }}></th>
-                  </tr>
-                </thead>
-                <tbody className="align-middle">
-                  {empleadoresPaginados.length > 0 ? (
-                    empleadoresPaginados.map((value: Empleador) => (
-                      <tr key={value.rutempleador} className="align-middle">
-                        <td>
-                          <Link
-                            href={`/empleadores/datos?rut=${value.rutempleador}&razon=${value.razonsocial}&id=${value.idempleador}`}>
-                            {value.rutempleador}
-                          </Link>
-                        </td>
-                        <td>{value.razonsocial}</td>
-                        <td className="text-center">
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              DesadscribirEmp(value.razonsocial, value.rutempleador);
-                            }}
-                            title={`Desadscribir empleador ${value.razonsocial}`}>
-                            Desadscribir
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td>-</td>
-                      <td>-</td>
-                      <td></td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-              <div className="mt-3">
-                <Paginacion
-                  totalPages={totalPaginas}
-                  onCambioPagina={cambiarPaginaActual}
-                  tamano="sm"
-                />
-              </div>
+              <TablaEntidadesEmpleadoras
+                empleadores={empleadores}
+                onDesadscribirEmpleador={(e) => DesadscribirEmp(e.razonsocial, e.rutempleador)}
+              />
             </div>
           </div>
           <br />
