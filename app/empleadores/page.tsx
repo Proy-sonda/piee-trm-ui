@@ -3,89 +3,137 @@
 import jwt_decode from 'jwt-decode';
 import Link from 'next/link';
 import { parseCookies } from 'nookies';
-import { useState, useEffect, FormEvent, useContext } from 'react';
-import { LoginComponent } from '../components/login/LoginComponent';
-import Position from '../components/stage/Position';
-import styles from './page.module.css';
-import { CargaEmpleadores, Desadscribir, InscribirEmpleador, datoEmpresa } from '../helpers/tramitacion/empleadores';
-import { Empleador } from './interface/empleador';
+import { FormEvent, useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { useForm } from '../hooks/useForm';
-import { CCACTLABCB, CCAFCB, CCCOMUNACB, CCREGIONCB, CCREMUNERACION, CCTAMANOCB, CCTIPOEM } from '../contexts/interfaces/types';
-import useCombo from '../hooks/useCombo';
-import { inscribeEmpleador } from './interface/inscribeEmpleador';
+import { LoginComponent } from '../components/login/LoginComponent';
+import Paginacion from '../components/paginacion/paginacion';
+import usePaginacion from '../components/paginacion/paginacion.hook';
+import Position from '../components/stage/Position';
 import { EmpleadorContext } from '../contexts/EmpleadorContext';
-import { DatoEmpleador } from './interface/datoEmpleador';
+import {
+  CCACTLABCB,
+  CCAFCB,
+  CCCOMUNACB,
+  CCREGIONCB,
+  CCREMUNERACION,
+  CCTAMANOCB,
+  CCTIPOEM,
+} from '../contexts/interfaces/types';
+import {
+  CargaEmpleadores,
+  Desadscribir,
+  InscribirEmpleador,
+} from '../helpers/tramitacion/empleadores';
+import useCombo from '../hooks/useCombo';
+import { useForm } from '../hooks/useForm';
+import { Empleador } from './interface/empleador';
+import { inscribeEmpleador } from './interface/inscribeEmpleador';
+import styles from './page.module.css';
 
-const initialComuna: CCCOMUNACB[] = [{
-  idcomuna: 0,
-  nombre: '',
-  region: {
+const initialComuna: CCCOMUNACB[] = [
+  {
+    idcomuna: 0,
+    nombre: '',
+    region: {
       idregion: 0,
-      nombre: ''
-  }
-}]
+      nombre: '',
+    },
+  },
+];
 
 const EmpleadoresPage = () => {
   const [empleadores, setempleadores] = useState<Empleador[]>([]);
-  let CCTIPOEMP: CCTIPOEM[] = useCombo("/tipoempleador/all");
-  let CCCOMUNA: CCCOMUNACB[] = useCombo("/comuna/all/region");
-  let CCAF: CCAFCB[] = useCombo("/ccaf/all");
-  let CCREGION: CCREGIONCB[] = useCombo("/Region/all");
-  let CCACTLAB: CCACTLABCB[] = useCombo("/actividadlaboral/all");
-  let CCREMUNERACION: CCREMUNERACION[] = useCombo("/sistemaremuneracion/all");
-  let CCTAMANOCB: CCTAMANOCB[] = useCombo("/tamanoempresa/all");
-  
+  let CCTIPOEMP: CCTIPOEM[] = useCombo('/tipoempleador/all');
+  let CCCOMUNA: CCCOMUNACB[] = useCombo('/comuna/all/region');
+  let CCAF: CCAFCB[] = useCombo('/ccaf/all');
+  let CCREGION: CCREGIONCB[] = useCombo('/Region/all');
+  let CCACTLAB: CCACTLABCB[] = useCombo('/actividadlaboral/all');
+  let CCREMUNERACION: CCREMUNERACION[] = useCombo('/sistemaremuneracion/all');
+  let CCTAMANOCB: CCTAMANOCB[] = useCombo('/tamanoempresa/all');
+
   const [ValidMail, setValidMail] = useState('');
 
-  const { empleador, cargaEmpleador } = useContext(EmpleadorContext)
+  const { empleador, cargaEmpleador } = useContext(EmpleadorContext);
 
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      const forms = document.querySelectorAll('.needs-validation')
+      const forms = document.querySelectorAll('.needs-validation');
       Array.from(forms).forEach((form: any) => {
-        form.addEventListener('submit', (event: Event) => {
-          if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
+        form.addEventListener(
+          'submit',
+          (event: Event) => {
+            if (!form.checkValidity()) {
+              event.preventDefault();
+              event.stopPropagation();
+            }
 
-          if (ValidMail == 'is-invalid') {
-            event.preventDefault();
-            event.stopPropagation();
-            return;
-          }
-          form.classList.add('was-validated');
-
-        }, false);
+            if (ValidMail == 'is-invalid') {
+              event.preventDefault();
+              event.stopPropagation();
+              return;
+            }
+            form.classList.add('was-validated');
+          },
+          false,
+        );
       });
     }
   }, []);
-  
 
-    const [region, setregion] = useState('');
-    const [comunas, setcomuna] = useState(initialComuna);
+  const [region, setregion] = useState('');
+  const [comunas, setcomuna] = useState(initialComuna);
 
-  const { inscribeRun, razonsocial, templeador, ccaf,
-    alaboralemp, ccomuna, sremun,
-    npersonas, calle, numero,
-    bdep, tf1, tf2, onInputValidRut,
-    cemple, recemple, onInputChange, onInputChangeOnlyNum
+  const {
+    inscribeRun,
+    razonsocial,
+    templeador,
+    ccaf,
+    alaboralemp,
+    ccomuna,
+    sremun,
+    npersonas,
+    calle,
+    numero,
+    bdep,
+    tf1,
+    tf2,
+    onInputValidRut,
+    cemple,
+    recemple,
+    onInputChange,
+    onInputChangeOnlyNum,
   } = useForm({
-    inscribeRun: '', razonsocial: '', templeador: '',
-    ccaf: '', alaboralemp: '', ccomuna: '',
-    npersonas: '', calle: '', numero: '',
-    bdep: '', tf1: '', tf2: '', cemple:'', recemple:''
-  })
+    inscribeRun: '',
+    razonsocial: '',
+    templeador: '',
+    ccaf: '',
+    alaboralemp: '',
+    ccomuna: '',
+    npersonas: '',
+    calle: '',
+    numero: '',
+    bdep: '',
+    tf1: '',
+    tf2: '',
+    cemple: '',
+    recemple: '',
+  });
 
+  const {
+    datosPaginados: empleadoresPaginados,
+    totalPaginas,
+    cambiarPaginaActual,
+  } = usePaginacion({
+    datos: empleadores,
+    tamanoPagina: 5,
+  });
 
   useEffect(() => {
-
     const loadEmpleador = async () => {
-      let respuesta = await CargaEmpleadores("");
+      let respuesta = await CargaEmpleadores('');
       setempleadores(respuesta);
       cargaEmpleador(respuesta);
-    }
+    };
     loadEmpleador();
   }, []);
 
@@ -93,7 +141,7 @@ const EmpleadoresPage = () => {
     setregion(event.target.value);
     CCCOMUNA = CCCOMUNA.filter(({ region: { idregion } }) => idregion == event.target.value);
     setcomuna(CCCOMUNA);
-}
+  };
 
   const DesadscribirEmp = (empresa: string, rut: string) => {
     Swal.fire({
@@ -105,19 +153,23 @@ const EmpleadoresPage = () => {
       cancelButtonText: 'Cancelar',
       confirmButtonText: 'Aceptar',
       confirmButtonColor: 'var(--color-blue)',
-    }).then(async (result) => {
+    }).then(async (result: any) => {
       if (result.isConfirmed) {
         let resp: Response = await Desadscribir(rut);
         if (resp.ok) {
-          Swal.fire({ icon: 'success', html: `Entidad empleadora: ${empresa} fue eliminada con éxito`, timer: 3000, showConfirmButton: false });
+          Swal.fire({
+            icon: 'success',
+            html: `Entidad empleadora: ${empresa} fue eliminada con éxito`,
+            timer: 3000,
+            showConfirmButton: false,
+          });
           const CargaEmpleador = async () => {
-            let respuesta = await CargaEmpleadores("");
+            let respuesta = await CargaEmpleadores('');
             setempleadores(respuesta);
-
-          }
+          };
           CargaEmpleador();
         } else {
-          Swal.fire({ icon: 'error', html: 'Hubo un problema en la operación' })
+          Swal.fire({ icon: 'error', html: 'Hubo un problema en la operación' });
         }
       }
     });
@@ -132,69 +184,77 @@ const EmpleadoresPage = () => {
 
   // CompruebaToken(token);
 
-  const handleSubmit =  (event: FormEvent)=> {
+  const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     let NuevoEmp: inscribeEmpleador = {
-      rutempleador:inscribeRun,
-      razonsocial:razonsocial,
-      telefonohabitual:tf1,
-      telefonomovil:tf2,
+      rutempleador: inscribeRun,
+      razonsocial: razonsocial,
+      telefonohabitual: tf1,
+      telefonomovil: tf2,
       email: cemple,
       emailconfirma: recemple,
-      tipoempleador : {
+      tipoempleador: {
         idtipoempleador: Number(templeador),
-        tipoempleador:templeador
+        tipoempleador: templeador,
       },
-      ccaf:{
+      ccaf: {
         idccaf: Number(ccaf),
-        nombre: ccaf
+        nombre: ccaf,
       },
-      actividadlaboral:{
-        idactividadlaboral:Number(alaboralemp),
-        actividadlaboral:alaboralemp,
+      actividadlaboral: {
+        idactividadlaboral: Number(alaboralemp),
+        actividadlaboral: alaboralemp,
       },
-      tamanoempresa:{
-        idtamanoempresa:Number(npersonas),
-        descripcion:npersonas,
-        nrotrabajadores:Number(npersonas)
+      tamanoempresa: {
+        idtamanoempresa: Number(npersonas),
+        descripcion: npersonas,
+        nrotrabajadores: Number(npersonas),
       },
-      sistemaremuneracion:{
-        idsistemaremuneracion:Number(sremun),
-        descripcion:sremun
+      sistemaremuneracion: {
+        idsistemaremuneracion: Number(sremun),
+        descripcion: sremun,
       },
-      direccionempleador:{
-        comuna:{
-          idcomuna:ccomuna,
-          nombre:ccomuna
+      direccionempleador: {
+        comuna: {
+          idcomuna: ccomuna,
+          nombre: ccomuna,
         },
-        calle:calle,
+        calle: calle,
         depto: bdep,
-        numero: numero
-      }
-    }
+        numero: numero,
+      },
+    };
 
     const Inscribir = async () => {
       const resp = await InscribirEmpleador(NuevoEmp);
-     
-      if(resp.ok) {
+
+      if (resp.ok) {
         const CargaEmpleador = async () => {
-          let respuesta = await CargaEmpleadores("");
+          let respuesta = await CargaEmpleadores('');
           setempleadores(respuesta);
-        }
+        };
         CargaEmpleador();
-       return Swal.fire({html:'Operación realizada con éxito', icon:'success', showConfirmButton:false, timer:2000});
-      }
-      else{
+        return Swal.fire({
+          html: 'Operación realizada con éxito',
+          icon: 'success',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+      } else {
         let data = await resp.json();
-        if(data.message.includes('rutempleador|ya existe')) data.message= 'Rut empleador ya existe';
-        return Swal.fire({html:data.message, icon:'error', timer:3000, showConfirmButton:false})
+        if (data.message.includes('rutempleador|ya existe'))
+          data.message = 'Rut empleador ya existe';
+        return Swal.fire({
+          html: data.message,
+          icon: 'error',
+          timer: 3000,
+          showConfirmButton: false,
+        });
       }
-    }
+    };
 
     Inscribir();
-
-  }
-
+  };
 
   return (
     <div className="bgads">
@@ -237,79 +297,52 @@ const EmpleadoresPage = () => {
           <div className="row mt-4">
             <div className="col-md-10 col-xl-8">
               <table className="table table-hover">
-                <thead className='align-middle'>
+                <thead className="align-middle">
                   <tr>
                     <th style={{ width: '100px' }}>RUT</th>
                     <th style={{ width: '150px' }}>Razón Social</th>
                     <th style={{ width: '20px' }}></th>
                   </tr>
                 </thead>
-                <tbody className='align-middle'>
-
-                  {
-                    empleadores.length > 0
-                    ?
-                    empleadores.map((value: Empleador) => (
-                      <tr key={value.rutempleador} className='align-middle'>
+                <tbody className="align-middle">
+                  {empleadoresPaginados.length > 0 ? (
+                    empleadoresPaginados.map((value: Empleador) => (
+                      <tr key={value.rutempleador} className="align-middle">
                         <td>
-                          <Link href={`/empleadores/datos?rut=${value.rutempleador}&razon=${value.razonsocial}&id=${value.idempleador}`}>
+                          <Link
+                            href={`/empleadores/datos?rut=${value.rutempleador}&razon=${value.razonsocial}&id=${value.idempleador}`}>
                             {value.rutempleador}
                           </Link>
                         </td>
-                        <td>
-                          {value.razonsocial}
-                        </td>
-                        <td className='text-center'>
-                          
-                            <button
-                              className="btn btn-danger btn-sm"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                DesadscribirEmp(value.razonsocial, value.rutempleador)
-                              }}
-                              title={`Desadscribir empleador ${value.razonsocial}`}>
-                              Desadscribir
-                            </button>
-
-                          
-
+                        <td>{value.razonsocial}</td>
+                        <td className="text-center">
+                          <button
+                            className="btn btn-danger btn-sm"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              DesadscribirEmp(value.razonsocial, value.rutempleador);
+                            }}
+                            title={`Desadscribir empleador ${value.razonsocial}`}>
+                            Desadscribir
+                          </button>
                         </td>
                       </tr>
                     ))
-                    : <tr>
+                  ) : (
+                    <tr>
                       <td>-</td>
                       <td>-</td>
                       <td></td>
                     </tr>
-                  }
-
+                  )}
                 </tbody>
               </table>
               <div className="mt-3">
-                <div>
-                  <ul className="pagination">
-                    <li className="page-item">
-                      <a className="page-link" href="#">
-                        Anterior
-                      </a>
-                    </li>
-                    <li className="page-item">
-                      <a className="page-link" href="#">
-                        1
-                      </a>
-                    </li>
-                    <li className="page-item">
-                      <a className="page-link" href="#">
-                        2
-                      </a>
-                    </li>
-                    <li className="page-item">
-                      <a className="page-link" href="#">
-                        Siguiente
-                      </a>
-                    </li>
-                  </ul>
-                </div>
+                <Paginacion
+                  totalPages={totalPaginas}
+                  onCambioPagina={cambiarPaginaActual}
+                  tamano="sm"
+                />
               </div>
             </div>
           </div>
@@ -343,11 +376,7 @@ const EmpleadoresPage = () => {
                 </div>
                 <div className="col-md-4">
                   <label>Razón Social/Nombre particular (*)</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    disabled
-                  />
+                  <input type="text" className="form-control" disabled />
                 </div>
               </div>
 
@@ -432,14 +461,7 @@ const EmpleadoresPage = () => {
                     <div className="input-group-prepend">
                       <div className="input-group-text">+56</div>
                     </div>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="tel1"
-                      name="tf1"
-                      
-                      
-                    />
+                    <input type="text" className="form-control" id="tel1" name="tf1" />
                   </div>
                 </div>
                 <div className="col-md-3">
@@ -450,12 +472,7 @@ const EmpleadoresPage = () => {
                     <div className="input-group-prepend">
                       <div className="input-group-text">+56</div>
                     </div>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="tel1"
-                      name="tf1"
-                    />
+                    <input type="text" className="form-control" id="tel1" name="tf1" />
                   </div>
                 </div>
 
@@ -521,11 +538,7 @@ const EmpleadoresPage = () => {
                 </div>
                 <div className="col-md-4">
                   <label>Razón Social/Nombre particular (*)</label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    disabled
-                  />
+                  <input type="text" className="form-control" disabled />
                 </div>
               </div>
 
@@ -605,12 +618,7 @@ const EmpleadoresPage = () => {
                     <div className="input-group-prepend">
                       <div className="input-group-text">+56</div>
                     </div>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="tel1"
-                      name="tf1"
-                    />
+                    <input type="text" className="form-control" id="tel1" name="tf1" />
                   </div>
                 </div>
               </div>
@@ -683,7 +691,7 @@ const EmpleadoresPage = () => {
                           maxLength={11}
                           value={inscribeRun}
                           onChange={onInputValidRut}
-                          autoComplete='new-custom-value'
+                          autoComplete="new-custom-value"
                           className="form-control"
                           aria-describedby="rutHelp"
                         />
@@ -698,7 +706,7 @@ const EmpleadoresPage = () => {
                             onInput={onInputChange}
                             minLength={4}
                             maxLength={120}
-                            autoComplete='new-custom-value'
+                            autoComplete="new-custom-value"
                             className="form-control"
                             aria-describedby="razonHelp"
                             placeholder=""
@@ -707,9 +715,15 @@ const EmpleadoresPage = () => {
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="templeador">Tipo de Entidad Empleadora (*)</label>
-                        <select className="form-select" id="templeador" name='templeador' value={templeador} onChange={onInputChange} required>
+                        <select
+                          className="form-select"
+                          id="templeador"
+                          name="templeador"
+                          value={templeador}
+                          onChange={onInputChange}
+                          required>
                           <option value={''}>Seleccionar</option>
-                          {CCTIPOEMP.map(({idtipoempleador, tipoempleador}) => (
+                          {CCTIPOEMP.map(({ idtipoempleador, tipoempleador }) => (
                             <option key={idtipoempleador} value={idtipoempleador}>
                               {tipoempleador}
                             </option>
@@ -721,40 +735,53 @@ const EmpleadoresPage = () => {
                     <div className="row mt-2">
                       <div className="col-md-4">
                         <label htmlFor="ccaf">Seleccione CCAF a la cual está afiliada (*)</label>
-                        <select className="form-select" id="ccaf" name='ccaf' value={ccaf} onChange={onInputChange}>
+                        <select
+                          className="form-select"
+                          id="ccaf"
+                          name="ccaf"
+                          value={ccaf}
+                          onChange={onInputChange}>
                           <option value={''}>Seleccionar</option>
-                          {
-                            CCAF.map(({idccaf, nombre})=> (
-
-                              <option key={idccaf} value={idccaf}>
-                                  {nombre}
-                              </option>
-                            ))
-                          }
+                          {CCAF.map(({ idccaf, nombre }) => (
+                            <option key={idccaf} value={idccaf}>
+                              {nombre}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="alaboralemp">
                           Actividad Laboral Entidad Empleadora (*)
                         </label>
-                        <select className="form-select" id="alaboralemp" name='alaboralemp' value={alaboralemp} onChange={onInputChange}>
+                        <select
+                          className="form-select"
+                          id="alaboralemp"
+                          name="alaboralemp"
+                          value={alaboralemp}
+                          onChange={onInputChange}>
                           <option value={''}>Seleccionar</option>
-                          {
-                            CCACTLAB.map(({idactividadlaboral, actividadlaboral})=> (
-                              <option key={idactividadlaboral} value={idactividadlaboral}>
-                                { actividadlaboral }
-                              </option>
-                            ))
-                          }
+                          {CCACTLAB.map(({ idactividadlaboral, actividadlaboral }) => (
+                            <option key={idactividadlaboral} value={idactividadlaboral}>
+                              {actividadlaboral}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="region">Región (*)</label>
-                        <select className="form-select" id="region" name='region' value={region} onChange={onChangeRegion} required>
+                        <select
+                          className="form-select"
+                          id="region"
+                          name="region"
+                          value={region}
+                          onChange={onChangeRegion}
+                          required>
                           <option value={''}>Seleccionar</option>
-                          {
-                            CCREGION.map(({idregion, nombre})=><option key={idregion} value={idregion}>{nombre}</option>)
-                          }
+                          {CCREGION.map(({ idregion, nombre }) => (
+                            <option key={idregion} value={idregion}>
+                              {nombre}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
@@ -762,9 +789,18 @@ const EmpleadoresPage = () => {
                     <div className="row mt-2">
                       <div className="col-md-4">
                         <label htmlFor="comuna">Comuna (*)</label>
-                        <select className="form-select" name='ccomuna' value={ccomuna} onChange={onInputChange} required>
+                        <select
+                          className="form-select"
+                          name="ccomuna"
+                          value={ccomuna}
+                          onChange={onInputChange}
+                          required>
                           <option value={''}>Seleccionar</option>
-                          {comunas.map(({ idcomuna, nombre }) => (<option key={idcomuna} value={idcomuna}>{nombre}</option>))}
+                          {comunas.map(({ idcomuna, nombre }) => (
+                            <option key={idcomuna} value={idcomuna}>
+                              {nombre}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div className="col-md-4">
@@ -773,7 +809,7 @@ const EmpleadoresPage = () => {
                           type="text"
                           name="calle"
                           value={calle}
-                          autoComplete='new-custom-value'
+                          autoComplete="new-custom-value"
                           minLength={2}
                           maxLength={80}
                           onChange={onInputChange}
@@ -826,16 +862,17 @@ const EmpleadoresPage = () => {
                           <div className="input-group-prepend">
                             <div className="input-group-text">+56</div>
                           </div>
-                          <input type="text" 
-                              className="form-control" 
-                              id="tel1"
-                              name="tf1"
-                              maxLength={9}
-                              minLength={9}
-                              autoComplete="new-custom-value"
-                              value={tf1}
-                              onChange={onInputChangeOnlyNum}
-                               />
+                          <input
+                            type="text"
+                            className="form-control"
+                            id="tel1"
+                            name="tf1"
+                            maxLength={9}
+                            minLength={9}
+                            autoComplete="new-custom-value"
+                            value={tf1}
+                            onChange={onInputChangeOnlyNum}
+                          />
                         </div>
                       </div>
                       <div className="col-md-4">
@@ -846,7 +883,8 @@ const EmpleadoresPage = () => {
                           <div className="input-group-prepend">
                             <div className="input-group-text">+56</div>
                           </div>
-                          <input type="text"
+                          <input
+                            type="text"
                             className="form-control"
                             id="tel2"
                             name="tf2"
@@ -855,7 +893,7 @@ const EmpleadoresPage = () => {
                             autoComplete="new-custom-value"
                             value={tf2}
                             onChange={onInputChangeOnlyNum}
-                             />
+                          />
                         </div>
                       </div>
                     </div>
@@ -870,11 +908,11 @@ const EmpleadoresPage = () => {
                           name="cemple"
                           value={cemple}
                           onChange={onInputChange}
-                          onPaste={(e)=> e.preventDefault()}
-                          onCopy={(e)=> e.preventDefault()}
+                          onPaste={(e) => e.preventDefault()}
+                          onCopy={(e) => e.preventDefault()}
                           minLength={3}
                           maxLength={250}
-                          autoComplete='new-custom-value'
+                          autoComplete="new-custom-value"
                           className="form-control"
                           aria-describedby="cempleHelp"
                           placeholder=""
@@ -894,8 +932,8 @@ const EmpleadoresPage = () => {
                           onChange={onInputChange}
                           minLength={3}
                           maxLength={350}
-                          onPaste={(e)=> e.preventDefault()}
-                          onCopy={(e)=> e.preventDefault()}
+                          onPaste={(e) => e.preventDefault()}
+                          onCopy={(e) => e.preventDefault()}
                           autoComplete="new-custom-value"
                           className="form-control"
                           aria-describedby="recempleHelp"
@@ -910,10 +948,15 @@ const EmpleadoresPage = () => {
                         <div className="form-group">
                           <label htmlFor="qtrabajadores">N° de personas trabajadoras (*)</label>
 
-                          <select className="form-select" id="qtrabajadores" name='npersonas' value={npersonas} onChange={onInputChange} required>
+                          <select
+                            className="form-select"
+                            id="qtrabajadores"
+                            name="npersonas"
+                            value={npersonas}
+                            onChange={onInputChange}
+                            required>
                             <option value={''}>Seleccionar</option>
                             {CCTAMANOCB.map(({ idtamanoempresa, descripcion }) => (
-                              
                               <option key={idtamanoempresa} value={idtamanoempresa}>
                                 {descripcion}
                               </option>
@@ -923,20 +966,28 @@ const EmpleadoresPage = () => {
                       </div>
                       <div className="col-md-4">
                         <label htmlFor="sremuneraciones">Sistema de Remuneración</label>
-                        <select className="form-select" id="sremuneraciones"  name='sremun' value={sremun} onChange={onInputChange} required>
+                        <select
+                          className="form-select"
+                          id="sremuneraciones"
+                          name="sremun"
+                          value={sremun}
+                          onChange={onInputChange}
+                          required>
                           <option value={''}>Seleccionar</option>
-                          {
-                            CCREMUNERACION.map(({idsistemaremuneracion, descripcion})=> (<option key={idsistemaremuneracion} value={idsistemaremuneracion}> {descripcion} </option>))
-                          }
+                          {CCREMUNERACION.map(({ idsistemaremuneracion, descripcion }) => (
+                            <option key={idsistemaremuneracion} value={idsistemaremuneracion}>
+                              {' '}
+                              {descripcion}{' '}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
                   </div>
-
                 </div>
               </div>
               <div className="modal-footer">
-                <button type='submit' className="btn btn-primary">
+                <button type="submit" className="btn btn-primary">
                   Confirmar Adscripción
                 </button>
               </div>
