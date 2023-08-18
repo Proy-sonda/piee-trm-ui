@@ -2,17 +2,19 @@
 
 import Position from '@/app/components/stage/Position';
 import Stage from '@/app/components/stage/Stage';
-import { EliminarUnidad, cargaUnidadrrhh, crearUnidad } from '@/app/helpers/tramitacion/empleadores';
+import { EliminarUnidad, cargaUnidadrrhh, crearUnidad, getDatoUnidad, putDatoUnidad } from '@/app/helpers/tramitacion/empleadores';
 import { Unidadrhh } from '@/app/interface/tramitacion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { parseCookies } from 'nookies';
-import { useEffect, useState, FormEvent } from 'react';
+import { useEffect, useState, FormEvent, ChangeEvent } from 'react';
 import Swal from 'sweetalert2';
 import { useForm } from '../../hooks/useForm';
 import { CCCOMUNACB, CCREGIONCB } from '@/app/contexts/interfaces/types';
 import useCombo from '@/app/hooks/useCombo';
 import { CrearUnidad } from '../interface/crearUnidad';
+import { UnidadResp } from '../interface/UnidadResp';
+import { UpdateUnidad } from '../interface/UpdateUnidad';
 
 
 interface UnidadRRHHProps {
@@ -31,15 +33,31 @@ const initialComuna: CCCOMUNACB[] = [{
   }
 }]
 
+
+let FormularioEdit = {
+  editnombre:'',
+  editcomuna:'',
+  editcalle:'',
+  editnrocalle:'',
+  editnrocasa:'',
+  editidentificador:'',
+  edittelefono:'',
+  editemail:'',
+  editremail:'',
+  editregion:'',
+}
+
 const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
   const router = useRouter();
   let CCREGION: CCREGIONCB[] = useCombo("/Region/all");
   let CCCOMUNA: CCCOMUNACB[] = useCombo("/comuna/all/region");
   const [region, setregion] = useState<any>();
+  const [idunidad, setIdunidad] = useState<string>();
   const [comunas, setcomuna] = useState(initialComuna);
 
   const { rut, razon, id } = searchParams;
   const [UnidadRRHH, setUnidadRRHH] = useState<Unidadrhh[]>([]);
+
   const { nombre, comuna, calle, nrocalle, nrocasa, identificador, telefono, email, remail, onInputChange , onInputChangeOnlyNum} =  useForm ({
       nombre:'',
       comuna:'',
@@ -50,8 +68,11 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
       telefono:'',
       email:'',
       remail:''
-  })
-  
+  });
+
+  const [InitialForm, setInitialForm] = useState(FormularioEdit);
+
+    
 
   let cookie = parseCookies();
   let token = cookie.token;
@@ -139,10 +160,92 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
 
     EnviaSolicitud();
   }
+
+  const handleEdit = (idunidad:number)=> {
+    setIdunidad(idunidad.toString());
+    const SelectUnidad = async ()=> {
+      const data = await getDatoUnidad(idunidad);
+      if(data.ok){
+        const resp:UnidadResp = await data.json();
+        setInitialForm({
+          editnombre: resp.unidad,
+          editcalle: resp.direccionunidad.numero,
+          editcomuna: resp.direccionunidad.comuna.idcomuna,
+          editemail: resp.email,
+          editidentificador: resp.identificador,
+          editnrocalle: resp.direccionunidad.numero,
+          editnrocasa: resp.direccionunidad.depto,
+          editremail:resp.email,
+          edittelefono: resp.telefono,
+          editregion: resp.direccionunidad.comuna.region.idregion
+        });
+      
+      }
+    }
+
+    SelectUnidad();
+  }
+
+  const onChangeEdit = (e:ChangeEvent<HTMLInputElement | HTMLSelectElement>)=>
+        setInitialForm({...InitialForm,[e.target.name]: e.target.value});
+    
   const onChangeRegion = (event: any) => {
     setregion(event.target.value);
+    setInitialForm({
+      ...InitialForm,
+      [event.target.name] : event.target.value
+    })
     CCCOMUNA = CCCOMUNA.filter(({ region: { idregion } }) => idregion == event.target.value);
     setcomuna(CCCOMUNA);
+  }
+
+  useEffect(() => {
+    CCCOMUNA = CCCOMUNA.filter(({ region: { idregion } }) => idregion == Number(InitialForm.editregion));
+    setcomuna(CCCOMUNA);
+  }, [InitialForm])
+  
+
+  const handleEditUnidad = (e:FormEvent)=> {
+    e.preventDefault();
+    const DataUnidad : UpdateUnidad = {
+        direccionunidad: {
+          comuna:{
+            idcomuna:  InitialForm.editcomuna,
+            nombre: InitialForm.editcomuna
+          },
+          calle: InitialForm.editcalle,
+          depto: InitialForm.editnrocasa,
+          numero: InitialForm.editnrocalle
+
+        },
+        email: InitialForm.editemail,
+        empleador: {
+          idempleador: Number(id),
+        },
+        estadounidadrrhh:{
+          idestadounidadrrhh: 1,
+          descripcion: 'SUSCRITO'
+        },
+        identificador: InitialForm.editidentificador,
+        idunidad: Number(idunidad),
+        telefono: InitialForm.edittelefono,
+        unidad: InitialForm.editnombre
+    }
+
+    const updateUnidad = async ()=> {
+      const data = await putDatoUnidad(DataUnidad);
+      if(data.ok) {
+        const cargaUnidades = async ()=> {
+          const data = await cargaUnidadrrhh(rut);
+          setUnidadRRHH(data);
+        }
+        cargaUnidades();
+        return Swal.fire({html:'Unidad fue actualizada con exito', icon:'success', timer:2000, showConfirmButton:false});
+      }
+      Swal.fire({html:'Existe un problema en la operación', icon:'error' });
+    }
+    updateUnidad();
+
   }
 
   if (!token) {
@@ -224,7 +327,7 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
                         {unidad?.unidad}
                       </td>
                       <td>
-                        {unidad?.idunidad}
+                        {unidad?.identificador}
                       </td>
                       <td>
                         {unidad?.direccionunidad?.numero}
@@ -239,7 +342,8 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
                         <button
                           className="btn text-primary"
                           data-bs-toggle="modal"
-                          data-bs-target="#modrrhh">
+                          data-bs-target="#modrrhh" 
+                          onClick={()=> handleEdit(unidad.idunidad)}>
                           <i className="bi bi-pencil-square"></i>
                         </button>
                         <button className="btn text-danger" 
@@ -272,9 +376,7 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
                     <td></td>
                   </tr>
                 }
-
-              </tbody>
-              <tfoot>
+                <tfoot>
                 <nav aria-label="Page navigation example" className="float-end">
                   <div>
                     <ul className="pagination">
@@ -303,7 +405,11 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
                   </div>
                 </nav>
               </tfoot>
+
+              </tbody>
+              
             </table>
+            
           </div>
         </div>
       </div>
@@ -479,95 +585,109 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
         aria-hidden="true">
         <div className="modal-dialog modal-xl">
           <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Modificar Unidad RRHH
-              </h1>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-              <div className="row mt-2">
-                <div className="col-md-3">
-                  <label className="form-text">Nombre</label>
-                  <input type="text" className="form-control" />
-                </div>
-                <div className="col-md-3">
-                  <label className="form-text">Región</label>
-                  <select className="form-select">
-                    <option>Seleccionar</option>
-                  </select>
-                </div>
-                <div className="col-md-3">
-                  <label className="form-text">Comuna</label>
-                  <select className="form-select">
-                    <option>Seleccionar</option>
-                  </select>
-                </div>
-                <div className="col-md-3">
-                  <label className="form-text">Calle</label>
-                  <input type="text" className="form-control"/>
-                </div>
+            <form onSubmit={handleEditUnidad} >
+              <div className="modal-header">
+                <h1 className="modal-title fs-5" id="exampleModalLabel">
+                  Modificar Unidad RRHH
+                </h1>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"></button>
               </div>
+              <div className="modal-body">
+                <div className="row mt-2">
+                  <div className="col-md-3">
+                    <label className="form-text">Nombre</label>
+                    <input type="text" 
+                    className="form-control"
+                    name='editnombre'
+                    value={InitialForm.editnombre}
+                    onChange={onChangeEdit}
+                    required/>
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-text">Región</label>
+                    <select className="form-select" name='editregion' value={InitialForm.editregion} onChange={onChangeRegion} required>
+                      <option value={''}>Seleccionar</option>
+                      {
+                        CCREGION.length > 0
+                          ? CCREGION.map(({ idregion, nombre }) => <option key={idregion} value={idregion}>{nombre}</option>)
+                          : <></>
+                      }
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-text">Comuna</label>
+                    <select className="form-select" name='comunaedit' value={InitialForm.editcomuna} onChange={onChangeEdit} required>
+                      <option value={''}>Seleccionar</option>
+                      {
+                        comunas.length > 0
+                          ? comunas.map(({ idcomuna, nombre }) => <option key={idcomuna} value={idcomuna}>{nombre}</option>)
+                          : <></>
+                      }
+                    </select>
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-text">Calle</label>
+                    <input type="text" className="form-control" name='editcalle' value={InitialForm.editcalle} onChange={onChangeEdit} required/>
+                  </div>
+                </div>
 
-              <div className="row mt-2">
-                <div className="col-md-3">
-                  <label className="form-text">N° Calle</label>
-                  <input type="text" className="form-control"/>
-                </div>
-                <div className="col-md-3">
-                  <label className="form-text">N° casa/Departamento</label>
-                  <input type="text" className="form-control"/>
-                </div>
-                <div className="col-md-3">
-                  <label className="form-text">Identificador Único</label>
-                  <input type="text" className="form-control"/>
-                </div>
+                <div className="row mt-2">
+                  <div className="col-md-3">
+                    <label className="form-text">N° Calle</label>
+                    <input type="text" className="form-control" name='editnrocalle' value={InitialForm.editnrocalle} onChange={onChangeEdit} required/>
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-text">N° casa/Departamento</label>
+                    <input type="text" className="form-control" name='editnrocasa' value={InitialForm.editnrocasa} onChange={onChangeEdit} required />
+                  </div>
+                  <div className="col-md-3">
+                    <label className="form-text">Identificador Único</label>
+                    <input type="text" className="form-control" name='editidentificador' value={InitialForm.editidentificador} onChange={onChangeEdit} required />
+                  </div>
 
-                <div className="col-md-3">
-                  <label className="sr-only" htmlFor="tel1">
-                    Teléfono
-                  </label>
-                  <div className="input-group mb-2">
-                    <div className="input-group-prepend">
-                      <div className="input-group-text">+56</div>
+                  <div className="col-md-3">
+                    <label className="sr-only" htmlFor="tel1">
+                      Teléfono
+                    </label>
+                    <div className="input-group mb-2">
+                      <div className="input-group-prepend">
+                        <div className="input-group-text">+56</div>
+                      </div>
+                      <input
+                        type="text"
+                        className="form-control"
+                        name='edittelefono' value={InitialForm.edittelefono} onChange={onChangeEdit} required/>
                     </div>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="tel1"
-                      name="tf1"
-                      
-                    />
+                  </div>
+                </div>
+                <div className="row mt-2">
+                  <div className="col-md-3">
+                    <label>Correo electrónico unidad RRHH</label>
+                    <input type="email" className="form-control" name='editemail' value={InitialForm.editemail} onChange={onChangeEdit} required/>
+                    <small id="cempleHelp" className="form-text text-muted">
+                      ejemplo@ejemplo.cl
+                    </small>
+                  </div>
+
+                  <div className="col-md-3">
+                    <label>Repetir correo electrónico</label>
+                    <input type="email" className="form-control" name='editremail' value={InitialForm.editremail} onChange={onChangeEdit} required/>
                   </div>
                 </div>
               </div>
-              <div className="row mt-2">
-                <div className="col-md-3">
-                  <label>Correo electrónico unidad RRHH</label>
-                  <input type="email" className="form-control" />
-                  <small id="cempleHelp" className="form-text text-muted">
-                    ejemplo@ejemplo.cl
-                  </small>
-                </div>
-
-                <div className="col-md-3">
-                  <label>Repetir correo electrónico</label>
-                  <input type="email" className="form-control" />
-                </div>
+              <div className="modal-footer">
+                <button type="submit" className="btn btn-primary">
+                  Modificar
+                </button>
+                <button type="button" className="btn btn-success" data-bs-dismiss="modal">
+                  Volver
+                </button>
               </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-primary">
-                Modificar
-              </button>
-              <button type="button" className="btn btn-success" data-bs-dismiss="modal">
-                Volver
-              </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>

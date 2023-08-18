@@ -234,7 +234,9 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
                         name="rutusuario"
                         className='form-control'
                         value={rutusuario}
-                        onChange={onInputChange}
+                        onChange={onInputValidRut}
+                        maxLength={11}
+                        required
                     />
                 </div>
                 <div className='mb-3'>
@@ -245,6 +247,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
                         className='form-control'
                         value={clave}
                         onChange={onInputChange}
+                        required
                     />
                 </div>
                 <div className={'mt-2 ' + styles.btnlogin}>

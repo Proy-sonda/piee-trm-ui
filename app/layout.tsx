@@ -11,6 +11,7 @@ import { AuthContext, AuthProvider, InscribeProvider, StepProvider } from '@/app
 import { useContext, useEffect, useState } from 'react';
 import Usuario from './components/usuario/Usuario';
 import { EmpleadorProvider } from './contexts/EmpleadorContext';
+import SessionTimer from './components/sessionTimer/SesionTimer';
 
 
 // const inter = Inter({ subsets: ['latin'] })
@@ -30,19 +31,17 @@ export default function RootLayout({
   const [datoUsuario, setUsuario] = useState<string>()
 
 
-  const { datosusuario:{user:{nombres}} } = useContext(AuthContext);
+  const { datosusuario:{user:{nombres}} , CompletarUsuario} = useContext(AuthContext);
 
   useEffect(() => {
     
       setUsuario(nombres);
+
   }, [nombres])
   
   console.log(datoUsuario)
 
   
-  
-  
-
   return (
     <StepProvider>
 
@@ -78,6 +77,7 @@ export default function RootLayout({
 
                       </Link>
                     </div>
+                    <SessionTimer/>
                    
 
                     {

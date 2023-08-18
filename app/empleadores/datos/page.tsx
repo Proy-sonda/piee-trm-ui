@@ -62,7 +62,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
       calle: empleador.find((v) => v.rutempleador == rut)?.direccionempleador.calle,
       numero: empleador.find((v) => v.rutempleador == rut)?.direccionempleador.numero,
       bdep: empleador.find((v) => v.rutempleador == rut)?.direccionempleador.depto,
-      ccomuna: empleador.find((v) => v.rutempleador == rut)?.direccionempleador.comuna.idcomuna,
+      ccomuna: empleador.find((v) => v.rutempleador == rut)?.direccionempleador.comuna.idcomuna.toString(),
       tf1: empleador.find((v) => v.rutempleador == rut)?.telefonohabitual,
       tf2: empleador.find((v) => v.rutempleador == rut)?.telefonomovil,
       cemple: empleador.find((v) => v.rutempleador == rut)?.email,
@@ -83,7 +83,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
       setLoading(false);
     }, 1800);
 
-  }, []);
+  }, [CCCOMUNA]);
 
   const onChangeRegion = (event: any) => {
     setregion(event.target.value);
