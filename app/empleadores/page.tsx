@@ -150,16 +150,11 @@ const EmpleadoresPage = () => {
       <Position position={4} />
       <div>
         <div className="ms-5 me-5">
-          <div className="row">
-            <div className="col-md-4">
-              <h5>Listado de entidades empleadoras</h5>
-            </div>
-            <div className="col-md-4"></div>
-            <div className="col-md-4">
-              <div className="float-end" style={{ cursor: 'pointer', color: 'blue' }}>
-                Manual
-                {/* TODO: REVISAR */}
-              </div>
+          <div className="d-flex align-items-center justify-content-between">
+            <h5>Listado de entidades empleadoras</h5>
+            <div className="float-end" style={{ cursor: 'pointer', color: 'blue' }}>
+              Manual
+              {/* TODO: REVISAR */}
             </div>
           </div>
 
