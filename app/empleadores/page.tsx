@@ -6,32 +6,28 @@ import Swal from 'sweetalert2';
 import { LoginComponent } from '../components/login/LoginComponent';
 import Position from '../components/stage/Position';
 import { EmpleadorContext } from '../contexts/EmpleadorContext';
-import {
-  CargaEmpleadores,
-  Desadscribir,
-  InscribirEmpleador,
-} from '../helpers/tramitacion/empleadores';
-import ModalInscribirEntidadEmpleadora, {
-  DatosNuevaEntidadEmpleadora,
-} from './(componentes)/ModalInscribirEntidadEmpleadora';
+import ModalInscribirEntidadEmpleadora from './(componentes)/ModalInscribirEntidadEmpleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/TablaEntidadesEmpleadoras';
+import { DatosNuevaEntidadEmpleadora } from './(modelos)/datosNuevaEntidadEmpleadora';
+import { DatosInscribirEmpleador } from './(modelos)/inscribeEmpleador';
+import { buscarEmpleadores } from './(servicios)/buscarEmpleadores';
+import { Desadscribir } from './(servicios)/desadscribirEmpleador';
+import { InscribirEmpleador } from './(servicios)/inscribirEmpleador';
 import { Empleador } from './interface/empleador';
-import { inscribeEmpleador } from './interface/inscribeEmpleador';
 
 const EmpleadoresPage = () => {
   const [empleadores, setempleadores] = useState<Empleador[]>([]);
   const { cargaEmpleador } = useContext(EmpleadorContext);
 
-  let cookie = parseCookies();
-  let token = cookie.token;
-
+  const cookie = parseCookies();
+  const token = cookie.token;
   if (!token) {
     return <LoginComponent buttonText="Ingresar" />;
   }
 
   useEffect(() => {
     const loadEmpleador = async () => {
-      let respuesta = await CargaEmpleadores('');
+      let respuesta = await buscarEmpleadores('');
       setempleadores(respuesta);
       cargaEmpleador(respuesta);
     };
@@ -62,7 +58,7 @@ const EmpleadoresPage = () => {
             showConfirmButton: false,
           });
           const CargaEmpleador = async () => {
-            let respuesta = await CargaEmpleadores('');
+            let respuesta = await buscarEmpleadores('');
             setempleadores(respuesta);
           };
           CargaEmpleador();
@@ -74,7 +70,7 @@ const EmpleadoresPage = () => {
   };
 
   const onCrearNuevaEntidadEmpleadora = (nuevaEntidad: DatosNuevaEntidadEmpleadora) => {
-    let NuevoEmp: inscribeEmpleador = {
+    const nuevaEntidadEmpleadora: DatosInscribirEmpleador = {
       rutempleador: nuevaEntidad.inscribeRun,
       razonsocial: nuevaEntidad.razonsocial,
       telefonohabitual: nuevaEntidad.tf1,
@@ -114,11 +110,11 @@ const EmpleadoresPage = () => {
     };
 
     const inscribirEntidad = async () => {
-      const resp = await InscribirEmpleador(NuevoEmp);
+      const resp = await InscribirEmpleador(nuevaEntidadEmpleadora);
 
       if (resp.ok) {
         const CargaEmpleador = async () => {
-          let respuesta = await CargaEmpleadores('');
+          let respuesta = await buscarEmpleadores('');
           setempleadores(respuesta);
           cargaEmpleador(respuesta);
         };
@@ -190,16 +186,9 @@ const EmpleadoresPage = () => {
         </div>
       </div>
 
-      <div
-        className="modal fade"
-        id="Addsempresa"
-        tabIndex={-1}
-        aria-labelledby="AddsempresaLabel"
-        aria-hidden="true">
-        <ModalInscribirEntidadEmpleadora
-          onCrearNuevaEntidadEmpleadora={onCrearNuevaEntidadEmpleadora}
-        />
-      </div>
+      <ModalInscribirEntidadEmpleadora
+        onCrearNuevaEntidadEmpleadora={onCrearNuevaEntidadEmpleadora}
+      />
     </div>
   );
 };
