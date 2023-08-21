@@ -1,17 +1,24 @@
-import { renovacionToken } from '@/app/helpers/tramitacion/empleadores';
+import { Logout, renovacionToken } from '@/app/helpers/tramitacion/empleadores';
+import { useRouter } from 'next/navigation';
+import { setCookie, destroyCookie } from 'nookies';
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 
 const SessionTimer = () => {
   const [isActive, setIsActive] = useState(true);
-  const [timeLeft, setTimeLeft] = useState(10); // Tiempo inicial en segundos
+  const [timeLeft, setTimeLeft] = useState(900); // Tiempo inicial en segundos
   const alertThreshold = 5; // Mostrar la alerta 5 segundos antes de expirar
+
+  const router = useRouter();
 
   useEffect(() => {
     let inactivityTimer:any;
 
+
     const resetTimer = () => {
+
       clearTimeout(inactivityTimer);
+      let timerInterval;
       inactivityTimer = setTimeout(() => {
         setIsActive(false);
         // Mostrar la alerta utilizando SweetAlert2
@@ -19,35 +26,49 @@ const SessionTimer = () => {
           title: 'Aviso de cierre de sesión',
           html: `
             <p>Tu sesión está a punto de expirar, ¿Necesitas más tiempo?</p>
-            <div class="progress">
-              <div class="progress-bar" role="progressbar" style="width: ${(
-                timeLeft / 60
-              ) * 100}%;" aria-valuenow="${timeLeft}" aria-valuemin="0" aria-valuemax="60"></div>
-            </div>
+            <b></b>
           `,
           icon: 'warning',
           showConfirmButton: true,
-          timer: 5000,
+          timer: 15000,
+          timerProgressBar: true,
           confirmButtonText: 'Mantener sesión activa',
           showCancelButton: true,
-          cancelButtonText: 'Cerrar sesión'
+          cancelButtonText: 'Cerrar sesión',
+          didOpen: () => {
+            // Swal.showLoading()
+            const b : any= Swal.getHtmlContainer()?.querySelector('b')
+            timerInterval = setInterval(() => {
+              b.textContent = Swal.getTimerLeft()
+            }, 100)
+          },
         }).then((result) => {
 
-          if(result.isConfirmed)
-          {
-            
-            const resp = async()=> {
-                const data = await renovacionToken();
-                if(data.ok){
-                  const respuesta = await data.json();
-                  console.log(respuesta)
-                }
+          if (result.isConfirmed) {
+
+            const resp = async () => {
+              const data = await renovacionToken();
+              if (data.ok) {
+                let token = await data.text();
+                setCookie(null,'token',token, { maxAge: 3600, path: '/' });
+              }
             }
             resp();
 
+          }else{
+
+            const resp = async()=> {
+              const data = await Logout();
+              if(data.ok){
+                destroyCookie(null, 'token');
+                router.push('/');
+              }
+            }
+
+            resp();
+
           }
-          // Aquí puedes realizar alguna acción adicional si lo deseas
-          // (por ejemplo, redirigir al usuario a la página de inicio de sesión).
+          
         });
       }, (60 - alertThreshold) * 1000); // 60 segundos - alertThreshold
 

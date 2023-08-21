@@ -53,15 +53,15 @@ const TramitacionPage = () => {
     EntidadEmpleadora();
 
 
-  }, [])
+  }, [token])
   
 
 
 
 
-  if (token == undefined) return <LoginComponent buttonText="Ingresar" />
+  if (token == '') return <LoginComponent buttonText="Ingresar" />
 
-  token = token.replaceAll('Bearer ', '');
+  token = token?.replaceAll('Bearer ', '');
   
 
   CompruebaToken(token);
@@ -70,7 +70,6 @@ const TramitacionPage = () => {
     
     let value = event.target.value;
     seteempleador(value);
-    console.log(value);
     if(value == '') return;
     const cargarUnidad = async ()=> {
       const resp:Unidadrhh[] = await cargaUnidadrrhh(value);
@@ -81,10 +80,6 @@ const TramitacionPage = () => {
     cargarUnidad();
 
   }
-
-
-
-
 
   return (
     <div className="bgads">

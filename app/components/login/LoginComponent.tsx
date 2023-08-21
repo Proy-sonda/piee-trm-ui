@@ -8,6 +8,7 @@ import Swal from 'sweetalert2';
 import { Modal, Button } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import { setCookie } from 'nookies';
+import jwt_decode from 'jwt-decode';
 
 
 
@@ -36,6 +37,8 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
     const [showModalRecu, setShowModalRecu] = useState(false);
     const [showModalRecu2, setshowModalRecu2] = useState(false)
 
+
+    const { CompletarUsuario } = useContext(AuthContext);
      
     const handleShowModalRecu = () => {
         setShowModalRecu(true);
@@ -103,6 +106,10 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
         if(respuesta.resp.statusCode == 200){
             if(respuesta.resp.message.includes('Bearer')) {
                 setCookie(null,'token',respuesta.resp.message, { maxAge: 3600, path: '/' });
+                
+                let data: any = jwt_decode(respuesta.resp.message);
+                CompletarUsuario(data);
+
                 return Swal.fire({
                     html:'Sesión iniciada correctamente',
                     icon:'success',

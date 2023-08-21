@@ -21,7 +21,7 @@ export default function usePaginacion<T>({
   const endIndex = startIndex + tamanoPagina;
 
   return {
-    datosPaginados: datos.slice(startIndex, endIndex),
+    datosPaginados: datos?.slice(startIndex, endIndex),
     cambiarPaginaActual: setPaginaActual,
     totalPaginas: Math.ceil(datos.length / tamanoPagina),
   };

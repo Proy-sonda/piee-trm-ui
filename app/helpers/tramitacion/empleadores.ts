@@ -178,3 +178,15 @@ export const renovacionToken = async()=> {
   })
   return data;
 }
+
+export const Logout = async ()=> {
+
+  const data = await fetch(`${api_url}auth/logout`,{
+    headers: {
+      'Authorization': token,
+      'Content-type': 'application/json'
+    },
+  });
+
+  return data;
+}

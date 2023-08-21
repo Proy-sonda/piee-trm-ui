@@ -1,50 +1,78 @@
+'use client'
+import { AuthContext } from "@/app/contexts";
+import { Logout } from "@/app/helpers/tramitacion/empleadores";
+import { useRouter } from "next/navigation";
+import { useContext, FormEvent } from 'react';
+import Swal from "sweetalert2";
 
 
+const Usuario: React.FC = () => {
+    const { datosusuario, CompletarUsuario } = useContext(AuthContext);
 
-type myAppProps = {
-    usuario: string
-}
+    const router = useRouter();
 
+    const handleLogout = (e:FormEvent)=> {
+        e.preventDefault();
+        Logout().then((value)=> {
+            if(value.ok){
+                CompletarUsuario({
+                    exp:0,
+                    iat:0,
+                    user:{
+                        nombres:'',
+                        apellidos:'',
+                        rol:{
+                            idrol:0,
+                            rol:''
+                        },
+                        rutusuario:'',
+                        email:''
 
+                    }
+                })
+                return router.push('/');
+            }
 
+            Swal.fire({html:value.text(), timer:2000})
 
-const Usuario: React.FC<myAppProps> = ({ usuario }) => {
+        });
+
+    }
+
     return (
-        <div className="collapse navbar-collapse" id="navbarText" style={{
-            marginRight:'25px'
+        <div id="navbarText" style={{
+            marginRight:'25px',
+            display: (datosusuario.exp == 0) ? 'none': ''
         }}>
 
             <div className="nav navbar-nav navbar-right hidden-xs text-light" style={{ fontSize: '14px' }}>
                 <span className="pull-left user-top">
-                    <p className="mT10 ng-binding ng-scope">
+                    <div className="mT10 ng-binding ng-scope">
                         {/* <h1><i className="bi bi-person-circle"></i></h1> */}
-                        <p><span className="fw-semibold" style={{
+                        <span className="fw-semibold" style={{
                                     whiteSpace:'nowrap'
                             }}>
                             Te damos la bienvenida
-                            <p style={{
+                            <div style={{
                                     whiteSpace:'nowrap'
                             }}><li className="nav-item dropdown">
                             <a className="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="true">
-                            {usuario}
+                            {datosusuario.user.email}
                             </a>
                             <ul className="dropdown-menu">
                                 <li><a className="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#Editacc">Editar Cuenta</a></li>
-                                {/* <li><hr className="dropdown-divider"/></li> */}
-                                {/* <li><a className="dropdown-item" href="#">Cerrar Sesión</a></li> */}
-                                {/* <li><a className="dropdown-item" href="#">Something else here</a></li> */}
                             </ul>
-                        </li></p>
+                        </li></div>
                             
 
-                        </span></p>
+                        </span>
 
-                    </p>
-                    <p>
-                        <a className="link-light" href="/logout">
+                    </div>
+                    <div>
+                        <a className="link-light" onClick={handleLogout}>
                             Cerrar Sesión
                         </a>
-                    </p>
+                    </div>
                 </span>
             </div>
         </div>
