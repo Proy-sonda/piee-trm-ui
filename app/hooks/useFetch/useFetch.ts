@@ -31,7 +31,9 @@ export type FetchResponse<T> = [FetchError | undefined, T | undefined, boolean];
  * @returns
  * Una {@link FetchResponse}, que es una tupla con un error, los datos de la respuesta y un flag
  * que es `true`si la petición esta pendiente (en ese orden). Si hay un error, los datos seran
- * `undefined` y si todo sale bien el error sera `undefined`.
+ * `undefined` y si todo sale bien el error sera `undefined`. El error se produce cuando la
+ * respuesta no esta en el rango de los 200-299 o por cualquier otro tipo de error como por ejemplo
+ * una respuesta que no contiene json.
  */
 export const useFetch = <T>(url: string, opciones?: RequestInit) => {
   const [response, setResponse] = useState<FetchResponse<T>>([undefined, undefined, true]);
