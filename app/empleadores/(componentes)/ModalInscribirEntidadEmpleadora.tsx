@@ -2,7 +2,7 @@ import { CCCOMUNACB } from '@/app/contexts/interfaces/types';
 import { useMergeFetchResponse } from '@/app/hooks/useFetch';
 import { useForm } from '@/app/hooks/useForm';
 import { FormEvent, useState } from 'react';
-import { DatosNuevaEntidadEmpleadora } from '../(modelos)/datosNuevaEntidadEmpleadora';
+import { DatosNuevaEntidadEmpleadora } from '../(modelos)/nuevaEntidadEmpleadora';
 import {
   useBuscarActividadesLaborales,
   useBuscarCajasDeCompensacion,

@@ -1,4 +1,4 @@
-import { DatosInscribirEmpleador } from '@/app/empleadores/(modelos)/inscribeEmpleador';
+import { DatosInscribirEmpleador } from '@/app/empleadores/(modelos)/inscribirEmpleador';
 import { parseCookies } from 'nookies';
 
 export const InscribirEmpleador = async (empleador: DatosInscribirEmpleador) => {

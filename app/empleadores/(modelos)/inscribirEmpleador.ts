@@ -10,7 +10,7 @@ export interface DatosInscribirEmpleador {
   actividadlaboral: ActividadLaboral;
   tamanoempresa: TamanoEmpresa;
   sistemaremuneracion: SistemaDeRemuneracion;
-  direccionempleador: Direccionempleador;
+  direccionempleador: DireccionEmpleador;
 }
 
 export interface ActividadLaboral {
@@ -23,7 +23,7 @@ export interface CajasDeCompensacion {
   nombre: string;
 }
 
-export interface Direccionempleador {
+export interface DireccionEmpleador {
   calle: string;
   numero: string;
   depto: string;
