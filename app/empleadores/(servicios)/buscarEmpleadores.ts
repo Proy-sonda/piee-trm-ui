@@ -1,10 +1,12 @@
 import { parseCookies } from 'nookies';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 export const buscarEmpleadores = async (razon = '') => {
   const cookie = parseCookies();
   const token = cookie.token;
 
-  const data = await fetch('http://10.153.106.88:3000/empleador/razonsocial', {
+  const data = await fetch(`${apiUrl}empleador/razonsocial`, {
     method: 'POST',
     headers: {
       Authorization: token,

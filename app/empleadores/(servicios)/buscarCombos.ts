@@ -9,27 +9,32 @@ import {
 } from '@/app/contexts/interfaces/types';
 import { useFetch } from '@/app/hooks/useFetch';
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
 export const useBuscarTiposDeEmpleadores = () => {
-  return useFetch<CCTIPOEM[]>('http://10.153.106.88:3000/tipoempleador/all');
+  return useFetch<CCTIPOEM[]>(`${apiUrl}tipoempleador/all`);
 };
 
 export const useBuscarComunas = () => {
-  return useFetch<CCCOMUNACB[]>('http://10.153.106.88:3000/comuna/all/region');
+  return useFetch<CCCOMUNACB[]>(`${apiUrl}comuna/all/region`);
 };
 
 export const useBuscarCajasDeCompensacion = () => {
-  return useFetch<CCAFCB[]>('http://10.153.106.88:3000/ccaf/all');
+  return useFetch<CCAFCB[]>(`${apiUrl}ccaf/all`);
 };
 
 export const useBuscarRegiones = () => {
-  return useFetch<CCREGIONCB[]>('http://10.153.106.88:3000/Region/all');
+  return useFetch<CCREGIONCB[]>(`${apiUrl}Region/all`);
 };
+
 export const useBuscarActividadesLaborales = () => {
-  return useFetch<CCACTLABCB[]>('http://10.153.106.88:3000/actividadlaboral/all');
+  return useFetch<CCACTLABCB[]>(`${apiUrl}actividadlaboral/all`);
 };
+
 export const useBuscarSistemasDeRemuneracion = () => {
-  return useFetch<CCREMUNERACION[]>('http://10.153.106.88:3000/sistemaremuneracion/all');
+  return useFetch<CCREMUNERACION[]>(`${apiUrl}sistemaremuneracion/all`);
 };
+
 export const useBuscarTamanosEmpresa = () => {
-  return useFetch<CCTAMANOCB[]>('http://10.153.106.88:3000/tamanoempresa/all');
+  return useFetch<CCTAMANOCB[]>(`${apiUrl}tamanoempresa/all`);
 };
