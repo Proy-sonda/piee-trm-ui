@@ -1,11 +1,11 @@
 'use client';
 
-import { parseCookies } from 'nookies';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { LoginComponent } from '../components/login/LoginComponent';
 import Position from '../components/stage/Position';
 import { EmpleadorContext } from '../contexts/EmpleadorContext';
+import { estaLogueado } from '../servicios/auth';
 import ModalInscribirEntidadEmpleadora from './(componentes)/ModalInscribirEntidadEmpleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/TablaEntidadesEmpleadoras';
 import { DatosInscribirEmpleador } from './(modelos)/inscribirEmpleador';
@@ -16,14 +16,12 @@ import { InscribirEmpleador } from './(servicios)/inscribirEmpleador';
 import { Empleador } from './interface/empleador';
 
 const EmpleadoresPage = () => {
-  const [empleadores, setempleadores] = useState<Empleador[]>([]);
-  const { cargaEmpleador } = useContext(EmpleadorContext);
-
-  const cookie = parseCookies();
-  const token = cookie.token;
-  if (!token) {
+  if (!estaLogueado()) {
     return <LoginComponent buttonText="Ingresar" />;
   }
+
+  const [empleadores, setempleadores] = useState<Empleador[]>([]);
+  const { cargaEmpleador } = useContext(EmpleadorContext);
 
   useEffect(() => {
     const loadEmpleador = async () => {
