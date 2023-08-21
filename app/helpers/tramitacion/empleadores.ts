@@ -8,7 +8,7 @@ let token = cookie.token;
 const api_url = process.env.NEXT_PUBLIC_API_URL;
 
 export const ComboEntidadEmpleador = async () => {
-  const data = await fetch(`${api_url}/empleador/rutusuario`, {
+  const data = await fetch(`${api_url}empleador/rutusuario`, {
     method: 'POST',
     headers: {
       Authorization: token,
@@ -22,7 +22,7 @@ export const ComboEntidadEmpleador = async () => {
 };
 
 export const cargaUnidadrrhh = async (rutempleador: string) => {
-  const data = await fetch(`${api_url}/unidad/rutempleador`, {
+  const data = await fetch(`${api_url}unidad/rutempleador`, {
     method: 'POST',
     headers: {
       Authorization: token,
@@ -37,7 +37,7 @@ export const cargaUnidadrrhh = async (rutempleador: string) => {
 };
 
 export const EliminarUnidad = async (idunidad: number) => {
-  const data = await fetch(`${api_url}/unidad/idunidad`, {
+  const data = await fetch(`${api_url}unidad/idunidad`, {
     method: 'DELETE',
     headers: {
       Authorization: token,
@@ -79,7 +79,7 @@ export const actualizaEmpleador = async (empleador: ActualizaEmpleador) => {
 };
 
 export const crearUnidad = async (unidad: CrearUnidad) => {
-  const data = await fetch(`${api_url}/unidad/create`, {
+  const data = await fetch(`${api_url}unidad/create`, {
     method: 'POST',
     headers: {
       Authorization: token,
