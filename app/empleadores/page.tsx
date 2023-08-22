@@ -16,13 +16,16 @@ import { InscribirEmpleador } from './(servicios)/inscribirEmpleador';
 import { Empleador } from './interface/empleador';
 
 const EmpleadoresPage = () => {
-  const [empleadores, setempleadores] = useState<Empleador[]>([]);
+  const [empleadores, setEmpleadores] = useState<Empleador[]>([]);
   const { cargaEmpleador } = useContext(EmpleadorContext);
+
+  const [rut, setRut] = useState('');
+  const [razonSocial, setRazonSocial] = useState('');
 
   useEffect(() => {
     const loadEmpleador = async () => {
       let respuesta = await buscarEmpleadores('');
-      setempleadores(respuesta);
+      setEmpleadores(respuesta);
       cargaEmpleador(respuesta);
     };
     loadEmpleador();
@@ -53,7 +56,7 @@ const EmpleadoresPage = () => {
           });
           const CargaEmpleador = async () => {
             let respuesta = await buscarEmpleadores('');
-            setempleadores(respuesta);
+            setEmpleadores(respuesta);
           };
           CargaEmpleador();
         } else {
@@ -109,7 +112,7 @@ const EmpleadoresPage = () => {
       if (resp.ok) {
         const CargaEmpleador = async () => {
           let respuesta = await buscarEmpleadores('');
-          setempleadores(respuesta);
+          setEmpleadores(respuesta);
           cargaEmpleador(respuesta);
         };
         CargaEmpleador();
@@ -135,6 +138,24 @@ const EmpleadoresPage = () => {
     inscribirEntidad();
   };
 
+  const onBuscarEntidadEmpleadora = async () => {
+    if (razonSocial.trim() === '' && rut.trim() === '') {
+      let respuesta = await buscarEmpleadores('');
+      setEmpleadores(respuesta);
+      cargaEmpleador(respuesta);
+      return;
+    }
+
+    const empleadoresFiltrados = empleadores.filter((empleador) => {
+      return (
+        empleador.razonsocial.toUpperCase().includes(razonSocial.trim().toUpperCase()) &&
+        empleador.rutempleador.includes(rut.trim())
+      );
+    });
+
+    setEmpleadores(empleadoresFiltrados);
+  };
+
   if (!estaLogueado()) {
     return <LoginComponent buttonText="Ingresar" />;
   }
@@ -155,14 +176,31 @@ const EmpleadoresPage = () => {
           <div className="row mt-3">
             <div className="col-md-3 float-end">
               <label>Razón Social</label>
-              <input type="text" className="form-control" />
+              <input
+                type="text"
+                className="form-control"
+                value={razonSocial}
+                onInput={(e) => setRazonSocial(e.currentTarget.value)}
+              />
             </div>
             <div className="col-md-3 float-end">
               <label>RUT</label>
-              <input type="text" className="form-control" />
+              <input
+                type="text"
+                className="form-control"
+                value={rut}
+                onInput={(e) => setRut(e.currentTarget.value)}
+              />
             </div>
             <div className="col-md-6 float-end align-self-end">
-              <button className="btn btn-primary">Buscar</button>
+              <button
+                className="btn btn-primary"
+                onClick={(e) => {
+                  e.preventDefault();
+                  onBuscarEntidadEmpleadora();
+                }}>
+                Buscar
+              </button>
               <button
                 className="ms-2 btn btn-success"
                 data-bs-toggle="modal"
