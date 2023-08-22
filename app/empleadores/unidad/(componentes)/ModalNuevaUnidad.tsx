@@ -1,9 +1,9 @@
 import { CCCOMUNACB } from '@/app/contexts/interfaces/types';
-import { useMergeFetchResponse } from '@/app/hooks/useFetch';
 import { useForm } from '@/app/hooks/useForm';
+import { useMergeFetchResponseObject } from '@/app/hooks/useMergeFetch';
 import { FormEvent, useState } from 'react';
 import { CrearUnidad } from '../(modelos)/nuevaUnidad';
-import { useBuscarComunas, useBuscarRegiones } from '../../(servicios)/buscarCombos';
+import { buscarComunas, buscarRegiones } from '../../(servicios)/buscarCombos';
 
 interface ModalNuevaUnidadProps {
   idEmpleador: string;
@@ -23,9 +23,9 @@ const ModalNuevaUnidad = ({ idEmpleador, onCrearNuevaUnidad }: ModalNuevaUnidadP
     },
   ] as CCCOMUNACB[]);
 
-  const [_, combos] = useMergeFetchResponse({
-    CCREGION: useBuscarRegiones(),
-    CCCOMUNA: useBuscarComunas(),
+  const [_, combos] = useMergeFetchResponseObject({
+    CCREGION: buscarRegiones(),
+    CCCOMUNA: buscarComunas(),
   });
 
   const [InitialForm, setInitialForm] = useState({

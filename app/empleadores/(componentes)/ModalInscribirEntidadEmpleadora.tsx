@@ -1,16 +1,16 @@
 import { CCCOMUNACB } from '@/app/contexts/interfaces/types';
-import { useMergeFetchResponse } from '@/app/hooks/useFetch';
 import { useForm } from '@/app/hooks/useForm';
+import { useMergeFetchResponseObject } from '@/app/hooks/useMergeFetch';
 import { FormEvent, useState } from 'react';
 import { DatosNuevaEntidadEmpleadora } from '../(modelos)/nuevaEntidadEmpleadora';
 import {
-  useBuscarActividadesLaborales,
-  useBuscarCajasDeCompensacion,
-  useBuscarComunas,
-  useBuscarRegiones,
-  useBuscarSistemasDeRemuneracion,
-  useBuscarTamanosEmpresa,
-  useBuscarTiposDeEmpleadores,
+  buscarActividadesLaborales,
+  buscarCajasDeCompensacion,
+  buscarComunas,
+  buscarRegiones,
+  buscarSistemasDeRemuneracion,
+  buscarTamanosEmpresa,
+  buscarTiposDeEmpleadores,
 } from '../(servicios)/buscarCombos';
 
 interface ModalInscribirEntidadEmpleadoraProps {
@@ -20,14 +20,14 @@ interface ModalInscribirEntidadEmpleadoraProps {
 const ModalInscribirEntidadEmpleadora = ({
   onCrearNuevaEntidadEmpleadora,
 }: ModalInscribirEntidadEmpleadoraProps) => {
-  const [_, combos] = useMergeFetchResponse({
-    tipoEmpleadores: useBuscarTiposDeEmpleadores(),
-    comunas: useBuscarComunas(),
-    cajasDeCompensacion: useBuscarCajasDeCompensacion(),
-    regiones: useBuscarRegiones(),
-    actividadesLaborales: useBuscarActividadesLaborales(),
-    sistemasDeRemuneracion: useBuscarSistemasDeRemuneracion(),
-    tamanosEmpresas: useBuscarTamanosEmpresa(),
+  const [_, combos] = useMergeFetchResponseObject({
+    tipoEmpleadores: buscarTiposDeEmpleadores(),
+    comunas: buscarComunas(),
+    cajasDeCompensacion: buscarCajasDeCompensacion(),
+    regiones: buscarRegiones(),
+    actividadesLaborales: buscarActividadesLaborales(),
+    sistemasDeRemuneracion: buscarSistemasDeRemuneracion(),
+    tamanosEmpresas: buscarTamanosEmpresa(),
   });
 
   const [region, setregion] = useState('');

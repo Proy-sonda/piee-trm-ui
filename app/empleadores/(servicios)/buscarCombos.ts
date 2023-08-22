@@ -7,34 +7,34 @@ import {
   CCTAMANOCB,
   CCTIPOEM,
 } from '@/app/contexts/interfaces/types';
-import { useFetch } from '@/app/hooks/useFetch';
+import { runFetch } from '@/app/servicios/fetch';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-export const useBuscarTiposDeEmpleadores = () => {
-  return useFetch<CCTIPOEM[]>(`${apiUrl}tipoempleador/all`);
+export const buscarTiposDeEmpleadores = async () => {
+  return runFetch<CCTIPOEM[]>(fetch(`${apiUrl}tipoempleador/all`));
 };
 
-export const useBuscarComunas = () => {
-  return useFetch<CCCOMUNACB[]>(`${apiUrl}comuna/all/region`);
+export const buscarComunas = async () => {
+  return runFetch<CCCOMUNACB[]>(fetch(`${apiUrl}comuna/all/region`));
 };
 
-export const useBuscarCajasDeCompensacion = () => {
-  return useFetch<CCAFCB[]>(`${apiUrl}ccaf/all`);
+export const buscarCajasDeCompensacion = async () => {
+  return runFetch<CCAFCB[]>(fetch(`${apiUrl}ccaf/all`));
 };
 
-export const useBuscarRegiones = () => {
-  return useFetch<CCREGIONCB[]>(`${apiUrl}Region/all`);
+export const buscarRegiones = async () => {
+  return runFetch<CCREGIONCB[]>(fetch(`${apiUrl}Region/all`));
 };
 
-export const useBuscarActividadesLaborales = () => {
-  return useFetch<CCACTLABCB[]>(`${apiUrl}actividadlaboral/all`);
+export const buscarActividadesLaborales = async () => {
+  return runFetch<CCACTLABCB[]>(fetch(`${apiUrl}actividadlaboral/all`));
 };
 
-export const useBuscarSistemasDeRemuneracion = () => {
-  return useFetch<CCREMUNERACION[]>(`${apiUrl}sistemaremuneracion/all`);
+export const buscarSistemasDeRemuneracion = async () => {
+  return runFetch<CCREMUNERACION[]>(fetch(`${apiUrl}sistemaremuneracion/all`));
 };
 
-export const useBuscarTamanosEmpresa = () => {
-  return useFetch<CCTAMANOCB[]>(`${apiUrl}tamanoempresa/all`);
+export const buscarTamanosEmpresa = async () => {
+  return runFetch<CCTAMANOCB[]>(fetch(`${apiUrl}tamanoempresa/all`));
 };

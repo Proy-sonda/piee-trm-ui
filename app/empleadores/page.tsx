@@ -16,10 +16,6 @@ import { InscribirEmpleador } from './(servicios)/inscribirEmpleador';
 import { Empleador } from './interface/empleador';
 
 const EmpleadoresPage = () => {
-  if (!estaLogueado()) {
-    return <LoginComponent buttonText="Ingresar" />;
-  }
-
   const [empleadores, setempleadores] = useState<Empleador[]>([]);
   const { cargaEmpleador } = useContext(EmpleadorContext);
 
@@ -138,6 +134,10 @@ const EmpleadoresPage = () => {
 
     inscribirEntidad();
   };
+
+  if (!estaLogueado()) {
+    return <LoginComponent buttonText="Ingresar" />;
+  }
 
   return (
     <div className="bgads">

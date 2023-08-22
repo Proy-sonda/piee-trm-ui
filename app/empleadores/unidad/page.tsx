@@ -29,11 +29,6 @@ interface UnidadRRHHProps {
 const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
   const router = useRouter();
 
-  if (!estaLogueado()) {
-    router.push('/login');
-    return null;
-  }
-
   const { rut, razon, id } = searchParams;
   const [UnidadRRHH, setUnidadRRHH] = useState<Unidadrhh[]>([]);
   const [idunidad, setIdunidad] = useState<string | undefined>(undefined);
@@ -118,6 +113,11 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
     };
     updateUnidad();
   };
+
+  if (!estaLogueado()) {
+    router.push('/login');
+    return null;
+  }
 
   return (
     <div className="bgads">
