@@ -169,7 +169,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                     data-testid="loader"
                 />
 
-      </div>
+    </div>
       
 
     <div className="bgads">

@@ -232,6 +232,7 @@ const EmpleadoresPage = () => {
         const CargaEmpleador = async () => {
           let respuesta = await CargaEmpleadores('');
           setempleadores(respuesta);
+          cargaEmpleador(respuesta);
         };
         CargaEmpleador();
         return Swal.fire({

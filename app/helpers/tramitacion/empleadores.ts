@@ -1,4 +1,4 @@
-import Swal from "sweetalert2";
+
 import { parseCookies } from 'nookies';
 import { inscribeEmpleador } from "@/app/empleadores/interface/inscribeEmpleador";
 import { ActualizaEmpleador } from "@/app/interface/tramitacion";
@@ -190,3 +190,4 @@ export const Logout = async ()=> {
 
   return data;
 }
+

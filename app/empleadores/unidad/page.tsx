@@ -15,6 +15,8 @@ import useCombo from '@/app/hooks/useCombo';
 import { CrearUnidad } from '../interface/crearUnidad';
 import { UnidadResp } from '../interface/UnidadResp';
 import { UpdateUnidad } from '../interface/UpdateUnidad';
+import Paginacion from '@/app/components/paginacion/paginacion';
+import usePaginacion from '@/app/components/paginacion/paginacion.hook';
 
 
 interface UnidadRRHHProps {
@@ -76,6 +78,15 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
 
   let cookie = parseCookies();
   let token = cookie.token;
+
+  const {
+    datosPaginados: empleadoresPaginados,
+    totalPaginas,
+    cambiarPaginaActual,
+  } = usePaginacion({
+    datos: UnidadRRHH,
+    tamanoPagina: 5,
+  });
 
   
 
@@ -305,7 +316,7 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
 
         <div className="row mt-2">
           <div className="col-md-12">
-            <table className="table table-hover">
+            <table className="table table-striped">
               <thead className="text-center">
                 <tr>
                   <th>Nombre</th>
@@ -352,7 +363,7 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
                           <i className="bi bi-trash3"></i>
                         </button>
                         <Link
-                          href={`/empleadores/trabajadores?unidad=${'Prueba 3'}&id=${'1'}&razon=${razon}`}
+                          href={`/empleadores/unidad/trabajadores?idunidad=${unidad.idunidad}&razon=${razon}&rutempleador=${rut}`}
                           className="btn btn-success btn-sm">
                           Trabajadores
                         </Link>{' '}
@@ -376,39 +387,15 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
                     <td></td>
                   </tr>
                 }
-                <tfoot>
-                <nav aria-label="Page navigation example" className="float-end">
-                  <div>
-                    <ul className="pagination">
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          Anterior
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          1
-                        </a>
-                      </li>
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          2
-                        </a>
-                      </li>
-                      {/* <li className="page-item"><a className="page-link" href="#">3</a></li> */}
-                      <li className="page-item">
-                        <a className="page-link" href="#">
-                          Siguiente
-                        </a>
-                      </li>
-                    </ul>
-                  </div>
-                </nav>
-              </tfoot>
-
               </tbody>
               
+              
             </table>
+            <Paginacion
+                  totalPages={totalPaginas}
+                  onCambioPagina={cambiarPaginaActual}
+                  tamano="sm"
+                />
             
           </div>
         </div>

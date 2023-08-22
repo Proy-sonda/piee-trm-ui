@@ -57,7 +57,7 @@ export default function RootLayout({
                         </Link>
                       </div>
 
-                      <SessionTimer />
+                      {/* <SessionTimer /> */}
 
                       <Usuario />
 

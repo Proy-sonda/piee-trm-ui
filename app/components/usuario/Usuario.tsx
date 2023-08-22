@@ -48,7 +48,7 @@ const Usuario: React.FC = () => {
             <div className="nav navbar-nav navbar-right hidden-xs text-light" style={{ fontSize: '14px' }}>
                 <span className="pull-left user-top">
                     <div className="mT10 ng-binding ng-scope">
-                        {/* <h1><i className="bi bi-person-circle"></i></h1> */}
+                        
                         <span className="fw-semibold" style={{
                                     whiteSpace:'nowrap'
                             }}>
@@ -69,7 +69,9 @@ const Usuario: React.FC = () => {
 
                     </div>
                     <div>
-                        <a className="link-light" onClick={handleLogout}>
+                        <a className="link-light" onClick={handleLogout} style={{
+                            cursor:'pointer'
+                        }}>
                             Cerrar Sesión
                         </a>
                     </div>
