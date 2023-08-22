@@ -4,13 +4,14 @@ import 'animate.css';
 import Stage from '@/app/components/stage/Stage'
 import styles from './trabajadores.module.css'
 import { getDatoUnidad } from '@/app/helpers/tramitacion/empleadores';
-import { Trabajador, Trabajadores } from './(modelos)/trabajadores';
+import { AgregarTrabajador, Trabajador, Trabajadores } from './(modelos)/trabajadores';
 import { Unidadrhh } from '@/app/interface/tramitacion';
 import Swal from 'sweetalert2';
-import { deleteTrabajador, getTrabajadorUnidad, getUnidadEmpleador, putTrabajador } from './(servicios)/trabajadores.services';
+import { createTrabajador, deleteTrabajador, getTrabajadorUnidad, getUnidadEmpleador, putTrabajador } from './(servicios)/trabajadores.services';
 import { Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 import { UnidadEmpleador } from './(modelos)/unidadEmpleador';
+import { useForm } from '@/app/hooks/useForm';
 
 
 interface props {
@@ -40,6 +41,10 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
     });
     const [rutedit, setrutedit] = useState<string>()
     const [show, setshow] = useState(false);
+
+    const { run, onInputValidRut } = useForm({
+        run:''
+    })
 
 
     useEffect(() => {
@@ -163,6 +168,44 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
 
     }
 
+    const handleAddTrabajador = (e: FormEvent)=> {
+        e.preventDefault();
+
+        const dataAgregarTrabajador:AgregarTrabajador ={
+            ruttrabajador: run,
+            unidad:{
+                idunidad:Number(idunidad)
+            },
+        }
+
+        const crearTrabajador = async()=> {
+            const data = await createTrabajador(dataAgregarTrabajador);
+            if(data.ok){
+                Swal.fire({html:'Persona trabajadora agregada correctamente', icon:'success',timer:2000, showConfirmButton:false});
+                const obtenerTrabajadorUnidad = async () => {
+                    const data = await getTrabajadorUnidad(Number(idunidad));
+                    if (data.ok) {
+                        const resp: Trabajadores[] = await data.json();
+        
+                        if (resp.length > 0) {
+                            settrabajadores(resp);
+        
+                        }
+                        setTimeout(() => setLoading(false), 2000); 
+                    }
+
+                }
+                obtenerTrabajadorUnidad();
+
+            }else{
+                Swal.fire({html: 'Existe un problema al momento de grabar '+ await data.text(), icon:'error'})
+            }
+        }
+
+        crearTrabajador();
+
+    }
+
     return (<>
     <div className={"spinner"} style={{
                 display: (loading ? '' : 'none')
@@ -205,20 +248,29 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
                         </h5>
                         <sub style={{ color: 'blue' }}>Agregar Persona Trabajadora</sub>
                         <br />
+                        <form onSubmit={handleAddTrabajador}>
+                            <div className='row mt-2'>
+                                <div className='col-md-8'>
+                                    <label htmlFor='run'>RUN</label>
+                                    <input id='run' 
+                                    type='text' 
+                                    className='form-control' 
+                                    minLength={4} 
+                                    maxLength={11} 
+                                    name='run' 
+                                    value={run} 
+                                    onChange={onInputValidRut} 
+                                    required />
+                                    
+                                </div>
+                                <div className='col-md-4' style={{
+                                    alignSelf: 'end'
+                                }}>
+                                    <button type='submit' className='btn btn-success'>Agregar</button>
+                                </div>
 
-                        <div className='row mt-2'>
-                            <div className='col-md-8'>
-                                <label htmlFor='run'>RUN</label>
-                                <input id='run' type='text' className='form-control' />
-                                <sub>No debe incluir guiones ni puntos (EJ: 175967044)</sub>
                             </div>
-                            <div className='col-md-4' style={{
-                                alignSelf: 'end'
-                            }}>
-                                <button className='btn btn-success'>Agregar</button>
-                            </div>
-
-                        </div>
+                        </form>
                     </div>
 
                     <div className='col-md-6'>

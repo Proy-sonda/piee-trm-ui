@@ -25,3 +25,15 @@ export interface Trabajador {
 export interface Unidad {
     idunidad: number;
 }
+
+export interface AgregarTrabajador {
+    ruttrabajador:    string;
+    unidad:           Unidad;
+    fechaafiliacion?:  Date;
+    estadotrabajador?: Estadotrabajador;
+}
+
+export interface Estadotrabajador {
+    idestadotrabajador: number;
+}
+

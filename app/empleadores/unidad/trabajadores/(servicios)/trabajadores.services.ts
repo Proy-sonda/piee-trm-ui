@@ -1,5 +1,5 @@
 import { parseCookies } from "nookies";
-import { Trabajador, Trabajadores } from "../(modelos)/trabajadores";
+import { AgregarTrabajador, Trabajador, Trabajadores } from "../(modelos)/trabajadores";
 
 const api_url= process.env.NEXT_PUBLIC_API_URL;
 let cookie = parseCookies();
@@ -65,6 +65,20 @@ export const getTrabajadorUnidad = async (idunidad:number)=> {
         'Content-type': 'application/json'
       },
       body: JSON.stringify(trabajador)
+    })
+
+    return data;
+  }
+
+  export const createTrabajador = async (trabajador:AgregarTrabajador)=> {
+
+    const data = await fetch(`${api_url}trabajador/create`,{
+      method:'POST',
+      headers: {
+        'Authorization': token,
+        'Content-type': 'application/json'
+      },
+      body:JSON.stringify(trabajador)
     })
 
     return data;
