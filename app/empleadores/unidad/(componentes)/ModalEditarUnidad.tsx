@@ -1,6 +1,8 @@
 import { CCCOMUNACB } from '@/app/contexts/interfaces/types';
 import { useMergeFetchResponse } from '@/app/hooks/useFetch';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
+import { UnidadResp } from '../(modelos)/UnidadResp';
 import { UpdateUnidad } from '../(modelos)/UpdateUnidad';
 import { getDatoUnidad } from '../(servicios)/getDatoUnidad';
 import { useBuscarComunas, useBuscarRegiones } from '../../(servicios)/buscarCombos';
@@ -49,6 +51,13 @@ const ModalEditarUnidad = ({ idEmpleador, idUnidad, onEditarUnidad }: ModalEdita
 
     getDatoUnidad(parseInt(idUnidad))
       .then((resp) => {
+        if (!resp.ok) {
+          throw new Error('Error al buscar unidad');
+        }
+
+        return resp.json() as Promise<UnidadResp>;
+      })
+      .then((resp) => {
         const idRegionResp = resp.direccionunidad.comuna.region.idregion;
 
         const comunas = combos.comunas.filter(
@@ -70,9 +79,15 @@ const ModalEditarUnidad = ({ idEmpleador, idUnidad, onEditarUnidad }: ModalEdita
           editregion: idRegionResp,
         });
       })
-
       .catch((err) => {
         console.error(err);
+
+        Swal.fire({
+          icon: 'error',
+          html: `Hubo un error al buscar la unidad para editar`,
+          showDenyButton: false,
+          confirmButtonText: 'OK',
+        });
       });
   }, [idUnidad]);
 

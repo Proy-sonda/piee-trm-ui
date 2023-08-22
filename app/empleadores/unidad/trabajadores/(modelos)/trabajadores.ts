@@ -1,39 +1,36 @@
-import { UnidadResp } from "@/app/empleadores/interface/UnidadResp";
-
 export interface Trabajadores {
-    idtrabajador:     number;
-    fechaafiliacion:  Date;
-    ruttrabajador:    string;
-    unidad:           Unidad;
-    estadotrabajador: Estadotrabajador;
+  idtrabajador: number;
+  fechaafiliacion: Date;
+  ruttrabajador: string;
+  unidad: Unidad;
+  estadotrabajador: Estadotrabajador;
 }
 
 export interface Estadotrabajador {
-    idestadotrabajador: number;
-    estadotrabajador:   string;
+  idestadotrabajador: number;
+  estadotrabajador: string;
 }
 
 export interface Unidad {
-    idunidad: number;
+  idunidad: number;
 }
 
 export interface Trabajador {
-    idtrabajador: number;
-    unidad:       Unidad;
+  idtrabajador: number;
+  unidad: Unidad;
 }
 
 export interface Unidad {
-    idunidad: number;
+  idunidad: number;
 }
 
 export interface AgregarTrabajador {
-    ruttrabajador:    string;
-    unidad:           Unidad;
-    fechaafiliacion?:  Date;
-    estadotrabajador?: Estadotrabajador;
+  ruttrabajador: string;
+  unidad: Unidad;
+  fechaafiliacion?: Date;
+  estadotrabajador?: Estadotrabajador;
 }
 
 export interface Estadotrabajador {
-    idestadotrabajador: number;
+  idestadotrabajador: number;
 }
-
