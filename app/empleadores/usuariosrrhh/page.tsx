@@ -28,15 +28,6 @@ const UsuariosRRHHPage: React.FC<UsuariosRRHHPageProps> = ({}) => {
                 <span style={{ cursor: 'pointer', color: 'blue' }}>Manual</span>
               </div>
             </div>
-            {/* <div className="col-md-12">
-              <Stage manual="" url="#">
-                Empleadores / Dirección y Unidades RRHH - {razon} / Usuarios - {unidad}
-              </Stage>
-            </div>
-            <div className="col-md-4">
-              <label style={{ cursor: 'pointer', color: 'blue' }}>Manual</label>
-              <br />
-            </div> */}
           </div>
 
           <div className="row mt-2">
@@ -62,33 +53,6 @@ const UsuariosRRHHPage: React.FC<UsuariosRRHHPageProps> = ({}) => {
                 </div>
               </div>
             </div>
-
-            {/* TODO: Ver si hay que eliminar esta parte o no
-             <div className="col-md-6">
-              <h5>Cargar Nómina</h5>
-              <p
-                className="text-muted"
-                style={{
-                  fontSize: '12px',
-                }}>
-                Para vincular trabajadores a la unidad <b>{unidad}</b>, solo tiene que seleccionar
-                un archivo (formato CSV) según el{' '}
-                <label style={{ color: 'blue', cursor: 'pointer' }}>siguiente formato.</label>
-              </p>
-              <div
-                className="row"
-                style={{
-                  alignItems: 'center',
-                }}>
-                <div className="col-md-6">
-                  <input type="file" className="form-control" />
-                </div>
-                <div className="col-md-6">
-                  <button className="btn btn-success">Cargar</button> &nbsp;
-                  <button className="btn btn-danger">Borrar Todo</button>
-                </div>
-              </div>
-            </div> */}
           </div>
 
           <div className="row mt-3">
