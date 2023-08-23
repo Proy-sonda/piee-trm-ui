@@ -2,10 +2,11 @@
 
 import Position from '@/app/components/stage/Position';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 import FormularioAgregarUsuario from './(componentes)/FormularioAgregarUsuario';
 import ModalModificarUsuario from './(componentes)/ModalModificarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
+import { UsuarioRRHH } from './(modelos)/UsuarioRRHH';
 
 interface UsuariosRRHHPageProps {}
 
@@ -13,6 +14,18 @@ const UsuariosRRHHPage: React.FC<UsuariosRRHHPageProps> = ({}) => {
   // Ver bien de donde obtener estos valores
   const razon = 'RAZON';
   const unidad = 'UNIDAD';
+
+  // TODO: Obtener usuarios desde backend
+  const [usuarios, setUsuarios] = useState<UsuarioRRHH[]>([
+    { rut: '123456-2', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
+    { rut: '123456-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
+    { rut: '123456-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
+    { rut: '123456-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
+    { rut: '123456-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
+    { rut: '12989367-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
+    { rut: '12989367-9', nombre: 'Juana', apellido: 'Rodrigueza', email: 'juanagmail.com' },
+    { rut: '12989367-9', nombre: 'Juan2', apellido: 'Rodrigueza', email: 'juanagmail.com' },
+  ]);
 
   const agregarNuevoUsuario = (run: string) => {
     console.log('Agregando nuevo usuario CON RUN: ', run);
@@ -44,7 +57,7 @@ const UsuariosRRHHPage: React.FC<UsuariosRRHHPageProps> = ({}) => {
           <div className="row mt-3">
             <h5 className="mb-3">Usuarios</h5>
             <div className="col-xs-6 col-md-12 ">
-              <TablaUsuarios />
+              <TablaUsuarios usuarios={usuarios} />
             </div>
           </div>
           <div className="row mt-3">

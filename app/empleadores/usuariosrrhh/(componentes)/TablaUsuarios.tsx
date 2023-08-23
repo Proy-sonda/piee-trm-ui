@@ -2,23 +2,14 @@
 
 import Paginacion from '@/app/components/paginacion/paginacion';
 import usePaginacion from '@/app/components/paginacion/paginacion.hook';
-import React, { useState } from 'react';
+import React from 'react';
 import { UsuarioRRHH } from '../(modelos)/UsuarioRRHH';
 
-interface TablaUsuariosProps {}
+interface TablaUsuariosProps {
+  usuarios: UsuarioRRHH[];
+}
 
-const TablaUsuarios: React.FC<TablaUsuariosProps> = ({}) => {
-  const [usuarios, setUsuarios] = useState<UsuarioRRHH[]>([
-    { rut: '123456-2', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
-    { rut: '123456-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
-    { rut: '123456-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
-    { rut: '123456-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
-    { rut: '123456-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
-    { rut: '12989367-9', nombre: 'Juan', apellido: 'Rodriguez', email: 'juan@gmail.com' },
-    { rut: '12989367-9', nombre: 'Juana', apellido: 'Rodrigueza', email: 'juanagmail.com' },
-    { rut: '12989367-9', nombre: 'Juan2', apellido: 'Rodrigueza', email: 'juanagmail.com' },
-  ]);
-
+const TablaUsuarios: React.FC<TablaUsuariosProps> = ({ usuarios }) => {
   const {
     datosPaginados: usuariosPaginados,
     totalPaginas,
