@@ -2,27 +2,71 @@
 
 import Position from '@/app/components/stage/Position';
 import Stage from '@/app/components/stage/Stage';
+import { estaLogueado } from '@/app/servicios/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { parseCookies } from 'nookies';
+import React, { useState } from 'react';
+import TablaUsuarios from './(componentes)/TablaUsuarios';
+import { UsuarioEntidadEmpleadora } from './(modelos)/UsuarioEntidadEmpleadora';
 
-interface UsuariosProps {
+interface UsuariosPageProps {
   searchParams: {
     rut: string;
     razon: string;
   };
 }
 
-const UnidadRRHH = ({ searchParams }: UsuariosProps) => {
+const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
   const router = useRouter();
 
   const { rut, razon } = searchParams;
-  let valorSInguion = rut?.replaceAll('-', '');
 
-  let cookie = parseCookies();
-  let token = cookie.token;
+  const [usuarios, setUsuarios] = useState<UsuarioEntidadEmpleadora[]>([
+    {
+      rut: '43814639-3',
+      nombre: 'Pepito Perez',
+      telefono: '+569 9 8888 7777',
+      email: 'algun.correo@gmail.com',
+      estado: 'Activo',
+    },
+    {
+      rut: '59706152-8',
+      nombre: 'Pepito Perez',
+      telefono: '+569 9 8888 7777',
+      email: 'algun.correo@gmail.com',
+      estado: 'Activo',
+    },
+    {
+      rut: '64689639-8',
+      nombre: 'Pepito Perez',
+      telefono: '+569 9 8888 7777',
+      email: 'algun.correo@gmail.com',
+      estado: 'Activo',
+    },
+    {
+      rut: '75553450-1',
+      nombre: 'Pepito Perez',
+      telefono: '+569 9 8888 7777',
+      email: 'algun.correo@gmail.com',
+      estado: 'Activo',
+    },
+    {
+      rut: '80235209-3',
+      nombre: 'Pepito Perez',
+      telefono: '+569 9 8888 7777',
+      email: 'algun.correo@gmail.com',
+      estado: 'Activo',
+    },
+    {
+      rut: '41052055-9',
+      nombre: 'Pepito Perez',
+      telefono: '+569 9 8888 7777',
+      email: 'algun.correo@gmail.com',
+      estado: 'Activo',
+    },
+  ]);
 
-  if (!token) {
+  if (!estaLogueado) {
     router.push('/login');
     return null;
   }
@@ -79,67 +123,7 @@ const UnidadRRHH = ({ searchParams }: UsuariosProps) => {
 
         <div className="row mt-2">
           <div className="col-md-12">
-            <table className="table table-hover">
-              <thead className="text-center align-middle">
-                <tr>
-                  <th>RUT</th>
-                  <th>Nombre</th>
-                  <th>Teléfono</th>
-                  <th>Correo electrónico</th>
-                  <th>Rol</th>
-                  <th>Estado</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody className="text-center align-middle">
-                <tr>
-                  <td>12404183-k</td>
-                  <td>Teresa</td>
-                  <td>1234567</td>
-                  <td>tgonzalez@fonasa.cl</td>
-                  <td>
-                    <select className="form-select" disabled>
-                      <option>Administrador</option>
-                    </select>
-                  </td>
-                  <td>Activo</td>
-                  <td>
-                    <button className="btn text-primary">
-                      <i className="bi bi-pencil-square"></i>
-                    </button>
-                    <button className="btn text-primary">
-                      <i className="bi bi-trash3"></i>
-                    </button>
-                    <button className="btn text-primary" title="Reenviar clave">
-                      <i className="bi bi-key"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr>
-                  <td>12404183-k</td>
-                  <td>Teresa</td>
-                  <td>1234567</td>
-                  <td>tgonzalez@fonasa.cl</td>
-                  <td>
-                    <select className="form-select" disabled>
-                      <option>Administrador</option>
-                    </select>
-                  </td>
-                  <td>Activo</td>
-                  <td>
-                    <button className="btn text-primary">
-                      <i className="bi bi-pencil-square"></i>
-                    </button>
-                    <button className="btn text-primary">
-                      <i className="bi bi-trash3"></i>
-                    </button>
-                    <button className="btn text-primary" title="Reenviar clave">
-                      <i className="bi bi-key"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <TablaUsuarios usuarios={usuarios} />
           </div>
         </div>
       </div>
@@ -283,4 +267,4 @@ const UnidadRRHH = ({ searchParams }: UsuariosProps) => {
   );
 };
 
-export default UnidadRRHH;
+export default UsuariosPage;
