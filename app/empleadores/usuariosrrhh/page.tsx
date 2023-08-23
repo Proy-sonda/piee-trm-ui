@@ -3,6 +3,7 @@
 import Position from '@/app/components/stage/Position';
 import Link from 'next/link';
 import React from 'react';
+import FormularioAgregarUsuario from './(componentes)/FormularioAgregarUsuario';
 import ModalModificarUsuario from './(componentes)/ModalModificarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
 
@@ -13,12 +14,16 @@ const UsuariosRRHHPage: React.FC<UsuariosRRHHPageProps> = ({}) => {
   const razon = 'RAZON';
   const unidad = 'UNIDAD';
 
+  const agregarNuevoUsuario = (run: string) => {
+    console.log('Agregando nuevo usuario CON RUN: ', run);
+  };
+
   return (
     <>
       <div className="bgads">
         <Position position={4} />
 
-        <div className="container mx-5">
+        <div className="container mx-5 pb-4">
           <div className="mb-4 row ">
             <div className="col-12">
               <div className="d-flex align-items-center justify-content-between">
@@ -31,27 +36,8 @@ const UsuariosRRHHPage: React.FC<UsuariosRRHHPageProps> = ({}) => {
           </div>
 
           <div className="row mt-2">
-            <div className="col-md-6">
-              <h5>Cargar Usuarios</h5>
-              <p className="text-primary" style={{ fontSize: '12px' }}>
-                Agregar Usuario
-              </p>
-              <div
-                className="row"
-                style={{
-                  alignItems: 'center',
-                }}>
-                <div className="col-md-6">
-                  <label>RUN</label>
-                  <input type="text" className="form-control" />
-                  <small id="rutHelp" className="form-text text-muted" style={{ fontSize: '10px' }}>
-                    No debe incluir guiones ni puntos (EJ: 175967044)
-                  </small>
-                </div>
-                <div className="col-md-6">
-                  <button className="btn btn-success">Agregar</button>
-                </div>
-              </div>
+            <div className="col-md-4">
+              <FormularioAgregarUsuario onAgregarUsuario={agregarNuevoUsuario} />
             </div>
           </div>
 
