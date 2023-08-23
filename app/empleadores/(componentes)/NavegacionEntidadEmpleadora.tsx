@@ -47,7 +47,7 @@ const NavegacionEntidadEmpleadora: React.FC<NavegacionEntidadEmpleadoraProps> = 
       <div className="d-grid gap-2 d-md-flex justify-content-md-center mt-3">
         <div id="flowBoxes">
           {links.map((link, index) => (
-            <div className={getClassName(link, index)}>
+            <div className={getClassName(link, index)} key={link.href}>
               <Link href={link.href}>{link.titulo}</Link>
             </div>
           ))}
