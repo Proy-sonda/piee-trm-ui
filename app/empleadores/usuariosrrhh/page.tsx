@@ -1,8 +1,9 @@
-'use-client';
+'use client';
 
 import Position from '@/app/components/stage/Position';
 import Link from 'next/link';
 import React from 'react';
+import TablaUsuarios from './(componentes)/TablaUsuarios';
 
 interface UsuariosRRHHPageProps {}
 
@@ -89,121 +90,10 @@ const UsuariosRRHHPage: React.FC<UsuariosRRHHPageProps> = ({}) => {
             </div> */}
           </div>
 
-          <div
-            className="row mt-3"
-            style={{
-              alignItems: 'center',
-            }}>
-            <h5>Usuarios</h5>
-            <div className="col-md-12 col-xs-6">
-              <table className="table table-hover table-striped">
-                <thead className="align-middle text-center">
-                  <tr>
-                    <th
-                      style={{
-                        width: '20px',
-                      }}>
-                      RUN
-                    </th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Correo</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="align-middle text-center">
-                  <tr>
-                    <td>123456-2</td>
-                    <td>Juan</td>
-                    <td>Rodriguez</td>
-                    <td>juan@gmail.com</td>
-                    <td>
-                      <button
-                        className="btn text-primary"
-                        title="Editar"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modusr">
-                        <i className="bi bi-pencil-square"></i>
-                      </button>
-                      <button className="btn text-primary">
-                        <i className="bi bi-trash3"></i>
-                      </button>
-                      <button className="btn text-primary" title="Reenviar clave">
-                        <i className="bi bi-key"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>123456-9</td>
-                    <td>Juan</td>
-                    <td>Rodriguez</td>
-                    <td>juan@gmail.com</td>
-                    <td>
-                      <button
-                        className="btn text-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modusr">
-                        <i className="bi bi-pencil-square"></i>
-                      </button>
-                      <button className="btn text-primary">
-                        <i className="bi bi-trash3"></i>
-                      </button>
-                      <button className="btn text-primary" title="Reenviar clave">
-                        <i className="bi bi-key"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>12989367-9</td>
-                    <td>Juan</td>
-                    <td>Rodriguez</td>
-                    <td>juan@gmail.com</td>
-                    <td>
-                      <button
-                        className="btn text-primary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#modusr">
-                        <i className="bi bi-pencil-square"></i>
-                      </button>
-                      <button className="btn text-primary">
-                        <i className="bi bi-trash3"></i>
-                      </button>
-                      <button className="btn text-primary" title="Reenviar clave">
-                        <i className="bi bi-key"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-                <tfoot>
-                  <nav aria-label="Page navigation example" className="float-end">
-                    <div>
-                      <ul className="pagination">
-                        <li className="page-item">
-                          <a className="page-link" href="#">
-                            Anterior
-                          </a>
-                        </li>
-                        <li className="page-item">
-                          <a className="page-link" href="#">
-                            1
-                          </a>
-                        </li>
-                        <li className="page-item">
-                          <a className="page-link" href="#">
-                            2
-                          </a>
-                        </li>
-                        {/* <li className="page-item"><a className="page-link" href="#">3</a></li> */}
-                        <li className="page-item">
-                          <a className="page-link" href="#">
-                            Siguiente
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </nav>
-                </tfoot>
-              </table>
+          <div className="row mt-3">
+            <h5 className="mb-3">Usuarios</h5>
+            <div className="col-xs-6 col-md-12 ">
+              <TablaUsuarios />
             </div>
           </div>
           <div className="row mt-3">
