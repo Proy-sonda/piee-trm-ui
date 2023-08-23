@@ -1,7 +1,6 @@
 'use client';
 
 import Position from '@/app/components/stage/Position';
-import Stage from '@/app/components/stage/Stage';
 import { estaLogueado } from '@/app/servicios/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -97,16 +96,12 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
           </div>
         </div>
 
-        <div className="row mt-2">
-          <div className="col-md-8">
-            <Stage manual="" url="#">
-              Entidad Empleadora / Usuarios - {razon}
-            </Stage>
-          </div>
-
-          <div className="col-md-4">
-            <label style={{ cursor: 'pointer', color: 'blue' }}>Manual</label>
-            <br />
+        <div className="my-4 row ">
+          <div className="col-12">
+            <div className="d-flex align-items-center justify-content-between">
+              <span className="pb-2 border-bottom">Entidad Empleadora / Usuarios {razon}</span>
+              <span style={{ cursor: 'pointer', color: 'blue' }}>Manual</span>
+            </div>
           </div>
         </div>
 
