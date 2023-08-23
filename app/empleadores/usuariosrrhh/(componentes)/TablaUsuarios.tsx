@@ -35,7 +35,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({}) => {
           <tr>
             <th
               style={{
-                width: '40px',
+                width: '100px',
               }}>
               RUN
             </th>
