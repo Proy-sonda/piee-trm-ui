@@ -4,10 +4,10 @@ import Position from '@/app/components/stage/Position';
 import Stage from '@/app/components/stage/Stage';
 import { Unidadrhh } from '@/app/interface/tramitacion';
 import { estaLogueado } from '@/app/servicios/auth';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
+import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
 import { cargaUnidadrrhh } from '../../servicios/cargaUnidadRRHH';
 import ModalEditarUnidad from './(componentes)/ModalEditarUnidad';
 import ModalNuevaUnidad from './(componentes)/ModalNuevaUnidad';
@@ -124,27 +124,7 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
       <Position position={4} />
       <div className="container">
         <div className="row">
-          <div className="d-grid gap-2 d-md-flex justify-content-md-center mt-3">
-            <div id="flowBoxes">
-              <div className="right">
-                <Link href={`/empleadores/datos?rut=${rut}&razon=${razon}&id=${id}`}>
-                  Datos Entidad Empleadora
-                </Link>{' '}
-                &nbsp;
-              </div>
-              <div className="left right active">
-                <Link href={`/empleadores/unidad?rut=${rut}&razon=${razon}&id=${id}`}>
-                  Unidad de RRHH
-                </Link>
-                &nbsp;
-              </div>
-              <div className="left">
-                <Link href={`/empleadores/usuarios?rut=${rut}&razon=${razon}&id=${id}`}>
-                  Usuarios
-                </Link>
-              </div>
-            </div>
-          </div>
+          <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
         </div>
 
         <div className="row mt-2">

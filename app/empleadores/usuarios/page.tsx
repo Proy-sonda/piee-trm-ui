@@ -2,15 +2,16 @@
 
 import Position from '@/app/components/stage/Position';
 import { estaLogueado } from '@/app/servicios/auth';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
 import ModalAgregarUsuario from './(componentes)/ModalAgregarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
 import { UsuarioEntidadEmpleadora } from './(modelos)/UsuarioEntidadEmpleadora';
 
 interface UsuariosPageProps {
   searchParams: {
+    id: string;
     rut: string;
     razon: string;
   };
@@ -19,7 +20,7 @@ interface UsuariosPageProps {
 const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
   const router = useRouter();
 
-  const { rut, razon } = searchParams;
+  const { id, rut, razon } = searchParams;
 
   const [usuarios, setUsuarios] = useState<UsuarioEntidadEmpleadora[]>([
     {
@@ -77,23 +78,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
       <div className="container">
         <div className="row">
-          <div className="d-grid gap-2 d-md-flex justify-content-md-center mt-3">
-            <div id="flowBoxes">
-              <div className="right">
-                <Link href={`/empleadores/datos?rut=${rut}&razon=${razon}`}>
-                  Datos Entidad Empleadora
-                </Link>{' '}
-                &nbsp;
-              </div>
-              <div className="left right">
-                <Link href={`/empleadores/unidad?rut=${rut}&razon=${razon}`}>Unidad de RRHH</Link>
-                &nbsp;
-              </div>
-              <div className="left active">
-                <Link href={`/empleadores/usuarios?rut=${rut}&razon=${razon}`}>Usuarios</Link>
-              </div>
-            </div>
-          </div>
+          <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
         </div>
 
         <div className="my-4 row ">

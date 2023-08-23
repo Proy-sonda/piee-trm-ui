@@ -33,7 +33,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({ usuarios }) => {
         </thead>
         <tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
-            <tr>
+            <tr key={usuario.rut}>
               <td>{usuario.rut}</td>
               <td>{usuario.nombre}</td>
               <td>{usuario.telefono}</td>
