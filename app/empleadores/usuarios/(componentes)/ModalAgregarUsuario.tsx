@@ -8,8 +8,8 @@ import { validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/es/lib/isEmail';
 import { CamposFormularioAgregarUsuario } from '../(modelos)/CamposFormularioAgregarUsuario';
+import { buscarRolesUsuarios } from '../(servicios)/buscarRolesUsuarios';
 import { crearUsuario } from '../(servicios)/crearUsuario';
-import { buscarRolesUsuarios } from '../(servicios)/rolesUsuarios';
 
 interface ModalAgregarUsuarioProps {
   idEmpleador: string;
@@ -125,15 +125,15 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({ idEmpleador }
           </div>
 
           <div className="modal-body">
+            <IfContainer show={errCombos.length > 0}>
+              <h4 className="my-5 text-center">Hubo un error al cargar los roles de usuario</h4>
+            </IfContainer>
+
             <IfContainer show={estaPendiente}>
               <LoadingSpinner />
             </IfContainer>
 
-            <IfContainer show={!estaPendiente}>
-              {/* TODO: ELIMINAR? */}
-              {/* <div className="row mt-2">
-                <h5>Datos del Usuario </h5>
-              </div> */}
+            <IfContainer show={!estaPendiente && errCombos.length === 0}>
               <form onSubmit={handleSubmit(onAgregarUsuario)}>
                 <div className="row mb-4 g-3 align-items-baseline">
                   <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
