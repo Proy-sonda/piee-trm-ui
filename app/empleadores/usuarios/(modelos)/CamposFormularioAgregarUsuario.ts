@@ -8,5 +8,5 @@ export interface CamposFormularioAgregarUsuario {
   email: string;
   confirmarEmail: string;
   direccion: string;
-  rolId: number;
+  rolId: string;
 }

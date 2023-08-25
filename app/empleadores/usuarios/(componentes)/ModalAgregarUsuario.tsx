@@ -21,7 +21,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
     email: '',
     confirmarEmail: '',
     direccion: '',
-    rolId: -1,
+    rolId: '',
   };
 
   const [errCombos, combos, estaPendiente] = useMergeFetchResponseObject({
@@ -323,10 +323,13 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     <select
                       className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
                       {...register('rolId', {
-                        validate: (rolId) =>
-                          rolId !== -1 ? undefined : 'Este campo es obligatorio',
+                        validate: (rolId) => {
+                          if (rolId === '') {
+                            return 'Este campo es obligatorio';
+                          }
+                        },
                       })}>
-                      <option value={-1}>Seleccionar</option>
+                      <option value={''}>Seleccionar</option>
                       {combos &&
                         combos.roles.map((rol) => (
                           <option key={rol.idrol} value={rol.idrol}>
