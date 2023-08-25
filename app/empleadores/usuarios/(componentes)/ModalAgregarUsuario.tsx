@@ -45,9 +45,10 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
       className="modal fade"
       id="AddUsr"
       tabIndex={-1}
+      data-bs-backdrop="static"
       aria-labelledby="exampleModalLabel"
       aria-hidden="true">
-      <div className="modal-dialog modal-xl">
+      <div className="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
         <div className="modal-content">
           <div className="modal-header">
             <h1 className="modal-title fs-5" id="exampleModalLabel">
@@ -66,13 +67,14 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
             </IfContainer>
 
             <IfContainer show={!estaPendiente}>
-              <div className="row mt-2">
+              {/* TODO: ELIMINAR? */}
+              {/* <div className="row mt-2">
                 <h5>Datos del Usuario </h5>
-              </div>
+              </div> */}
 
               <form onSubmit={handleSubmit(onAgregarUsuario)}>
-                <div className="row mt-2">
-                  <div className="col-md-3 position-relative">
+                <div className="row mb-4 g-3 align-items-baseline">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label>RUT</label>
                     <input
                       type="text"
@@ -98,7 +100,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     </small>
                   </div>
 
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label>Nombres</label>
                     <input
                       type="text"
@@ -123,7 +125,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     </IfContainer>
                   </div>
 
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label>Apellidos</label>
                     <input
                       type="text"
@@ -148,7 +150,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     </IfContainer>
                   </div>
 
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label>Fecha de nacimiento</label>
                     <input
                       type="date"
@@ -164,10 +166,8 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                       <div className="invalid-tooltip">{errors.fechaNacimiento?.message}</div>
                     </IfContainer>
                   </div>
-                </div>
 
-                <div className="row mt-2">
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label className="sr-only" htmlFor="tel1">
                       Teléfono 1
                     </label>
@@ -204,7 +204,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     </div>
                   </div>
 
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label className="sr-only" htmlFor="tel2">
                       Teléfono 2
                     </label>
@@ -240,7 +240,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     </div>
                   </div>
 
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label htmlFor="exampleInputEmail1">Correo electrónico</label>
                     <input
                       type="mail"
@@ -264,7 +264,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     </IfContainer>
                   </div>
 
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label htmlFor="exampleInputEmail1">Repetir Correo</label>
                     <input
                       type="mail"
@@ -292,10 +292,8 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                       <div className="invalid-tooltip">{errors.confirmarEmail?.message}</div>
                     </IfContainer>
                   </div>
-                </div>
 
-                <div className="row mt-2">
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label>Dirección</label>
                     <input
                       type="text"
@@ -312,7 +310,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     </IfContainer>
                   </div>
 
-                  <div className="col-md-3 position-relative">
+                  <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                     <label className="form-text">Rol</label>
                     <select
                       className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
@@ -333,11 +331,25 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     </IfContainer>
                   </div>
                 </div>
+
+                <div className="row mt-4">
+                  <div className="d-flex flex-column flex-md-row-reverse">
+                    <button type="submit" className="btn btn-primary" disabled={estaPendiente}>
+                      Guardar
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger mt-2 mt-md-0 me-md-2"
+                      data-bs-dismiss="modal">
+                      Volver
+                    </button>
+                  </div>
+                </div>
               </form>
             </IfContainer>
           </div>
 
-          <div className="modal-footer">
+          {/* <div className="modal-footer">
             <button
               type="button"
               className="btn btn-primary"
@@ -348,7 +360,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
             <button type="button" className="btn btn-success" data-bs-dismiss="modal">
               Volver
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
