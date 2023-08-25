@@ -108,7 +108,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
         </div>
       </div>
 
-      <ModalAgregarUsuario />
+      <ModalAgregarUsuario idEmpleador={id} />
     </div>
   );
 };

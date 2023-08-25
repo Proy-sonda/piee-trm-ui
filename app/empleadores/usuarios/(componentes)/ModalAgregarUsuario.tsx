@@ -1,16 +1,21 @@
 import IfContainer from '@/app/components/IfContainer';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { useMergeFetchResponseObject } from '@/app/hooks/useMergeFetch';
+import { HttpError } from '@/app/servicios/fetch';
 import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { validateRut } from 'rutlib';
+import Swal from 'sweetalert2';
 import isEmail from 'validator/es/lib/isEmail';
 import { CamposFormularioAgregarUsuario } from '../(modelos)/CamposFormularioAgregarUsuario';
+import { crearUsuario } from '../(servicios)/crearUsuario';
 import { buscarRolesUsuarios } from '../(servicios)/rolesUsuarios';
 
-interface ModalAgregarUsuarioProps {}
+interface ModalAgregarUsuarioProps {
+  idEmpleador: string;
+}
 
-const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
+const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({ idEmpleador }) => {
   const valoresPorDefecto: CamposFormularioAgregarUsuario = {
     rut: '',
     nombres: '',
@@ -39,8 +44,58 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
   });
 
   const onAgregarUsuario: SubmitHandler<CamposFormularioAgregarUsuario> = async (data) => {
-    console.log('AGREGANDO USUARIO');
-    console.table(data);
+    const rol = combos!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
+    if (!rol) {
+      throw new Error('El rol no se ha seleccionado o no existe');
+    }
+
+    try {
+      await crearUsuario({
+        rutusuario: data.rut,
+        nombres: data.nombres,
+        apellidos: data.apellidos,
+        email: data.email,
+        emailconfirma: data.confirmarEmail,
+        telefonouno: data.telefono1,
+        telefonodos: data.telefono2,
+        rol: rol,
+        usuarioempleador: [
+          {
+            empleador: {
+              idempleador: parseInt(idEmpleador),
+            },
+          },
+        ],
+      });
+
+      Swal.fire({
+        title: 'Usuario creado con éxito',
+        icon: 'success',
+        showConfirmButton: true,
+      });
+    } catch (error) {
+      console.error({ error });
+
+      if (error instanceof HttpError) {
+        if (error.body.message === 'Usuario ya existe') {
+          await Swal.fire({
+            title: 'El usuario ya existe',
+            icon: 'error',
+            showConfirmButton: true,
+            confirmButtonColor: 'var(--color-blue)',
+          });
+          return;
+        }
+      }
+
+      await Swal.fire({
+        title: 'Error al crear usuario',
+        text: 'Se ha producido un error desconocido',
+        icon: 'error',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
   };
 
   const onCerrarModal = () => {
@@ -79,7 +134,6 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
               {/* <div className="row mt-2">
                 <h5>Datos del Usuario </h5>
               </div> */}
-
               <form onSubmit={handleSubmit(onAgregarUsuario)}>
                 <div className="row mb-4 g-3 align-items-baseline">
                   <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
