@@ -11,6 +11,19 @@ import { buscarRolesUsuarios } from '../(servicios)/rolesUsuarios';
 interface ModalAgregarUsuarioProps {}
 
 const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
+  const valoresPorDefecto: CamposFormularioAgregarUsuario = {
+    rut: '',
+    nombres: '',
+    apellidos: '',
+    fechaNacimiento: '',
+    telefono1: '',
+    telefono2: '',
+    email: '',
+    confirmarEmail: '',
+    direccion: '',
+    rolId: -1,
+  };
+
   const [errCombos, combos, estaPendiente] = useMergeFetchResponseObject({
     roles: buscarRolesUsuarios(),
   });
@@ -19,25 +32,19 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
     register,
     handleSubmit,
     getValues,
+    reset,
     formState: { errors },
   } = useForm<CamposFormularioAgregarUsuario>({
-    defaultValues: {
-      rut: '',
-      nombres: '',
-      apellidos: '',
-      fechaNacimiento: '',
-      telefono1: '',
-      telefono2: '',
-      email: '',
-      confirmarEmail: '',
-      direccion: '',
-      rolId: -1,
-    },
+    defaultValues: valoresPorDefecto,
   });
 
   const onAgregarUsuario: SubmitHandler<CamposFormularioAgregarUsuario> = async (data) => {
     console.log('AGREGANDO USUARIO');
     console.table(data);
+  };
+
+  const onCerrarModal = () => {
+    reset(valoresPorDefecto);
   };
 
   return (
@@ -57,6 +64,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
             <button
               type="button"
               className="btn-close"
+              onClick={onCerrarModal}
               data-bs-dismiss="modal"
               aria-label="Close"></button>
           </div>
@@ -340,6 +348,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
                     <button
                       type="button"
                       className="btn btn-danger mt-2 mt-md-0 me-md-2"
+                      onClick={onCerrarModal}
                       data-bs-dismiss="modal">
                       Volver
                     </button>
@@ -348,19 +357,6 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({}) => {
               </form>
             </IfContainer>
           </div>
-
-          {/* <div className="modal-footer">
-            <button
-              type="button"
-              className="btn btn-primary"
-              disabled={estaPendiente}
-              onClick={handleSubmit(onAgregarUsuario)}>
-              Guardar
-            </button>
-            <button type="button" className="btn btn-success" data-bs-dismiss="modal">
-              Volver
-            </button>
-          </div> */}
         </div>
       </div>
     </div>
