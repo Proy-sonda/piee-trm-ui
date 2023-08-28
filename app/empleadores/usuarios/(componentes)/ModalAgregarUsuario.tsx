@@ -25,12 +25,10 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
     rut: '',
     nombres: '',
     apellidos: '',
-    fechaNacimiento: '',
     telefono1: '',
     telefono2: '',
     email: '',
     confirmarEmail: '',
-    direccion: '',
     rolId: '',
   };
 
@@ -198,23 +196,6 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label>Fecha de nacimiento</label>
-                <input
-                  type="date"
-                  className={`form-control ${errors.fechaNacimiento ? 'is-invalid' : ''}`}
-                  {...register('fechaNacimiento', {
-                    required: {
-                      message: 'Este campo es obligatorio',
-                      value: true,
-                    },
-                  })}
-                />
-                <IfContainer show={!!errors.fechaNacimiento}>
-                  <div className="invalid-tooltip">{errors.fechaNacimiento?.message}</div>
-                </IfContainer>
-              </div>
-
-              <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="sr-only" htmlFor="tel1">
                   Teléfono 1
                 </label>
@@ -337,23 +318,6 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                 />
                 <IfContainer show={!!errors.confirmarEmail}>
                   <div className="invalid-tooltip">{errors.confirmarEmail?.message}</div>
-                </IfContainer>
-              </div>
-
-              <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label>Dirección</label>
-                <input
-                  type="text"
-                  className={`form-control ${errors.direccion ? 'is-invalid' : ''}`}
-                  {...register('direccion', {
-                    required: {
-                      value: true,
-                      message: 'Este campo es obligatorio',
-                    },
-                  })}
-                />
-                <IfContainer show={!!errors.direccion}>
-                  <div className="invalid-tooltip">{errors.direccion?.message}</div>
                 </IfContainer>
               </div>
 
