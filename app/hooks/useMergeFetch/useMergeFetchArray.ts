@@ -1,5 +1,5 @@
 import { FetchError } from '@/app/servicios/fetch';
-import { useEffect, useState } from 'react';
+import { DependencyList, useEffect, useState } from 'react';
 import { FetchResponse, RemappedFetchResponseTuple } from '.';
 
 /**
@@ -35,6 +35,7 @@ import { FetchResponse, RemappedFetchResponseTuple } from '.';
  */
 export function useMergeFetchResponseArray<T extends [...FetchResponse<any>[]]>(
   respuestas: [...T],
+  deps?: DependencyList,
 ): RemappedFetchResponseTuple<T> {
   const [resumen, setResumen] = useState<RemappedFetchResponseTuple<T>>([
     [] as FetchError[],
@@ -52,7 +53,7 @@ export function useMergeFetchResponseArray<T extends [...FetchResponse<any>[]]>(
         setResumen([[], x.map((x) => x[1]) as any, false]);
       }
     });
-  }, []);
+  }, deps);
 
   return resumen;
 }
