@@ -1,8 +1,14 @@
-// TODO: Renombrar propiedades de acuerdo a lo que venga del backend. con F2
+import { EstadoUsuario } from './EstadoUsuario';
+import { RolUsuario } from './RolUsuario';
+
 export interface UsuarioEntidadEmpleadora {
-  rut: string;
-  nombre: string;
-  telefono: string;
+  idusuario: number;
+  rutusuario: string;
+  nombres: string;
+  apellidos: string;
   email: string;
-  estado: string;
+  telefonouno: string;
+  telefonodos: string;
+  rol: RolUsuario;
+  estadousuario: EstadoUsuario;
 }

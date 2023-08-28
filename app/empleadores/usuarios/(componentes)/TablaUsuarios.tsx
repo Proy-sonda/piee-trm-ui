@@ -5,9 +5,10 @@ import { UsuarioEntidadEmpleadora } from '../(modelos)/UsuarioEntidadEmpleadora'
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
+  onEditarUsuario: (usuarioId: number) => void;
 }
 
-const TablaUsuarios: React.FC<TablaUsuariosProps> = ({ usuarios }) => {
+const TablaUsuarios: React.FC<TablaUsuariosProps> = ({ usuarios, onEditarUsuario }) => {
   const {
     datosPaginados: usuariosPaginados,
     cambiarPaginaActual,
@@ -33,19 +34,24 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({ usuarios }) => {
         </thead>
         <tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
-            <tr key={usuario.rut}>
-              <td>{usuario.rut}</td>
-              <td>{usuario.nombre}</td>
-              <td>{usuario.telefono}</td>
+            <tr key={usuario.rutusuario}>
+              <td>{usuario.rutusuario}</td>
+              <td>{`${usuario.nombres} ${usuario.apellidos}`}</td>
+              <td>{usuario.telefonouno}</td>
               <td>{usuario.email}</td>
               <td>
                 <select className="form-select form-select-sm" disabled>
                   <option>Administrador</option>
                 </select>
               </td>
-              <td>{usuario.estado}</td>
+              <td>{usuario.estadousuario.descripcion}</td>
               <td>
-                <button className="btn text-primary">
+                <button
+                  className="btn text-primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onEditarUsuario(usuario.idusuario);
+                  }}>
                   <i className="bi bi-pencil-square"></i>
                 </button>
                 <button className="btn text-primary">
