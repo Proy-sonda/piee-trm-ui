@@ -7,9 +7,11 @@ import { useMergeFetchResponseObject } from '@/app/hooks/useMergeFetch';
 import { estaLogueado } from '@/app/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
 import ModalCrearEditarUsuario from './(componentes)/ModalCrearEditarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
+import { UsuarioEntidadEmpleadora } from './(modelos)/UsuarioEntidadEmpleadora';
 import { buscarUsuarios } from './(servicios)/buscarUsuarios';
 
 interface UsuariosPageProps {
@@ -47,6 +49,23 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
   const onCerrarModal = () => {
     setMostrarModal(false);
     setIdUsuarioEditar(undefined);
+  };
+
+  const onEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
+    const x = await Swal.fire({
+      html: `¿Está seguro que quiere eliminar al usuario <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
+      icon: 'question',
+      showConfirmButton: true,
+      confirmButtonText: 'SÍ',
+      confirmButtonColor: 'var(--color-blue)',
+      showCancelButton: true,
+      cancelButtonText: 'NO',
+      cancelButtonColor: 'var(--bs-danger)',
+    });
+
+    if (!x.isConfirmed) {
+      return;
+    }
   };
 
   return (
@@ -91,6 +110,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
               <TablaUsuarios
                 usuarios={datosPagina?.usuarios ?? []}
                 onEditarUsuario={onEditarUsuario}
+                onEliminarUsuario={onEliminarUsuario}
               />
             </IfContainer>
           </div>
