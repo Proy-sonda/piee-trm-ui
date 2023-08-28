@@ -8,7 +8,7 @@ import { estaLogueado } from '@/app/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
-import ModalAgregarUsuario from './(componentes)/ModalAgregarUsuario';
+import ModalCrearEditarUsuario from './(componentes)/ModalCrearEditarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
 import { buscarUsuarios } from './(servicios)/buscarUsuarios';
 
@@ -90,7 +90,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
       </div>
 
       {mostrarModal && (
-        <ModalAgregarUsuario
+        <ModalCrearEditarUsuario
           idEmpleador={id}
           idUsuarioEditar={idUsuarioEditar}
           onCerrarModal={onCerrarModal}

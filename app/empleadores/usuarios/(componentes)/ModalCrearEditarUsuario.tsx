@@ -14,13 +14,13 @@ import { buscarRolesUsuarios } from '../(servicios)/buscarRolesUsuarios';
 import { buscarUsuarioPorId } from '../(servicios)/buscarUsuarioPorId';
 import { crearUsuario } from '../(servicios)/crearUsuario';
 
-interface ModalAgregarUsuarioProps {
+interface ModalCrearEditarProps {
   idEmpleador: string;
   idUsuarioEditar?: number;
   onCerrarModal: () => void;
 }
 
-const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
+const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
   idEmpleador,
   idUsuarioEditar,
   onCerrarModal,
@@ -447,4 +447,4 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
   );
 };
 
-export default ModalAgregarUsuario;
+export default ModalCrearEditarUsuario;
