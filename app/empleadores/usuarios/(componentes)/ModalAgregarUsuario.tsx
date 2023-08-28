@@ -24,17 +24,6 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
   idUsuarioEditar,
   onCerrarModal,
 }) => {
-  const valoresPorDefecto: CamposFormularioAgregarUsuario = {
-    rut: '',
-    nombres: '',
-    apellidos: '',
-    telefono1: '',
-    telefono2: '',
-    email: '',
-    confirmarEmail: '',
-    rolId: '',
-  };
-
   const [errCombos, combos, estaPendiente] = useMergeFetchResponseObject({
     roles: buscarRolesUsuarios(),
     usuarioEditar:
@@ -48,9 +37,20 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
     handleSubmit,
     getValues,
     formState: { errors },
-  } = useForm<CamposFormularioAgregarUsuario>({
-    // defaultValues: valoresPorDefecto,
-  });
+  } = useForm<CamposFormularioAgregarUsuario>();
+
+  const buscarValorParaComboRoles = (): string => {
+    const roles = combos?.roles ?? [];
+    const usuarioEditar = combos?.usuarioEditar;
+
+    if (!usuarioEditar) {
+      return '';
+    }
+
+    const rol = roles.find((x) => x.idrol === usuarioEditar.rol.idrol);
+
+    return rol?.idrol.toString() ?? '';
+  };
 
   const onAgregarUsuario: SubmitHandler<CamposFormularioAgregarUsuario> = async (data) => {
     const rol = combos!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
@@ -114,7 +114,9 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
   return (
     <Modal backdrop="static" size="xl" centered={true} scrollable={true} show={true}>
       <Modal.Header closeButton onClick={onCerrarModalInterno}>
-        <Modal.Title>Agregar Nuevo Usuario</Modal.Title>
+        <Modal.Title>
+          {`${idUsuarioEditar !== undefined ? 'Editar' : 'Agregar Nuevo'} Usuario`}
+        </Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
@@ -136,7 +138,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     type="text"
                     className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
                     {...register('rut', {
-                      value: combos!.usuarioEditar?.rut ?? '',
+                      value: combos!.usuarioEditar?.rutusuario ?? '',
                       required: {
                         message: 'El RUT es obligatorio',
                         value: true,
@@ -186,6 +188,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     type="text"
                     className={`form-control ${errors.apellidos ? 'is-invalid' : ''}`}
                     {...register('apellidos', {
+                      value: combos!.usuarioEditar?.apellidos ?? '',
                       required: {
                         message: 'Este campo es obligatorio',
                         value: true,
@@ -218,6 +221,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                       type="text"
                       className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
                       {...register('telefono1', {
+                        value: combos!.usuarioEditar?.telefonouno ?? '',
                         required: {
                           value: true,
                           message: 'Este campo es obligatorio',
@@ -254,6 +258,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                       type="text"
                       className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
                       {...register('telefono2', {
+                        value: combos!.usuarioEditar?.telefonodos ?? '',
                         required: {
                           value: true,
                           message: 'Este campo es obligatorio',
@@ -288,6 +293,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     onCopy={(e) => e.preventDefault()}
                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                     {...register('email', {
+                      value: combos!.usuarioEditar?.email ?? '',
                       required: {
                         value: true,
                         message: 'Este campo es obligatorio',
@@ -312,6 +318,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     onCopy={(e) => e.preventDefault()}
                     className={`form-control ${errors.confirmarEmail ? 'is-invalid' : ''}`}
                     {...register('confirmarEmail', {
+                      value: combos!.usuarioEditar?.email ?? '',
                       required: {
                         value: true,
                         message: 'Este campo es obligatorio',
@@ -336,6 +343,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                   <select
                     className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
                     {...register('rolId', {
+                      value: buscarValorParaComboRoles(),
                       validate: (rolId) => (rolId === '' ? 'Este campo es obligatorio' : undefined),
                     })}>
                     <option value={''}>Seleccionar</option>

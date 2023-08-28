@@ -34,23 +34,23 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({ usuarios, onEditarUsuario
         </thead>
         <tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
-            <tr key={usuario.rut}>
-              <td>{usuario.rut}</td>
+            <tr key={usuario.rutusuario}>
+              <td>{usuario.rutusuario}</td>
               <td>{`${usuario.nombres} ${usuario.apellidos}`}</td>
-              <td>{usuario.telefono1}</td>
+              <td>{usuario.telefonouno}</td>
               <td>{usuario.email}</td>
               <td>
                 <select className="form-select form-select-sm" disabled>
                   <option>Administrador</option>
                 </select>
               </td>
-              <td>{usuario.estado}</td>
+              <td>{usuario.estadousuario.descripcion}</td>
               <td>
                 <button
                   className="btn text-primary"
                   onClick={(e) => {
                     e.preventDefault();
-                    onEditarUsuario(usuario.id);
+                    onEditarUsuario(usuario.idusuario);
                   }}>
                   <i className="bi bi-pencil-square"></i>
                 </button>
