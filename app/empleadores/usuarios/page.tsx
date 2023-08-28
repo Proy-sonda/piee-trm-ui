@@ -13,6 +13,7 @@ import ModalCrearEditarUsuario from './(componentes)/ModalCrearEditarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
 import { UsuarioEntidadEmpleadora } from './(modelos)/UsuarioEntidadEmpleadora';
 import { buscarUsuarios } from './(servicios)/buscarUsuarios';
+import { eliminarUsuario } from './(servicios)/eliminarUsuario';
 
 interface UsuariosPageProps {
   searchParams: {
@@ -53,7 +54,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
   const onEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
     const x = await Swal.fire({
-      html: `¿Está seguro que quiere eliminar al usuario <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
+      html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
       icon: 'question',
       showConfirmButton: true,
       confirmButtonText: 'SÍ',
@@ -65,6 +66,26 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
     if (!x.isConfirmed) {
       return;
+    }
+
+    try {
+      await eliminarUsuario(usuario.idusuario);
+
+      await Swal.fire({
+        title: `${usuario.nombres} ${usuario.apellidos} fue eliminado con éxito`,
+        icon: 'success',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    } catch (error) {
+      console.error({ error });
+
+      await Swal.fire({
+        title: 'Error al eliminar usuario',
+        icon: 'error',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+      });
     }
   };
 
