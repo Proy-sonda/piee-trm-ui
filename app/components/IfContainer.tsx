@@ -1,16 +1,16 @@
 import React, { ReactNode } from 'react';
 
-interface DivProps {
+interface IfContainerProps {
   show: boolean;
-  children: ReactNode;
+  children: ReactNode | (() => ReactNode);
 }
 
-const IfContainer: React.FC<DivProps> = ({ show, children }) => {
+const IfContainer: React.FC<IfContainerProps> = ({ show, children }) => {
   if (!show) {
     return null;
   }
 
-  return <>{children}</>;
+  return <>{typeof children === 'function' ? children() : children}</>;
 };
 
 export default IfContainer;
