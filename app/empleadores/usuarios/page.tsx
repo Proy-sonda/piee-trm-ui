@@ -1,13 +1,16 @@
 'use client';
 
+import IfContainer from '@/app/components/IfContainer';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 import Position from '@/app/components/stage/Position';
+import { useMergeFetchResponseArray } from '@/app/hooks/useMergeFetch';
 import { estaLogueado } from '@/app/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
 import ModalAgregarUsuario from './(componentes)/ModalAgregarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
-import { UsuarioEntidadEmpleadora } from './(modelos)/UsuarioEntidadEmpleadora';
+import { buscarUsuarios } from './(servicios)/buscarUsuarios';
 
 interface UsuariosPageProps {
   searchParams: {
@@ -23,55 +26,23 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
   const { id, rut, razon } = searchParams;
 
   const [mostrarModal, setMostrarModal] = useState(false);
-  const [usuarios, setUsuarios] = useState<UsuarioEntidadEmpleadora[]>([
-    {
-      rut: '43814639-3',
-      nombre: 'Pepito Perez',
-      telefono: '+569 9 8888 7777',
-      email: 'algun.correo@gmail.com',
-      estado: 'Activo',
-    },
-    {
-      rut: '59706152-8',
-      nombre: 'Pepito Perez',
-      telefono: '+569 9 8888 7777',
-      email: 'algun.correo@gmail.com',
-      estado: 'Activo',
-    },
-    {
-      rut: '64689639-8',
-      nombre: 'Pepito Perez',
-      telefono: '+569 9 8888 7777',
-      email: 'algun.correo@gmail.com',
-      estado: 'Activo',
-    },
-    {
-      rut: '75553450-1',
-      nombre: 'Pepito Perez',
-      telefono: '+569 9 8888 7777',
-      email: 'algun.correo@gmail.com',
-      estado: 'Activo',
-    },
-    {
-      rut: '80235209-3',
-      nombre: 'Pepito Perez',
-      telefono: '+569 9 8888 7777',
-      email: 'algun.correo@gmail.com',
-      estado: 'Activo',
-    },
-    {
-      rut: '41052055-9',
-      nombre: 'Pepito Perez',
-      telefono: '+569 9 8888 7777',
-      email: 'algun.correo@gmail.com',
-      estado: 'Activo',
-    },
-  ]);
+  const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
+  const [err, [usuarios], pendiente] = useMergeFetchResponseArray([buscarUsuarios()]);
 
   if (!estaLogueado) {
     router.push('/login');
     return null;
   }
+
+  const onEditarUsuario = (idUsuarioEditar: number): void => {
+    setIdUsuarioEditar(idUsuarioEditar);
+    setMostrarModal(true);
+  };
+
+  const onCerrarModal = () => {
+    setMostrarModal(false);
+    setIdUsuarioEditar(undefined);
+  };
 
   return (
     <div className="bgads">
@@ -101,13 +72,29 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
         <div className="row mt-3">
           <div className="col-md-12">
-            <TablaUsuarios usuarios={usuarios} />
+            <IfContainer show={!pendiente && err.length > 0}>
+              <h4 className="mt-4 mb-5 text-center">Error al buscar usuarios</h4>
+            </IfContainer>
+
+            <IfContainer show={pendiente}>
+              <div className="mb-5">
+                <LoadingSpinner titulo="Cargando usuarios..." />
+              </div>
+            </IfContainer>
+
+            <IfContainer show={!pendiente && err.length === 0}>
+              <TablaUsuarios usuarios={usuarios ?? []} onEditarUsuario={onEditarUsuario} />
+            </IfContainer>
           </div>
         </div>
       </div>
 
       {mostrarModal && (
-        <ModalAgregarUsuario idEmpleador={id} onCerrarModal={() => setMostrarModal(false)} />
+        <ModalAgregarUsuario
+          idEmpleador={id}
+          idUsuarioEditar={idUsuarioEditar}
+          onCerrarModal={onCerrarModal}
+        />
       )}
     </div>
   );

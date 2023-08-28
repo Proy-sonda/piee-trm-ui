@@ -14,6 +14,7 @@ import { crearUsuario } from '../(servicios)/crearUsuario';
 
 interface ModalAgregarUsuarioProps {
   idEmpleador: string;
+  idUsuarioEditar?: number;
   onCerrarModal: () => void;
 }
 
