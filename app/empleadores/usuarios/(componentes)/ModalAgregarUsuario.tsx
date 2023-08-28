@@ -9,6 +9,7 @@ import { validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/es/lib/isEmail';
 import { CamposFormularioAgregarUsuario } from '../(modelos)/CamposFormularioAgregarUsuario';
+import { actualizarUsuario } from '../(servicios)/actualizarUsuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscarRolesUsuarios';
 import { buscarUsuarioPorId } from '../(servicios)/buscarUsuarioPorId';
 import { crearUsuario } from '../(servicios)/crearUsuario';
@@ -24,7 +25,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
   idUsuarioEditar,
   onCerrarModal,
 }) => {
-  const [errCombos, combos, estaPendiente] = useMergeFetchResponseObject({
+  const [errDatosModal, datosModal, datosPendientes] = useMergeFetchResponseObject({
     roles: buscarRolesUsuarios(),
     usuarioEditar:
       idUsuarioEditar !== undefined
@@ -40,8 +41,8 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
   } = useForm<CamposFormularioAgregarUsuario>();
 
   const buscarValorParaComboRoles = (): string => {
-    const roles = combos?.roles ?? [];
-    const usuarioEditar = combos?.usuarioEditar;
+    const roles = datosModal?.roles ?? [];
+    const usuarioEditar = datosModal?.usuarioEditar;
 
     if (!usuarioEditar) {
       return '';
@@ -52,8 +53,18 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
     return rol?.idrol.toString() ?? '';
   };
 
-  const onAgregarUsuario: SubmitHandler<CamposFormularioAgregarUsuario> = async (data) => {
-    const rol = combos!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
+  const onGuardarCambios: SubmitHandler<CamposFormularioAgregarUsuario> = async (data) => {
+    const usuarioEditar = datosModal?.usuarioEditar;
+
+    if (!usuarioEditar) {
+      await agregarUsuario(data);
+    } else {
+      await editarUsuario(data);
+    }
+  };
+
+  const agregarUsuario = async (data: CamposFormularioAgregarUsuario) => {
+    const rol = datosModal!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
     if (!rol) {
       throw new Error('El rol no se ha seleccionado o no existe');
     }
@@ -107,6 +118,61 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
     }
   };
 
+  const editarUsuario = async (data: CamposFormularioAgregarUsuario) => {
+    const rol = datosModal!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
+    if (!rol) {
+      throw new Error('El rol no se ha seleccionado o no existe');
+    }
+
+    const usuarioEditar = datosModal?.usuarioEditar;
+    if (!usuarioEditar) {
+      throw new Error('No se encuentra el usuario para editar');
+    }
+
+    try {
+      await actualizarUsuario({
+        idusuario: usuarioEditar.idusuario,
+        rutusuario: data.rut,
+        nombres: data.nombres,
+        apellidos: data.apellidos,
+        email: data.email,
+        emailconfirma: data.confirmarEmail,
+        telefonouno: data.telefono1,
+        telefonodos: data.telefono2,
+        rol: rol,
+        estadousuario: usuarioEditar.estadousuario,
+      });
+
+      Swal.fire({
+        title: 'Usuario actualizado con éxito',
+        icon: 'success',
+        showConfirmButton: true,
+      });
+    } catch (error) {
+      console.error({ error });
+
+      if (error instanceof HttpError) {
+        if (error.body.message === 'Usuario ya existe') {
+          await Swal.fire({
+            title: 'El usuario ya existe',
+            icon: 'error',
+            showConfirmButton: true,
+            confirmButtonColor: 'var(--color-blue)',
+          });
+          return;
+        }
+      }
+
+      await Swal.fire({
+        title: 'Error al actualizar usuario',
+        text: 'Se ha producido un error desconocido',
+        icon: 'error',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+  };
+
   const onCerrarModalInterno = () => {
     onCerrarModal();
   };
@@ -115,22 +181,22 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
     <Modal backdrop="static" size="xl" centered={true} scrollable={true} show={true}>
       <Modal.Header closeButton onClick={onCerrarModalInterno}>
         <Modal.Title>
-          {`${idUsuarioEditar !== undefined ? 'Editar' : 'Agregar Nuevo'} Usuario`}
+          {`${idUsuarioEditar !== undefined ? 'Editar Usuario' : 'Agregar Nuevo Usuario'}`}
         </Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
-        <IfContainer show={errCombos.length > 0}>
-          <h4 className="my-5 text-center">Hubo un error al cargar los roles de usuario</h4>
+        <IfContainer show={errDatosModal.length > 0}>
+          <h4 className="my-5 text-center">Hubo un error al cargar los datos</h4>
         </IfContainer>
 
-        <IfContainer show={estaPendiente}>
+        <IfContainer show={datosPendientes}>
           <LoadingSpinner />
         </IfContainer>
 
-        <IfContainer show={!estaPendiente && errCombos.length === 0}>
+        <IfContainer show={!datosPendientes && errDatosModal.length === 0}>
           {() => (
-            <form onSubmit={handleSubmit(onAgregarUsuario)}>
+            <form onSubmit={handleSubmit(onGuardarCambios)}>
               <div className="row mb-4 g-3 align-items-baseline">
                 <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                   <label>RUT</label>
@@ -138,7 +204,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     type="text"
                     className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
                     {...register('rut', {
-                      value: combos!.usuarioEditar?.rutusuario ?? '',
+                      value: datosModal!.usuarioEditar?.rutusuario ?? '',
                       required: {
                         message: 'El RUT es obligatorio',
                         value: true,
@@ -162,7 +228,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     type="text"
                     className={`form-control ${errors.nombres ? 'is-invalid' : ''}`}
                     {...register('nombres', {
-                      value: combos!.usuarioEditar?.nombres ?? '',
+                      value: datosModal!.usuarioEditar?.nombres ?? '',
                       required: {
                         message: 'Este campo es obligatorio',
                         value: true,
@@ -188,7 +254,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     type="text"
                     className={`form-control ${errors.apellidos ? 'is-invalid' : ''}`}
                     {...register('apellidos', {
-                      value: combos!.usuarioEditar?.apellidos ?? '',
+                      value: datosModal!.usuarioEditar?.apellidos ?? '',
                       required: {
                         message: 'Este campo es obligatorio',
                         value: true,
@@ -221,7 +287,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                       type="text"
                       className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
                       {...register('telefono1', {
-                        value: combos!.usuarioEditar?.telefonouno ?? '',
+                        value: datosModal!.usuarioEditar?.telefonouno ?? '',
                         required: {
                           value: true,
                           message: 'Este campo es obligatorio',
@@ -258,7 +324,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                       type="text"
                       className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
                       {...register('telefono2', {
-                        value: combos!.usuarioEditar?.telefonodos ?? '',
+                        value: datosModal!.usuarioEditar?.telefonodos ?? '',
                         required: {
                           value: true,
                           message: 'Este campo es obligatorio',
@@ -293,7 +359,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     onCopy={(e) => e.preventDefault()}
                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                     {...register('email', {
-                      value: combos!.usuarioEditar?.email ?? '',
+                      value: datosModal!.usuarioEditar?.email ?? '',
                       required: {
                         value: true,
                         message: 'Este campo es obligatorio',
@@ -318,7 +384,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                     onCopy={(e) => e.preventDefault()}
                     className={`form-control ${errors.confirmarEmail ? 'is-invalid' : ''}`}
                     {...register('confirmarEmail', {
-                      value: combos!.usuarioEditar?.email ?? '',
+                      value: datosModal!.usuarioEditar?.email ?? '',
                       required: {
                         value: true,
                         message: 'Este campo es obligatorio',
@@ -347,8 +413,8 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
                       validate: (rolId) => (rolId === '' ? 'Este campo es obligatorio' : undefined),
                     })}>
                     <option value={''}>Seleccionar</option>
-                    {combos &&
-                      combos.roles.map((rol) => (
+                    {datosModal &&
+                      datosModal.roles.map((rol) => (
                         <option key={rol.idrol} value={rol.idrol}>
                           {rol.rol}
                         </option>
@@ -362,7 +428,7 @@ const ModalAgregarUsuario: React.FC<ModalAgregarUsuarioProps> = ({
 
               <div className="row mt-4">
                 <div className="d-flex flex-column flex-md-row-reverse">
-                  <button type="submit" className="btn btn-primary" disabled={estaPendiente}>
+                  <button type="submit" className="btn btn-primary" disabled={datosPendientes}>
                     Guardar
                   </button>
                   <button
