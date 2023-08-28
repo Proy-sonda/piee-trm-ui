@@ -22,6 +22,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
   const { id, rut, razon } = searchParams;
 
+  const [mostrarModal, setMostrarModal] = useState(false);
   const [usuarios, setUsuarios] = useState<UsuarioEntidadEmpleadora[]>([
     {
       rut: '43814639-3',
@@ -92,10 +93,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
         <div className="mt-2 row">
           <div className="d-flex justify-content-end">
-            <button
-              className="btn btn-success btn-sm"
-              data-bs-toggle="modal"
-              data-bs-target="#AddUsr">
+            <button className="btn btn-success btn-sm" onClick={() => setMostrarModal(true)}>
               + Agregar Usuario
             </button>
           </div>
@@ -108,7 +106,9 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
         </div>
       </div>
 
-      <ModalAgregarUsuario idEmpleador={id} />
+      {mostrarModal && (
+        <ModalAgregarUsuario idEmpleador={id} onCerrarModal={() => setMostrarModal(false)} />
+      )}
     </div>
   );
 };
