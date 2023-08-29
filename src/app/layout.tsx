@@ -1,7 +1,7 @@
 'use client';
 import Usuario from '@/components/usuario/Usuario';
 import { AuthProvider, InscribeProvider, StepProvider } from '@/contexts';
-import { EmpleadorProvider } from '@/contexts/EmpleadorContext';
+import { EmpleadorProvider } from '@/contexts/empleador-context';
 import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';

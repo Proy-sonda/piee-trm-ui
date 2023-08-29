@@ -1,6 +1,6 @@
 import { DatoEmpleador } from '@/modelos/dato-empleador';
 import { createContext, useState } from 'react';
-import { ChildrenApp } from './interfaces/types';
+import { ChildrenApp } from './modelos/types';
 
 type EmpleadorContextType = {
   empleador: DatoEmpleador[];

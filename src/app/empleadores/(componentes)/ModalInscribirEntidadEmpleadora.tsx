@@ -1,4 +1,4 @@
-import { CCCOMUNACB } from '@/contexts/interfaces/types';
+import { CCCOMUNACB } from '@/contexts/modelos/types';
 import { useForm } from '@/hooks/use-form';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { FormEvent, useState } from 'react';

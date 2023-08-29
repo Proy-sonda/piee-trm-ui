@@ -1,4 +1,4 @@
-import { UsuarioLogin } from '@/contexts/interfaces/types';
+import { UsuarioLogin } from '@/contexts/modelos/types';
 import { respLogin } from '@/modelos/adscripcion';
 
 let respuesta: respLogin = {

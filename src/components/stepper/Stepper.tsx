@@ -1,8 +1,5 @@
-import { FC, Fragment, useContext } from 'react';
+import { FC, Fragment } from 'react';
 import styles from './Stepper.module.css';
-
-import Link from 'next/link';
-import StepContext from '../../contexts/Stepcontext';
 
 interface Data {
   label: string;

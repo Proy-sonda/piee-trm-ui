@@ -1,7 +1,7 @@
 'use client';
 import Position from '@/components/stage/Position';
 import Stage from '@/components/stage/Stage';
-import { EmpleadorContext } from '@/contexts/EmpleadorContext';
+import { EmpleadorContext } from '@/contexts/empleador-context';
 import {
   CCACTLABCB,
   CCAFCB,
@@ -10,7 +10,7 @@ import {
   CCREMUNERACION,
   CCTAMANOCB,
   CCTIPOEM,
-} from '@/contexts/interfaces/types';
+} from '@/contexts/modelos/types';
 import { actualizaEmpleador } from '@/helpers/tramitacion/empleadores';
 import useCombo from '@/hooks/use-combo';
 import { useForm } from '@/hooks/use-form';

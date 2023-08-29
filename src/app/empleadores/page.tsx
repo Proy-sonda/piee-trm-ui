@@ -2,7 +2,7 @@
 
 import { LoginComponent } from '@/components/login/LoginComponent';
 import Position from '@/components/stage/Position';
-import { EmpleadorContext } from '@/contexts/EmpleadorContext';
+import { EmpleadorContext } from '@/contexts/empleador-context';
 import { estaLogueado } from '@/servicios/auth';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';

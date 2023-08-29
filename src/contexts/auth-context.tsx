@@ -2,7 +2,7 @@
 
 import { LoginUsuario } from '@/helpers/adscripcion/login-usuario';
 import { createContext, useState } from 'react';
-import { ChildrenApp, UserData, UsuarioLogin } from './interfaces/types';
+import { ChildrenApp, UserData, UsuarioLogin } from './modelos/types';
 
 type AuthContextType = {
   rutusuario: string;

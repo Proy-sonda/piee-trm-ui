@@ -1,4 +1,4 @@
-import { CCCOMUNACB } from '@/contexts/interfaces/types';
+import { CCCOMUNACB } from '@/contexts/modelos/types';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';

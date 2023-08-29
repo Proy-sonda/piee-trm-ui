@@ -1,6 +1,6 @@
 'use client';
-import { AuthContext } from '@/contexts/AuthContext';
-import { UsuarioLogin } from '@/contexts/interfaces/types';
+import { AuthContext } from '@/contexts/auth-context';
+import { UsuarioLogin } from '@/contexts/modelos/types';
 import { useForm } from '@/hooks/use-form';
 import jwt_decode from 'jwt-decode';
 import { useRouter } from 'next/navigation';

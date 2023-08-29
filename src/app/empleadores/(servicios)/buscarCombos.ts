@@ -6,7 +6,7 @@ import {
   CCREMUNERACION,
   CCTAMANOCB,
   CCTIPOEM,
-} from '@/contexts/interfaces/types';
+} from '@/contexts/modelos/types';
 import { runFetch } from '@/servicios/fetch';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
