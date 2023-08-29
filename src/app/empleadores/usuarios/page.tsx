@@ -9,11 +9,11 @@ import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
-import ModalCrearEditarUsuario from './(componentes)/ModalCrearEditarUsuario';
-import TablaUsuarios from './(componentes)/TablaUsuarios';
-import { UsuarioEntidadEmpleadora } from './(modelos)/UsuarioEntidadEmpleadora';
-import { buscarUsuarios } from './(servicios)/buscarUsuarios';
-import { eliminarUsuario } from './(servicios)/eliminarUsuario';
+import ModalCrearEditarUsuario from './(componentes)/modal-crear-editar-usuario';
+import TablaUsuarios from './(componentes)/tabla-usuarios';
+import { UsuarioEntidadEmpleadora } from './(modelos)/usuario-entidad-empleadora';
+import { buscarUsuarios } from './(servicios)/buscar-usuarios';
+import { eliminarUsuario } from './(servicios)/eliminar-usuario';
 
 interface UsuariosPageProps {
   searchParams: {

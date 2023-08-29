@@ -1,7 +1,7 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import React from 'react';
-import { UsuarioEntidadEmpleadora } from '../(modelos)/UsuarioEntidadEmpleadora';
+import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];

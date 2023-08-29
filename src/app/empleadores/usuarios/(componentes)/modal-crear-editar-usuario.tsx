@@ -8,11 +8,11 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/es/lib/isEmail';
-import { CamposFormularioAgregarUsuario } from '../(modelos)/CamposFormularioAgregarUsuario';
-import { actualizarUsuario } from '../(servicios)/actualizarUsuario';
-import { buscarRolesUsuarios } from '../(servicios)/buscarRolesUsuarios';
-import { buscarUsuarioPorId } from '../(servicios)/buscarUsuarioPorId';
-import { crearUsuario } from '../(servicios)/crearUsuario';
+import { CamposFormularioAgregarUsuario } from '../(modelos)/campos-formulario-agregar-usuario';
+import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
+import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
+import { buscarUsuarioPorId } from '../(servicios)/buscar-usuario-por-id';
+import { crearUsuario } from '../(servicios)/crear-usuario';
 
 interface ModalCrearEditarProps {
   idEmpleador: string;

@@ -1,6 +1,6 @@
 import { obtenerToken } from '@/servicios/auth';
 import { runFetch } from '@/servicios/fetch';
-import { UsuarioEntidadEmpleadora } from '../(modelos)/UsuarioEntidadEmpleadora';
+import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 

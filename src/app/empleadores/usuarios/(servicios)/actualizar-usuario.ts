@@ -1,7 +1,7 @@
 import { obtenerToken } from '@/servicios/auth';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { EstadoUsuario } from '../(modelos)/EstadoUsuario';
-import { RolUsuario } from '../(modelos)/RolUsuario';
+import { EstadoUsuario } from '../(modelos)/estado-usuario';
+import { RolUsuario } from '../(modelos)/rol-usuario';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 

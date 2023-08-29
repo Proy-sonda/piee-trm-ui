@@ -1,5 +1,5 @@
-import { EstadoUsuario } from './EstadoUsuario';
-import { RolUsuario } from './RolUsuario';
+import { EstadoUsuario } from './estado-usuario';
+import { RolUsuario } from './rol-usuario';
 
 export interface UsuarioEntidadEmpleadora {
   idusuario: number;
