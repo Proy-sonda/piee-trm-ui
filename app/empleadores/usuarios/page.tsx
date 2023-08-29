@@ -72,7 +72,8 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
     try {
       await eliminarUsuario(usuario.idusuario);
 
-      await Swal.fire({
+      /** NOTA: No usar await en esta alerta para que refresque el componente en el fondo */
+      Swal.fire({
         title: `${usuario.nombres} ${usuario.apellidos} fue eliminado con éxito`,
         icon: 'success',
         showConfirmButton: true,
