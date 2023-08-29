@@ -18,12 +18,16 @@ interface ModalCrearEditarProps {
   idEmpleador: string;
   idUsuarioEditar?: number;
   onCerrarModal: () => void;
+  onUsuarioCreado: () => void;
+  onUsuarioEditado: () => void;
 }
 
 const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
   idEmpleador,
   idUsuarioEditar,
   onCerrarModal,
+  onUsuarioCreado,
+  onUsuarioEditado,
 }) => {
   const [errDatosModal, datosModal, datosPendientes] = useMergeFetchResponseObject({
     roles: buscarRolesUsuarios(),
@@ -93,6 +97,8 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
         icon: 'success',
         showConfirmButton: true,
       });
+
+      onUsuarioCreado();
     } catch (error) {
       console.error({ error });
 
@@ -148,6 +154,8 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
         icon: 'success',
         showConfirmButton: true,
       });
+
+      onUsuarioEditado();
     } catch (error) {
       console.error({ error });
 

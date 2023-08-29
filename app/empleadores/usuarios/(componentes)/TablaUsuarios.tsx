@@ -6,9 +6,14 @@ import { UsuarioEntidadEmpleadora } from '../(modelos)/UsuarioEntidadEmpleadora'
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
   onEditarUsuario: (usuarioId: number) => void;
+  onEliminarUsuario: (usuario: UsuarioEntidadEmpleadora) => void | Promise<void>;
 }
 
-const TablaUsuarios: React.FC<TablaUsuariosProps> = ({ usuarios, onEditarUsuario }) => {
+const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
+  usuarios,
+  onEditarUsuario,
+  onEliminarUsuario,
+}) => {
   const {
     datosPaginados: usuariosPaginados,
     cambiarPaginaActual,
@@ -54,7 +59,12 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({ usuarios, onEditarUsuario
                   }}>
                   <i className="bi bi-pencil-square"></i>
                 </button>
-                <button className="btn text-primary">
+                <button
+                  className="btn text-primary"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    onEliminarUsuario(usuario);
+                  }}>
                   <i className="bi bi-trash3"></i>
                 </button>
                 <button className="btn text-primary" title="Reenviar clave">

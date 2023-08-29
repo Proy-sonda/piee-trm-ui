@@ -7,10 +7,13 @@ import { useMergeFetchResponseObject } from '@/app/hooks/useMergeFetch';
 import { estaLogueado } from '@/app/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
 import ModalCrearEditarUsuario from './(componentes)/ModalCrearEditarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
+import { UsuarioEntidadEmpleadora } from './(modelos)/UsuarioEntidadEmpleadora';
 import { buscarUsuarios } from './(servicios)/buscarUsuarios';
+import { eliminarUsuario } from './(servicios)/eliminarUsuario';
 
 interface UsuariosPageProps {
   searchParams: {
@@ -25,19 +28,20 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
   const { id, rut, razon } = searchParams;
 
+  const [refresh, setRefresh] = useState(0);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
   const [err, datosPagina, pendiente] = useMergeFetchResponseObject(
     {
       usuarios: buscarUsuarios(rut),
     },
-    [mostrarModal],
+    [refresh],
   );
 
-  if (!estaLogueado) {
-    router.push('/login');
-    return null;
-  }
+  const refrescarComponente = () => {
+    /* Hay que setearlo a un valor distinto al anterior para que vuelva a cargar los usuarios */
+    setRefresh(Math.random());
+  };
 
   const onEditarUsuario = (idUsuarioEditar: number): void => {
     setIdUsuarioEditar(idUsuarioEditar);
@@ -48,6 +52,51 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
     setMostrarModal(false);
     setIdUsuarioEditar(undefined);
   };
+
+  const onEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
+    const respuesta = await Swal.fire({
+      html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
+      icon: 'question',
+      showConfirmButton: true,
+      confirmButtonText: 'SÍ',
+      confirmButtonColor: 'var(--color-blue)',
+      showCancelButton: true,
+      cancelButtonText: 'NO',
+      cancelButtonColor: 'var(--bs-danger)',
+    });
+
+    if (!respuesta.isConfirmed) {
+      return;
+    }
+
+    try {
+      await eliminarUsuario(usuario.idusuario);
+
+      /** NOTA: No usar await en esta alerta para que refresque el componente en el fondo */
+      Swal.fire({
+        title: `${usuario.nombres} ${usuario.apellidos} fue eliminado con éxito`,
+        icon: 'success',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+      });
+
+      refrescarComponente();
+    } catch (error) {
+      console.error({ error });
+
+      await Swal.fire({
+        title: 'Error al eliminar usuario',
+        icon: 'error',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+  };
+
+  if (!estaLogueado) {
+    router.push('/login');
+    return null;
+  }
 
   return (
     <div className="bgads">
@@ -91,6 +140,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
               <TablaUsuarios
                 usuarios={datosPagina?.usuarios ?? []}
                 onEditarUsuario={onEditarUsuario}
+                onEliminarUsuario={onEliminarUsuario}
               />
             </IfContainer>
           </div>
@@ -102,6 +152,8 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
           idEmpleador={id}
           idUsuarioEditar={idUsuarioEditar}
           onCerrarModal={onCerrarModal}
+          onUsuarioCreado={refrescarComponente}
+          onUsuarioEditado={refrescarComponente}
         />
       )}
     </div>

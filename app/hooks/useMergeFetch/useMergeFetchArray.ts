@@ -44,6 +44,8 @@ export function useMergeFetchResponseArray<T extends [...FetchResponse<any>[]]>(
   ]);
 
   useEffect(() => {
+    setResumen([[], respuestas.map(() => undefined), true]);
+
     Promise.all(respuestas).then((x) => {
       const errores = x.filter(([error]) => !!error).map((r) => r[0]) as FetchError[];
 
@@ -53,7 +55,7 @@ export function useMergeFetchResponseArray<T extends [...FetchResponse<any>[]]>(
         setResumen([[], x.map((x) => x[1]) as any, false]);
       }
     });
-  }, deps);
+  }, deps ?? []);
 
   return resumen;
 }
