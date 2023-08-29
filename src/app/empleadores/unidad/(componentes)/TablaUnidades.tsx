@@ -1,6 +1,6 @@
 import Paginacion from '@/components/paginacion/paginacion';
 import usePaginacion from '@/components/paginacion/paginacion.hook';
-import { Unidadrhh } from '@/interface/tramitacion';
+import { Unidadrhh } from '@/modelos/tramitacion';
 import Link from 'next/link';
 
 interface TablaUnidadesProps {

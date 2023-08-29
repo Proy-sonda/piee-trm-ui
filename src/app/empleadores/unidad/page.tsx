@@ -2,7 +2,7 @@
 
 import Position from '@/components/stage/Position';
 import Stage from '@/components/stage/Stage';
-import { Unidadrhh } from '@/interface/tramitacion';
+import { Unidadrhh } from '@/modelos/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
 import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';

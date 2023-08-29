@@ -6,7 +6,7 @@ import { EmpleadorContext } from '@/contexts/EmpleadorContext';
 import { estaLogueado } from '@/servicios/auth';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { Empleador } from '../../interface/empleador';
+import { Empleador } from '../../modelos/empleador';
 import ModalInscribirEntidadEmpleadora from './(componentes)/ModalInscribirEntidadEmpleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/TablaEntidadesEmpleadoras';
 import { DatosInscribirEmpleador } from './(modelos)/inscribirEmpleador';

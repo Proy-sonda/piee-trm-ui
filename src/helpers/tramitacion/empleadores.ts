@@ -1,4 +1,4 @@
-import { ActualizaEmpleador } from '@/interface/tramitacion';
+import { ActualizaEmpleador } from '@/modelos/tramitacion';
 import { parseCookies } from 'nookies';
 let cookie = parseCookies();
 let token = cookie.token;

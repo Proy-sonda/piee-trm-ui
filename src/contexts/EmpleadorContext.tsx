@@ -1,4 +1,4 @@
-import { DatoEmpleador } from '@/interface/datoEmpleador';
+import { DatoEmpleador } from '@/modelos/dato-empleador';
 import { createContext, useState } from 'react';
 import { ChildrenApp } from './interfaces/types';
 

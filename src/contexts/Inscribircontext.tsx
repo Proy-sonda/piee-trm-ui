@@ -1,17 +1,17 @@
 'use client';
 
-import { ReactNode, useState, createContext } from 'react';
+import { ReactNode, createContext, useState } from 'react';
 import {
   Actividadlaboral,
   Administrador,
   Ccaf,
   Comuna,
+  DireccionEmpleador,
   Empleador,
+  Sistemaremuneracion,
   Tamanoempresa,
   Tipoempleador,
-  Sistemaremuneracion,
-  DireccionEmpleador,
-} from '../interface/adscripcion';
+} from '../modelos/adscripcion';
 
 type myAppProps = {
   children: ReactNode;

@@ -14,7 +14,7 @@ import {
 import { actualizaEmpleador } from '@/helpers/tramitacion/empleadores';
 import useCombo from '@/hooks/useCombo';
 import { useForm } from '@/hooks/useForm';
-import { ActualizaEmpleador } from '@/interface/tramitacion';
+import { ActualizaEmpleador } from '@/modelos/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useContext, useEffect, useState } from 'react';

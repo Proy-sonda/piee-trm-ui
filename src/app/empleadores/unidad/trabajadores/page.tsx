@@ -1,7 +1,7 @@
 'use client';
 import Stage from '@/components/stage/Stage';
 import { useForm } from '@/hooks/useForm';
-import { Unidadrhh } from '@/interface/tramitacion';
+import { Unidadrhh } from '@/modelos/tramitacion';
 import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';

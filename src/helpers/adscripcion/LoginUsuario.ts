@@ -1,5 +1,5 @@
 import { UsuarioLogin } from '@/contexts/interfaces/types';
-import { respLogin } from '@/interface/adscripcion';
+import { respLogin } from '@/modelos/adscripcion';
 
 let respuesta: respLogin = {
   data: [],
