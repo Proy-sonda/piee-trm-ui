@@ -39,7 +39,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
   );
 
   const refrescarComponente = () => {
-    /* Hay que setearlo a un valor distinto al anterior para que vuelva a renderizar el componente */
+    /* Hay que setearlo a un valor distinto al anterior para que vuelva a cargar los usuarios */
     setRefresh(Math.random());
   };
 
