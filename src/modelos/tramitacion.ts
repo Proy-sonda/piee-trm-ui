@@ -9,25 +9,25 @@ export interface Unidadrhh {
   direccionunidad: Direccionunidad;
 }
 
-export interface Direccionunidad {
+interface Direccionunidad {
   iddireccionunidad: number;
   numero: string;
   depto: string;
   comuna: Comuna;
 }
 
-export interface Comuna {
+interface Comuna {
   idcomuna: string;
   nombre: string;
   region: Region;
 }
 
-export interface Region {
+interface Region {
   idregion: string;
   nombre: string;
 }
 
-export interface Empleador {
+interface Empleador {
   idempleador: number;
   rutempleador: string;
   razonsocial: string;
@@ -39,9 +39,9 @@ export interface Empleador {
   usuarioempleador: Usuarioempleador;
 }
 
-export interface Usuarioempleador {}
+interface Usuarioempleador {}
 
-export interface Estadounidadrrhh {
+interface Estadounidadrrhh {
   idestadounidadrrhh: number;
   descripcion: string;
 }
@@ -63,40 +63,40 @@ export interface ActualizaEmpleador {
   direccionempleador: Direccionempleador;
 }
 
-export interface Actividadlaboral {
+interface Actividadlaboral {
   idactividadlaboral: number;
   actividadlaboral: string;
 }
 
-export interface Ccaf {
+interface Ccaf {
   idccaf: number;
   nombre: string;
 }
 
-export interface Direccionempleador {
+interface Direccionempleador {
   calle: string;
   numero: string;
   depto: string;
   comuna: Comuna2;
 }
 
-export interface Comuna2 {
+interface Comuna2 {
   idcomuna: string;
   nombre: string;
 }
 
-export interface Sistemaremuneracion {
+interface Sistemaremuneracion {
   idsistemaremuneracion: number;
   descripcion: string;
 }
 
-export interface Tamanoempresa {
+interface Tamanoempresa {
   idtamanoempresa: number;
   nrotrabajadores: number;
   descripcion: string;
 }
 
-export interface Tipoempleador {
+interface Tipoempleador {
   idtipoempleador: number;
   tipoempleador: string;
 }

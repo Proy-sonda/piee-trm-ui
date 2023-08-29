@@ -2,15 +2,6 @@
 import Position from '@/components/stage/position';
 import Stage from '@/components/stage/stage';
 import { EmpleadorContext } from '@/contexts/empleador-context';
-import {
-  CCACTLABCB,
-  CCAFCB,
-  CCCOMUNACB,
-  CCREGIONCB,
-  CCREMUNERACION,
-  CCTAMANOCB,
-  CCTIPOEM,
-} from '@/contexts/modelos/types';
 import { actualizaEmpleador } from '@/helpers/tramitacion/empleadores';
 import useCombo from '@/hooks/use-combo';
 import { useForm } from '@/hooks/use-form';
@@ -20,7 +11,14 @@ import { useRouter } from 'next/navigation';
 import { FormEvent, useContext, useEffect, useState } from 'react';
 import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
-import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
+import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
+import { ActividadLaboral } from '../(modelos)/actividad-laboral';
+import { CajaDeCompensacion } from '../(modelos)/caja-de-compensacion';
+import { Comuna } from '../(modelos)/comuna';
+import { Region } from '../(modelos)/region';
+import { SistemaDeRemuneracion } from '../(modelos)/sistema-de-remuneracion';
+import { TamanoEmpresa } from '../(modelos)/tamano-empresa';
+import { TipoEmpleador } from '../(modelos)/tipo-empleador';
 
 interface DatosEmpleadoresProps {
   searchParams: {
@@ -29,7 +27,7 @@ interface DatosEmpleadoresProps {
     id: string;
   };
 }
-const initialComuna: CCCOMUNACB[] = [
+const initialComuna: Comuna[] = [
   {
     idcomuna: 0,
     nombre: '',
@@ -43,13 +41,13 @@ const initialComuna: CCCOMUNACB[] = [
 const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
   const router = useRouter();
 
-  let CCTIPOEMP: CCTIPOEM[] = useCombo('/tipoempleador/all');
-  let CCAF: CCAFCB[] = useCombo('/ccaf/all');
-  let CCACTLAB: CCACTLABCB[] = useCombo('/actividadlaboral/all');
-  let CCREGION: CCREGIONCB[] = useCombo('/Region/all');
-  let CCCOMUNA: CCCOMUNACB[] = useCombo('/comuna/all/region');
-  let CCREMUNERACION: CCREMUNERACION[] = useCombo('/sistemaremuneracion/all');
-  let CCTAMANOCB: CCTAMANOCB[] = useCombo('/tamanoempresa/all');
+  let CCTIPOEMP: TipoEmpleador[] = useCombo('/tipoempleador/all');
+  let CCAF: CajaDeCompensacion[] = useCombo('/ccaf/all');
+  let CCACTLAB: ActividadLaboral[] = useCombo('/actividadlaboral/all');
+  let CCREGION: Region[] = useCombo('/Region/all');
+  let CCCOMUNA: Comuna[] = useCombo('/comuna/all/region');
+  let comboRemuneracion: SistemaDeRemuneracion[] = useCombo('/sistemaremuneracion/all');
+  let comboTamanoEmpresa: TamanoEmpresa[] = useCombo('/tamanoempresa/all');
 
   const { empleador } = useContext(EmpleadorContext);
   const { rut, id } = searchParams;
@@ -544,8 +542,8 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                     onChange={onInputChange}
                     required>
                     <option value={''}>Seleccionar</option>
-                    {CCTAMANOCB.length > 0 ? (
-                      CCTAMANOCB.map(({ idtamanoempresa, descripcion }) => (
+                    {comboTamanoEmpresa.length > 0 ? (
+                      comboTamanoEmpresa.map(({ idtamanoempresa, descripcion }) => (
                         <option key={idtamanoempresa} value={idtamanoempresa}>
                           {descripcion}
                         </option>
@@ -565,8 +563,8 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                   onChange={onInputChange}
                   required>
                   <option value={''}>Seleccionar</option>
-                  {CCREMUNERACION.length > 0 ? (
-                    CCREMUNERACION.map(({ idsistemaremuneracion, descripcion }) => (
+                  {comboRemuneracion.length > 0 ? (
+                    comboRemuneracion.map(({ idsistemaremuneracion, descripcion }) => (
                       <option key={idsistemaremuneracion} value={idsistemaremuneracion}>
                         {descripcion}
                       </option>

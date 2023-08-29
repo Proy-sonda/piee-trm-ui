@@ -1,11 +1,12 @@
-import { CCCOMUNACB } from '@/contexts/modelos/types';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { UnidadResp } from '../(modelos)/UnidadResp';
 import { UpdateUnidad } from '../(modelos)/UpdateUnidad';
 import { getDatoUnidad } from '../(servicios)/getDatoUnidad';
-import { buscarComunas, buscarRegiones } from '../../(servicios)/buscarCombos';
+import { Comuna } from '../../(modelos)/comuna';
+import { buscarComunas } from '../../(servicios)/buscar-comunas';
+import { buscarRegiones } from '../../(servicios)/buscar-regiones';
 
 interface ModalEditarUnidadProps {
   idEmpleador: string;
@@ -24,7 +25,7 @@ const ModalEditarUnidad = ({ idEmpleador, idUnidad, onEditarUnidad }: ModalEdita
         nombre: '',
       },
     },
-  ] as CCCOMUNACB[]);
+  ] as Comuna[]);
 
   const [_, combos] = useMergeFetchObject({
     regiones: buscarRegiones(),

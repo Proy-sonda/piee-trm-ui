@@ -8,7 +8,7 @@ import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
+import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
 import ModalEditarUnidad from './(componentes)/ModalEditarUnidad';
 import ModalNuevaUnidad from './(componentes)/ModalNuevaUnidad';
 import TablaUnidades from './(componentes)/TablaUnidades';

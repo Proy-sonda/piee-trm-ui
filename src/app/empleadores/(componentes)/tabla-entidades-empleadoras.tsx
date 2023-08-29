@@ -1,7 +1,7 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
+import { Empleador } from '@/modelos/empleador';
 import Link from 'next/link';
-import { Empleador } from '../../../modelos/empleador';
 
 interface TablaEntidadesEmpleadorasProps {
   empleadores: Empleador[];

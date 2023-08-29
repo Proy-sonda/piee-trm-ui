@@ -8,7 +8,7 @@ import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
-import NavegacionEntidadEmpleadora from '../(componentes)/NavegacionEntidadEmpleadora';
+import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
 import ModalCrearEditarUsuario from './(componentes)/ModalCrearEditarUsuario';
 import TablaUsuarios from './(componentes)/TablaUsuarios';
 import { UsuarioEntidadEmpleadora } from './(modelos)/UsuarioEntidadEmpleadora';

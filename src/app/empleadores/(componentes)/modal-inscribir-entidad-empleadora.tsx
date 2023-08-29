@@ -1,17 +1,15 @@
-import { CCCOMUNACB } from '@/contexts/modelos/types';
 import { useForm } from '@/hooks/use-form';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { FormEvent, useState } from 'react';
-import { DatosNuevaEntidadEmpleadora } from '../(modelos)/nuevaEntidadEmpleadora';
-import {
-  buscarActividadesLaborales,
-  buscarCajasDeCompensacion,
-  buscarComunas,
-  buscarRegiones,
-  buscarSistemasDeRemuneracion,
-  buscarTamanosEmpresa,
-  buscarTiposDeEmpleadores,
-} from '../(servicios)/buscarCombos';
+import { Comuna } from '../(modelos)/comuna';
+import { DatosNuevaEntidadEmpleadora } from '../(modelos)/nueva-entidad-empleadora';
+import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
+import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
+import { buscarComunas } from '../(servicios)/buscar-comunas';
+import { buscarRegiones } from '../(servicios)/buscar-regiones';
+import { buscarSistemasDeRemuneracion } from '../(servicios)/buscar-sistemas-de-remuneracion';
+import { buscarTamanosEmpresa } from '../(servicios)/buscar-tamanos-empresa';
+import { buscarTiposDeEmpleadores } from '../(servicios)/buscar-tipo-de-empleadores';
 
 interface ModalInscribirEntidadEmpleadoraProps {
   onCrearNuevaEntidadEmpleadora: (nuevaEntidad: DatosNuevaEntidadEmpleadora) => void;
@@ -40,7 +38,7 @@ const ModalInscribirEntidadEmpleadora = ({
         nombre: '',
       },
     },
-  ] as CCCOMUNACB[]);
+  ] as Comuna[]);
 
   const {
     inscribeRun,

@@ -1,4 +1,4 @@
-import { DatosInscribirEmpleador } from '@/app/empleadores/(modelos)/inscribirEmpleador';
+import { DatosInscribirEmpleador } from '@/app/empleadores/(modelos)/datos-inscribir-empleador';
 import { parseCookies } from 'nookies';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;

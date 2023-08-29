@@ -6,47 +6,47 @@ export interface DatosInscribirEmpleador {
   email: string;
   emailconfirma: string;
   tipoempleador: TipoEmpleador;
-  ccaf: CajasDeCompensacion;
+  ccaf: CajaDeCompensacion;
   actividadlaboral: ActividadLaboral;
   tamanoempresa: TamanoEmpresa;
   sistemaremuneracion: SistemaDeRemuneracion;
   direccionempleador: DireccionEmpleador;
 }
 
-export interface ActividadLaboral {
+interface ActividadLaboral {
   idactividadlaboral: number;
   actividadlaboral: string;
 }
 
-export interface CajasDeCompensacion {
+interface CajaDeCompensacion {
   idccaf: number;
   nombre: string;
 }
 
-export interface DireccionEmpleador {
+interface DireccionEmpleador {
   calle: string;
   numero: string;
   depto: string;
   comuna: Comuna;
 }
 
-export interface Comuna {
+interface Comuna {
   idcomuna: string;
   nombre: string;
 }
 
-export interface SistemaDeRemuneracion {
+interface SistemaDeRemuneracion {
   idsistemaremuneracion: number;
   descripcion: string;
 }
 
-export interface TamanoEmpresa {
+interface TamanoEmpresa {
   idtamanoempresa: number;
   nrotrabajadores: number;
   descripcion: string;
 }
 
-export interface TipoEmpleador {
+interface TipoEmpleador {
   idtipoempleador: number;
   tipoempleador: string;
 }

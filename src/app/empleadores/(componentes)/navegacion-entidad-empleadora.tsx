@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import React from 'react';
-import { LinkNavegacionEntidadEmpleadora } from '../(modelos)/LinkNavegacionEntidadEmpleadora';
+import { LinkNavegacionEntidadEmpleadora } from '../(modelos)/link-navegacion-entidad-empleadora';
 
 interface NavegacionEntidadEmpleadoraProps {
   id: string;

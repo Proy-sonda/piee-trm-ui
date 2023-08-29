@@ -12,17 +12,17 @@ export interface Empleador {
   tamanoempresa: Tamanoempresa;
 }
 
-export interface Actividadlaboral {
+interface Actividadlaboral {
   idactividadlaboral: number;
   actividadlaboral: string;
 }
 
-export interface Ccaf {
+interface Ccaf {
   idccaf: number;
   nombre: string;
 }
 
-export interface Direccionempleador {
+interface Direccionempleador {
   iddireccionempleador: number;
   calle: string;
   numero: string;
@@ -30,34 +30,34 @@ export interface Direccionempleador {
   comuna: Comuna;
 }
 
-export interface Comuna {
+interface Comuna {
   idcomuna: string;
   nombre: string;
   region: Region;
 }
 
-export interface Region {
+interface Region {
   idregion: string;
   nombre: string;
 }
 
-export interface Estadoempleador {
+interface Estadoempleador {
   idestadoempleador: number;
   estadoempleador: string;
 }
 
-export interface Sistemaremuneracion {
+interface Sistemaremuneracion {
   idsistemaremuneracion: number;
   descripcion: string;
 }
 
-export interface Tamanoempresa {
+interface Tamanoempresa {
   idtamanoempresa: number;
   nrotrabajadores: number;
   descripcion: string;
 }
 
-export interface Tipoempleador {
+interface Tipoempleador {
   idtipoempleador: number;
   tipoempleador: string;
 }

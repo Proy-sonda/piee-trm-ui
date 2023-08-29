@@ -1,9 +1,10 @@
-import { CCCOMUNACB } from '@/contexts/modelos/types';
+import { buscarComunas } from '@/app/empleadores/(servicios)/buscar-comunas';
+import { buscarRegiones } from '@/app/empleadores/(servicios)/buscar-regiones';
 import { useForm } from '@/hooks/use-form';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { FormEvent, useState } from 'react';
 import { CrearUnidad } from '../(modelos)/nuevaUnidad';
-import { buscarComunas, buscarRegiones } from '../../(servicios)/buscarCombos';
+import { Comuna } from '../../(modelos)/comuna';
 
 interface ModalNuevaUnidadProps {
   idEmpleador: string;
@@ -21,7 +22,7 @@ const ModalNuevaUnidad = ({ idEmpleador, onCrearNuevaUnidad }: ModalNuevaUnidadP
         nombre: '',
       },
     },
-  ] as CCCOMUNACB[]);
+  ] as Comuna[]);
 
   const [_, combos] = useMergeFetchObject({
     CCREGION: buscarRegiones(),

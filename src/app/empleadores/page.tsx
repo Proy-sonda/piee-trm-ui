@@ -3,17 +3,17 @@
 import { LoginComponent } from '@/components/login/login-component';
 import Position from '@/components/stage/position';
 import { EmpleadorContext } from '@/contexts/empleador-context';
+import { Empleador } from '@/modelos/empleador';
 import { estaLogueado } from '@/servicios/auth';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { Empleador } from '../../modelos/empleador';
-import ModalInscribirEntidadEmpleadora from './(componentes)/ModalInscribirEntidadEmpleadora';
-import TablaEntidadesEmpleadoras from './(componentes)/TablaEntidadesEmpleadoras';
-import { DatosInscribirEmpleador } from './(modelos)/inscribirEmpleador';
-import { DatosNuevaEntidadEmpleadora } from './(modelos)/nuevaEntidadEmpleadora';
-import { buscarEmpleadores } from './(servicios)/buscarEmpleadores';
-import { Desadscribir } from './(servicios)/desadscribirEmpleador';
-import { InscribirEmpleador } from './(servicios)/inscribirEmpleador';
+import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
+import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
+import { DatosInscribirEmpleador } from './(modelos)/datos-inscribir-empleador';
+import { DatosNuevaEntidadEmpleadora } from './(modelos)/nueva-entidad-empleadora';
+import { buscarEmpleadores } from './(servicios)/buscar-empleadores';
+import { Desadscribir } from './(servicios)/desadscribir-empleador';
+import { InscribirEmpleador } from './(servicios)/inscribir-empleador';
 
 const EmpleadoresPage = () => {
   const [empleadores, setEmpleadores] = useState<Empleador[]>([]);
