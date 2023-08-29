@@ -1,6 +1,6 @@
 import { CCCOMUNACB } from '@/contexts/interfaces/types';
-import { useForm } from '@/hooks/useForm';
-import { useMergeFetchResponseObject } from '@/hooks/useMergeFetch';
+import { useForm } from '@/hooks/use-form';
+import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { FormEvent, useState } from 'react';
 import { DatosNuevaEntidadEmpleadora } from '../(modelos)/nuevaEntidadEmpleadora';
 import {
@@ -20,7 +20,7 @@ interface ModalInscribirEntidadEmpleadoraProps {
 const ModalInscribirEntidadEmpleadora = ({
   onCrearNuevaEntidadEmpleadora,
 }: ModalInscribirEntidadEmpleadoraProps) => {
-  const [_, combos] = useMergeFetchResponseObject({
+  const [_, combos] = useMergeFetchObject({
     tipoEmpleadores: buscarTiposDeEmpleadores(),
     comunas: buscarComunas(),
     cajasDeCompensacion: buscarCajasDeCompensacion(),

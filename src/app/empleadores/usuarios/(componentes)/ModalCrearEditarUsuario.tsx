@@ -1,6 +1,6 @@
 import IfContainer from '@/components/IfContainer';
 import LoadingSpinner from '@/components/LoadingSpinner';
-import { useMergeFetchResponseObject } from '@/hooks/useMergeFetch';
+import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { HttpError } from '@/servicios/fetch';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
@@ -29,7 +29,7 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
   onUsuarioCreado,
   onUsuarioEditado,
 }) => {
-  const [errDatosModal, datosModal, datosPendientes] = useMergeFetchResponseObject({
+  const [errDatosModal, datosModal, datosPendientes] = useMergeFetchObject({
     roles: buscarRolesUsuarios(),
     usuarioEditar:
       idUsuarioEditar !== undefined

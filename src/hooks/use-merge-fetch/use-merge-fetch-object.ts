@@ -1,6 +1,6 @@
 import { FetchError } from '@/servicios/fetch';
 import { DependencyList, useEffect, useState } from 'react';
-import { FetchResponse, RemappedResponseFetchObject } from './useMergeFetch.types';
+import { FetchResponse, RemappedResponseFetchObject } from './use-merge-fetch.types';
 
 /**
  * Combina multiples {@link FetchResponse} que se pasan como un objeto, devolviendo todos los
@@ -31,7 +31,7 @@ import { FetchResponse, RemappedResponseFetchObject } from './useMergeFetch.type
  *           cuyos valores seran lo que sea que resuelva la promesa.
  *  - `[2]`: Un booleano que es `true` si es que aún hay promesas pendientes.
  */
-export function useMergeFetchResponseObject<T extends Record<string, FetchResponse<any>>>(
+export function useMergeFetchObject<T extends Record<string, FetchResponse<any>>>(
   respuestas: T,
   deps?: DependencyList,
 ): RemappedResponseFetchObject<T> {

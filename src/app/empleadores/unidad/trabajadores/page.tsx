@@ -1,6 +1,6 @@
 'use client';
 import Stage from '@/components/stage/Stage';
-import { useForm } from '@/hooks/useForm';
+import { useForm } from '@/hooks/use-form';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';

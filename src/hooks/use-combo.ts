@@ -1,4 +1,4 @@
-import CargaCombos from '@/helpers/adscripcion/CargaCombos';
+import CargaCombos from '@/helpers/adscripcion/carga-combos';
 import { useEffect, useState } from 'react';
 
 const useCombo = (url: string) => {

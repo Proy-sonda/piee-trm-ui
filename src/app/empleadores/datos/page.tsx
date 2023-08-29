@@ -12,8 +12,8 @@ import {
   CCTIPOEM,
 } from '@/contexts/interfaces/types';
 import { actualizaEmpleador } from '@/helpers/tramitacion/empleadores';
-import useCombo from '@/hooks/useCombo';
-import { useForm } from '@/hooks/useForm';
+import useCombo from '@/hooks/use-combo';
+import { useForm } from '@/hooks/use-form';
 import { ActualizaEmpleador } from '@/modelos/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';

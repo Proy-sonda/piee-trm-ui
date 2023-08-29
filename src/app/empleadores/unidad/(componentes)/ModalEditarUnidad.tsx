@@ -1,5 +1,5 @@
 import { CCCOMUNACB } from '@/contexts/interfaces/types';
-import { useMergeFetchResponseObject } from '@/hooks/useMergeFetch';
+import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { UnidadResp } from '../(modelos)/UnidadResp';
@@ -26,7 +26,7 @@ const ModalEditarUnidad = ({ idEmpleador, idUnidad, onEditarUnidad }: ModalEdita
     },
   ] as CCCOMUNACB[]);
 
-  const [_, combos] = useMergeFetchResponseObject({
+  const [_, combos] = useMergeFetchObject({
     regiones: buscarRegiones(),
     comunas: buscarComunas(),
   });

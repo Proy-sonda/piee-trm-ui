@@ -3,7 +3,7 @@
 import IfContainer from '@/components/IfContainer';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import Position from '@/components/stage/Position';
-import { useMergeFetchResponseObject } from '@/hooks/useMergeFetch';
+import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -31,7 +31,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
   const [refresh, setRefresh] = useState(0);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
-  const [err, datosPagina, pendiente] = useMergeFetchResponseObject(
+  const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
       usuarios: buscarUsuarios(rut),
     },

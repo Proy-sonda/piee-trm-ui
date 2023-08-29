@@ -33,7 +33,7 @@ import { FetchResponse, RemappedFetchResponseTuple } from '.';
  *           Si hubo un error el arreglo estara lleno de `undefined`.
  *  - `[2]`: Un booleano que es `true` si es que aún hay promesas pendientes.
  */
-export function useMergeFetchResponseArray<T extends [...FetchResponse<any>[]]>(
+export function useMergeFetchArray<T extends [...FetchResponse<any>[]]>(
   respuestas: [...T],
   deps?: DependencyList,
 ): RemappedFetchResponseTuple<T> {
