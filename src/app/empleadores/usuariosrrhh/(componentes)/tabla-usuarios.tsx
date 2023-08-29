@@ -3,7 +3,7 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import React from 'react';
-import { UsuarioRRHH } from '../(modelos)/UsuarioRRHH';
+import { UsuarioRRHH } from '../(modelos)/usuario-rrhh';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioRRHH[];

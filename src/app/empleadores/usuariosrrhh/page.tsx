@@ -3,10 +3,10 @@
 import Position from '@/components/stage/position';
 import Link from 'next/link';
 import React, { useState } from 'react';
-import FormularioAgregarUsuario from './(componentes)/FormularioAgregarUsuario';
-import ModalModificarUsuario from './(componentes)/ModalModificarUsuario';
-import TablaUsuarios from './(componentes)/TablaUsuarios';
-import { UsuarioRRHH } from './(modelos)/UsuarioRRHH';
+import FormularioAgregarUsuario from './(componentes)/formulario-agregar-usuario';
+import ModalModificarUsuario from './(componentes)/modal-modificar-usuario';
+import TablaUsuarios from './(componentes)/tabla-usuarios';
+import { UsuarioRRHH } from './(modelos)/usuario-rrhh';
 
 interface UsuariosRRHHPageProps {}
 
