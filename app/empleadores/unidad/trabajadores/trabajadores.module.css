@@ -1,8 +1,0 @@
-.span-link {
-    color: blue !important;
-    cursor: pointer !important;
-}
-
-.span-link :hover {
-    text-decoration: underline !important;
-}
