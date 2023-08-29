@@ -35,7 +35,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
     {
       usuarios: buscarUsuarios(rut),
     },
-    [mostrarModal, refresh],
+    [refresh],
   );
 
   const refrescarComponente = () => {
@@ -151,6 +151,8 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
           idEmpleador={id}
           idUsuarioEditar={idUsuarioEditar}
           onCerrarModal={onCerrarModal}
+          onUsuarioCreado={refrescarComponente}
+          onUsuarioEditado={refrescarComponente}
         />
       )}
     </div>
