@@ -3,7 +3,7 @@
 import { LoginComponent } from '@/components/login/LoginComponent';
 import Position from '@/components/stage/Position';
 import { AuthContext } from '@/contexts';
-import { CompruebaToken } from '@/helpers/adscripcion/LoginUsuario';
+import { CompruebaToken } from '@/helpers/adscripcion/login-usuario';
 import { ComboEntidadEmpleador } from '@/helpers/tramitacion/empleadores';
 import { useForm } from '@/hooks/use-form';
 import { Empleador } from '@/modelos/empleador';

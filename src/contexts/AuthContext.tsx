@@ -1,6 +1,7 @@
 'use client';
+
+import { LoginUsuario } from '@/helpers/adscripcion/login-usuario';
 import { createContext, useState } from 'react';
-import { LoginUsuario } from '../helpers/adscripcion/LoginUsuario';
 import { ChildrenApp, UserData, UsuarioLogin } from './interfaces/types';
 
 type AuthContextType = {
