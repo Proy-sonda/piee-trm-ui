@@ -3,7 +3,7 @@
 import IfContainer from '@/app/components/IfContainer';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import Position from '@/app/components/stage/Position';
-import { useMergeFetchResponseArray } from '@/app/hooks/useMergeFetch';
+import { useMergeFetchResponseObject } from '@/app/hooks/useMergeFetch';
 import { estaLogueado } from '@/app/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
@@ -27,7 +27,12 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
   const [mostrarModal, setMostrarModal] = useState(false);
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
-  const [err, [usuarios], pendiente] = useMergeFetchResponseArray([buscarUsuarios()]);
+  const [err, datosPagina, pendiente] = useMergeFetchResponseObject(
+    {
+      usuarios: buscarUsuarios(rut),
+    },
+    [mostrarModal],
+  );
 
   if (!estaLogueado) {
     router.push('/login');
@@ -83,7 +88,10 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
             </IfContainer>
 
             <IfContainer show={!pendiente && err.length === 0}>
-              <TablaUsuarios usuarios={usuarios ?? []} onEditarUsuario={onEditarUsuario} />
+              <TablaUsuarios
+                usuarios={datosPagina?.usuarios ?? []}
+                onEditarUsuario={onEditarUsuario}
+              />
             </IfContainer>
           </div>
         </div>

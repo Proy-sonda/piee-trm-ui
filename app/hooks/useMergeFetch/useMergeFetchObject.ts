@@ -1,5 +1,5 @@
 import { FetchError } from '@/app/servicios/fetch';
-import { useEffect, useState } from 'react';
+import { DependencyList, useEffect, useState } from 'react';
 import { FetchResponse, RemappedResponseFetchObject } from './useMergeFetch.types';
 
 /**
@@ -33,6 +33,7 @@ import { FetchResponse, RemappedResponseFetchObject } from './useMergeFetch.type
  */
 export function useMergeFetchResponseObject<T extends Record<string, FetchResponse<any>>>(
   respuestas: T,
+  deps?: DependencyList,
 ): RemappedResponseFetchObject<T> {
   const [resumen, setResumen] = useState<RemappedResponseFetchObject<T>>([
     [] as FetchError[],
@@ -64,7 +65,7 @@ export function useMergeFetchResponseObject<T extends Record<string, FetchRespon
         setResumen([[], valores, false]);
       }
     });
-  }, []);
+  }, deps ?? []);
 
   return resumen;
 }

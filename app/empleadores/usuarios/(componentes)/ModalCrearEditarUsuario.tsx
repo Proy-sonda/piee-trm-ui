@@ -88,7 +88,7 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
         ],
       });
 
-      Swal.fire({
+      await Swal.fire({
         title: 'Usuario creado con éxito',
         icon: 'success',
         showConfirmButton: true,
@@ -143,7 +143,7 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
         estadousuario: usuarioEditar.estadousuario,
       });
 
-      Swal.fire({
+      await Swal.fire({
         title: 'Usuario actualizado con éxito',
         icon: 'success',
         showConfirmButton: true,
