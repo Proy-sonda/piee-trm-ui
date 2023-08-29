@@ -1,5 +1,5 @@
 import { obtenerToken } from '@/servicios/auth';
-import { runFetchConThrow } from '@/servicios/fetch/runFetchConThrow';
+import { runFetchConThrow } from '@/servicios/fetch';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 

@@ -8,7 +8,7 @@ import { ComboEntidadEmpleador } from '@/helpers/tramitacion/empleadores';
 import { useForm } from '@/hooks/useForm';
 import { Empleador } from '@/interface/empleador';
 import { Unidadrhh } from '@/interface/tramitacion';
-import { cargaUnidadrrhh } from '@/servicios/cargaUnidadRRHH';
+import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
 import jwt_decode from 'jwt-decode';
 import { parseCookies } from 'nookies';
 import { useContext, useEffect, useState } from 'react';

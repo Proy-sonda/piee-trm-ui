@@ -1,5 +1,5 @@
 import { obtenerToken } from '@/servicios/auth';
-import { runFetchConThrow } from '@/servicios/fetch/runFetchConThrow';
+import { runFetchConThrow } from '@/servicios/fetch';
 import { EstadoUsuario } from '../(modelos)/EstadoUsuario';
 import { RolUsuario } from '../(modelos)/RolUsuario';
 

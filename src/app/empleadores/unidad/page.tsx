@@ -4,7 +4,7 @@ import Position from '@/components/stage/Position';
 import Stage from '@/components/stage/Stage';
 import { Unidadrhh } from '@/interface/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
-import { cargaUnidadrrhh } from '@/servicios/cargaUnidadRRHH';
+import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';

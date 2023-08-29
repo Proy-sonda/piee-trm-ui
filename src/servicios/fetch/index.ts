@@ -1,2 +1,3 @@
 export * from './errores';
-export * from './runFetch';
+export * from './run-fetch';
+export * from './run-fetch-con-throw';
