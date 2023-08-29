@@ -28,19 +28,20 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
   const { id, rut, razon } = searchParams;
 
+  const [refresh, setRefresh] = useState(0);
   const [mostrarModal, setMostrarModal] = useState(false);
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
   const [err, datosPagina, pendiente] = useMergeFetchResponseObject(
     {
       usuarios: buscarUsuarios(rut),
     },
-    [mostrarModal],
+    [mostrarModal, refresh],
   );
 
-  if (!estaLogueado) {
-    router.push('/login');
-    return null;
-  }
+  const refrescarComponente = () => {
+    /* Hay que setearlo a un valor distinto al anterior para que vuelva a renderizar el componente */
+    setRefresh(Math.random());
+  };
 
   const onEditarUsuario = (idUsuarioEditar: number): void => {
     setIdUsuarioEditar(idUsuarioEditar);
@@ -53,7 +54,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
   };
 
   const onEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
-    const x = await Swal.fire({
+    const respuesta = await Swal.fire({
       html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
       icon: 'question',
       showConfirmButton: true,
@@ -64,7 +65,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
       cancelButtonColor: 'var(--bs-danger)',
     });
 
-    if (!x.isConfirmed) {
+    if (!respuesta.isConfirmed) {
       return;
     }
 
@@ -77,6 +78,8 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
       });
+
+      refrescarComponente();
     } catch (error) {
       console.error({ error });
 
@@ -88,6 +91,11 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
       });
     }
   };
+
+  if (!estaLogueado) {
+    router.push('/login');
+    return null;
+  }
 
   return (
     <div className="bgads">

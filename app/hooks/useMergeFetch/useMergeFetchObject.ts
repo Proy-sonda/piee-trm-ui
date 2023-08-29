@@ -42,7 +42,9 @@ export function useMergeFetchResponseObject<T extends Record<string, FetchRespon
   ]);
 
   useEffect(() => {
-    const aux = async (rs: T) => {
+    setResumen([[], undefined, true]);
+
+    const ejecutarPromesas = async (rs: T) => {
       const errores: FetchError[] = [];
       const resultado: any = {};
       for (const [key, value] of Object.entries(rs)) {
@@ -58,7 +60,7 @@ export function useMergeFetchResponseObject<T extends Record<string, FetchRespon
       return [errores, resultado];
     };
 
-    aux(respuestas).then(([errores, valores]) => {
+    ejecutarPromesas(respuestas).then(([errores, valores]) => {
       if (errores.length > 0) {
         setResumen([errores, undefined, false]);
       } else {
