@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import styles from './Position.module.css';
+import styles from './position.module.css';
 
 type MyAppProps = {
   position: number;

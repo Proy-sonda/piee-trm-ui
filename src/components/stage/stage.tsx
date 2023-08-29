@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
-import styles from './Stage.module.css';
 import Link from 'next/link';
+import { ReactNode } from 'react';
+import styles from './stage.module.css';
 
 type MyPropsApp = {
   children: ReactNode;

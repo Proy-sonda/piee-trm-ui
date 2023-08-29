@@ -1,5 +1,5 @@
 import { FC, Fragment } from 'react';
-import styles from './Stepper.module.css';
+import styles from './stepper.module.css';
 
 interface Data {
   label: string;

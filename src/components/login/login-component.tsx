@@ -1,4 +1,5 @@
 'use client';
+
 import { AuthContext } from '@/contexts/auth-context';
 import { UsuarioLogin } from '@/contexts/modelos/types';
 import { useForm } from '@/hooks/use-form';
@@ -8,7 +9,7 @@ import { setCookie } from 'nookies';
 import { useContext, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import Swal from 'sweetalert2';
-import styles from './Login.module.css';
+import styles from './login.module.css';
 
 type appsProps = {
   buttonText: string;
