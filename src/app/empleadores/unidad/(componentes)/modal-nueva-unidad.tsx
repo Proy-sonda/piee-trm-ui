@@ -3,7 +3,7 @@ import { buscarRegiones } from '@/app/empleadores/(servicios)/buscar-regiones';
 import { useForm } from '@/hooks/use-form';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { FormEvent, useState } from 'react';
-import { CrearUnidad } from '../(modelos)/nuevaUnidad';
+import { CrearUnidad } from '../(modelos)/datos-nueva-unidad';
 import { Comuna } from '../../(modelos)/comuna';
 
 interface ModalNuevaUnidadProps {

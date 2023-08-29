@@ -9,14 +9,14 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
-import ModalEditarUnidad from './(componentes)/ModalEditarUnidad';
-import ModalNuevaUnidad from './(componentes)/ModalNuevaUnidad';
-import TablaUnidades from './(componentes)/TablaUnidades';
-import { UpdateUnidad } from './(modelos)/UpdateUnidad';
-import { CrearUnidad } from './(modelos)/nuevaUnidad';
-import { actualizarUnidad } from './(servicios)/actualizarDatoUnidad';
-import { crearUnidad } from './(servicios)/crearUnidad';
-import { eliminarUnidad } from './(servicios)/eliminarUnidad';
+import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
+import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
+import TablaUnidades from './(componentes)/tabla-unidades';
+import { UpdateUnidad } from './(modelos)/datos-actualizar-unidad';
+import { CrearUnidad } from './(modelos)/datos-nueva-unidad';
+import { actualizarUnidad } from './(servicios)/actualizar-unidad';
+import { crearUnidad } from './(servicios)/crear-unidad';
+import { eliminarUnidad } from './(servicios)/eliminar-unidad';
 
 interface UnidadRRHHProps {
   searchParams: {

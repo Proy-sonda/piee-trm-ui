@@ -1,9 +1,9 @@
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { UnidadResp } from '../(modelos)/UnidadResp';
-import { UpdateUnidad } from '../(modelos)/UpdateUnidad';
-import { getDatoUnidad } from '../(servicios)/getDatoUnidad';
+import { UpdateUnidad } from '../(modelos)/datos-actualizar-unidad';
+import { UnidadRRHH } from '../(modelos)/unidad-rrhh';
+import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
 import { Comuna } from '../../(modelos)/comuna';
 import { buscarComunas } from '../../(servicios)/buscar-comunas';
 import { buscarRegiones } from '../../(servicios)/buscar-regiones';
@@ -50,13 +50,13 @@ const ModalEditarUnidad = ({ idEmpleador, idUnidad, onEditarUnidad }: ModalEdita
       return;
     }
 
-    getDatoUnidad(parseInt(idUnidad))
+    buscarUnidadPorId(parseInt(idUnidad))
       .then((resp) => {
         if (!resp.ok) {
           throw new Error('Error al buscar unidad');
         }
 
-        return resp.json() as Promise<UnidadResp>;
+        return resp.json() as Promise<UnidadRRHH>;
       })
       .then((resp) => {
         const idRegionResp = resp.direccionunidad.comuna.region.idregion;

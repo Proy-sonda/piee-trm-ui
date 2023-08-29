@@ -1,4 +1,5 @@
 'use client';
+
 import Stage from '@/components/stage/stage';
 import { useForm } from '@/hooks/use-form';
 import { Unidadrhh } from '@/modelos/tramitacion';
@@ -7,7 +8,7 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
-import { getDatoUnidad } from '../(servicios)/getDatoUnidad';
+import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
 import { AgregarTrabajador, Trabajador, Trabajadores } from './(modelos)/trabajadores';
 import { UnidadEmpleador } from './(modelos)/unidadEmpleador';
 import {
@@ -64,7 +65,7 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
     obtenerTrabajadorUnidad();
 
     const obtenerUnidad = async () => {
-      const data = await getDatoUnidad(Number(idunidad));
+      const data = await buscarUnidadPorId(Number(idunidad));
       if (data.ok) {
         const resp: Unidadrhh = await data.json();
         setunidad(resp.unidad);

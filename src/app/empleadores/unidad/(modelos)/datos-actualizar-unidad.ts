@@ -9,23 +9,23 @@ export interface UpdateUnidad {
   empleador: Empleador;
 }
 
-export interface DireccionUnidad {
+interface DireccionUnidad {
   calle: string;
   numero: string;
   depto: string;
   comuna: Comuna;
 }
 
-export interface Comuna {
+interface Comuna {
   idcomuna: string;
   nombre: string;
 }
 
-export interface Empleador {
+interface Empleador {
   idempleador: number;
 }
 
-export interface EstadoUnidadRRHH {
+interface EstadoUnidadRRHH {
   idestadounidadrrhh: number;
   descripcion: string;
 }

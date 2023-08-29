@@ -1,4 +1,4 @@
-export interface UnidadResp {
+export interface UnidadRRHH {
   idunidad: number;
   unidad: string;
   identificador: string;
@@ -9,25 +9,25 @@ export interface UnidadResp {
   direccionunidad: Direccionunidad;
 }
 
-export interface Direccionunidad {
+interface Direccionunidad {
   iddireccionunidad: number;
   numero: string;
   depto: string;
   comuna: Comuna;
 }
 
-export interface Comuna {
+interface Comuna {
   idcomuna: string;
   nombre: string;
   region: Region;
 }
 
-export interface Region {
+interface Region {
   idregion: string;
   nombre: string;
 }
 
-export interface Empleador {
+interface Empleador {
   idempleador: number;
   rutempleador: string;
   razonsocial: string;
@@ -39,9 +39,9 @@ export interface Empleador {
   usuarioempleador: Usuarioempleador;
 }
 
-export interface Usuarioempleador {}
+interface Usuarioempleador {}
 
-export interface Estadounidadrrhh {
+interface Estadounidadrrhh {
   idestadounidadrrhh: number;
   descripcion: string;
 }
