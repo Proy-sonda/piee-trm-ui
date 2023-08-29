@@ -1,6 +1,6 @@
 'use client';
-import Position from '@/components/stage/Position';
-import Stage from '@/components/stage/Stage';
+import Position from '@/components/stage/position';
+import Stage from '@/components/stage/stage';
 import { EmpleadorContext } from '@/contexts/empleador-context';
 import {
   CCACTLABCB,

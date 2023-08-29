@@ -1,5 +1,5 @@
-import { ButtonImage } from '@/components/ButtonImage';
-import { LoginComponent } from '@/components/login/LoginComponent';
+import { ButtonImage } from '@/components/button-image';
+import { LoginComponent } from '@/components/login/login-component';
 import insemp from '@/img/Inscribeem.png';
 
 export default function Home() {

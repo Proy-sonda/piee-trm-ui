@@ -1,7 +1,7 @@
 'use client';
 
-import { LoginComponent } from '@/components/login/LoginComponent';
-import Position from '@/components/stage/Position';
+import { LoginComponent } from '@/components/login/login-component';
+import Position from '@/components/stage/position';
 import { AuthContext } from '@/contexts';
 import { CompruebaToken } from '@/helpers/adscripcion/login-usuario';
 import { ComboEntidadEmpleador } from '@/helpers/tramitacion/empleadores';

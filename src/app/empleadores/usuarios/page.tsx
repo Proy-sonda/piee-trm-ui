@@ -1,8 +1,8 @@
 'use client';
 
-import IfContainer from '@/components/IfContainer';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import Position from '@/components/stage/Position';
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
+import Position from '@/components/stage/position';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';

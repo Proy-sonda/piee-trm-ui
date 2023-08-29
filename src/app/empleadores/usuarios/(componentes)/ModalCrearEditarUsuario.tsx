@@ -1,5 +1,5 @@
-import IfContainer from '@/components/IfContainer';
-import LoadingSpinner from '@/components/LoadingSpinner';
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { HttpError } from '@/servicios/fetch';
 import React from 'react';

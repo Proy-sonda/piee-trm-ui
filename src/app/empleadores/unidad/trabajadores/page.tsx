@@ -1,5 +1,5 @@
 'use client';
-import Stage from '@/components/stage/Stage';
+import Stage from '@/components/stage/stage';
 import { useForm } from '@/hooks/use-form';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import 'animate.css';

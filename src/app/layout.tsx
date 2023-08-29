@@ -1,5 +1,5 @@
 'use client';
-import Usuario from '@/components/usuario/Usuario';
+import Usuario from '@/components/usuario/usuario';
 import { AuthProvider, InscribeProvider, StepProvider } from '@/contexts';
 import { EmpleadorProvider } from '@/contexts/empleador-context';
 import 'animate.css';

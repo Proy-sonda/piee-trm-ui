@@ -1,6 +1,6 @@
 'use client';
 
-import Position from '@/components/stage/Position';
+import Position from '@/components/stage/position';
 import Link from 'next/link';
 import React, { useState } from 'react';
 import FormularioAgregarUsuario from './(componentes)/FormularioAgregarUsuario';

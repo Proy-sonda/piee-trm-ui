@@ -1,3 +1,4 @@
+import React from 'react';
 import ReactPaginate from 'react-paginate';
 
 interface PaginacionProps {
@@ -6,7 +7,7 @@ interface PaginacionProps {
   onCambioPagina: (paginaSeleccionada: number) => void;
 }
 
-export default function Paginacion({ totalPages, tamano, onCambioPagina }: PaginacionProps) {
+const Paginacion: React.FC<PaginacionProps> = ({ totalPages, tamano, onCambioPagina }) => {
   return (
     <ReactPaginate
       breakLabel="..."
@@ -28,4 +29,6 @@ export default function Paginacion({ totalPages, tamano, onCambioPagina }: Pagin
       disabledClassName="disabled"
     />
   );
-}
+};
+
+export default Paginacion;

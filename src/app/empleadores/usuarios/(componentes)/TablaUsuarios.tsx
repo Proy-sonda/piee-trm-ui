@@ -1,5 +1,5 @@
-import Paginacion from '@/components/paginacion/paginacion';
-import usePaginacion from '@/components/paginacion/paginacion.hook';
+import Paginacion from '@/components/paginacion';
+import { usePaginacion } from '@/hooks/use-paginacion';
 import React from 'react';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/UsuarioEntidadEmpleadora';
 

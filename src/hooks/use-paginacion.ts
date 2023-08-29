@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-interface PaginationHookProps<T> {
+interface PaginacionHookProps<T> {
   datos?: T[];
   tamanoPagina: number;
 }
@@ -11,10 +11,10 @@ interface PaginacionHookReturn<T> {
   totalPaginas: number;
 }
 
-export default function usePaginacion<T>({
+export const usePaginacion = <T>({
   datos,
   tamanoPagina,
-}: PaginationHookProps<T>): PaginacionHookReturn<T> {
+}: PaginacionHookProps<T>): PaginacionHookReturn<T> => {
   const [paginaActual, setPaginaActual] = useState(0);
 
   const startIndex = paginaActual * tamanoPagina;
@@ -25,4 +25,4 @@ export default function usePaginacion<T>({
     cambiarPaginaActual: setPaginaActual,
     totalPaginas: Math.ceil((datos ?? []).length / tamanoPagina),
   };
-}
+};

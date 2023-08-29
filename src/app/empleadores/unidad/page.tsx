@@ -1,7 +1,7 @@
 'use client';
 
-import Position from '@/components/stage/Position';
-import Stage from '@/components/stage/Stage';
+import Position from '@/components/stage/position';
+import Stage from '@/components/stage/stage';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
 import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';

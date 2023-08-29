@@ -1,7 +1,7 @@
 'use client';
 
-import { LoginComponent } from '@/components/login/LoginComponent';
-import Position from '@/components/stage/Position';
+import { LoginComponent } from '@/components/login/login-component';
+import Position from '@/components/stage/position';
 import { EmpleadorContext } from '@/contexts/empleador-context';
 import { estaLogueado } from '@/servicios/auth';
 import { useContext, useEffect, useState } from 'react';
