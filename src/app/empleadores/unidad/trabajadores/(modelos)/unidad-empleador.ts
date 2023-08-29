@@ -9,29 +9,29 @@ export interface UnidadEmpleador {
   direccionunidad: Direccionunidad;
 }
 
-export interface Direccionunidad {
+interface Direccionunidad {
   iddireccionunidad: number;
   numero: string;
   depto: string;
   comuna: Comuna;
 }
 
-export interface Comuna {
+interface Comuna {
   idcomuna: string;
   nombre: string;
   region: Region;
 }
 
-export interface Region {
+interface Region {
   idregion: string;
   nombre: string;
 }
 
-export interface Empleador {
+interface Empleador {
   idempleador: number;
 }
 
-export interface Estadounidadrrhh {
+interface Estadounidadrrhh {
   idestadounidadrrhh: number;
   descripcion: string;
 }

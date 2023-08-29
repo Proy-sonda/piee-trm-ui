@@ -6,31 +6,11 @@ export interface Trabajadores {
   estadotrabajador: Estadotrabajador;
 }
 
-export interface Estadotrabajador {
+interface Estadotrabajador {
   idestadotrabajador: number;
   estadotrabajador: string;
 }
 
-export interface Unidad {
+interface Unidad {
   idunidad: number;
-}
-
-export interface Trabajador {
-  idtrabajador: number;
-  unidad: Unidad;
-}
-
-export interface Unidad {
-  idunidad: number;
-}
-
-export interface AgregarTrabajador {
-  ruttrabajador: string;
-  unidad: Unidad;
-  fechaafiliacion?: Date;
-  estadotrabajador?: Estadotrabajador;
-}
-
-export interface Estadotrabajador {
-  idestadotrabajador: number;
 }

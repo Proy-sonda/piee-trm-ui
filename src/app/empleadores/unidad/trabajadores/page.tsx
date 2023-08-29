@@ -9,18 +9,17 @@ import { Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
-import { AgregarTrabajador, Trabajador, Trabajadores } from './(modelos)/trabajadores';
-import { UnidadEmpleador } from './(modelos)/unidadEmpleador';
-import {
-  createTrabajador,
-  deleteTrabajador,
-  getTrabajadorUnidad,
-  getUnidadEmpleador,
-  putTrabajador,
-} from './(servicios)/trabajadores.services';
+import { Trabajador } from './(modelos)/trabajador';
+import { Trabajadores } from './(modelos)/trabajadores';
+import { UnidadEmpleador } from './(modelos)/unidad-empleador';
+import { actualizarTrabajador } from './(servicios)/actualizar-trabajador';
+import { buscarTrabajadoresDeUnidad } from './(servicios)/buscar-trabajadores-de-unidad';
+import { buscarUnidadesDeEmpleador } from './(servicios)/buscar-unidades-de-empleador';
+import { crearTrabajador } from './(servicios)/crear-trabajador';
+import { eliminarTrabajador } from './(servicios)/eliminar-trabajador';
 import styles from './trabajadores.module.css';
 
-interface props {
+interface TrabajadoresPageProps {
   searchParams: {
     idunidad: number;
     razon: string;
@@ -28,7 +27,7 @@ interface props {
   };
 }
 
-const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
+const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
   const [unidad, setunidad] = useState('');
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
   let [loading, setLoading] = useState(true);
@@ -51,7 +50,7 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
     setLoading(true);
 
     const obtenerTrabajadorUnidad = async () => {
-      const data = await getTrabajadorUnidad(Number(idunidad));
+      const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
       if (data.ok) {
         const resp: Trabajadores[] = await data.json();
 
@@ -85,7 +84,7 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
     setrutedit(ruttrabajador);
 
     const ObtenerUnidadesEmpleador = async () => {
-      const data = await getUnidadEmpleador(rutempleador);
+      const data = await buscarUnidadesDeEmpleador(rutempleador);
       if (data.ok) {
         const resp: UnidadEmpleador[] = await data.json();
         setunidadEmpleador(resp);
@@ -101,10 +100,10 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
 
   const handleDeleteTrabajador = (idtrabajador: number, rut: string) => {
     const EliminarTrabajador = async () => {
-      const data = await deleteTrabajador(idtrabajador);
+      const data = await eliminarTrabajador(idtrabajador);
 
       if (data.ok) {
-        const dataund = await getTrabajadorUnidad(Number(idunidad));
+        const dataund = await buscarTrabajadoresDeUnidad(Number(idunidad));
         if (data.ok) {
           const resp: Trabajadores[] = await dataund.json();
           resp.length > 0 ? settrabajadores(resp) : settrabajadores([]);
@@ -142,7 +141,7 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
     console.log('test');
 
     const ActualizaTrabajador = async () => {
-      const data = await putTrabajador(editar);
+      const data = await actualizarTrabajador(editar);
       if (data.ok) {
         Swal.fire({
           html: 'Trabajador modificado con éxito',
@@ -152,7 +151,7 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
         });
         setshow(false);
         const obtenerTrabajadorUnidad = async () => {
-          const data = await getTrabajadorUnidad(Number(idunidad));
+          const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
           if (data.ok) {
             const resp: Trabajadores[] = await data.json();
 
@@ -174,15 +173,14 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
 
-    const dataAgregarTrabajador: AgregarTrabajador = {
-      ruttrabajador: run,
-      unidad: {
-        idunidad: Number(idunidad),
-      },
-    };
+    const crearTrabajadorAux = async () => {
+      const data = await crearTrabajador({
+        ruttrabajador: run,
+        unidad: {
+          idunidad: Number(idunidad),
+        },
+      });
 
-    const crearTrabajador = async () => {
-      const data = await createTrabajador(dataAgregarTrabajador);
       if (data.ok) {
         Swal.fire({
           html: 'Persona trabajadora agregada correctamente',
@@ -191,7 +189,7 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
           showConfirmButton: false,
         });
         const obtenerTrabajadorUnidad = async () => {
-          const data = await getTrabajadorUnidad(Number(idunidad));
+          const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
           if (data.ok) {
             const resp: Trabajadores[] = await data.json();
 
@@ -210,7 +208,7 @@ const TrabajadoresPage: React.FC<props> = ({ searchParams }: props) => {
       }
     };
 
-    crearTrabajador();
+    crearTrabajadorAux();
   };
 
   return (
