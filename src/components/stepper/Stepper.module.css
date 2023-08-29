@@ -1,0 +1,88 @@
+.stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step {
+  margin-top: 10px;
+  /* display: flex; */
+  /* position: relative; */
+  align-items: center;
+  justify-content: center;
+}
+
+.step-circle {
+  width: 30px;
+  height: 30px;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 50%;
+  background-color: var(--color-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #f5f2f2;
+}
+
+.step.active .step-circle {
+  /* background-color: var(--color-blue); */
+  color: #fff;
+  /* border: 2px solid #444; */
+}
+
+.step-label {
+  font-size: 12.5px;
+  white-space: nowrap;
+  text-decoration: none !important;
+  color: var(--color-blue);
+}
+
+.line {
+  height: 2px;
+  background-color: var(--color-blue);
+  /* width: calc(100% - 10px); */
+  width: 100%;
+  position: relative;
+  margin-right: -10px;
+  /* margin-top: 10px; */
+  border-left: 10px solid var(--color-blue); /* Color de la flecha */
+  /* transform: translateY(-50%); */
+}
+
+.step.active ~ .line {
+  background-color: #eeeeee;
+  /* border-left: 30px solid #eeeeee; */
+  border-left: 30px solid #eeeeee !important;
+}
+
+.step.active ~ .line ~ .step .step-label {
+  color: black !important;
+}
+
+.step.active ~ .line ~ .step .step-circle {
+  background-color: #eee !important;
+  color: black !important;
+  /* border-left: 30px solid #eeeeee; */
+}
+
+.step.active .step-label {
+  /* background-color: var(--color-blue); */
+  padding-top: 20% !important;
+  color: var(--color-blue) !important;
+  font-weight: bold;
+}
+
+.step.step.active + .line {
+  border-left: 30px solid var(--color-blue) !important;
+}
+
+.line:first-child {
+  margin-right: 10px;
+}
+
+.line:last-child {
+  margin-left: 10px;
+}

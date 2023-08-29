@@ -1,0 +1,10 @@
+.pactive {
+  font-weight: bold;
+  color: var(--color-blue) !important;
+  border-bottom: 2px solid red;
+  width: 200px;
+}
+
+.linkpoint {
+  cursor: pointer;
+}

@@ -1,12 +1,23 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-# PIEE Tramitación 
+# PIEE Tramitación <!-- omit in toc -->
+
+## Índice <!-- omit in toc -->
+
+- [Instalación](#instalación)
+  - [Requerimientos](#requerimientos)
+  - [Desarrollo](#desarrollo)
+  - [Configurar prettier en VS Code](#configurar-prettier-en-vs-code)
+  - [Formatear código](#formatear-código)
+- [Estructura de carpetas](#estructura-de-carpetas)
+  - [Carpeta `src`](#carpeta-src)
+  - [Estructura por pantalla](#estructura-por-pantalla)
+  - [¿Como refactorizar?](#como-refactorizar)
 
 ## Instalación
 
 ### Requerimientos
 
 - NodeJS >= 16.8
-- Yarn 1.22.29. Si se tiene una versión de yarn superior a la 2 se puede setear la versión de esta forma
+- Yarn 1.22.29. Si se instaló una versión de yarn >= se puede setear la versión de esta forma
   ```
   corepack prepare yarn@1.22.29 --activate
   ```
@@ -16,7 +27,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 1. Instalar las dependencias con
 
    ```
-   yarn add --frozen-lockfile
+   yarn install --frozen-lockfile
    ```
 
    El flag `--frozen-lockfile` evitará que se modifique el `yarn.lock`
@@ -49,17 +60,40 @@ Para formatear todo el código dentro de la carpeta `/app` se puede usar el sigu
 ```shell
 yarn format:fix
 ```
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+## Estructura de carpetas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Todo el código de la aplicación está en la carpeta `src`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Carpeta `src`
 
-## Deploy on Vercel
+El primer nivel de la carpeta `src` tiene los elementos "globales" de la aplicación, es decir, que se usan en distintas pantallas/componentes/etc a través de toda la aplicación en vez de en un lugar concreto.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Carpeta      | Descripción                                                                                                                                 |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app`        | Las páginas de la aplicación                                                                                                                |
+| `components` | Componentes globales y returilizables                                                                                                       |
+| `contexts`   | Contextos (TODO: definir mejor)                                                                                                             |
+| `helpers`    | **_Deprecada_**. Era el equivalente a la carpeta `servicios`, pero hay que mover el código a las pantallas/componentes/etc correspondientes |
+| `hooks`      | Hooks de react globales                                                                                                                     |
+| `img`        | TODO: definir                                                                                                                               |
+| `modelos`    | Tipos de datos globales                                                                                                                     |
+| `servicios`  | Llamadas la API, etc. A diferencia de las utilidades estas tienen sentido de negocio o relacionadas a la aplicación.                        |
+| `utilidades` | Funciones de caracter general (formateadores, validadores, etc)                                                                             |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Estructura por pantalla
+
+Como Nextjs tiene enrutamiento por la estructura de carpetas, cada subcarpeta dentro de `src/app` tiene la siguiente estructura
+
+| Carpeta                 | Descripción                                                                                                                       |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `/<path>/page.tsx`      | La pantalla que uno ve en el navegador                                                                                            |
+| `/<path>/(componentes)` | Componentes usados solamente en la pantalla `/<path>/page.tsx`                                                                    |
+| `/<path>/(servicios)`   | Servicios usados en la pantalla `/<path>/page.tsx` o en subrutas de esta                                                          |
+| `/<path>/(modelos)`     | Modelos usados para tipear los servicios en `/<path>/(servicios)` o en las carpetas `(servicios)` de las subrutas de la pantalla. |
+
+### ¿Como refactorizar?
+
+TODO: Describir mejor
+
+En caso de querer utilizar codigo en carpetas hermanas, por ejemplo, si `/path_1/path_2/pagina_1/page.tsx` se quiere usar un servicio que está en `/path_1/path_2/pagina_2/(servicios)`, en lugar de importar directamente mover el servicio a la ruta común más cercana (en `src/app`) que sería `/path_1/path_2/(servicios)`. En caso de que no exista una ruta común, moverlo a nivel global en `src/app/servicios`. Lo mismo para modelos y componentes.
