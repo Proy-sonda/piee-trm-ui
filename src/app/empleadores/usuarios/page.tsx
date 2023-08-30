@@ -6,7 +6,7 @@ import Position from '@/components/stage/position';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
 import ModalCrearEditarUsuario from './(componentes)/modal-crear-editar-usuario';
@@ -52,6 +52,10 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
     setMostrarModal(false);
     setIdUsuarioEditar(undefined);
   };
+
+  useEffect(() => {
+    window.history.pushState(null, '', '/empleadores/usuarios');
+  }, []);
 
   const onEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
     const respuesta = await Swal.fire({
@@ -110,7 +114,9 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
         <div className="my-4 row ">
           <div className="col-12">
             <div className="d-flex align-items-center justify-content-between">
-              <span className="pb-2 border-bottom">Entidad Empleadora / Usuarios {razon}</span>
+              <span className="pb-2 border-bottom">
+                Entidad Empleadora / Usuarios <b>{razon}</b>
+              </span>
               <span style={{ cursor: 'pointer', color: 'blue' }}>Manual</span>
             </div>
           </div>

@@ -71,6 +71,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       }
     };
     obtenerUnidad();
+
+    window.history.pushState(null, '', '/empleadores/unidad/trabajadores');
   }, []);
 
   const handleEditTrabajador = (idtrabajador: number, idunidad: number, ruttrabajador: string) => {
@@ -349,6 +351,19 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
               </table>
             </div>
           </div>
+          <div
+            className="row mt-2"
+            style={{
+              alignSelf: 'end',
+            }}>
+            <div className="col-md-6"></div>
+            <div className="col-md-6 text-end">
+              <button className="btn btn-success" onClick={() => window.history.go(-3)}>
+                Volver
+              </button>
+            </div>
+          </div>
+          <br />
         </div>
 
         <Modal show={show} onHide={handleClose}>

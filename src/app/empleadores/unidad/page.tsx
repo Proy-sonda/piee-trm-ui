@@ -39,6 +39,7 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
       setUnidadRRHH(data);
     };
     cargaUnidades();
+    window.history.pushState(null, '', '/empleadores/unidad');
   }, []);
 
   const handleDelete = (unidadEliminar: Unidadrhh) => {
@@ -130,7 +131,7 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
         <div className="row mt-2">
           <div className="col-md-8">
             <Stage manual="" url="#">
-              Entidad Empleadora / Dirección y Unidades RRHH - {razon}
+              Entidad Empleadora / Dirección y Unidades RRHH - <b>{razon}</b>
             </Stage>
           </div>
 
@@ -155,6 +156,7 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
         <div className="row mt-2">
           <div className="col-md-12">
             <TablaUnidades
+              rut={rut}
               unidades={UnidadRRHH}
               razon={razon}
               onEditarUnidad={({ idunidad }) => setIdunidad(idunidad.toString())}

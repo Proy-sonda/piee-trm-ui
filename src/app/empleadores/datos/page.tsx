@@ -117,6 +117,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
       }
       setLoading(false);
     }, 1800);
+    window.history.pushState(null, '', '/empleadores/datos');
   }, [CCCOMUNA]);
 
   const onChangeRegion = (event: any) => {
@@ -218,7 +219,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
             <div className="col-md-8">
               <Stage manual="" url="#">
                 Datos Entidad Empleadora -{' '}
-                {empleador.find((v) => v.rutempleador == rut)?.razonsocial}
+                <b>{empleador.find((v) => v.rutempleador == rut)?.razonsocial}</b>
               </Stage>
             </div>
 

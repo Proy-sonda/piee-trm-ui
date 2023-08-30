@@ -6,6 +6,7 @@ import Link from 'next/link';
 interface TablaUnidadesProps {
   unidades: Unidadrhh[];
   razon: string;
+  rut: string;
   onEditarUnidad: (unidad: Unidadrhh) => void;
   onEliminarUnidad: (unidad: Unidadrhh) => void;
 }
@@ -13,6 +14,7 @@ interface TablaUnidadesProps {
 const TablaUnidades = ({
   unidades,
   razon,
+  rut,
   onEditarUnidad,
   onEliminarUnidad,
 }: TablaUnidadesProps) => {
@@ -62,13 +64,13 @@ const TablaUnidades = ({
                     <i className="bi bi-trash3"></i>
                   </button>
                   <Link
-                    href={`/empleadores/trabajadores?unidad=${'Prueba 3'}&id=${'1'}&razon=${razon}`}
+                    href={`/empleadores/unidad/trabajadores?idunidad=${unidad.idunidad}&razon=${razon}&rut=${rut}`}
                     className="btn btn-success btn-sm">
                     Trabajadores
                   </Link>{' '}
                   &nbsp;
                   <Link
-                    href={`/empleadores/usuariosrrhh?unidad=${'Prueba 3'}&id=${'1'}&razon=${razon}`}
+                    href={`/empleadores/unidad/usuarios?unidad=${'Prueba 3'}&id=${'1'}&razon=${razon}`}
                     className="btn btn-success btn-sm">
                     Usuarios
                   </Link>
