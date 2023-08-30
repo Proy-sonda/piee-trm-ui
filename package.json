@@ -29,6 +29,7 @@
     "react-hook-form": "^7.45.4",
     "react-paginate": "^8.2.0",
     "react-spinners": "^0.13.8",
+    "react-super-responsive-table": "^5.2.1",
     "rutlib": "^1.0.3",
     "sweetalert2": "^11.7.20",
     "typescript": "5.1.6",

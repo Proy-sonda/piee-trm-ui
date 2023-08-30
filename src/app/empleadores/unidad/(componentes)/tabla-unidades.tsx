@@ -70,7 +70,7 @@ const TablaUnidades = ({
                   </Link>{' '}
                   &nbsp;
                   <Link
-                    href={`/empleadores/unidad/usuarios?unidad=${'Prueba 3'}&id=${'1'}&razon=${razon}`}
+                    href={`/empleadores/unidad/usuarios?unidad=${unidad.unidad}&id=${unidad.idunidad}&razon=${razon}&rut=${rut}`}
                     className="btn btn-success btn-sm">
                     Usuarios
                   </Link>
