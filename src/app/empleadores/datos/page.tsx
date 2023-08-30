@@ -1,10 +1,11 @@
 'use client';
+
 import Position from '@/components/stage/position';
 import Stage from '@/components/stage/stage';
 import { EmpleadorContext } from '@/contexts/empleador-context';
 import { actualizaEmpleador } from '@/helpers/tramitacion/empleadores';
-import useCombo from '@/hooks/use-combo';
 import { useForm } from '@/hooks/use-form';
+import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { ActualizaEmpleador } from '@/modelos/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
@@ -12,13 +13,14 @@ import { FormEvent, useContext, useEffect, useState } from 'react';
 import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
-import { ActividadLaboral } from '../(modelos)/actividad-laboral';
-import { CajaDeCompensacion } from '../(modelos)/caja-de-compensacion';
 import { Comuna } from '../(modelos)/comuna';
-import { Region } from '../(modelos)/region';
-import { SistemaDeRemuneracion } from '../(modelos)/sistema-de-remuneracion';
-import { TamanoEmpresa } from '../(modelos)/tamano-empresa';
-import { TipoEmpleador } from '../(modelos)/tipo-empleador';
+import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
+import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
+import { buscarComunas } from '../(servicios)/buscar-comunas';
+import { buscarRegiones } from '../(servicios)/buscar-regiones';
+import { buscarSistemasDeRemuneracion } from '../(servicios)/buscar-sistemas-de-remuneracion';
+import { buscarTamanosEmpresa } from '../(servicios)/buscar-tamanos-empresa';
+import { buscarTiposDeEmpleadores } from '../(servicios)/buscar-tipo-de-empleadores';
 
 interface DatosEmpleadoresProps {
   searchParams: {
@@ -41,13 +43,26 @@ const initialComuna: Comuna[] = [
 const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
   const router = useRouter();
 
-  let CCTIPOEMP: TipoEmpleador[] = useCombo('/tipoempleador/all');
-  let CCAF: CajaDeCompensacion[] = useCombo('/ccaf/all');
-  let CCACTLAB: ActividadLaboral[] = useCombo('/actividadlaboral/all');
-  let CCREGION: Region[] = useCombo('/Region/all');
-  let CCCOMUNA: Comuna[] = useCombo('/comuna/all/region');
-  let comboRemuneracion: SistemaDeRemuneracion[] = useCombo('/sistemaremuneracion/all');
-  let comboTamanoEmpresa: TamanoEmpresa[] = useCombo('/tamanoempresa/all');
+  const [_, combos] = useMergeFetchArray([
+    buscarTiposDeEmpleadores(),
+    buscarCajasDeCompensacion(),
+    buscarActividadesLaborales(),
+    buscarRegiones(),
+    buscarComunas(),
+    buscarSistemasDeRemuneracion(),
+    buscarTamanosEmpresa(),
+  ]);
+
+  const [CCTIPOEMP, CCAF, CCACTLAB, CCREGION, CCCOMUNA, comboRemuneracion, comboTamanoEmpresa] =
+    combos;
+
+  // let CCTIPOEMP: TipoEmpleador[] = useCombo('/tipoempleador/all');
+  // let CCAF: CajaDeCompensacion[] = useCombo('/ccaf/all');
+  // let CCACTLAB: ActividadLaboral[] = useCombo('/actividadlaboral/all');
+  // let CCREGION: Region[] = useCombo('/Region/all');
+  // let CCCOMUNA: Comuna[] = useCombo('/comuna/all/region');
+  // let comboRemuneracion: SistemaDeRemuneracion[] = useCombo('/sistemaremuneracion/all');
+  // let comboTamanoEmpresa: TamanoEmpresa[] = useCombo('/tamanoempresa/all');
 
   const { empleador } = useContext(EmpleadorContext);
   const { rut, id } = searchParams;
@@ -104,7 +119,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
             .find((v) => v.rutempleador == rut)
             ?.direccionempleador.comuna.idcomuna.substring(0, 2),
         );
-        CCCOMUNA = CCCOMUNA.filter(
+        let CCCOMUNA2 = (CCCOMUNA ?? []).filter(
           ({ region: { idregion } }) =>
             idregion ==
             Number(
@@ -113,7 +128,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                 ?.direccionempleador.comuna.idcomuna.substring(0, 2),
             ),
         );
-        setcomuna(CCCOMUNA);
+        setcomuna(CCCOMUNA2);
       }
       setLoading(false);
     }, 1800);
@@ -122,8 +137,10 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
 
   const onChangeRegion = (event: any) => {
     setregion(event.target.value);
-    CCCOMUNA = CCCOMUNA.filter(({ region: { idregion } }) => idregion == event.target.value);
-    setcomuna(CCCOMUNA);
+    let CCCOMUNA2 = (CCCOMUNA ?? []).filter(
+      ({ region: { idregion } }) => idregion == event.target.value,
+    );
+    setcomuna(CCCOMUNA2);
   };
 
   const handleSubmit = (e: FormEvent) => {
@@ -284,7 +301,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                   value={templador}
                   required>
                   <option value={''}>Seleccionar</option>
-                  {CCTIPOEMP.length > 0 ? (
+                  {CCTIPOEMP && CCTIPOEMP.length > 0 ? (
                     CCTIPOEMP.map((tipo) => (
                       <option key={tipo.idtipoempleador} value={tipo.idtipoempleador}>
                         {tipo.tipoempleador}
@@ -305,7 +322,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                   required>
                   <option value={''}>Seleccionar</option>
 
-                  {CCAF.length > 0 ? (
+                  {CCAF && CCAF.length > 0 ? (
                     CCAF.map((ccaf) => (
                       <option key={ccaf.idccaf} value={ccaf.idccaf}>
                         {' '}
@@ -327,7 +344,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                   onChange={onInputChange}
                   required>
                   <option value={''}>Seleccionar</option>
-                  {CCACTLAB.length > 0 ? (
+                  {CCACTLAB && CCACTLAB.length > 0 ? (
                     CCACTLAB.map(({ idactividadlaboral, actividadlaboral }) => (
                       <option key={idactividadlaboral} value={idactividadlaboral}>
                         {actividadlaboral}
@@ -350,7 +367,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                   onChange={onChangeRegion}
                   required>
                   <option value={''}>Seleccionar</option>
-                  {CCREGION.length > 0 ? (
+                  {CCREGION && CCREGION.length > 0 ? (
                     CCREGION.map(({ idregion, nombre }) => (
                       <option key={idregion} value={idregion}>
                         {nombre}
@@ -543,7 +560,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                     onChange={onInputChange}
                     required>
                     <option value={''}>Seleccionar</option>
-                    {comboTamanoEmpresa.length > 0 ? (
+                    {comboTamanoEmpresa && comboTamanoEmpresa.length > 0 ? (
                       comboTamanoEmpresa.map(({ idtamanoempresa, descripcion }) => (
                         <option key={idtamanoempresa} value={idtamanoempresa}>
                           {descripcion}
@@ -564,7 +581,7 @@ const DatosEmpleadoresPage = ({ searchParams }: DatosEmpleadoresProps) => {
                   onChange={onInputChange}
                   required>
                   <option value={''}>Seleccionar</option>
-                  {comboRemuneracion.length > 0 ? (
+                  {comboRemuneracion && comboRemuneracion.length > 0 ? (
                     comboRemuneracion.map(({ idsistemaremuneracion, descripcion }) => (
                       <option key={idsistemaremuneracion} value={idsistemaremuneracion}>
                         {descripcion}
