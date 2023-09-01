@@ -43,7 +43,7 @@ const Usuario: React.FC = () => {
         display: datosusuario.exp == 0 ? 'none' : '',
       }}>
       <div
-        className="nav navbar-nav navbar-right hidden-xs text-light"
+        className="nav navbar-nav navbar-right hidden-xs text-light d-sm-none d-md-block"
         style={{ fontSize: '14px' }}>
         <span className="pull-left user-top">
           <div className="mT10 ng-binding ng-scope">
