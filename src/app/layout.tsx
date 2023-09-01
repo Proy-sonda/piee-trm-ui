@@ -7,6 +7,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Head from 'next/head';
 import Link from 'next/link';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import './globals.css';
 import svg from './logo-fonasa.svg';
 
@@ -35,12 +36,12 @@ export default function RootLayout(
                 <div id="root" className="d-flex flex-column h-100">
                   <header className="sticky-top">
                     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                      <div className="container">
+                      <div className="container d-none d-sm-block">
                         <Link className="navbar-brand" href="/">
                           <img src={svg.src} alt="Fonasa" className="logo-fonasa img-fluid" />
                           &nbsp;
                           <span className="spanheader">
-                            <p>Portal Integrado para Entidades Empleadoras (PIEE) de </p>
+                            <p>Portal Integrado para Entidades Empleadoras (PIEE) de a</p>
                             <p className="text-center">Tramitación de Licencias Médicas</p>
                           </span>
                         </Link>

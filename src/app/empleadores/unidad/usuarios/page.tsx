@@ -1,14 +1,18 @@
 'use client';
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { buscarUsuarios } from '../../usuarios/(servicios)/buscar-usuarios';
+import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
 import { formUsrUnd } from './(modelos)/iformusrund';
 import { asociarUnidad } from './(servicios)/asociar-unidad';
 import { buscarEmpleadorRut } from './(servicios)/buscar-empleador-rut';
+import { buscarUsuariosAso } from './(servicios)/buscar-usuario-aso';
+import { eliminarUsuarioAso } from './(servicios)/eliminar-usuarioaso';
 import styles from './usuarios.module.css';
-
 interface iUsuarios {
   searchParams: {
     unidad: string;
@@ -25,6 +29,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
     {
       usuarios: buscarUsuarios(rut),
       empleador: buscarEmpleadorRut(rut),
+      usuarioAso: buscarUsuariosAso(Number(id)),
     },
     [refresh],
   );
@@ -41,7 +46,11 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
     });
   }, [datosPagina]);
 
-  // useEffect(() => window.history.pushState(null, '', '/empleadores/unidad/usuarios'), []);
+  useEffect(() => {
+    let state = window.history.state;
+    window.history.pushState(state, '', '/empleadores/unidad/usuarios');
+  }, []);
+  const refrescarComponente = () => setRefresh(Math.random());
 
   const onHandleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -67,11 +76,47 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
         showConfirmButton: false,
         timer: 2000,
         html: 'Asociación realizada con éxito',
+        didClose: () => refrescarComponente(),
       });
     } catch (error) {
       Swal.fire({
         icon: 'error',
         html: 'Error en asociación, verifique los datos correctamente',
+      });
+    }
+  };
+
+  const handleDelete = async (idusuario: number) => {
+    console.log(idusuario);
+    const respuesta = await Swal.fire({
+      icon: 'info',
+      title: 'Eliminar Usuario/a',
+      html: `¿Desea eliminar al usuario de la unidad ${unidad}?`,
+      showConfirmButton: true,
+      confirmButtonText: 'SI',
+      confirmButtonColor: 'var(--color-blue)',
+      showCancelButton: true,
+      cancelButtonText: 'NO',
+      cancelButtonColor: 'var(--bs-danger)',
+    });
+
+    if (!respuesta.isConfirmed) return;
+
+    try {
+      await eliminarUsuarioAso(idusuario);
+
+      refrescarComponente();
+      Swal.fire({
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 2000,
+        html: 'Eliminación realizada con éxito',
+        didClose: () => refrescarComponente(),
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        html: 'Error en eliminación, verifique los datos correctamente',
       });
     }
   };
@@ -105,7 +150,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
               <div className="col-md-6">
                 <label>RUN</label>
                 <select
-                  className="form-select"
+                  className="form-select js-example-basic-single"
                   data-live-search="true"
                   required
                   onChange={onChangeSelect}
@@ -134,7 +179,24 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
 
         <div className="row mt-3">
           <h5>Usuarios</h5>
-          <div className="col-md-12 col-sm-12 col-xl-12"></div>
+          <div className="col-md-12 col-sm-12 col-xl-12">
+            <IfContainer show={!pendiente && err.length > 0}>
+              <h4 className="mt-4 mb-5 text-center">Error al buscar usuarios</h4>
+            </IfContainer>
+
+            <IfContainer show={pendiente}>
+              <div className="mb-5">
+                <LoadingSpinner titulo="Cargando usuarios..." />
+              </div>
+            </IfContainer>
+
+            <IfContainer show={!pendiente && err.length === 0}>
+              <TableUsuariosAsociados
+                usuarioAsociado={datosPagina?.usuarioAso ?? []}
+                handleDelete={handleDelete}
+              />
+            </IfContainer>
+          </div>
         </div>
       </div>
     </div>
