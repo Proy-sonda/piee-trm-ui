@@ -242,8 +242,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
               <div className="row mt-3">
                 <div className="col-md-4">
                   <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">RUT Entidad Empleadora (*)</label>
+                    <label htmlFor="rut" className="form-label">
+                      RUT Entidad Empleadora (*)
+                    </label>
                     <input
+                      id="rut"
                       type="text"
                       aria-describedby="rutHelp"
                       readOnly
@@ -255,8 +258,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">Razón Social / Nombre particular</label>
+                    <label htmlFor="razonSocial" className="form-label">
+                      Razón Social / Nombre particular
+                    </label>
                     <input
+                      id="razonSocial"
                       type="text"
                       className={`form-control ${errors.razonSocial ? 'is-invalid' : ''}`}
                       {...register('razonSocial', {
@@ -282,8 +288,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">Nombre Fantasía (*)</label>
+                    <label htmlFor="nombreFantasia" className="form-label">
+                      Nombre Fantasía (*)
+                    </label>
                     <input
+                      id="nombreFantasia"
                       type="text"
                       className={`form-control ${errors.nombreFantasia ? 'is-invalid' : ''}`}
                       {...register('nombreFantasia', {
@@ -310,8 +319,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
               <div className="row mt-2">
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="templeador">Tipo de Entidad Empleadora</label>
+                  <label htmlFor="tipoEntidad" className="form-label">
+                    Tipo de Entidad Empleadora
+                  </label>
                   <select
+                    id="tipoEntidad"
                     className={`form-select ${errors.tipoEntidadEmpleadoraId ? 'is-invalid' : ''}`}
                     {...register('tipoEntidadEmpleadoraId', {
                       setValueAs: (v) => parseInt(v, 10),
@@ -331,8 +343,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="ccaf">Seleccione CCAF a la cual está afiliada</label>
+                  <label htmlFor="cajaCompensacion" className="form-label">
+                    Seleccione CCAF a la cual está afiliada
+                  </label>
                   <select
+                    id="cajaCompensacion"
                     className={`form-select ${errors.cajaCompensacionId ? 'is-invalid' : ''}`}
                     {...register('cajaCompensacionId', {
                       setValueAs: (v) => parseInt(v, 10),
@@ -352,8 +367,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="alaboralemp">Actividad Laboral Entidad Empleadora (*)</label>
+                  <label htmlFor="actividadLaboral" className="form-label">
+                    Actividad Laboral Entidad Empleadora (*)
+                  </label>
                   <select
+                    id="actividadLaboral"
                     className={`form-select ${errors.actividadLaboralId ? 'is-invalid' : ''}`}
                     {...register('actividadLaboralId', {
                       setValueAs: (v) => parseInt(v, 10),
@@ -375,8 +393,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
               <div className="row mt-2">
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="region">Región</label>
+                  <label htmlFor="region" className="form-label">
+                    Región
+                  </label>
                   <select
+                    id="region"
                     className={`form-select ${errors.regionId ? 'is-invalid' : ''}`}
                     {...register('regionId', {
                       validate: validarComboObligatorio(),
@@ -395,8 +416,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="comuna">Comuna (*)</label>
+                  <label htmlFor="comuna" className="form-label">
+                    Comuna (*)
+                  </label>
                   <select
+                    id="comuna"
                     className={`form-select ${errors.comunaId ? 'is-invalid' : ''}`}
                     {...register('comunaId', {
                       validate: validarComboObligatorio(),
@@ -419,8 +443,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
               <div className="row mt-2">
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="exampleInputEmail1">Calle (*)</label>
+                  <label htmlFor="calle" className="form-label">
+                    Calle (*)
+                  </label>
                   <input
+                    id="calle"
                     type="text"
                     className={`form-control ${errors.calle ? 'is-invalid' : ''}`}
                     {...register('calle', {
@@ -444,8 +471,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="exampleInputEmail1">Número (*)</label>
+                  <label htmlFor="numero" className="form-label">
+                    Número (*)
+                  </label>
                   <input
+                    id="numero"
                     type="text"
                     className={`form-control ${errors.numero ? 'is-invalid' : ''}`}
                     {...register('numero', {
@@ -470,8 +500,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="exampleInputEmail1">Block / Departamento</label>
+                  <label htmlFor="departamento" className="form-label">
+                    Block / Departamento
+                  </label>
                   <input
+                    id="departamento"
                     type="text"
                     className={`form-control ${errors.departamento ? 'is-invalid' : ''}`}
                     {...register('departamento', {
@@ -493,8 +526,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
               <div className="row mt-2">
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="exampleInputEmail1">Punto de referencia (Opcional)</label>
+                  <label htmlFor="puntoReferencia" className="form-label">
+                    Punto de referencia (Opcional)
+                  </label>
                   <input
+                    id="puntoReferencia"
                     type="text"
                     className={`form-control ${errors.puntoReferencia ? 'is-invalid' : ''}`}
                     {...register('puntoReferencia')}
@@ -505,7 +541,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 position-relative">
-                  <label className="sr-only" htmlFor="tel1">
+                  <label className="form-label" htmlFor="telefono1">
                     Teléfono 1 (*)
                   </label>
                   <div className="input-group mb-2">
@@ -513,6 +549,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                       <div className="input-group-text">+56</div>
                     </div>
                     <input
+                      id="telefono1"
                       type="text"
                       className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
                       {...register('telefono1', {
@@ -534,7 +571,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 postition-relative">
-                  <label className="sr-only" htmlFor="tel2">
+                  <label className="form-label" htmlFor="telefono2">
                     Teléfono 2
                   </label>
                   <div className="input-group mb-2">
@@ -542,6 +579,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                       <div className="input-group-text">+56</div>
                     </div>
                     <input
+                      id="telefono2"
                       type="text"
                       className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
                       {...register('telefono2', {
@@ -561,8 +599,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
               <div className="row mt-2">
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="exampleInputEmail1">Correo electrónico empleador (*)</label>
+                  <label htmlFor="email" className="form-label">
+                    Correo electrónico empleador (*)
+                  </label>
                   <input
+                    id="email"
                     type="mail"
                     placeholder="ejemplo@ejemplo.cl"
                     onPaste={(e) => e.preventDefault()}
@@ -588,8 +629,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="exampleInputEmail1">Repetir correo electrónico (*)</label>
+                  <label htmlFor="emailConfirma" className="form-label">
+                    Repetir correo electrónico (*)
+                  </label>
                   <input
+                    id="emailConfirma"
                     type="mail"
                     placeholder="ejemplo@ejemplo.cl"
                     onPaste={(e) => e.preventDefault()}
@@ -621,8 +665,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
-                    <label htmlFor="exampleInputEmail1">Holding</label>
+                    <label htmlFor="holding" className="form-label">
+                      Holding
+                    </label>
                     <input
+                      id="holding"
                       type="text"
                       className={`form-control ${errors.holding ? 'is-invalid' : ''}`}
                       {...register('holding')} // TODO: Falta validar el holding
@@ -637,8 +684,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
               <div className="row mt-2">
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
-                    <label htmlFor="qtrabajadores">N° de trabajadores</label>
+                    <label htmlFor="tamanoEmpresa" className="form-label">
+                      N° de trabajadores
+                    </label>
                     <select
+                      id="tamanoEmpresa"
                       className={`form-select ${errors.tamanoEmpresaId ? 'is-invalid' : ''}`}
                       {...register('tamanoEmpresaId', {
                         setValueAs: (v) => parseInt(v, 10),
@@ -659,8 +709,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 </div>
 
                 <div className="col-md-4 position-relative">
-                  <label htmlFor="sremuneraciones">Sistema de Remuneración</label>
+                  <label htmlFor="sistemaRemuneracion" className="form-label">
+                    Sistema de Remuneración
+                  </label>
                   <select
+                    id="sistemaRemuneracion"
                     className={`form-select ${errors.sistemaRemuneracionId ? 'is-invalid' : ''}`}
                     {...register('sistemaRemuneracionId', {
                       setValueAs: (v) => parseInt(v, 10),
