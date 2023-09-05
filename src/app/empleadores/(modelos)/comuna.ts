@@ -1,8 +1,8 @@
 export type Comuna = {
-  idcomuna: number;
+  idcomuna: string;
   nombre: string;
   region: {
-    idregion: number;
+    idregion: string;
     nombre: string;
   };
 };
