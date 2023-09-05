@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm as useFormRH } from 'react-hook-form';
 import { ClipLoader } from 'react-spinners';
+import Swal from 'sweetalert2';
 import isEmail from 'validator/lib/isEmail';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
 import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
@@ -19,6 +20,7 @@ import { buscarSistemasDeRemuneracion } from '../(servicios)/buscar-sistemas-de-
 import { buscarTamanosEmpresa } from '../(servicios)/buscar-tamanos-empresa';
 import { buscarTiposDeEmpleadores } from '../(servicios)/buscar-tipo-de-empleadores';
 import { CamposFormularioEmpleador } from './(modelos)/campos-formulario-empleador';
+import { actualizarEmpleador } from './(servicios)/actualizar-empleador';
 import { buscarEmpleadorPorId } from './(servicios)/buscar-empleador-por-id';
 
 interface DatosEmpleadoresPageProps {
@@ -72,11 +74,12 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
   const regionSeleccionada = watch('regionId');
 
   useEffect(() => {
+    setMostrarSpinner(true);
     if (cargandoDatos || !empleador) {
+      setMostrarSpinner(false);
       return;
     }
 
-    setMostrarSpinner(true);
     setValue('rut', empleador.rutempleador);
     setValue('razonSocial', empleador.razonsocial);
     setValue('nombreFantasia', empleador.nombrefantasia);
@@ -105,8 +108,49 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
   }, [cargandoDatos]);
 
   const onGuardarCambios: SubmitHandler<CamposFormularioEmpleador> = async (data) => {
-    console.table(data);
+    if (!empleador) {
+      throw new Error('No se ha cargado el empleador aun');
+    }
 
+    try {
+      setMostrarSpinner(true);
+
+      await actualizarEmpleador({
+        idEmpleador: empleador.idempleador,
+        rutEmpleador: data.rut,
+        razonSocial: data.razonSocial,
+        nombreFantasia: data.nombreFantasia,
+        email: data.email,
+        emailconfirma: data.emailConfirma,
+        telefono1: data.telefono1,
+        telefono2: data.telefono2,
+        calle: data.calle,
+        depto: data.departamento,
+        numero: data.numero,
+        comunaId: data.comunaId,
+        sistemaRemuneracionId: data.sistemaRemuneracionId,
+        tamanoEmpresaId: data.tamanoEmpresaId,
+        tipoEmpleadorId: data.tipoEntidadEmpleadoraId,
+        actividadLaboralId: data.actividadLaboralId,
+        cajaCompensacionId: data.cajaCompensacionId,
+      });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Entidad empleadora fue actualizado con exito',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error al actualizar empleador',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
     // const handleSubmit = (e: FormEvent) => {
     //   e.preventDefault();
 
