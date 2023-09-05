@@ -1,6 +1,7 @@
 'use client';
 
 import IfContainer from '@/components/if-container';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Position from '@/components/stage/position';
 import Stage from '@/components/stage/stage';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
@@ -8,7 +9,6 @@ import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm as useFormRH } from 'react-hook-form';
-import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/lib/isEmail';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
@@ -74,12 +74,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
   const regionSeleccionada = watch('regionId');
 
   useEffect(() => {
-    setMostrarSpinner(true);
     if (cargandoDatos || !empleador) {
-      setMostrarSpinner(false);
       return;
     }
 
+    setMostrarSpinner(true);
     setValue('rut', empleador.rutempleador);
     setValue('razonSocial', empleador.razonsocial);
     setValue('nombreFantasia', empleador.nombrefantasia);
@@ -194,15 +193,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
           </div>
 
           <IfContainer show={cargandoDatos || mostrarSpinner}>
-            <div className={'spinner'}>
-              <ClipLoader
-                color={'var(--color-blue)'}
-                loading={true}
-                size={150}
-                aria-label="Loading Spinner"
-                data-testid="loader"
-              />
-            </div>
+            <SpinnerPantallaCompleta />
           </IfContainer>
 
           <IfContainer show={!cargandoDatos && errorCargaDatos.length > 0}>
