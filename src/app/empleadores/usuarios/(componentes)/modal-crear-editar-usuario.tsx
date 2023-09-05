@@ -34,7 +34,7 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
     usuarioEditar:
       idUsuarioEditar !== undefined
         ? buscarUsuarioPorId(idUsuarioEditar)
-        : Promise.resolve([undefined, undefined]),
+        : [() => Promise.resolve(undefined), () => {}],
   });
 
   const {

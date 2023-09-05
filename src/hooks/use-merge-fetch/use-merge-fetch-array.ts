@@ -11,9 +11,9 @@ import { FetchResponse, RemappedFetchResponseTuple } from '.';
  *    // El tipo y orden usado en el useFetch se
  *    //preserva en la tupla combinada
  *    const [errores, respuestas, pendiente] = useMergeFetchResponse([
- *      empleadores: runFetch<Empleador[]>('...'),
- *      comunas: runFetch<Comuna[]>('...'),
- *      rubro: runFetch<Rubro>('...'),
+ *      empleadores: runFetchAbortable<Empleador[]>('...'),
+ *      comunas: runFetchAbortable<Comuna[]>('...'),
+ *      rubro: runFetchAbortable<Rubro>('...'),
  *    ]);
  *
  *    const [empleadores, comunas, rubro] = respuesta;
@@ -46,15 +46,34 @@ export function useMergeFetchArray<T extends [...FetchResponse<any>[]]>(
   useEffect(() => {
     setResumen([[], respuestas.map(() => undefined), true]);
 
-    Promise.all(respuestas).then((x) => {
-      const errores = x.filter(([error]) => !!error).map((r) => r[0]) as FetchError[];
+    const callbacks = respuestas.map(([cb]) => cb);
+    const abortadores = respuestas.map(([_, x]) => x);
+
+    (async () => {
+      const resultados: any[] = [];
+      const errores: any[] = [];
+      for (const callback of callbacks) {
+        try {
+          resultados.push(await callback());
+        } catch (error) {
+          errores.push(error);
+        }
+      }
 
       if (errores.length > 0) {
-        setResumen([errores, x.map(() => undefined) as any, false]);
+        setResumen([errores, respuestas.map(() => undefined), false]);
       } else {
-        setResumen([[], x.map((x) => x[1]) as any, false]);
+        setResumen([[], resultados, false]);
       }
-    });
+    })();
+
+    return () => {
+      for (const abortar of abortadores) {
+        abortar();
+      }
+
+      setResumen([[] as FetchError[], respuestas.map(() => undefined), false]);
+    };
   }, deps ?? []);
 
   return resumen;

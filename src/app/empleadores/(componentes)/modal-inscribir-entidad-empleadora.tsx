@@ -29,16 +29,7 @@ const ModalInscribirEntidadEmpleadora = ({
   });
 
   const [region, setregion] = useState('');
-  const [comunas, setcomuna] = useState([
-    {
-      idcomuna: 0,
-      nombre: '',
-      region: {
-        idregion: 0,
-        nombre: '',
-      },
-    },
-  ] as Comuna[]);
+  const [comunas, setcomuna] = useState<Comuna[]>([]);
 
   const {
     inscribeRun,
