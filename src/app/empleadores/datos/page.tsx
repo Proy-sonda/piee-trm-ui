@@ -248,6 +248,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <input
                       id="rut"
                       type="text"
+                      autoComplete="new-custom-value"
                       aria-describedby="rutHelp"
                       readOnly
                       className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
@@ -264,6 +265,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <input
                       id="razonSocial"
                       type="text"
+                      autoComplete="new-custom-value"
                       className={`form-control ${errors.razonSocial ? 'is-invalid' : ''}`}
                       {...register('razonSocial', {
                         required: {
@@ -294,6 +296,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <input
                       id="nombreFantasia"
                       type="text"
+                      autoComplete="new-custom-value"
                       className={`form-control ${errors.nombreFantasia ? 'is-invalid' : ''}`}
                       {...register('nombreFantasia', {
                         required: {
@@ -449,6 +452,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   <input
                     id="calle"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.calle ? 'is-invalid' : ''}`}
                     {...register('calle', {
                       required: {
@@ -477,6 +481,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   <input
                     id="numero"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.numero ? 'is-invalid' : ''}`}
                     {...register('numero', {
                       required: {
@@ -506,6 +511,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   <input
                     id="departamento"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.departamento ? 'is-invalid' : ''}`}
                     {...register('departamento', {
                       maxLength: {
@@ -532,6 +538,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   <input
                     id="puntoReferencia"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.puntoReferencia ? 'is-invalid' : ''}`}
                     {...register('puntoReferencia')}
                   />
@@ -551,6 +558,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <input
                       id="telefono1"
                       type="text"
+                      autoComplete="new-custom-value"
                       className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
                       {...register('telefono1', {
                         required: {
@@ -581,6 +589,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <input
                       id="telefono2"
                       type="text"
+                      autoComplete="new-custom-value"
                       className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
                       {...register('telefono2', {
                         pattern: {
@@ -605,6 +614,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   <input
                     id="email"
                     type="mail"
+                    autoComplete="new-custom-value"
                     placeholder="ejemplo@ejemplo.cl"
                     onPaste={(e) => e.preventDefault()}
                     onCopy={(e) => e.preventDefault()}
@@ -635,6 +645,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   <input
                     id="emailConfirma"
                     type="mail"
+                    autoComplete="new-custom-value"
                     placeholder="ejemplo@ejemplo.cl"
                     onPaste={(e) => e.preventDefault()}
                     onCopy={(e) => e.preventDefault()}
@@ -671,6 +682,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <input
                       id="holding"
                       type="text"
+                      autoComplete="new-custom-value"
                       className={`form-control ${errors.holding ? 'is-invalid' : ''}`}
                       {...register('holding')} // TODO: Falta validar el holding
                     />
