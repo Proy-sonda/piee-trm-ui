@@ -5,6 +5,7 @@ import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Position from '@/components/stage/position';
 import Stage from '@/components/stage/stage';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -36,21 +37,14 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
   const { rut, id, razon } = searchParams;
 
-  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const [refresh, refrescarPagina] = useRefrescarPagina();
+
+  const [spinnerCargar, setSpinnerCargar] = useState(false);
 
   const [
-    errorCargaDatos,
-    [
-      CCTIPOEMP,
-      CCAF,
-      CCACTLAB,
-      CCREGION,
-      CCCOMUNA,
-      comboRemuneracion,
-      comboTamanoEmpresa,
-      empleador,
-    ],
-    cargandoDatos,
+    errorCombos,
+    [CCTIPOEMP, CCAF, CCACTLAB, CCREGION, CCCOMUNA, comboRemuneracion, comboTamanoEmpresa],
+    cargandoCombos,
   ] = useMergeFetchArray([
     buscarTiposDeEmpleadores(),
     buscarCajasDeCompensacion(),
@@ -59,8 +53,12 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
     buscarComunas(),
     buscarSistemasDeRemuneracion(),
     buscarTamanosEmpresa(),
-    buscarEmpleadorPorId(parseInt(id, 10)),
   ]);
+
+  const [errorEmpleador, [empleador], cargandoEmpleador] = useMergeFetchArray(
+    [buscarEmpleadorPorId(parseInt(id, 10))],
+    [refresh],
+  );
 
   const {
     register,
@@ -69,16 +67,18 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
     setValue,
     watch,
     formState: { errors },
-  } = useFormRH<CamposFormularioEmpleador>();
+  } = useFormRH<CamposFormularioEmpleador>({
+    mode: 'onBlur',
+  });
 
   const regionSeleccionada = watch('regionId');
 
   useEffect(() => {
-    if (cargandoDatos || !empleador) {
+    if (cargandoCombos || cargandoEmpleador || !empleador || errorCombos.length > 0) {
       return;
     }
 
-    setMostrarSpinner(true);
+    setSpinnerCargar(true);
     setValue('rut', empleador.rutempleador);
     setValue('razonSocial', empleador.razonsocial);
     setValue('nombreFantasia', empleador.nombrefantasia);
@@ -102,9 +102,9 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
      * un tiempo para actualizar el combo de comunas al parchar la region. */
     setTimeout(() => {
       setValue('comunaId', empleador.direccionempleador.comuna.idcomuna);
-      setMostrarSpinner(false);
+      setSpinnerCargar(false);
     }, 1000);
-  }, [cargandoDatos]);
+  }, [cargandoCombos, cargandoEmpleador]);
 
   const onGuardarCambios: SubmitHandler<CamposFormularioEmpleador> = async (data) => {
     if (!empleador) {
@@ -112,7 +112,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
     }
 
     try {
-      setMostrarSpinner(true);
+      setSpinnerCargar(true);
 
       await actualizarEmpleador({
         idEmpleador: empleador.idempleador,
@@ -134,21 +134,25 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
         cajaCompensacionId: data.cajaCompensacionId,
       });
 
-      Swal.fire({
+      setSpinnerCargar(false);
+
+      await Swal.fire({
         icon: 'success',
-        title: 'Entidad empleadora fue actualizado con exito',
+        title: 'Entidad empleadora fue actualizada con éxito',
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
       });
+
+      refrescarPagina();
     } catch (error) {
+      setSpinnerCargar(false);
+
       Swal.fire({
         icon: 'error',
-        title: 'Error al actualizar empleador',
+        title: 'Error al actualizar la entidad empleadora',
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
       });
-    } finally {
-      setMostrarSpinner(false);
     }
   };
 
@@ -177,6 +181,14 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
     };
   };
 
+  const trimInput = (campo: keyof CamposFormularioEmpleador) => {
+    const value = getValues(campo);
+
+    if (typeof value === 'string') {
+      setValue(campo, value.trim(), { shouldValidate: true });
+    }
+  };
+
   if (!estaLogueado()) {
     router.push('/login');
     return null;
@@ -189,18 +201,22 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
         <div className="container pb-4">
           <div className="row">
-            <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
+            <NavegacionEntidadEmpleadora
+              rut={rut}
+              razon={empleador?.razonsocial ?? razon}
+              id={id}
+            />
           </div>
 
-          <IfContainer show={cargandoDatos || mostrarSpinner}>
+          <IfContainer show={cargandoCombos || cargandoEmpleador || spinnerCargar}>
             <SpinnerPantallaCompleta />
           </IfContainer>
 
-          <IfContainer show={!cargandoDatos && errorCargaDatos.length > 0}>
+          <IfContainer show={errorCombos.length > 0 || errorEmpleador.length > 0}>
             <h4 className="text-center py-5">Error al cargar los datos de la entidad empleadora</h4>
           </IfContainer>
 
-          <IfContainer show={errorCargaDatos.length === 0}>
+          <IfContainer show={errorCombos.length === 0 && errorEmpleador.length === 0}>
             <div className="row mt-2">
               <div className="col-md-8">
                 <Stage manual="" url="#">
@@ -226,7 +242,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                       type="text"
                       autoComplete="new-custom-value"
                       aria-describedby="rutHelp"
-                      readOnly
+                      disabled
                       className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
                       {...register('rut')}
                     />
@@ -256,6 +272,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                           value: 120,
                           message: 'No puede tener más de 120 caracteres',
                         },
+                        onBlur: () => trimInput('razonSocial'),
                       })}
                     />
                     <IfContainer show={!!errors.razonSocial}>
@@ -287,6 +304,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                           value: 120,
                           message: 'No puede tener más de 120 caracteres',
                         },
+                        onBlur: () => trimInput('nombreFantasia'),
                       })}
                     />
                     <IfContainer show={!!errors.nombreFantasia}>
@@ -443,6 +461,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                         value: 80,
                         message: 'No puede tener más de 80 caracteres',
                       },
+                      onBlur: () => trimInput('calle'),
                     })}
                   />
                   <IfContainer show={!!errors.calle}>
@@ -545,7 +564,20 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                           value: /^[0-9]{9}$/, // Exactamente 9 digitos
                           message: 'Debe tener 9 dígitos',
                         },
-                        onChange: permitirSoloNumeros('telefono1'),
+                        onChange: (event: any) => {
+                          const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                          let valorFinal = event.target.value as string;
+
+                          if (regex.test(valorFinal)) {
+                            valorFinal = valorFinal.replaceAll(regex, '');
+                          }
+
+                          if (valorFinal.length > 9) {
+                            valorFinal = valorFinal.substring(0, 9);
+                          }
+
+                          setValue('telefono1', valorFinal);
+                        },
                       })}
                     />
                     <IfContainer show={!!errors.telefono1}>
@@ -572,7 +604,20 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                           value: /^[0-9]{9}$/, // Exactamente 9 digitos
                           message: 'Debe tener 9 dígitos',
                         },
-                        onChange: permitirSoloNumeros('telefono2'),
+                        onChange: (event: any) => {
+                          const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                          let valorFinal = event.target.value as string;
+
+                          if (regex.test(valorFinal)) {
+                            valorFinal = valorFinal.replaceAll(regex, '');
+                          }
+
+                          if (valorFinal.length > 9) {
+                            valorFinal = valorFinal.substring(0, 9);
+                          }
+
+                          setValue('telefono2', valorFinal);
+                        },
                       })}
                     />
                     <IfContainer show={!!errors.telefono2}>
