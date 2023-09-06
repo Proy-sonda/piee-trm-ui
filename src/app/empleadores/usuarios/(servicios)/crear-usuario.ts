@@ -23,14 +23,12 @@ export interface CrearUsuarioRequest {
 }
 
 export const crearUsuario = (datosUsuario: CrearUsuarioRequest) => {
-  return runFetchConThrow<void>(
-    fetch(`${apiUrl}usuario/create`, {
-      method: 'POST',
-      headers: {
-        Authorization: obtenerToken(),
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(datosUsuario),
-    }),
-  );
+  return runFetchConThrow<void>(`${apiUrl}usuario/create`, {
+    method: 'POST',
+    headers: {
+      Authorization: obtenerToken(),
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(datosUsuario),
+  });
 };

@@ -1,9 +1,8 @@
 import { ErrorFetchDesconocido, HttpError } from './errores';
 
 /**
- * Toma una promesa de una llamada a `fetch` y devuelve el valor de esta o lanza un error si es
- * que no se puede parsear el json del cuerpo o el codigo de respuesta no esta en el rango de los
- * 200.
+ * Una llamada a `fetch` que devuelve el valor de esta o lanza un error si es que hay un error o el
+ * codigo de respuesta no esta en el rango de los 200.
  *
  * Se puede pasar el tipo de dato esperado al que va a resolver el fetch, pero no se verificará
  * que en efecto corresponda a ese tipo de dato, solo es una ayuda para typescript.
@@ -12,13 +11,21 @@ import { ErrorFetchDesconocido, HttpError } from './errores';
  * resuelve correctamente a `undefined`, por lo tanto conviene tipear la respuesta con `void` o
  * `undefined` para evitar problemas por tipos.
  *
- * @param fetchRequest
- * La llamada a `fetch` que se quiere envolver.
+ * @param url
+ * La misma URL que `fetch`
+ *
+ * @param init
+ * El mismo que `fetch`
  *
  * @returns
  * Una promesa que resuelve al valor del fetch envuelto. El error sera de tipo {@link FetchError}
  */
-export const runFetchConThrow = async <T>(fetchRequest: Promise<Response>): Promise<T> => {
+export const runFetchConThrow = async <T>(
+  url: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<T> => {
+  const fetchRequest = !init ? fetch(url) : fetch(url, init);
+
   const res = await fetchRequest;
 
   try {

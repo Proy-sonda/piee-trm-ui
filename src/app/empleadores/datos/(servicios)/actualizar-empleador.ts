@@ -66,14 +66,12 @@ export const actualizarEmpleador = (request: ActualizarEmpleadorRequest) => {
     },
   };
 
-  return runFetchConThrow<void>(
-    fetch(`${apiUrl}empleador/actualizar`, {
-      method: 'POST',
-      headers: {
-        Authorization: obtenerToken(),
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(req),
-    }),
-  );
+  return runFetchConThrow<void>(`${apiUrl}empleador/actualizar`, {
+    method: 'POST',
+    headers: {
+      Authorization: obtenerToken(),
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(req),
+  });
 };
