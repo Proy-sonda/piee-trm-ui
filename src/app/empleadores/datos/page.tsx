@@ -73,6 +73,12 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
   const regionSeleccionada = watch('regionId');
 
+  // Eliminar query params de la URL
+  useEffect(() => {
+    window.history.pushState(null, '', '/empleadores/datos');
+  });
+
+  // Parchar fomulario
   useEffect(() => {
     if (cargandoCombos || cargandoEmpleador || !empleador || errorCombos.length > 0) {
       return;
