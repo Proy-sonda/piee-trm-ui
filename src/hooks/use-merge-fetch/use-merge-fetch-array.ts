@@ -47,17 +47,16 @@ export function useMergeFetchArray<T extends [...FetchResponse<any>[]]>(
     setResumen([[], respuestas.map(() => undefined), true]);
 
     const callbacks = respuestas.map(([cb]) => cb);
-    const abortadores = respuestas.map(([_, x]) => x);
+    const abortadores = respuestas.map(([_, a]) => a);
 
     (async () => {
-      const resultados: any[] = [];
-      const errores: any[] = [];
-      for (const callback of callbacks) {
-        try {
-          resultados.push(await callback());
-        } catch (error) {
-          errores.push(error);
-        }
+      let errores: any[] = [];
+      let resultados: any[] = [];
+
+      try {
+        resultados = await Promise.all(callbacks.map((cb) => cb()));
+      } catch (error) {
+        errores.push(error);
       }
 
       if (errores.length > 0) {

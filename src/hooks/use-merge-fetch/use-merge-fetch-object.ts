@@ -50,12 +50,20 @@ export function useMergeFetchObject<T extends Record<string, FetchResponse<any>>
       const errores: any[] = [];
       const resultados: any = {};
 
-      for (const [key, [callback, _]] of Object.entries(respuestas)) {
-        try {
-          resultados[key] = await callback();
-        } catch (error) {
-          errores.push(error);
+      const entries = Object.entries(respuestas);
+      const keys = entries.map(([key]) => key);
+      const callbacks = entries.map(([_, [cb]]) => cb);
+
+      try {
+        const resultadosPromesas = await Promise.all(callbacks.map((cb) => cb()));
+
+        for (let index = 0; index < resultadosPromesas.length; index++) {
+          const resultado = resultadosPromesas[index];
+          const key = keys[index];
+          resultados[key] = resultado;
         }
+      } catch (error) {
+        errores.push(error);
       }
 
       if (errores.length > 0) {
