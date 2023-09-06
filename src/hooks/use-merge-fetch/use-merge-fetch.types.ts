@@ -1,6 +1,6 @@
 import { FetchError } from '@/servicios/fetch';
 
-export type FetchResponse<T> = Promise<[FetchError | undefined, T]>;
+export type FetchResponse<T> = [() => Promise<T>, () => void];
 
 export type UnwrappedFetchResponse<T> = T extends FetchResponse<infer U> ? U : never;
 

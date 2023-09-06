@@ -13,16 +13,7 @@ interface ModalNuevaUnidadProps {
 
 const ModalNuevaUnidad = ({ idEmpleador, onCrearNuevaUnidad }: ModalNuevaUnidadProps) => {
   const [region, setregion] = useState<any>();
-  const [comunas, setcomuna] = useState([
-    {
-      idcomuna: 0,
-      nombre: '',
-      region: {
-        idregion: 0,
-        nombre: '',
-      },
-    },
-  ] as Comuna[]);
+  const [comunas, setcomuna] = useState([] as Comuna[]);
 
   const [_, combos] = useMergeFetchObject({
     CCREGION: buscarRegiones(),

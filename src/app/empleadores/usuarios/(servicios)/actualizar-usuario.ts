@@ -19,14 +19,12 @@ export interface EditarUsuarioRequest {
 }
 
 export const actualizarUsuario = (datosUsuario: EditarUsuarioRequest) => {
-  return runFetchConThrow<void>(
-    fetch(`${apiUrl}usuario/update`, {
-      method: 'PUT',
-      headers: {
-        Authorization: obtenerToken(),
-        'Content-type': 'application/json',
-      },
-      body: JSON.stringify(datosUsuario),
-    }),
-  );
+  return runFetchConThrow<void>(`${apiUrl}usuario/update`, {
+    method: 'PUT',
+    headers: {
+      Authorization: obtenerToken(),
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(datosUsuario),
+  });
 };

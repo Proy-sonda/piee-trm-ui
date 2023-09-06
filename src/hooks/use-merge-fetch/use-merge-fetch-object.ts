@@ -10,9 +10,9 @@ import { FetchResponse, RemappedResponseFetchObject } from './use-merge-fetch.ty
  *  function AlgunComponente() {
  *    // El tipo usado en el useFetch se preserva en el objeto combinado
  *    const [errores, combos, pendiente] = useMergeFetchResponse({
- *      empleadores: runFetch<Empleador[]>('...'),
- *      comunas: runFetch<Comuna[]>('...'),
- *      rubro: runFetch<Rubro>('...'),
+ *      empleadores: runFetchAbortable<Empleador[]>('...'),
+ *      comunas: runFetchAbortable<Comuna[]>('...'),
+ *      rubro: runFetchAbortable<Rubro>('...'),
  *    });
  *
  *    return (
@@ -44,29 +44,42 @@ export function useMergeFetchObject<T extends Record<string, FetchResponse<any>>
   useEffect(() => {
     setResumen([[], undefined, true]);
 
-    const ejecutarPromesas = async (rs: T) => {
-      const errores: FetchError[] = [];
-      const resultado: any = {};
-      for (const [key, value] of Object.entries(rs)) {
-        const [err, res] = await value;
+    const abortadores = Object.values(respuestas).map(([_, x]) => x);
 
-        if (err) {
-          errores.push(err);
-        } else {
-          resultado[key] = res;
+    (async () => {
+      const errores: any[] = [];
+      const resultados: any = {};
+
+      const entries = Object.entries(respuestas);
+      const keys = entries.map(([key]) => key);
+      const callbacks = entries.map(([_, [cb]]) => cb);
+
+      try {
+        const resultadosPromesas = await Promise.all(callbacks.map((cb) => cb()));
+
+        for (let index = 0; index < resultadosPromesas.length; index++) {
+          const resultado = resultadosPromesas[index];
+          const key = keys[index];
+          resultados[key] = resultado;
         }
+      } catch (error) {
+        errores.push(error);
       }
 
-      return [errores, resultado];
-    };
-
-    ejecutarPromesas(respuestas).then(([errores, valores]) => {
       if (errores.length > 0) {
         setResumen([errores, undefined, false]);
       } else {
-        setResumen([[], valores, false]);
+        setResumen([[], resultados, false]);
       }
-    });
+    })();
+
+    return () => {
+      for (const abortar of abortadores) {
+        abortar();
+      }
+
+      setResumen([[], undefined, false]);
+    };
   }, deps ?? []);
 
   return resumen;

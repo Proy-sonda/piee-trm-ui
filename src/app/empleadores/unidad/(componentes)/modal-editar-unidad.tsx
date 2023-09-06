@@ -16,16 +16,7 @@ interface ModalEditarUnidadProps {
 
 const ModalEditarUnidad = ({ idEmpleador, idUnidad, onEditarUnidad }: ModalEditarUnidadProps) => {
   const [region, setregion] = useState<any>();
-  const [comunas, setcomuna] = useState([
-    {
-      idcomuna: 0,
-      nombre: '',
-      region: {
-        idregion: 0,
-        nombre: '',
-      },
-    },
-  ] as Comuna[]);
+  const [comunas, setcomuna] = useState<Comuna[]>([]);
 
   const [_, combos] = useMergeFetchObject({
     regiones: buscarRegiones(),
