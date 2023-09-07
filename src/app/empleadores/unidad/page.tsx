@@ -1,7 +1,7 @@
 'use client';
 
 import Position from '@/components/stage/position';
-import Stage from '@/components/stage/stage';
+import Titulo from '@/components/titulo/titulo';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
 import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
@@ -128,18 +128,9 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
           <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
         </div>
 
-        <div className="row mt-2">
-          <div className="col-md-8">
-            <Stage manual="" url="#">
-              Entidad Empleadora / Dirección y Unidades RRHH - <b>{razon}</b>
-            </Stage>
-          </div>
-
-          <div className="col-md-4">
-            <label style={{ cursor: 'pointer', color: 'blue' }}>Manual</label>
-            <br />
-          </div>
-        </div>
+        <Titulo url="">
+          Entidad Empleadora / Dirección y Unidades RRHH - <b>{razon}</b>
+        </Titulo>
 
         <div className="row mt-2">
           <div className="col-md-8"></div>
