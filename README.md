@@ -11,6 +11,9 @@
   - [Carpeta `src`](#carpeta-src)
   - [Estructura por pantalla](#estructura-por-pantalla)
   - [¿Como refactorizar?](#como-refactorizar)
+- [Convenciones de código](#convenciones-de-código)
+- [TODO: Scripts](#todo-scripts)
+- [TODO: Branches](#todo-branches)
 
 ## Instalación
 
@@ -97,3 +100,42 @@ Como Nextjs tiene enrutamiento por la estructura de carpetas, cada subcarpeta de
 TODO: Describir mejor
 
 En caso de querer utilizar codigo en carpetas hermanas, por ejemplo, si `/path_1/path_2/pagina_1/page.tsx` se quiere usar un servicio que está en `/path_1/path_2/pagina_2/(servicios)`, en lugar de importar directamente mover el servicio a la ruta común más cercana (en `src/app`) que sería `/path_1/path_2/(servicios)`. En caso de que no exista una ruta común, moverlo a nivel global en `src/app/servicios`. Lo mismo para modelos y componentes.
+
+## Convenciones de código
+
+**Nombres de archivos**:
+
+- Todo en minúscula, separado por un guión (`-`) cuando tiene más de una palabra.
+- No usar abreviaciones en las palabras individuales, a menos que sea algo de conocimiento general como RRHH para recursos humanos.
+- No ocupar "i" para indicar que es una interfaz.
+
+| Ejemplos OK :blush:            | Ejemplos malos :rage:  |
+| ------------------------------ | ---------------------- |
+| `eliminar-usuario-asociado.ts` | `elimusua.ts`          |
+| `buscar-empleadores.ts`        | `buscarEmpleadores.ts` |
+| `trabajador.ts`                | `itrabajador.ts`       |
+| `tabla-licencias-vencidas.tsx` | `TablaLicVen.tsx`      |
+
+**Nombres de variables y funciones**:
+
+- Usar camel case con la primera letra en minúscula.
+- No usar abreviaciones en las palabras individuales, a menos que sea algo de conocimiento general como RRHH para recursos humanos.
+- No ocupar "i" para indicar que es una interfaz.
+
+| Ejemplos OK :blush:     | Ejemplos malos :rage:   |
+| ----------------------- | ----------------------- |
+| `buscarEmpleadorPorId`  | `buscarEmpId`           |
+| `actividadesLaborales`  | `actLab`                |
+| `sistemaDeRemuneracion` | `sistemaderemuneracion` |
+
+## TODO: Scripts
+
+¿Los scripts de npm y que es lo que hacen?
+
+## TODO: Branches
+
+- Ramas y para que se usan
+- Convenciones en los nombres de las ramas
+- Convenciones en estructuras de commits
+- Convenciones al momento de integrar cambios (pull requests)
+- etc
