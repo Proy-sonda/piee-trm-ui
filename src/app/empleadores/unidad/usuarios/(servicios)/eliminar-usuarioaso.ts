@@ -1,10 +1,9 @@
 import { obtenerToken } from '@/servicios/auth';
+import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
 export const eliminarUsuarioAso = (idusuario: number) => {
-  return runFetchConThrow<void>(`${apiUrl}usuarioempleador/idusuarioempleador`, {
+  return runFetchConThrow<void>(`${apiUrl()}usuarioempleador/idusuarioempleador`, {
     method: 'delete',
     headers: {
       Authorization: obtenerToken(),

@@ -1,11 +1,10 @@
 import { obtenerToken } from '@/servicios/auth';
+import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 import { EstadoUsuario } from '../(modelos)/estado-usuario';
 import { RolUsuario } from '../(modelos)/rol-usuario';
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-export interface EditarUsuarioRequest {
+interface EditarUsuarioRequest {
   idusuario: number;
   rutusuario: string;
   nombres: string;
@@ -19,7 +18,7 @@ export interface EditarUsuarioRequest {
 }
 
 export const actualizarUsuario = (datosUsuario: EditarUsuarioRequest) => {
-  return runFetchConThrow<void>(`${apiUrl}usuario/update`, {
+  return runFetchConThrow<void>(`${apiUrl()}/usuario/update`, {
     method: 'PUT',
     headers: {
       Authorization: obtenerToken(),

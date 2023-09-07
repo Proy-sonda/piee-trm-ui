@@ -1,9 +1,8 @@
 import { obtenerToken } from '@/servicios/auth';
-
-const api_url = process.env.NEXT_PUBLIC_API_URL;
+import { apiUrl } from '@/servicios/environment';
 
 export const eliminarTrabajador = async (idtrabajador: number) => {
-  const data = await fetch(`${api_url}trabajador/idtrabajador`, {
+  const data = await fetch(`${apiUrl()}/trabajador/idtrabajador`, {
     method: 'DELETE',
     headers: {
       Authorization: obtenerToken(),

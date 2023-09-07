@@ -1,12 +1,11 @@
+import { apiUrl } from '@/servicios/environment';
 import { parseCookies } from 'nookies';
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const buscarEmpleadores = async (razon = '') => {
   const cookie = parseCookies();
   const token = cookie.token;
 
-  const data = await fetch(`${apiUrl}empleador/razonsocial`, {
+  const data = await fetch(`${apiUrl()}/empleador/razonsocial`, {
     method: 'POST',
     headers: {
       Authorization: token,

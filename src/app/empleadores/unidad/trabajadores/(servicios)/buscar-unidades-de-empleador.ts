@@ -1,9 +1,8 @@
 import { obtenerToken } from '@/servicios/auth';
-
-const api_url = process.env.NEXT_PUBLIC_API_URL;
+import { apiUrl } from '@/servicios/environment';
 
 export const buscarUnidadesDeEmpleador = async (rutempleador: string) => {
-  const data = await fetch(`${api_url}unidad/rutempleador`, {
+  const data = await fetch(`${apiUrl()}/unidad/rutempleador`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),

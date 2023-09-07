@@ -1,7 +1,6 @@
 import { obtenerToken } from '@/servicios/auth';
+import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export interface CrearUsuarioRequest {
   rutusuario: string;
@@ -23,7 +22,7 @@ export interface CrearUsuarioRequest {
 }
 
 export const crearUsuario = (datosUsuario: CrearUsuarioRequest) => {
-  return runFetchConThrow<void>(`${apiUrl}usuario/create`, {
+  return runFetchConThrow<void>(`${apiUrl()}/usuario/create`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),

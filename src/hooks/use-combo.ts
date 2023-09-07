@@ -1,4 +1,5 @@
 import CargaCombos from '@/helpers/adscripcion/carga-combos';
+import { apiUrl } from '@/servicios/environment';
 import { useEffect, useState } from 'react';
 
 const useCombo = (url: string) => {
@@ -8,7 +9,7 @@ const useCombo = (url: string) => {
 
   useEffect(() => {
     const cargaData = async () => {
-      let resp = await CargaCombos('http://10.153.106.88:3000' + url);
+      let resp = await CargaCombos(apiUrl() + url);
 
       setdata(resp);
     };

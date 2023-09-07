@@ -1,10 +1,9 @@
 import { obtenerToken } from '@/servicios/auth';
+import { apiUrl } from '@/servicios/environment';
 import { CrearUnidad } from '../(modelos)/datos-nueva-unidad';
 
-const api_url = process.env.NEXT_PUBLIC_API_URL;
-
 export const crearUnidad = async (unidad: CrearUnidad) => {
-  const data = await fetch(`${api_url}unidad/create`, {
+  const data = await fetch(`${apiUrl()}/unidad/create`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),

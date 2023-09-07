@@ -1,11 +1,10 @@
+import { apiUrl } from '@/servicios/environment';
 import { parseCookies } from 'nookies';
 let cookie = parseCookies();
 let token = cookie.token;
 
-const api_url = process.env.NEXT_PUBLIC_API_URL;
-
 export const ComboEntidadEmpleador = async () => {
-  const data = await fetch(`${api_url}empleador/rutusuario`, {
+  const data = await fetch(`${apiUrl()}/empleador/rutusuario`, {
     method: 'POST',
     headers: {
       Authorization: token,
@@ -19,7 +18,7 @@ export const ComboEntidadEmpleador = async () => {
 };
 
 export const renovacionToken = async () => {
-  const data = await fetch(`${api_url}auth/refresh`, {
+  const data = await fetch(`${apiUrl()}/auth/refresh`, {
     headers: {
       Authorization: token,
       'Content-type': 'application/json',
@@ -29,7 +28,7 @@ export const renovacionToken = async () => {
 };
 
 export const Logout = async () => {
-  const data = await fetch(`${api_url}auth/logout`, {
+  const data = await fetch(`${apiUrl()}/auth/logout`, {
     headers: {
       Authorization: token,
       'Content-type': 'application/json',

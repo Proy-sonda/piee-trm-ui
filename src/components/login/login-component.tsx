@@ -3,6 +3,7 @@
 import { AuthContext } from '@/contexts/auth-context';
 import { UsuarioLogin } from '@/contexts/modelos/types';
 import { useForm } from '@/hooks/use-form';
+import { apiUrl } from '@/servicios/environment';
 import jwt_decode from 'jwt-decode';
 import { useRouter } from 'next/navigation';
 import { setCookie } from 'nookies';
@@ -136,7 +137,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
       clavenuevados: clavenuevados,
     };
 
-    const resp = await fetch('http://10.153.106.88:3000/auth/change', {
+    const resp = await fetch(`${apiUrl()}/auth/change`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -166,7 +167,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
       });
 
     handleCloseModalRecu();
-    const data = await fetch('http://10.153.106.88:3000/auth/recover', {
+    const data = await fetch(`${apiUrl()}/auth/recover`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

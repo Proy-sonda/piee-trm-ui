@@ -1,9 +1,8 @@
 import { obtenerToken } from '@/servicios/auth';
-
-const api_url = process.env.NEXT_PUBLIC_API_URL;
+import { apiUrl } from '@/servicios/environment';
 
 export const buscarUnidadPorId = async (idUnidad: number) => {
-  const res = await fetch(`${api_url}unidad/idunidad`, {
+  const res = await fetch(`${apiUrl()}/unidad/idunidad`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),

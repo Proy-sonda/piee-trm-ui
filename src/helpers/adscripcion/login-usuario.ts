@@ -1,5 +1,6 @@
 import { UsuarioLogin } from '@/contexts/modelos/types';
 import { respLogin } from '@/modelos/adscripcion';
+import { apiUrl } from '@/servicios/environment';
 
 let respuesta: respLogin = {
   data: [],
@@ -11,7 +12,7 @@ export const LoginUsuario = async (usuario: UsuarioLogin) => {
   let resp: respLogin;
 
   try {
-    const data = await fetch('http://10.153.106.88:3000/auth/login', {
+    const data = await fetch(`${apiUrl()}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ export const LoginUsuario = async (usuario: UsuarioLogin) => {
 
 export const CompruebaToken = async (token: string) => {
   try {
-    const resp = await fetch('http://10.153.106.88:3000/auth/islogin', {
+    const resp = await fetch(`${apiUrl()}/auth/islogin`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

@@ -1,10 +1,9 @@
 import { obtenerToken } from '@/servicios/auth';
+import { apiUrl } from '@/servicios/environment';
 import { Trabajador } from '../(modelos)/trabajador';
 
-const api_url = process.env.NEXT_PUBLIC_API_URL;
-
 export const actualizarTrabajador = async (trabajador: Trabajador) => {
-  const data = await fetch(`${api_url}trabajador/edit`, {
+  const data = await fetch(`${apiUrl()}/trabajador/edit`, {
     method: 'PUT',
     headers: {
       Authorization: obtenerToken(),

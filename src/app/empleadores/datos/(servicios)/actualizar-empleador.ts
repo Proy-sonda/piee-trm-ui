@@ -1,8 +1,7 @@
 import { obtenerToken } from '@/servicios/auth';
+import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 import { ActualizarEmpleadorBackendRequest } from '../(modelos)/actualizar-empleador-backend-backend';
-
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 interface ActualizarEmpleadorRequest {
   idEmpleador: number;
@@ -66,7 +65,7 @@ export const actualizarEmpleador = (request: ActualizarEmpleadorRequest) => {
     },
   };
 
-  return runFetchConThrow<void>(`${apiUrl}empleador/actualizar`, {
+  return runFetchConThrow<void>(`${apiUrl()}/empleador/actualizar`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),
