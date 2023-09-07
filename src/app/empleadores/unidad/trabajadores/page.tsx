@@ -1,6 +1,6 @@
 'use client';
 
-import Stage from '@/components/stage/stage';
+import Titulo from '@/components/titulo/titulo';
 import { useForm } from '@/hooks/use-form';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import 'animate.css';
@@ -235,17 +235,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           display: loading ? 'none' : '',
         }}>
         <div className="me-5 ms-5 animate__animate animate__fadeIn">
-          <div className="row mt-2">
-            <div className="col-md-8">
-              <Stage manual="" url="#">
-                Entidad Empleadora / Dirección y Unidades RRHH - {razon} / Trabajadores - {unidad}
-              </Stage>
-            </div>
-
-            <div className="col-md-4">
-              <label style={{ cursor: 'pointer', color: 'blue' }}>Manual</label>
-              <br />
-            </div>
+          <div className="row mt-5">
+            <Titulo url="">
+              Entidad Empleadora / Dirección y Unidades RRHH - {razon} / Trabajadores - {unidad}
+            </Titulo>
           </div>
 
           <div className="row mt-2">

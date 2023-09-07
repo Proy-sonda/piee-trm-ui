@@ -3,6 +3,7 @@
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Position from '@/components/stage/position';
+import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
@@ -111,16 +112,9 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
           <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
         </div>
 
-        <div className="my-4 row ">
-          <div className="col-12">
-            <div className="d-flex align-items-center justify-content-between">
-              <span className="pb-2 border-bottom">
-                Entidad Empleadora / Usuarios <b>{razon}</b>
-              </span>
-              <span style={{ cursor: 'pointer', color: 'blue' }}>Manual</span>
-            </div>
-          </div>
-        </div>
+        <Titulo url="">
+          Entidad Empleadora / Usuarios <b>{razon}</b>
+        </Titulo>
 
         <div className="mt-2 row">
           <div className="d-flex justify-content-end">
