@@ -3,7 +3,7 @@
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Position from '@/components/stage/position';
-import Stage from '@/components/stage/stage';
+import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { estaLogueado } from '@/servicios/auth';
@@ -223,18 +223,9 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
           </IfContainer>
 
           <IfContainer show={errorCombos.length === 0 && errorEmpleador.length === 0}>
-            <div className="row mt-2">
-              <div className="col-md-8">
-                <Stage manual="" url="#">
-                  Datos Entidad Empleadora - <b>{empleador?.razonsocial ?? 'Cargando...'}</b>
-                </Stage>
-              </div>
-
-              <div className="col-md-4">
-                <label style={{ cursor: 'pointer', color: 'blue' }}>Manual</label>
-                <br />
-              </div>
-            </div>
+            <Titulo url="">
+              Datos Entidad Empleadora - <b>{empleador?.razonsocial ?? 'Cargando...'}</b>
+            </Titulo>
 
             <form onSubmit={handleSubmitRH(onGuardarCambios)}>
               <div className="row mt-3">
