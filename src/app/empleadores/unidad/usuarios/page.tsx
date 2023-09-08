@@ -48,7 +48,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
 
   useEffect(() => {
     let state = window.history.state;
-    window.history.pushState(state, '', '/empleadores/unidad/usuarios');
+    // window.history.pushState(state, '', '/empleadores/unidad/usuarios');
   }, []);
   const refrescarComponente = () => setRefresh(Math.random());
 

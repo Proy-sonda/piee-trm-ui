@@ -36,7 +36,7 @@ export default function RootLayout(
                 <div id="root" className="d-flex flex-column h-100">
                   <header className="sticky-top">
                     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                      <div className="container d-none d-sm-block">
+                      <div className="container d-none d-md-block">
                         <Link className="navbar-brand" href="/">
                           <img src={svg.src} alt="Fonasa" className="logo-fonasa img-fluid" />
                           &nbsp;
