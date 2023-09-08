@@ -64,7 +64,7 @@ const TablaUnidades = ({
                     <i className="bi bi-trash3"></i>
                   </button>
                   <Link
-                    href={`/empleadores/unidad/trabajadores?idunidad=${unidad.idunidad}&razon=${razon}&rut=${rut}`}
+                    href={`/empleadores/unidad/trabajadores?idunidad=${unidad.idunidad}&razon=${razon}&rutempleador=${rut}`}
                     className="btn btn-success btn-sm">
                     Trabajadores
                   </Link>{' '}

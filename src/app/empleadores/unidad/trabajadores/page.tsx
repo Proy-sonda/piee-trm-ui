@@ -72,7 +72,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
     };
     obtenerUnidad();
 
-    window.history.pushState(null, '', '/empleadores/unidad/trabajadores');
+    // window.history.pushState(null, '', '/empleadores/unidad/trabajadores');
   }, []);
 
   const handleEditTrabajador = (idtrabajador: number, idunidad: number, ruttrabajador: string) => {
@@ -140,8 +140,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
   };
 
   const handleSubmitEdit = () => {
-    console.log('test');
-
     const ActualizaTrabajador = async () => {
       const data = await actualizarTrabajador(editar);
       if (data.ok) {
@@ -401,7 +399,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
               Modificar
             </button>{' '}
             &nbsp;
-            <button className="btn btn-sucess">Volver</button>
+            <button className="btn btn-danger" onClick={() => handleClose()}>
+              Volver
+            </button>
           </Modal.Footer>
         </Modal>
       </div>
