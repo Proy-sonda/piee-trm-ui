@@ -7,11 +7,11 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { buscarUsuarios } from '../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
-import { formUsrUnd } from './(modelos)/iformusrund';
+import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
 import { asociarUnidad } from './(servicios)/asociar-unidad';
 import { buscarEmpleadorRut } from './(servicios)/buscar-empleador-rut';
-import { buscarUsuariosAso } from './(servicios)/buscar-usuario-aso';
-import { eliminarUsuarioAso } from './(servicios)/eliminar-usuarioaso';
+import { buscarUsuariosAso } from './(servicios)/buscar-usuario-asociado';
+import { eliminarUsuarioAso } from './(servicios)/eliminar-usuario-asociado';
 import styles from './usuarios.module.css';
 interface iUsuarios {
   searchParams: {
