@@ -4,7 +4,7 @@ import { runFetchAbortable } from '@/servicios/fetch';
 import { UsuarioEmpleador } from '../(modelos)/usuario-asociado';
 
 export const buscarUsuariosAsociado = (idunidad: number) => {
-  return runFetchAbortable<UsuarioEmpleador[]>(`${apiUrl()}usuarioempleador/idusuarioempleador`, {
+  return runFetchAbortable<UsuarioEmpleador[]>(`${apiUrl()}/usuarioempleador/idusuarioempleador`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),
