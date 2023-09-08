@@ -9,14 +9,14 @@ import { Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
 import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
-import { Trabajador } from './(modelos)/trabajador';
-import { Trabajadores } from './(modelos)/trabajadores';
-import { UnidadEmpleador } from './(modelos)/unidad-empleador';
-import { actualizarTrabajador } from './(servicios)/actualizar-trabajador';
-import { buscarTrabajadoresDeUnidad } from './(servicios)/buscar-trabajadores-de-unidad';
-import { buscarUnidadesDeEmpleador } from './(servicios)/buscar-unidades-de-empleador';
-import { crearTrabajador } from './(servicios)/crear-trabajador';
-import { eliminarTrabajador } from './(servicios)/eliminar-trabajador';
+import { Trabajador, Trabajadores, UnidadEmpleador } from './(modelos)/';
+import {
+  actualizarTrabajador,
+  buscarTrabajadoresDeUnidad,
+  buscarUnidadesDeEmpleador,
+  crearTrabajador,
+  eliminarTrabajador,
+} from './(servicios)/';
 import styles from './trabajadores.module.css';
 
 interface TrabajadoresPageProps {

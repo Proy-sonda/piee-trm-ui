@@ -1,7 +1,7 @@
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { formUsrUnd } from '../(modelos)/iformusrund';
+import { formUsrUnd } from '../(modelos)/formulario-usuario-unidad';
 
 export const asociarUnidad = (usuario: formUsrUnd) => {
   return runFetchConThrow<void>(`${apiUrl()}/usuarioempleador/create`, {

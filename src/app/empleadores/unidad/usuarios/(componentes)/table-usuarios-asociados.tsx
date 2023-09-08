@@ -1,7 +1,7 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { UsuarioEmpleador } from '../(modelos)/iusuarioaso';
+import { UsuarioEmpleador } from '../(modelos)/usuario-asociado';
 
 type props = {
   usuarioAsociado: UsuarioEmpleador[];
