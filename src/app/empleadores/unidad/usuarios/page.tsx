@@ -10,8 +10,8 @@ import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados
 import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
 import { asociarUnidad } from './(servicios)/asociar-unidad';
 import { buscarEmpleadorRut } from './(servicios)/buscar-empleador-rut';
-import { buscarUsuariosAso } from './(servicios)/buscar-usuario-asociado';
-import { eliminarUsuarioAso } from './(servicios)/eliminar-usuario-asociado';
+import { buscarUsuariosAsociado } from './(servicios)/buscar-usuario-asociado';
+import { eliminarUsuarioAsociado } from './(servicios)/eliminar-usuario-asociado';
 import styles from './usuarios.module.css';
 interface iUsuarios {
   searchParams: {
@@ -29,7 +29,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
     {
       usuarios: buscarUsuarios(rut),
       empleador: buscarEmpleadorRut(rut),
-      usuarioAso: buscarUsuariosAso(Number(id)),
+      usuarioAso: buscarUsuariosAsociado(Number(id)),
     },
     [refresh],
   );
@@ -103,7 +103,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
     if (!respuesta.isConfirmed) return;
 
     try {
-      await eliminarUsuarioAso(idusuario);
+      await eliminarUsuarioAsociado(idusuario);
 
       refrescarComponente();
       Swal.fire({
