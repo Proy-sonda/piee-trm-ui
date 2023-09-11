@@ -3,6 +3,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { buscarUsuarios } from '../../usuarios/(servicios)/buscar-usuarios';
@@ -25,11 +26,18 @@ interface iUsuarios {
 const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
   const { id, unidad, razon, rut } = searchParams;
   const [refresh, setRefresh] = useState(0);
+  const router = useRouter();
   const [err, datosPagina, pendiente] = useMergeFetchObject(
+    {
+      usuarioAso: buscarUsuariosAsociado(Number(id)),
+    },
+    [refresh],
+  );
+
+  const [error, usuarios, pending] = useMergeFetchObject(
     {
       usuarios: buscarUsuarios(rut),
       empleador: buscarEmpleadorRut(rut),
-      usuarioAso: buscarUsuariosAsociado(Number(id)),
     },
     [refresh],
   );
@@ -42,13 +50,13 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
   useEffect(() => {
     setformIni({
       ...formIni,
-      idempleador: datosPagina?.empleador.idempleador,
+      idempleador: usuarios?.empleador.idempleador,
     });
   }, [datosPagina]);
 
   useEffect(() => {
     let state = window.history.state;
-    // window.history.pushState(state, '', '/empleadores/unidad/usuarios');
+    window.history.pushState(state, '', '/empleadores/unidad/usuarios');
   }, []);
   const refrescarComponente = () => setRefresh(Math.random());
 
@@ -157,8 +165,8 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
                   value={formIni?.idusuario}
                   name="idusuario">
                   <option value={''}>Seleccionar</option>
-                  {datosPagina?.usuarios?.length || 0 > 0 ? (
-                    datosPagina?.usuarios.map(({ idusuario, rutusuario, nombres }) => (
+                  {usuarios?.usuarios?.length || 0 > 0 ? (
+                    usuarios?.usuarios.map(({ idusuario, rutusuario, nombres }) => (
                       <option key={idusuario} value={idusuario} data-tokens={rutusuario}>
                         {rutusuario} / {nombres}
                       </option>
@@ -196,6 +204,18 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
                 handleDelete={handleDelete}
               />
             </IfContainer>
+          </div>
+        </div>
+
+        <div className="d-flex flex-row-reverse">
+          <div className="p-2">
+            <button
+              className="btn btn-danger"
+              onClick={() => {
+                router.push(`/empleadores/unidad?razon=${razon}&id=${id}&rut=${rut}`);
+              }}>
+              Volver
+            </button>
           </div>
         </div>
       </div>
