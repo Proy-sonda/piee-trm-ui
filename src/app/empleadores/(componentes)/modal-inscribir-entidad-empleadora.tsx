@@ -1,10 +1,11 @@
 import IfContainer from '@/components/if-container';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import React from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
+import Swal from 'sweetalert2';
 import isEmail from 'validator/lib/isEmail';
 import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
-import { DatosNuevaEntidadEmpleadora } from '../(modelos)/nueva-entidad-empleadora';
 import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
 import { buscarComunas } from '../(servicios)/buscar-comunas';
@@ -12,14 +13,15 @@ import { buscarRegiones } from '../(servicios)/buscar-regiones';
 import { buscarSistemasDeRemuneracion } from '../(servicios)/buscar-sistemas-de-remuneracion';
 import { buscarTamanosEmpresa } from '../(servicios)/buscar-tamanos-empresa';
 import { buscarTiposDeEmpleadores } from '../(servicios)/buscar-tipo-de-empleadores';
+import { EmpleadorYaExisteError, inscribirEmpleador } from '../(servicios)/inscribir-empleador';
 
 interface ModalInscribirEntidadEmpleadoraProps {
-  onCrearNuevaEntidadEmpleadora: (nuevaEntidad: DatosNuevaEntidadEmpleadora) => void;
+  onEntidadEmpleadoraCreada: () => void;
 }
 
-const ModalInscribirEntidadEmpleadora = ({
-  onCrearNuevaEntidadEmpleadora,
-}: ModalInscribirEntidadEmpleadoraProps) => {
+const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraProps> = ({
+  onEntidadEmpleadoraCreada,
+}) => {
   const [_, combos] = useMergeFetchObject({
     tipoEmpleadores: buscarTiposDeEmpleadores(),
     comunas: buscarComunas(),
@@ -61,10 +63,38 @@ const ModalInscribirEntidadEmpleadora = ({
 
   const regionSeleccionada = watch('regionId');
 
-  const crearEntidadEmpleadora: SubmitHandler<FormularioInscribirEntidadEmpleadora> = async (
-    data,
-  ) => {
-    console.table(data);
+  const crearNuevaEntidad: SubmitHandler<FormularioInscribirEntidadEmpleadora> = async (data) => {
+    try {
+      await inscribirEmpleador(data);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'La nueva entidad empleadora fue inscrita con éxito',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+
+      onEntidadEmpleadoraCreada();
+    } catch (error) {
+      if (error instanceof EmpleadorYaExisteError) {
+        return Swal.fire({
+          icon: 'error',
+          title: 'RUT del empleador ya existe',
+          showConfirmButton: true,
+          confirmButtonColor: 'var(--color-blue)',
+          confirmButtonText: 'OK',
+        });
+      }
+
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error al inscribir empleador',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+    }
   };
 
   const onChangeRunEntidadEmpleadora = (event: any) => {
@@ -117,7 +147,7 @@ const ModalInscribirEntidadEmpleadora = ({
                 data-bs-dismiss="modal"
                 aria-label="Close"></button>
             </div>
-            <form onSubmit={handleSubmit(crearEntidadEmpleadora)}>
+            <form onSubmit={handleSubmit(crearNuevaEntidad)}>
               <div className="modal-body">
                 <div className="ms-3 me-3">
                   <div

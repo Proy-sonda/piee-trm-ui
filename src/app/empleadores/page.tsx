@@ -9,11 +9,8 @@ import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
-import { DatosInscribirEmpleador } from './(modelos)/datos-inscribir-empleador';
-import { DatosNuevaEntidadEmpleadora } from './(modelos)/nueva-entidad-empleadora';
 import { buscarEmpleadores } from './(servicios)/buscar-empleadores';
 import { Desadscribir } from './(servicios)/desadscribir-empleador';
-import { InscribirEmpleador } from './(servicios)/inscribir-empleador';
 
 const EmpleadoresPage = () => {
   const [empleadores, setEmpleadores] = useState<Empleador[]>([]);
@@ -66,76 +63,13 @@ const EmpleadoresPage = () => {
     });
   };
 
-  const onCrearNuevaEntidadEmpleadora = (nuevaEntidad: DatosNuevaEntidadEmpleadora) => {
-    const nuevaEntidadEmpleadora: DatosInscribirEmpleador = {
-      rutempleador: nuevaEntidad.inscribeRun,
-      razonsocial: nuevaEntidad.razonsocial,
-      telefonohabitual: nuevaEntidad.tf1,
-      telefonomovil: nuevaEntidad.tf2,
-      email: nuevaEntidad.cemple,
-      emailconfirma: nuevaEntidad.recemple,
-      tipoempleador: {
-        idtipoempleador: Number(nuevaEntidad.templeador),
-        tipoempleador: nuevaEntidad.templeador,
-      },
-      ccaf: {
-        idccaf: Number(nuevaEntidad.ccaf),
-        nombre: nuevaEntidad.ccaf,
-      },
-      actividadlaboral: {
-        idactividadlaboral: Number(nuevaEntidad.alaboralemp),
-        actividadlaboral: nuevaEntidad.alaboralemp,
-      },
-      tamanoempresa: {
-        idtamanoempresa: Number(nuevaEntidad.npersonas),
-        descripcion: nuevaEntidad.npersonas,
-        nrotrabajadores: Number(nuevaEntidad.npersonas),
-      },
-      sistemaremuneracion: {
-        idsistemaremuneracion: Number(nuevaEntidad.sremun),
-        descripcion: nuevaEntidad.sremun,
-      },
-      direccionempleador: {
-        comuna: {
-          idcomuna: nuevaEntidad.ccomuna,
-          nombre: nuevaEntidad.ccomuna,
-        },
-        calle: nuevaEntidad.calle,
-        depto: nuevaEntidad.bdep,
-        numero: nuevaEntidad.numero,
-      },
+  const onEntidadEmpleadoraCreada = () => {
+    const CargaEmpleador = async () => {
+      let respuesta = await buscarEmpleadores('');
+      setEmpleadores(respuesta);
+      cargaEmpleador(respuesta);
     };
-
-    const inscribirEntidad = async () => {
-      const resp = await InscribirEmpleador(nuevaEntidadEmpleadora);
-
-      if (resp.ok) {
-        const CargaEmpleador = async () => {
-          let respuesta = await buscarEmpleadores('');
-          setEmpleadores(respuesta);
-          cargaEmpleador(respuesta);
-        };
-        CargaEmpleador();
-        return Swal.fire({
-          html: 'Operación realizada con éxito',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 2000,
-        });
-      } else {
-        let data = await resp.json();
-        if (data.message.includes('rutempleador|ya existe'))
-          data.message = 'Rut empleador ya existe';
-        return Swal.fire({
-          html: data.message,
-          icon: 'error',
-          timer: 3000,
-          showConfirmButton: false,
-        });
-      }
-    };
-
-    inscribirEntidad();
+    CargaEmpleador();
   };
 
   const onBuscarEntidadEmpleadora = async () => {
@@ -222,9 +156,7 @@ const EmpleadoresPage = () => {
         </div>
       </div>
 
-      <ModalInscribirEntidadEmpleadora
-        onCrearNuevaEntidadEmpleadora={onCrearNuevaEntidadEmpleadora}
-      />
+      <ModalInscribirEntidadEmpleadora onEntidadEmpleadoraCreada={onEntidadEmpleadoraCreada} />
     </div>
   );
 };
