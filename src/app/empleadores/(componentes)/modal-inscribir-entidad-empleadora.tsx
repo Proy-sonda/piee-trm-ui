@@ -35,35 +35,16 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
     tamanosEmpresas: buscarTamanosEmpresa(),
   });
 
-  const valoresPorDefecto = {
-    rut: '',
-    razonSocial: '',
-    tipoEntidadEmpleadoraId: -1,
-    cajaCompensacionId: -1,
-    actividadLaboralId: -1,
-    regionId: '',
-    comunaId: '',
-    calle: '',
-    numero: '',
-    departamento: '',
-    telefono1: '',
-    telefono2: '',
-    email: '',
-    emailConfirma: '',
-    tamanoEmpresaId: -1,
-    sistemaRemuneracionId: -1,
-  };
-
   const {
     register,
     handleSubmit,
     getValues,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FormularioInscribirEntidadEmpleadora>({
     mode: 'onBlur',
-    values: valoresPorDefecto,
   });
 
   const regionSeleccionada = watch('regionId');
@@ -73,11 +54,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
   };
 
   const resetearFormulario = () => {
-    const campos = Object.keys(valoresPorDefecto) as [keyof FormularioInscribirEntidadEmpleadora];
-
-    for (const campo of campos) {
-      setValue(campo, valoresPorDefecto[campo]);
-    }
+    reset();
   };
 
   const crearNuevaEntidad: SubmitHandler<FormularioInscribirEntidadEmpleadora> = async (data) => {
