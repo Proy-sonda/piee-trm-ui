@@ -29,6 +29,8 @@ const EmpleadoresPage = () => {
     [refresh],
   );
 
+  const [empleadoresFiltrados, setEmpleadoresFiltrados] = useState<Empleador[]>([]);
+
   const [rut, setRut] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
 
@@ -37,6 +39,7 @@ const EmpleadoresPage = () => {
       return;
     }
 
+    filtrarEmpleadores();
     cargaEmpleador(empleadores2 as any[]);
   }, [empleadores2]);
 
@@ -90,20 +93,22 @@ const EmpleadoresPage = () => {
     refrescarPagina();
   };
 
-  const onBuscarEntidadEmpleadora = async () => {
-    // if (razonSocial.trim() === '' && rut.trim() === '') {
-    //   let respuesta = await buscarEmpleadores('');
-    //   setEmpleadores(respuesta);
-    //   cargaEmpleador(respuesta);
-    //   return;
-    // }
-    // const empleadoresFiltrados = empleadores.filter((empleador) => {
-    //   return (
-    //     empleador.razonsocial.toUpperCase().includes(razonSocial.trim().toUpperCase()) &&
-    //     empleador.rutempleador.includes(rut.trim())
-    //   );
-    // });
-    // setEmpleadores(empleadoresFiltrados);
+  const filtrarEmpleadores = () => {
+    const porFiltrar = empleadores2 ?? [];
+
+    if (razonSocial.trim() === '' && rut.trim() === '') {
+      setEmpleadoresFiltrados(porFiltrar);
+      return;
+    }
+
+    const filtrados = porFiltrar.filter((empleador) => {
+      return (
+        empleador.razonsocial.toUpperCase().includes(razonSocial.trim().toUpperCase()) &&
+        empleador.rutempleador.includes(rut.trim())
+      );
+    });
+
+    setEmpleadoresFiltrados(filtrados);
   };
 
   if (!estaLogueado()) {
@@ -147,7 +152,7 @@ const EmpleadoresPage = () => {
                 className="btn btn-primary"
                 onClick={(e) => {
                   e.preventDefault();
-                  onBuscarEntidadEmpleadora();
+                  filtrarEmpleadores();
                 }}>
                 Buscar
               </button>
@@ -178,7 +183,7 @@ const EmpleadoresPage = () => {
 
               <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length === 0}>
                 <TablaEntidadesEmpleadoras
-                  empleadores={empleadores2 ?? []}
+                  empleadores={empleadoresFiltrados ?? []}
                   onDesadscribirEmpleador={desadscribirEntidadEmpleadora}
                 />
               </IfContainer>
