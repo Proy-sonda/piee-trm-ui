@@ -772,7 +772,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   <button
                     type="button"
                     className="btn btn-danger"
-                    data-bs-dismiss="modal"
                     onClick={() => router.push('/empleadores')}>
                     Volver
                   </button>

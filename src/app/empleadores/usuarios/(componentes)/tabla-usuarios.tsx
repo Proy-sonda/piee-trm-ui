@@ -1,8 +1,10 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import React from 'react';
+import React, { FormEvent } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import Swal from 'sweetalert2';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
+import { recuperarContrasena } from '../(servicios)/recuperar-clave';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
@@ -23,6 +25,30 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     datos: usuarios,
     tamanoPagina: 5,
   });
+
+  const reenviarContrasena = async (
+    e: FormEvent<HTMLButtonElement>,
+    rut: string,
+    email: string,
+  ) => {
+    e.preventDefault();
+    try {
+      await recuperarContrasena(rut);
+      Swal.fire({
+        html: `<p>Clave recuperada</p> se ha enviado al correo ${email}`,
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error: any) {
+      Swal.fire({
+        html: 'Usuario se encuentra deshabilitado',
+        icon: 'error',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    }
+  };
 
   return (
     <>
@@ -68,7 +94,10 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                   }}>
                   <i className="bi bi-trash3"></i>
                 </button>
-                <button className="btn text-primary" title="Reenviar clave">
+                <button
+                  className="btn text-primary"
+                  title="Reenviar clave"
+                  onClick={(e) => reenviarContrasena(e, usuario.rutusuario, usuario.email)}>
                   <i className="bi bi-key"></i>
                 </button>
               </Td>
