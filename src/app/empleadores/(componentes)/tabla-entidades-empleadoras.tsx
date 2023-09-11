@@ -2,6 +2,7 @@ import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import Link from 'next/link';
+import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 interface TablaEntidadesEmpleadorasProps {
   empleadores: Empleador[];
@@ -23,26 +24,26 @@ export default function TablaEntidadesEmpleadoras({
 
   return (
     <>
-      <table className="table table-hover">
-        <thead className="align-middle">
-          <tr>
-            <th style={{ width: '100px' }}>RUT</th>
-            <th style={{ width: '150px' }}>Razón Social</th>
-            <th style={{ width: '20px' }}></th>
-          </tr>
-        </thead>
-        <tbody className="align-middle">
+      <Table className="table table-hover">
+        <Thead className="align-middle">
+          <Tr>
+            <Th style={{ width: '100px' }}>RUT</Th>
+            <Th style={{ width: '150px' }}>Razón Social</Th>
+            <Th style={{ width: '20px' }}></Th>
+          </Tr>
+        </Thead>
+        <Tbody className="align-middle">
           {empleadoresPaginados.length > 0 ? (
             empleadoresPaginados.map((empleador: Empleador) => (
-              <tr key={empleador.rutempleador} className="align-middle">
-                <td>
+              <Tr key={empleador.rutempleador} className="align-middle">
+                <Td>
                   <Link
                     href={`/empleadores/datos?rut=${empleador.rutempleador}&razon=${empleador.razonsocial}&id=${empleador.idempleador}`}>
                     {empleador.rutempleador}
                   </Link>
-                </td>
-                <td>{empleador.razonsocial}</td>
-                <td className="text-center">
+                </Td>
+                <Td>{empleador.razonsocial}</Td>
+                <Td className="text-center">
                   <button
                     className="btn btn-danger btn-sm"
                     onClick={(e) => {
@@ -52,18 +53,18 @@ export default function TablaEntidadesEmpleadoras({
                     title={`Desadscribir empleador ${empleador.razonsocial}`}>
                     Desadscribir
                   </button>
-                </td>
-              </tr>
+                </Td>
+              </Tr>
             ))
           ) : (
-            <tr>
-              <td>-</td>
-              <td>-</td>
-              <td></td>
-            </tr>
+            <Tr>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td></Td>
+            </Tr>
           )}
-        </tbody>
-      </table>
+        </Tbody>
+      </Table>
       <div className="mt-3">
         <Paginacion totalPages={totalPaginas} onCambioPagina={cambiarPaginaActual} tamano="sm" />
       </div>

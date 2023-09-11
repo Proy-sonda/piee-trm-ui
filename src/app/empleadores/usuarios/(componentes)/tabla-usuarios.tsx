@@ -1,6 +1,7 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import React from 'react';
+import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 
 interface TablaUsuariosProps {
@@ -25,32 +26,32 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
   return (
     <>
-      <table className="table table-hover">
-        <thead className="text-center align-middle">
-          <tr>
-            <th>RUT</th>
-            <th>Nombre</th>
-            <th>Teléfono</th>
-            <th>Correo electrónico</th>
-            <th>Rol</th>
-            <th>Estado</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody className="text-center align-middle">
+      <Table className="table table-hover">
+        <Thead className="text-center align-middle">
+          <Tr>
+            <Th>RUT</Th>
+            <Th>Nombre</Th>
+            <Th>Teléfono</Th>
+            <Th>Correo electrónico</Th>
+            <Th>Rol</Th>
+            <Th>Estado</Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <Tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
-            <tr key={usuario.idusuario}>
-              <td>{usuario.rutusuario}</td>
-              <td>{`${usuario.nombres} ${usuario.apellidos}`}</td>
-              <td>{usuario.telefonouno}</td>
-              <td>{usuario.email}</td>
-              <td>
+            <Tr key={usuario.idusuario}>
+              <Td>{usuario.rutusuario}</Td>
+              <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
+              <Td>{usuario.telefonouno}</Td>
+              <Td>{usuario.email}</Td>
+              <Td>
                 <select className="form-select form-select-sm" disabled>
                   <option>{usuario.rol.rol}</option>
                 </select>
-              </td>
-              <td>{usuario.estadousuario.descripcion}</td>
-              <td>
+              </Td>
+              <Td>{usuario.estadousuario.descripcion}</Td>
+              <Td>
                 <button
                   className="btn text-primary"
                   onClick={(e) => {
@@ -70,11 +71,11 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 <button className="btn text-primary" title="Reenviar clave">
                   <i className="bi bi-key"></i>
                 </button>
-              </td>
-            </tr>
+              </Td>
+            </Tr>
           ))}
-        </tbody>
-      </table>
+        </Tbody>
+      </Table>
 
       <div className="mt-3">
         <Paginacion totalPages={totalPaginas} onCambioPagina={cambiarPaginaActual} />

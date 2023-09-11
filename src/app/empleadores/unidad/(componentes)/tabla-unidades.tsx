@@ -2,6 +2,7 @@ import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import Link from 'next/link';
+import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 interface TablaUnidadesProps {
   unidades: Unidadrhh[];
@@ -29,27 +30,27 @@ const TablaUnidades = ({
 
   return (
     <>
-      <table className="table table-hover">
-        <thead className="text-center">
-          <tr>
-            <th>Nombre</th>
-            <th>Código</th>
-            <th>Dirección</th>
-            <th>Teléfono</th>
-            <th>Correo electrónico</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody className="text-center align-middle">
+      <Table className="table table-hover">
+        <Thead className="text-center">
+          <Tr>
+            <Th>Nombre</Th>
+            <Th>Código</Th>
+            <Th>Dirección</Th>
+            <Th>Teléfono</Th>
+            <Th>Correo electrónico</Th>
+            <Th></Th>
+          </Tr>
+        </Thead>
+        <Tbody className="text-center align-middle">
           {unidadesPaginadas.length > 0 ? (
             unidadesPaginadas.map((unidad) => (
-              <tr key={unidad?.idunidad}>
-                <td>{unidad?.unidad}</td>
-                <td>{unidad?.identificador}</td>
-                <td>{unidad?.direccionunidad?.numero}</td>
-                <td>{unidad?.telefono}</td>
-                <td>{unidad?.email}</td>
-                <td>
+              <Tr key={unidad?.idunidad}>
+                <Td>{unidad?.unidad}</Td>
+                <Td>{unidad?.identificador}</Td>
+                <Td>{unidad?.direccionunidad?.numero}</Td>
+                <Td>{unidad?.telefono}</Td>
+                <Td>{unidad?.email}</Td>
+                <Td>
                   <button
                     className="btn text-primary"
                     data-bs-toggle="modal"
@@ -74,21 +75,21 @@ const TablaUnidades = ({
                     className="btn btn-success btn-sm">
                     Usuarios
                   </Link>
-                </td>
-              </tr>
+                </Td>
+              </Tr>
             ))
           ) : (
-            <tr>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td></td>
-            </tr>
+            <Tr>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td></Td>
+            </Tr>
           )}
-        </tbody>
-      </table>
+        </Tbody>
+      </Table>
       <div className="mt-3">
         <Paginacion totalPages={totalPaginas} onCambioPagina={cambiarPaginaActual} tamano="md" />
       </div>
