@@ -1,22 +1,17 @@
+import { Empleador } from '@/modelos/empleador';
+import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
-import { parseCookies } from 'nookies';
+import { runFetchAbortable } from '@/servicios/fetch';
 
-export const buscarEmpleadores = async (razon = '') => {
-  const cookie = parseCookies();
-  const token = cookie.token;
-
-  const data = await fetch(`${apiUrl()}/empleador/razonsocial`, {
+export const buscarEmpleadores = (razon = '') => {
+  return runFetchAbortable<Empleador[]>(`${apiUrl()}/empleador/razonsocial`, {
     method: 'POST',
     headers: {
-      Authorization: token,
+      Authorization: obtenerToken(),
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      razonsocial: razon,
+      razonsocial: razon ?? '',
     }),
   });
-
-  const resp = await data.json();
-
-  return resp;
 };

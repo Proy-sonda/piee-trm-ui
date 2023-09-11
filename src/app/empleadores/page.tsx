@@ -1,8 +1,13 @@
 'use client';
 
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
 import { LoginComponent } from '@/components/login/login-component';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Position from '@/components/stage/position';
 import { EmpleadorContext } from '@/contexts/empleador-context';
+import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
 import { estaLogueado } from '@/servicios/auth';
 import { useContext, useEffect, useState } from 'react';
@@ -10,29 +15,36 @@ import Swal from 'sweetalert2';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
 import { buscarEmpleadores } from './(servicios)/buscar-empleadores';
-import { Desadscribir } from './(servicios)/desadscribir-empleador';
+import { desadscribirEmpleador } from './(servicios)/desadscribir-empleador';
 
 const EmpleadoresPage = () => {
-  const [empleadores, setEmpleadores] = useState<Empleador[]>([]);
   const { cargaEmpleador } = useContext(EmpleadorContext);
+
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+
+  const [refresh, refrescarPagina] = useRefrescarPagina();
+
+  const [errorCargaEmpleador, [empleadores2], cargandoEmpleador] = useMergeFetchArray(
+    [buscarEmpleadores()],
+    [refresh],
+  );
 
   const [rut, setRut] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
 
   useEffect(() => {
-    const loadEmpleador = async () => {
-      let respuesta = await buscarEmpleadores('');
-      setEmpleadores(respuesta);
-      cargaEmpleador(respuesta);
-    };
-    loadEmpleador();
-  }, []);
+    if (!empleadores2) {
+      return;
+    }
 
-  const desadscribirEmpleador = (empleador: Empleador) => {
+    cargaEmpleador(empleadores2 as any[]);
+  }, [empleadores2]);
+
+  const desadscribirEntidadEmpleadora = async (empleador: Empleador) => {
     const empresa = empleador.razonsocial;
     const rut = empleador.rutempleador;
 
-    Swal.fire({
+    const { isConfirmed } = await Swal.fire({
       title: 'Desadscribir',
       html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
       showCancelButton: true,
@@ -41,53 +53,57 @@ const EmpleadoresPage = () => {
       cancelButtonText: 'Cancelar',
       confirmButtonText: 'Aceptar',
       confirmButtonColor: 'var(--color-blue)',
-    }).then(async (result: any) => {
-      if (result.isConfirmed) {
-        let resp: Response = await Desadscribir(rut);
-        if (resp.ok) {
-          Swal.fire({
-            icon: 'success',
-            html: `Entidad empleadora: ${empresa} fue eliminada con éxito`,
-            timer: 3000,
-            showConfirmButton: false,
-          });
-          const CargaEmpleador = async () => {
-            let respuesta = await buscarEmpleadores('');
-            setEmpleadores(respuesta);
-          };
-          CargaEmpleador();
-        } else {
-          Swal.fire({ icon: 'error', html: 'Hubo un problema en la operación' });
-        }
-      }
     });
-  };
 
-  const onEntidadEmpleadoraCreada = () => {
-    const CargaEmpleador = async () => {
-      let respuesta = await buscarEmpleadores('');
-      setEmpleadores(respuesta);
-      cargaEmpleador(respuesta);
-    };
-    CargaEmpleador();
-  };
-
-  const onBuscarEntidadEmpleadora = async () => {
-    if (razonSocial.trim() === '' && rut.trim() === '') {
-      let respuesta = await buscarEmpleadores('');
-      setEmpleadores(respuesta);
-      cargaEmpleador(respuesta);
+    if (!isConfirmed) {
       return;
     }
 
-    const empleadoresFiltrados = empleadores.filter((empleador) => {
-      return (
-        empleador.razonsocial.toUpperCase().includes(razonSocial.trim().toUpperCase()) &&
-        empleador.rutempleador.includes(rut.trim())
-      );
-    });
+    try {
+      setMostrarSpinner(true);
 
-    setEmpleadores(empleadoresFiltrados);
+      await desadscribirEmpleador(rut);
+
+      refrescarPagina();
+
+      Swal.fire({
+        icon: 'success',
+        html: `Entidad empleadora: ${empresa} fue eliminada con éxito`,
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Hubo un problema al desadscribir al empleador',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
+  };
+
+  const onEntidadEmpleadoraCreada = () => {
+    refrescarPagina();
+  };
+
+  const onBuscarEntidadEmpleadora = async () => {
+    // if (razonSocial.trim() === '' && rut.trim() === '') {
+    //   let respuesta = await buscarEmpleadores('');
+    //   setEmpleadores(respuesta);
+    //   cargaEmpleador(respuesta);
+    //   return;
+    // }
+    // const empleadoresFiltrados = empleadores.filter((empleador) => {
+    //   return (
+    //     empleador.razonsocial.toUpperCase().includes(razonSocial.trim().toUpperCase()) &&
+    //     empleador.rutempleador.includes(rut.trim())
+    //   );
+    // });
+    // setEmpleadores(empleadoresFiltrados);
   };
 
   if (!estaLogueado()) {
@@ -145,11 +161,27 @@ const EmpleadoresPage = () => {
           </div>
 
           <div className="row mt-4">
-            <div className="col-md-10 col-xl-8">
-              <TablaEntidadesEmpleadoras
-                empleadores={empleadores}
-                onDesadscribirEmpleador={(e) => desadscribirEmpleador(e)}
-              />
+            <div className="col-md-12 col-xl-12">
+              <IfContainer show={mostrarSpinner}>
+                <SpinnerPantallaCompleta></SpinnerPantallaCompleta>
+              </IfContainer>
+
+              <IfContainer show={cargandoEmpleador}>
+                <div className="mt-4">
+                  <LoadingSpinner titulo="Cargando empleadores"></LoadingSpinner>
+                </div>
+              </IfContainer>
+
+              <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length > 0}>
+                <h4 className="my-5 text-center">Error al cargar empleadores</h4>
+              </IfContainer>
+
+              <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length === 0}>
+                <TablaEntidadesEmpleadoras
+                  empleadores={empleadores2 ?? []}
+                  onDesadscribirEmpleador={desadscribirEntidadEmpleadora}
+                />
+              </IfContainer>
             </div>
           </div>
           <br />
