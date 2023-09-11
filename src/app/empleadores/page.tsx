@@ -120,7 +120,7 @@ const EmpleadoresPage = () => {
     <div className="bgads">
       <Position position={4} />
       <div>
-        <div className="ms-5 me-5">
+        <div className="mx-3 mx-lg-5">
           <div style={{ marginTop: '-20px' }}>
             <Titulo url="">
               <h5>Listado de entidades empleadoras</h5>
