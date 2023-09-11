@@ -769,8 +769,12 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     Actualizar Datos
                   </button>{' '}
                   &nbsp;
-                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                    Cancelar
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    data-bs-dismiss="modal"
+                    onClick={() => router.push('/empleadores')}>
+                    Volver
                   </button>
                 </div>
               </div>
