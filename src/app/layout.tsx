@@ -8,9 +8,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Head from 'next/head';
 import Link from 'next/link';
 import './globals.css';
-import svg from './logo-fonasa.svg';
-
 import styles from './layout.module.css';
+import svg from './logo-fonasa.svg';
 
 export default function RootLayout(
   {

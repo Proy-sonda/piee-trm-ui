@@ -13,7 +13,6 @@ import jwt_decode from 'jwt-decode';
 import { parseCookies } from 'nookies';
 import { useContext, useEffect, useState } from 'react';
 import { Table, Tbody, Th, Thead, Tr } from 'react-super-responsive-table';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import styles from './tramitacion.module.css';
 
 const TramitacionPage = () => {
