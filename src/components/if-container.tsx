@@ -1,7 +1,8 @@
 import React, { ReactNode } from 'react';
 
 interface IfContainerProps {
-  show: boolean;
+  /** Verifica por valores Falsy/Truthy, no por boolean */
+  show: any;
   children: ReactNode | (() => ReactNode);
 }
 
