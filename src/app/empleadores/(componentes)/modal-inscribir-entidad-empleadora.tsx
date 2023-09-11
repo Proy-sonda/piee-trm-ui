@@ -162,7 +162,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
               </IfContainer>
 
               <IfContainer show={erroresCargarCombos.length === 0}>
-                <div className="modal-body">
+                <div className="modal-body mx-lg-4 mb-lg-4">
                   <div className="row">
                     <div className="col-12 d-flex justify-content-end">
                       <div style={{ color: 'blueviolet' }}>
@@ -173,7 +173,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                     </div>
                   </div>
 
-                  <div className="row mt-3 g-3 align-items-baseline">
+                  <div className="row mt-2 mt-lg-0 g-3 align-items-baseline">
                     <div className="col-12 col-lg-4 position-relative">
                       <label htmlFor="rutEntidadEmpleadora" className="form-label">
                         <span>RUT Entidad Empleadora /</span>
