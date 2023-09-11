@@ -7,6 +7,7 @@ import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
+import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
 import { Trabajador, Trabajadores, UnidadEmpleador } from './(modelos)/';
@@ -299,19 +300,19 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
             <h5>Trabajadores</h5>
             <br />
             <div className="col-md-6">
-              <table className="table table-striped">
-                <thead className="align-middle text-center">
-                  <tr>
-                    <th>Run</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="align-middle text-center">
+              <Table className="table table-striped">
+                <Thead className="align-middle text-center">
+                  <Tr>
+                    <Th>Run</Th>
+                    <Th>Acciones</Th>
+                  </Tr>
+                </Thead>
+                <Tbody className="align-middle text-center">
                   {trabajadores.length > 0 ? (
                     trabajadores.map(({ ruttrabajador, idtrabajador }) => (
-                      <tr key={ruttrabajador}>
-                        <td>{ruttrabajador}</td>
-                        <td>
+                      <Tr key={ruttrabajador}>
+                        <Td>{ruttrabajador}</Td>
+                        <Td>
                           <button
                             className="btn btn-sm btn-primary"
                             onClick={() =>
@@ -329,17 +330,17 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                               title={`eliminar ${ruttrabajador}`}
                               className={'bi bi-trash btn-danger'}></i>
                           </button>
-                        </td>
-                      </tr>
+                        </Td>
+                      </Tr>
                     ))
                   ) : (
-                    <tr>
-                      <td>-</td>
-                      <td>-</td>
-                    </tr>
+                    <Tr>
+                      <Td>-</Td>
+                      <Td>-</Td>
+                    </Tr>
                   )}
-                </tbody>
-              </table>
+                </Tbody>
+              </Table>
             </div>
           </div>
           <div

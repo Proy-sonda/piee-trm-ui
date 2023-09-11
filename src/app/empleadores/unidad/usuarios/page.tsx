@@ -52,7 +52,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
       ...formIni,
       idempleador: usuarios?.empleador.idempleador,
     });
-  }, [datosPagina]);
+  }, [usuarios]);
 
   useEffect(() => {
     let state = window.history.state;
