@@ -12,6 +12,8 @@ import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
 import jwt_decode from 'jwt-decode';
 import { parseCookies } from 'nookies';
 import { useContext, useEffect, useState } from 'react';
+import { Table, Tbody, Th, Thead, Tr } from 'react-super-responsive-table';
+import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import styles from './tramitacion.module.css';
 
 const TramitacionPage = () => {
@@ -230,21 +232,21 @@ const TramitacionPage = () => {
 
         <div className="row mt-3">
           <div className="col-md-12">
-            <table className="table table-hover table-striped">
-              <thead>
-                <tr className={`text-center ${styles['text-tr']}`}>
-                  <th>FOLIO</th>
-                  <th>ESTADO</th>
-                  <th>ENTIDAD EMPLEADORA</th>
-                  <th>PERSONA TRABAJADORA</th>
-                  <th>DESCRIPCIÓN</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr></tr>
-              </tbody>
-            </table>
+            <Table className="table table-hover table-striped">
+              <Thead>
+                <Tr className={`text-center ${styles['text-tr']}`}>
+                  <Th>FOLIO</Th>
+                  <Th>ESTADO</Th>
+                  <Th>ENTIDAD EMPLEADORA</Th>
+                  <Th>PERSONA TRABAJADORA</Th>
+                  <Th>DESCRIPCIÓN</Th>
+                  <Th></Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr></Tr>
+              </Tbody>
+            </Table>
           </div>
         </div>
       </div>

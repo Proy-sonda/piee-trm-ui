@@ -7,9 +7,10 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Head from 'next/head';
 import Link from 'next/link';
-import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import './globals.css';
 import svg from './logo-fonasa.svg';
+
+import styles from './layout.module.css';
 
 export default function RootLayout(
   {
@@ -36,20 +37,51 @@ export default function RootLayout(
                 <div id="root" className="d-flex flex-column h-100">
                   <header className="sticky-top">
                     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                      <div className="container d-none d-sm-block">
-                        <Link className="navbar-brand" href="/">
-                          <img src={svg.src} alt="Fonasa" className="logo-fonasa img-fluid" />
-                          &nbsp;
-                          <span className="spanheader">
-                            <p>Portal Integrado para Entidades Empleadoras (PIEE) de a</p>
+                      <div className="container">
+                        <div className="d-flex">
+                          <Link className="navbar-brand" href="/">
+                            <img
+                              src={svg.src}
+                              alt="Fonasa"
+                              className="logo-fonasa img-fluid d-none d-md-inline-block"
+                            />
+                          </Link>
+
+                          <span className="spanheader d-none d-md-inline-block">
+                            <p>Portal Integrado para Entidades Empleadoras (PIEE) de </p>
                             <p className="text-center">Tramitación de Licencias Médicas</p>
                           </span>
-                        </Link>
+
+                          <div className="d-block d-md-none">
+                            <span className={`text-center`}>
+                              <img
+                                src={svg.src}
+                                alt="Fonasa"
+                                className="logo-fonasa img-fluid"
+                                style={{
+                                  width: '60px',
+                                  position: 'absolute',
+                                  left: '2%',
+                                }}
+                              />
+                            </span>
+                            <p className={`spanheader text-center ${styles['title-layout']}`}>
+                              Portal Tramitación
+                            </p>
+                          </div>
+
+                          <div
+                            className="d-none d-md-block"
+                            style={{
+                              position: 'absolute',
+                              right: '0%',
+                            }}>
+                            <Usuario />
+                          </div>
+                        </div>
                       </div>
 
                       {/* <SessionTimer /> */}
-
-                      <Usuario />
                     </nav>
                   </header>
                 </div>
