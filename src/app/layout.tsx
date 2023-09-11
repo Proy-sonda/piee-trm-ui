@@ -10,7 +10,6 @@ import Link from 'next/link';
 import './globals.css';
 import styles from './layout.module.css';
 import svg from './logo-fonasa.svg';
-
 export default function RootLayout(
   {
     children,
