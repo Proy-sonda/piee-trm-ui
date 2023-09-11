@@ -5,6 +5,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { LoginComponent } from '@/components/login/login-component';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Position from '@/components/stage/position';
+import Titulo from '@/components/titulo/titulo';
 import { EmpleadorContext } from '@/contexts/empleador-context';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
@@ -24,7 +25,7 @@ const EmpleadoresPage = () => {
 
   const [refresh, refrescarPagina] = useRefrescarPagina();
 
-  const [errorCargaEmpleador, [empleadores2], cargandoEmpleador] = useMergeFetchArray(
+  const [errorCargaEmpleador, [empleadores], cargandoEmpleador] = useMergeFetchArray(
     [buscarEmpleadores()],
     [refresh],
   );
@@ -35,13 +36,13 @@ const EmpleadoresPage = () => {
   const [razonSocial, setRazonSocial] = useState('');
 
   useEffect(() => {
-    if (!empleadores2) {
+    if (!empleadores) {
       return;
     }
 
     filtrarEmpleadores();
-    cargaEmpleador(empleadores2 as any[]);
-  }, [empleadores2]);
+    cargaEmpleador(empleadores as any);
+  }, [empleadores]);
 
   const desadscribirEntidadEmpleadora = async (empleador: Empleador) => {
     const empresa = empleador.razonsocial;
@@ -94,7 +95,7 @@ const EmpleadoresPage = () => {
   };
 
   const filtrarEmpleadores = () => {
-    const porFiltrar = empleadores2 ?? [];
+    const porFiltrar = empleadores ?? [];
 
     if (razonSocial.trim() === '' && rut.trim() === '') {
       setEmpleadoresFiltrados(porFiltrar);
@@ -120,12 +121,10 @@ const EmpleadoresPage = () => {
       <Position position={4} />
       <div>
         <div className="ms-5 me-5">
-          <div className="d-flex align-items-center justify-content-between">
-            <h5>Listado de entidades empleadoras</h5>
-            <div className="float-end" style={{ cursor: 'pointer', color: 'blue' }}>
-              Manual
-              {/* TODO: REVISAR */}
-            </div>
+          <div style={{ marginTop: '-20px' }}>
+            <Titulo url="">
+              <h5>Listado de entidades empleadoras</h5>
+            </Titulo>
           </div>
 
           <div className="row mt-3">
