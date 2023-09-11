@@ -31,13 +31,25 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     rut: string,
     email: string,
   ) => {
+    const resp = await Swal.fire({
+      title: 'Recuperar clave',
+      html: `¿Desea reenviar clave al correo ${email}?`,
+      showDenyButton: true,
+      showCancelButton: false,
+      confirmButtonText: 'Si',
+      confirmButtonColor: 'var(--color-blue)',
+      denyButtonText: `No`,
+    });
+
+    if (resp.isDenied || resp.isDismissed) return;
+
     e.preventDefault();
     try {
       await recuperarContrasena(rut);
       Swal.fire({
         html: `<p>Clave recuperada</p> se ha enviado al correo ${email}`,
         icon: 'success',
-        timer: 2000,
+        timer: 4000,
         showConfirmButton: false,
       });
     } catch (error: any) {
