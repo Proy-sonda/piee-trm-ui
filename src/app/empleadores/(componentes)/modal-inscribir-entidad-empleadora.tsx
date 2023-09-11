@@ -35,6 +35,25 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
     tamanosEmpresas: buscarTamanosEmpresa(),
   });
 
+  const valoresPorDefecto = {
+    rut: '',
+    razonSocial: '',
+    tipoEntidadEmpleadoraId: -1,
+    cajaCompensacionId: -1,
+    actividadLaboralId: -1,
+    regionId: '',
+    comunaId: '',
+    calle: '',
+    numero: '',
+    departamento: '',
+    telefono1: '',
+    telefono2: '',
+    email: '',
+    emailConfirma: '',
+    tamanoEmpresaId: -1,
+    sistemaRemuneracionId: -1,
+  };
+
   const {
     register,
     handleSubmit,
@@ -44,33 +63,30 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
     formState: { errors },
   } = useForm<FormularioInscribirEntidadEmpleadora>({
     mode: 'onBlur',
-    values: {
-      rut: '',
-      razonSocial: '',
-      tipoEntidadEmpleadoraId: -1,
-      cajaCompensacionId: -1,
-      actividadLaboralId: -1,
-      regionId: '',
-      comunaId: '',
-      calle: '',
-      numero: '',
-      departamento: '',
-      telefono1: '',
-      telefono2: '',
-      email: '',
-      emailConfirma: '',
-      tamanoEmpresaId: -1,
-      sistemaRemuneracionId: -1,
-    },
+    values: valoresPorDefecto,
   });
 
   const regionSeleccionada = watch('regionId');
+
+  const onCerrarModal = () => {
+    resetearFormulario();
+  };
+
+  const resetearFormulario = () => {
+    const campos = Object.keys(valoresPorDefecto) as [keyof FormularioInscribirEntidadEmpleadora];
+
+    for (const campo of campos) {
+      setValue(campo, valoresPorDefecto[campo]);
+    }
+  };
 
   const crearNuevaEntidad: SubmitHandler<FormularioInscribirEntidadEmpleadora> = async (data) => {
     try {
       setMostrarSpinner(true);
 
-      inscribirEmpleador(data);
+      await inscribirEmpleador(data);
+
+      resetearFormulario();
 
       Swal.fire({
         icon: 'success',
@@ -141,7 +157,9 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
         id="Addsempresa"
         tabIndex={-1}
         aria-labelledby="AddsempresaLabel"
-        aria-hidden="true">
+        aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div className="modal-dialog modal-xl">
           <div className="modal-content">
             <div className="modal-header">
@@ -151,6 +169,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
               <button
                 type="button"
                 className="btn-close"
+                onClick={onCerrarModal}
                 data-bs-dismiss="modal"
                 aria-label="Close"></button>
             </div>
@@ -712,6 +731,13 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                 </div>
 
                 <div className="modal-footer">
+                  <button
+                    type="button"
+                    className="btn btn-danger"
+                    data-bs-dismiss="modal"
+                    onClick={onCerrarModal}>
+                    Cancelar
+                  </button>
                   <button type="submit" className="btn btn-primary">
                     Confirmar Adscripción
                   </button>
