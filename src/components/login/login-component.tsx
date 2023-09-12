@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { setCookie } from 'nookies';
 import { useContext, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
+import { validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import styles from './login.module.css';
 
@@ -204,6 +205,17 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
         icon: 'error',
         timer: 2000,
         showConfirmButton: false,
+      });
+    }
+
+    if (!validateRut(rutrecu)) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'El RUT ingresado no es válido',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: 'var(--color-blue)',
       });
     }
 
