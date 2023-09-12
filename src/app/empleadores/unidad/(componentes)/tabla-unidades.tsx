@@ -19,11 +19,7 @@ const TablaUnidades = ({
   onEditarUnidad,
   onEliminarUnidad,
 }: TablaUnidadesProps) => {
-  const {
-    datosPaginados: unidadesPaginadas,
-    totalPaginas,
-    cambiarPaginaActual,
-  } = usePaginacion({
+  const [unidadesPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: unidades,
     tamanoPagina: 10,
   });
@@ -91,7 +87,12 @@ const TablaUnidades = ({
         </Tbody>
       </Table>
       <div className="mt-3">
-        <Paginacion totalPages={totalPaginas} onCambioPagina={cambiarPaginaActual} tamano="md" />
+        <Paginacion
+          paginaActual={paginaActual}
+          numeroDePaginas={totalPaginas}
+          onCambioPagina={cambiarPagina}
+          tamano="md"
+        />
       </div>
     </>
   );

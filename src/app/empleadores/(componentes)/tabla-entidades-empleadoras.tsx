@@ -13,11 +13,7 @@ export default function TablaEntidadesEmpleadoras({
   empleadores,
   onDesadscribirEmpleador,
 }: TablaEntidadesEmpleadorasProps) {
-  const {
-    datosPaginados: empleadoresPaginados,
-    totalPaginas,
-    cambiarPaginaActual,
-  } = usePaginacion({
+  const [empleadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: empleadores,
     tamanoPagina: 5,
   });
@@ -66,7 +62,12 @@ export default function TablaEntidadesEmpleadoras({
         </Tbody>
       </Table>
       <div className="mt-3">
-        <Paginacion totalPages={totalPaginas} onCambioPagina={cambiarPaginaActual} tamano="sm" />
+        <Paginacion
+          numeroDePaginas={totalPaginas}
+          onCambioPagina={cambiarPagina}
+          tamano="sm"
+          paginaActual={paginaActual}
+        />
       </div>
     </>
   );
