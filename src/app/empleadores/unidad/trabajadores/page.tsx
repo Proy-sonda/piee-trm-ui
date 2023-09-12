@@ -350,7 +350,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
             }}>
             <div className="col-md-6"></div>
             <div className="col-md-6 text-end">
-              <button className="btn btn-success" onClick={() => window.history.go(-3)}>
+              <button className="btn btn-danger" onClick={() => window.history.go(-2)}>
                 Volver
               </button>
             </div>
