@@ -6,7 +6,6 @@ import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import { Unidadrhh } from '@/modelos/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
@@ -20,7 +19,6 @@ import { UpdateUnidad } from './(modelos)/datos-actualizar-unidad';
 import { CrearUnidad } from './(modelos)/datos-nueva-unidad';
 import { actualizarUnidad } from './(servicios)/actualizar-unidad';
 import { crearUnidad } from './(servicios)/crear-unidad';
-import { eliminarUnidad } from './(servicios)/eliminar-unidad';
 
 interface UnidadRRHHPageProps {
   searchParams: {
@@ -47,29 +45,6 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
   useEffect(() => {
     window.history.pushState(null, '', '/empleadores/unidad');
   }, []);
-
-  const handleDelete = (unidadEliminar: Unidadrhh) => {
-    const { idunidad, unidad } = unidadEliminar;
-
-    Swal.fire({
-      icon: 'warning',
-      html: `¿Desea eliminar la unidad: ${unidad}?`,
-      showDenyButton: true,
-      confirmButtonText: 'Si',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const resp = await eliminarUnidad(idunidad);
-
-        if (resp.ok) {
-          refrescarPagina();
-
-          return Swal.fire('Operación realizada con éxito', '', 'success');
-        }
-
-        return Swal.fire('Existe un problema, favor contactar administrador', '', 'error');
-      }
-    });
-  };
 
   const crearNuevaUnidad = (nuevaUnidad: CrearUnidad) => {
     const EnviaSolicitud = async () => {
@@ -154,7 +129,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
                 unidades={unidades ?? []}
                 razon={razon}
                 onEditarUnidad={({ idunidad }) => setIdunidad(idunidad.toString())}
-                onEliminarUnidad={(unidad) => handleDelete(unidad)}
+                onUnidadEliminada={() => refrescarPagina()}
               />
             </IfContainer>
           </div>
