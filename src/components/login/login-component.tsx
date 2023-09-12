@@ -1,12 +1,9 @@
 'use client';
-
 import { AuthContext } from '@/contexts/auth-context';
-import { UsuarioLogin } from '@/contexts/modelos/types';
+import { UsuarioLogin } from '@/contexts/interfaces/types';
 import { useForm } from '@/hooks/use-form';
 import { apiUrl } from '@/servicios/environment';
-import jwt_decode from 'jwt-decode';
 import { useRouter } from 'next/navigation';
-import { setCookie } from 'nookies';
 import { useContext, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import Swal from 'sweetalert2';
@@ -24,20 +21,19 @@ type changePass = {
 };
 
 export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' }) => {
-  const router = useRouter();
-
   const [show, setShow] = useState('');
   const [display, setDisplay] = useState('none');
   const [showModalRecu, setShowModalRecu] = useState(false);
   const [showModalRecu2, setshowModalRecu2] = useState(false);
 
-  const { CompletarUsuario } = useContext(AuthContext);
+  const router = useRouter();
 
   const handleShowModalRecu = () => {
     setShowModalRecu(true);
   };
   const handleCloseModalRecu = () => {
     setShowModalRecu(false);
+    onResetForm();
   };
   const handleCloseModalRecu2 = () => {
     setshowModalRecu2(false);
@@ -57,6 +53,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
     rutrecu,
     onInputChange,
     onInputValidRut,
+    onResetForm,
   } = useForm({
     claveanterior: '',
     clavenuevauno: '',
@@ -102,17 +99,12 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
 
     if (respuesta.resp.statusCode == 200) {
       if (respuesta.resp.message.includes('Bearer')) {
-        setCookie(null, 'token', respuesta.resp.message, { maxAge: 3600, path: '/' });
-
-        let data: any = jwt_decode(respuesta.resp.message);
-        CompletarUsuario(data);
-
         return Swal.fire({
           html: 'Sesión iniciada correctamente',
           icon: 'success',
           timer: 2000,
           showConfirmButton: false,
-          willClose: () => router.push('/tramitacion'),
+          didClose: () => router.push('/tramitacion'),
         });
       }
     }
@@ -127,9 +119,28 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
   };
 
   const ChangeTemporal = async () => {
-    if (!claveanterior) return Swal.fire('Error', 'Debe ingresar clave transitoria', 'error');
-    if (clavenuevauno != clavenuevados)
-      return Swal.fire('Error', 'Las contraseñas deben coincidir', 'error');
+    if (!claveanterior) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Debe ingresar clave transitoria',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+
+    if (clavenuevauno != clavenuevados) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Las contraseñas deben coincidir',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+
     let PostVal: changePass = {
       rutusuario: rutusuario,
       claveanterior: claveanterior,
@@ -145,7 +156,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
       body: JSON.stringify(PostVal),
     });
 
-    if (resp.ok)
+    if (resp.ok) {
       return Swal.fire({
         html: 'Contraseña actualizada correctamente, vuelva a iniciar sesión',
         icon: 'success',
@@ -153,20 +164,45 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
         showConfirmButton: false,
         willClose: () => {
           OncloseModal();
+          onResetForm();
         },
       });
+    }
+
+    const body = await resp.json();
+    if (body.message === 'Login/Password invalida') {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'La clave temporal es inválida',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+
+    return Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Hubo un error al actualizar la contraseña',
+      showConfirmButton: true,
+      confirmButtonText: 'OK',
+      confirmButtonColor: 'var(--color-blue)',
+    });
   };
 
   const validaRut = async () => {
-    if (rutrecu == '')
+    if (rutrecu == '') {
       return Swal.fire({
         html: 'El campo RUT no puede estar vació',
         icon: 'error',
         timer: 2000,
         showConfirmButton: false,
       });
+    }
 
     handleCloseModalRecu();
+
     const data = await fetch(`${apiUrl()}/auth/recover`, {
       method: 'POST',
       headers: {
@@ -176,7 +212,11 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
         rutusuario: rutrecu,
       }),
     });
-    if (data.ok) return handleShowModalRecu2();
+
+    if (data.ok) {
+      OncloseModal();
+      return handleShowModalRecu2();
+    }
 
     const resp = await data.json();
     if (resp.statusCode == 401)
@@ -191,6 +231,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
   const OncloseModal = () => {
     setShow('');
     setDisplay('none');
+    onResetForm();
   };
 
   return (
@@ -222,7 +263,6 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
               <br />
               <label htmlFor="transitoria">Contraseña transitoria</label>
               <input
-                id="transitoria"
                 name="claveanterior"
                 value={claveanterior}
                 onChange={onInputChange}
@@ -235,7 +275,6 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
                 name="clavenuevauno"
                 value={clavenuevauno}
                 onChange={onInputChange}
-                id="claveuno"
                 type="password"
                 className="form-control"
               />
@@ -245,7 +284,6 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
                 name="clavenuevados"
                 value={clavenuevados}
                 onChange={onInputChange}
-                id="claveuno"
                 type="password"
                 className="form-control"
               />
@@ -263,15 +301,9 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
       </div>
 
       <form onSubmit={handleSubmit} className={styles.formlogin}>
-        <label
-          style={{
-            textAlign: 'justify',
-            textJustify: 'inter-word',
-            fontSize: '15px',
-          }}>
-          Ingresa tus credenciales de acceso al Portal Único Empleadores
-        </label>
+        <label>Ingresa tus credenciales de acceso al Portal Único Empleadores</label>
         <br />
+
         <div className="mb-3 mt-3">
           <label htmlFor="username">RUN Persona Usuaria:</label>
           <input
@@ -280,7 +312,8 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
             className="form-control"
             value={rutusuario}
             onChange={onInputValidRut}
-            maxLength={11}
+            minLength={9}
+            maxLength={10}
             required
           />
         </div>
@@ -318,10 +351,9 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
           <Modal.Title>Recuperar Clave de acceso</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <p>Escriba su rut para solicitar una nueva clave de acceso</p>
+          <p>Escriba su RUT para solicitar una nueva clave de acceso</p>
           <div className="row">
             <div className="col-md-12">
-              <label>Por favor ingresa tu RUT</label>
               <input
                 type="text"
                 className="form-control"
@@ -352,14 +384,14 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
           <Modal.Title>Recuperar Clave de acceso</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div
-            className="row text-center"
-            style={{
-              textAlign: 'justify',
-            }}>
+          <div className="row text-center" style={{ textAlign: 'justify' }}>
             <p>¡Felicitaciones!</p>
-            <p>Hemos creado tu clave para acceder al Nuevo Portal</p>
-            <p>Esta clave tiene una vigencia de 48 horas</p>
+            <p>
+              Hemos creado y enviado a su correo una nueva clave temporal para acceder al Portal de
+              Tramitación.
+            </p>
+            {/* Descomentar cuando se implemente la vigencia de la clave temporal */}
+            {/* <p>Esta clave tiene una vigencia de 48 horas</p> */}
           </div>
         </Modal.Body>
         <Modal.Footer>

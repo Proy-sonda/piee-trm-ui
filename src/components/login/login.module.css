@@ -6,12 +6,23 @@
   color: black;
   font-weight: bold;
   border-radius: 2%;
-  width: 450px;
+  margin-right: 2%;
+  margin-left: 2%;
   padding: 2%;
+  width: auto;
+  text-align: 'justify';
+  text-justify: 'inter-word';
+  font-size: '15px';
 }
 
 .btnlogin {
   text-align: justify;
   text-justify: inter-word;
   margin-top: 20%;
+}
+
+@media only screen and (min-width: 950px) {
+  .formlogin {
+    width: 450px;
+  }
 }
