@@ -1,20 +1,16 @@
+import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
-import { parseCookies } from 'nookies';
+import { runFetchConThrow } from '@/servicios/fetch';
 
-export const Desadscribir = async (rut: string) => {
-  const cookie = parseCookies();
-  const token = cookie.token;
-
-  let data: Response;
-  data = await fetch(`${apiUrl()}/empleador/desuscribir`, {
+export const desadscribirEmpleador = async (rut: string) => {
+  return runFetchConThrow<void>(`${apiUrl()}/empleador/desuscribir`, {
     method: 'POST',
     headers: {
-      Authorization: token,
+      Authorization: obtenerToken(),
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
       rutempleador: rut,
     }),
   });
-  return data;
 };

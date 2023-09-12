@@ -1,41 +1,52 @@
 'use client';
 
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
 import { LoginComponent } from '@/components/login/login-component';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Position from '@/components/stage/position';
+import Titulo from '@/components/titulo/titulo';
 import { EmpleadorContext } from '@/contexts/empleador-context';
+import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
 import { estaLogueado } from '@/servicios/auth';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
+import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
-import { DatosInscribirEmpleador } from './(modelos)/datos-inscribir-empleador';
-import { DatosNuevaEntidadEmpleadora } from './(modelos)/nueva-entidad-empleadora';
 import { buscarEmpleadores } from './(servicios)/buscar-empleadores';
-import { Desadscribir } from './(servicios)/desadscribir-empleador';
-import { InscribirEmpleador } from './(servicios)/inscribir-empleador';
+import { desadscribirEmpleador } from './(servicios)/desadscribir-empleador';
 
 const EmpleadoresPage = () => {
-  const [empleadores, setEmpleadores] = useState<Empleador[]>([]);
   const { cargaEmpleador } = useContext(EmpleadorContext);
 
-  const [rut, setRut] = useState('');
-  const [razonSocial, setRazonSocial] = useState('');
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+
+  const [refresh, refrescarPagina] = useRefrescarPagina();
+
+  const [errorCargaEmpleador, [empleadores], cargandoEmpleador] = useMergeFetchArray(
+    [buscarEmpleadores()],
+    [refresh],
+  );
+
+  const [empleadoresFiltrados, setEmpleadoresFiltrados] = useState<Empleador[]>([]);
 
   useEffect(() => {
-    const loadEmpleador = async () => {
-      let respuesta = await buscarEmpleadores('');
-      setEmpleadores(respuesta);
-      cargaEmpleador(respuesta);
-    };
-    loadEmpleador();
-  }, []);
+    if (!empleadores) {
+      return;
+    }
 
-  const desadscribirEmpleador = (empleador: Empleador) => {
+    filtrarEmpleadores('', '');
+    cargaEmpleador(empleadores as any);
+  }, [empleadores]);
+
+  const desadscribirEntidadEmpleadora = async (empleador: Empleador) => {
     const empresa = empleador.razonsocial;
     const rut = empleador.rutempleador;
 
-    Swal.fire({
+    const { isConfirmed } = await Swal.fire({
       title: 'Desadscribir',
       html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
       showCancelButton: true,
@@ -44,116 +55,61 @@ const EmpleadoresPage = () => {
       cancelButtonText: 'Cancelar',
       confirmButtonText: 'Aceptar',
       confirmButtonColor: 'var(--color-blue)',
-    }).then(async (result: any) => {
-      if (result.isConfirmed) {
-        let resp: Response = await Desadscribir(rut);
-        if (resp.ok) {
-          Swal.fire({
-            icon: 'success',
-            html: `Entidad empleadora: ${empresa} fue eliminada con éxito`,
-            timer: 3000,
-            showConfirmButton: false,
-          });
-          const CargaEmpleador = async () => {
-            let respuesta = await buscarEmpleadores('');
-            setEmpleadores(respuesta);
-          };
-          CargaEmpleador();
-        } else {
-          Swal.fire({ icon: 'error', html: 'Hubo un problema en la operación' });
-        }
-      }
     });
-  };
 
-  const onCrearNuevaEntidadEmpleadora = (nuevaEntidad: DatosNuevaEntidadEmpleadora) => {
-    const nuevaEntidadEmpleadora: DatosInscribirEmpleador = {
-      rutempleador: nuevaEntidad.inscribeRun,
-      razonsocial: nuevaEntidad.razonsocial,
-      telefonohabitual: nuevaEntidad.tf1,
-      telefonomovil: nuevaEntidad.tf2,
-      email: nuevaEntidad.cemple,
-      emailconfirma: nuevaEntidad.recemple,
-      tipoempleador: {
-        idtipoempleador: Number(nuevaEntidad.templeador),
-        tipoempleador: nuevaEntidad.templeador,
-      },
-      ccaf: {
-        idccaf: Number(nuevaEntidad.ccaf),
-        nombre: nuevaEntidad.ccaf,
-      },
-      actividadlaboral: {
-        idactividadlaboral: Number(nuevaEntidad.alaboralemp),
-        actividadlaboral: nuevaEntidad.alaboralemp,
-      },
-      tamanoempresa: {
-        idtamanoempresa: Number(nuevaEntidad.npersonas),
-        descripcion: nuevaEntidad.npersonas,
-        nrotrabajadores: Number(nuevaEntidad.npersonas),
-      },
-      sistemaremuneracion: {
-        idsistemaremuneracion: Number(nuevaEntidad.sremun),
-        descripcion: nuevaEntidad.sremun,
-      },
-      direccionempleador: {
-        comuna: {
-          idcomuna: nuevaEntidad.ccomuna,
-          nombre: nuevaEntidad.ccomuna,
-        },
-        calle: nuevaEntidad.calle,
-        depto: nuevaEntidad.bdep,
-        numero: nuevaEntidad.numero,
-      },
-    };
-
-    const inscribirEntidad = async () => {
-      const resp = await InscribirEmpleador(nuevaEntidadEmpleadora);
-
-      if (resp.ok) {
-        const CargaEmpleador = async () => {
-          let respuesta = await buscarEmpleadores('');
-          setEmpleadores(respuesta);
-          cargaEmpleador(respuesta);
-        };
-        CargaEmpleador();
-        return Swal.fire({
-          html: 'Operación realizada con éxito',
-          icon: 'success',
-          showConfirmButton: false,
-          timer: 2000,
-        });
-      } else {
-        let data = await resp.json();
-        if (data.message.includes('rutempleador|ya existe'))
-          data.message = 'Rut empleador ya existe';
-        return Swal.fire({
-          html: data.message,
-          icon: 'error',
-          timer: 3000,
-          showConfirmButton: false,
-        });
-      }
-    };
-
-    inscribirEntidad();
-  };
-
-  const onBuscarEntidadEmpleadora = async () => {
-    if (razonSocial.trim() === '' && rut.trim() === '') {
-      let respuesta = await buscarEmpleadores('');
-      setEmpleadores(respuesta);
-      cargaEmpleador(respuesta);
+    if (!isConfirmed) {
       return;
     }
 
-    const empleadoresFiltrados = empleadores.filter((empleador) => {
+    try {
+      setMostrarSpinner(true);
+
+      await desadscribirEmpleador(rut);
+
+      refrescarPagina();
+
+      Swal.fire({
+        icon: 'success',
+        html: `Entidad empleadora: ${empresa} fue eliminada con éxito`,
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Hubo un problema al desadscribir al empleador',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
+  };
+
+  const onEntidadEmpleadoraCreada = () => {
+    refrescarPagina();
+  };
+
+  const filtrarEmpleadores = (rut: string, razonSocial: string) => {
+    const porFiltrar = empleadores ?? [];
+    const rutLimpio = rut.trim().toUpperCase();
+    const razonSocialLimpia = razonSocial.trim().toUpperCase();
+
+    if (rutLimpio === '' && razonSocialLimpia === '') {
+      setEmpleadoresFiltrados(porFiltrar);
+      return;
+    }
+
+    const filtrados = porFiltrar.filter((empleador) => {
       return (
-        empleador.razonsocial.toUpperCase().includes(razonSocial.trim().toUpperCase()) &&
-        empleador.rutempleador.includes(rut.trim())
+        empleador.razonsocial.toUpperCase().includes(razonSocialLimpia) &&
+        empleador.rutempleador.toUpperCase().includes(rutLimpio)
       );
     });
 
-    setEmpleadores(empleadoresFiltrados);
+    setEmpleadoresFiltrados(filtrados);
   };
 
   if (!estaLogueado()) {
@@ -164,67 +120,44 @@ const EmpleadoresPage = () => {
     <div className="bgads">
       <Position position={4} />
       <div>
-        <div className="ms-5 me-5">
-          <div className="d-flex align-items-center justify-content-between">
-            <h5>Listado de entidades empleadoras</h5>
-            <div className="float-end" style={{ cursor: 'pointer', color: 'blue' }}>
-              Manual
-              {/* TODO: REVISAR */}
-            </div>
+        <div className="mx-3 mx-lg-5">
+          <div style={{ marginTop: '-20px' }}>
+            <Titulo url="">
+              <h5>Listado de entidades empleadoras</h5>
+            </Titulo>
           </div>
 
-          <div className="row mt-3">
-            <div className="col-md-3 float-end">
-              <label>Razón Social</label>
-              <input
-                type="text"
-                className="form-control"
-                value={razonSocial}
-                onInput={(e) => setRazonSocial(e.currentTarget.value)}
-              />
-            </div>
-            <div className="col-md-3 float-end">
-              <label>RUT</label>
-              <input
-                type="text"
-                className="form-control"
-                value={rut}
-                onInput={(e) => setRut(e.currentTarget.value)}
-              />
-            </div>
-            <div className="col-md-6 float-end align-self-end">
-              <button
-                className="btn btn-primary"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onBuscarEntidadEmpleadora();
-                }}>
-                Buscar
-              </button>
-              <button
-                className="ms-2 btn btn-success"
-                data-bs-toggle="modal"
-                data-bs-target="#Addsempresa">
-                Inscribe Entidad Empleadora
-              </button>
-            </div>
-          </div>
+          <BarraBusquedaEntidadesEmpleadoras onBuscar={filtrarEmpleadores} />
 
           <div className="row mt-4">
-            <div className="col-md-10 col-xl-8">
-              <TablaEntidadesEmpleadoras
-                empleadores={empleadores}
-                onDesadscribirEmpleador={(e) => desadscribirEmpleador(e)}
-              />
+            <div className="col-md-12 col-xl-12">
+              <IfContainer show={mostrarSpinner}>
+                <SpinnerPantallaCompleta></SpinnerPantallaCompleta>
+              </IfContainer>
+
+              <IfContainer show={cargandoEmpleador}>
+                <div className="mt-4">
+                  <LoadingSpinner titulo="Cargando empleadores"></LoadingSpinner>
+                </div>
+              </IfContainer>
+
+              <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length > 0}>
+                <h4 className="my-5 text-center">Error al cargar empleadores</h4>
+              </IfContainer>
+
+              <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length === 0}>
+                <TablaEntidadesEmpleadoras
+                  empleadores={empleadoresFiltrados ?? []}
+                  onDesadscribirEmpleador={desadscribirEntidadEmpleadora}
+                />
+              </IfContainer>
             </div>
           </div>
           <br />
         </div>
       </div>
 
-      <ModalInscribirEntidadEmpleadora
-        onCrearNuevaEntidadEmpleadora={onCrearNuevaEntidadEmpleadora}
-      />
+      <ModalInscribirEntidadEmpleadora onEntidadEmpleadoraCreada={onEntidadEmpleadoraCreada} />
     </div>
   );
 };

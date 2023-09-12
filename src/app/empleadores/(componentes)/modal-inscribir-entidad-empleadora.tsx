@@ -1,8 +1,12 @@
-import { useForm } from '@/hooks/use-form';
+import IfContainer from '@/components/if-container';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { FormEvent, useState } from 'react';
-import { Comuna } from '../(modelos)/comuna';
-import { DatosNuevaEntidadEmpleadora } from '../(modelos)/nueva-entidad-empleadora';
+import React, { useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { formatRut, validateRut } from 'rutlib';
+import Swal from 'sweetalert2';
+import isEmail from 'validator/lib/isEmail';
+import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
 import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
 import { buscarComunas } from '../(servicios)/buscar-comunas';
@@ -10,15 +14,18 @@ import { buscarRegiones } from '../(servicios)/buscar-regiones';
 import { buscarSistemasDeRemuneracion } from '../(servicios)/buscar-sistemas-de-remuneracion';
 import { buscarTamanosEmpresa } from '../(servicios)/buscar-tamanos-empresa';
 import { buscarTiposDeEmpleadores } from '../(servicios)/buscar-tipo-de-empleadores';
+import { EmpleadorYaExisteError, inscribirEmpleador } from '../(servicios)/inscribir-empleador';
 
 interface ModalInscribirEntidadEmpleadoraProps {
-  onCrearNuevaEntidadEmpleadora: (nuevaEntidad: DatosNuevaEntidadEmpleadora) => void;
+  onEntidadEmpleadoraCreada: () => void;
 }
 
-const ModalInscribirEntidadEmpleadora = ({
-  onCrearNuevaEntidadEmpleadora,
-}: ModalInscribirEntidadEmpleadoraProps) => {
-  const [_, combos] = useMergeFetchObject({
+const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraProps> = ({
+  onEntidadEmpleadoraCreada,
+}) => {
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+
+  const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     tipoEmpleadores: buscarTiposDeEmpleadores(),
     comunas: buscarComunas(),
     cajasDeCompensacion: buscarCajasDeCompensacion(),
@@ -28,73 +35,96 @@ const ModalInscribirEntidadEmpleadora = ({
     tamanosEmpresas: buscarTamanosEmpresa(),
   });
 
-  const [region, setregion] = useState('');
-  const [comunas, setcomuna] = useState<Comuna[]>([]);
-
   const {
-    inscribeRun,
-    razonsocial,
-    templeador,
-    ccaf,
-    alaboralemp,
-    ccomuna,
-    sremun,
-    npersonas,
-    calle,
-    numero,
-    bdep,
-    tf1,
-    tf2,
-    onInputValidRut,
-    cemple,
-    recemple,
-    onInputChange,
-    onInputChangeOnlyNum,
-  } = useForm({
-    inscribeRun: '',
-    razonsocial: '',
-    templeador: '',
-    ccaf: '',
-    alaboralemp: '',
-    ccomuna: '',
-    npersonas: '',
-    calle: '',
-    numero: '',
-    bdep: '',
-    tf1: '',
-    tf2: '',
-    cemple: '',
-    recemple: '',
+    register,
+    handleSubmit,
+    getValues,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<FormularioInscribirEntidadEmpleadora>({
+    mode: 'onBlur',
   });
 
-  const onChangeRegion = (event: any) => {
-    setregion(event.target.value);
-    const comunas = combos!.comunas.filter(
-      ({ region: { idregion } }) => idregion == event.target.value,
-    );
-    setcomuna(comunas);
+  const regionSeleccionada = watch('regionId');
+
+  const onCerrarModal = () => {
+    resetearFormulario();
   };
 
-  const onConfirmarAdscripcionInterno = (event: FormEvent) => {
-    event.preventDefault();
+  const resetearFormulario = () => {
+    reset();
+  };
 
-    onCrearNuevaEntidadEmpleadora({
-      inscribeRun,
-      razonsocial,
-      templeador,
-      ccaf,
-      alaboralemp,
-      ccomuna,
-      sremun,
-      npersonas,
-      calle,
-      numero,
-      bdep,
-      tf1,
-      tf2,
-      cemple,
-      recemple,
-    });
+  const crearNuevaEntidad: SubmitHandler<FormularioInscribirEntidadEmpleadora> = async (data) => {
+    try {
+      setMostrarSpinner(true);
+
+      await inscribirEmpleador(data);
+
+      resetearFormulario();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'La nueva entidad empleadora fue inscrita con éxito',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+
+      onEntidadEmpleadoraCreada();
+    } catch (error) {
+      if (error instanceof EmpleadorYaExisteError) {
+        return Swal.fire({
+          icon: 'error',
+          title: 'RUT del empleador ya existe',
+          showConfirmButton: true,
+          confirmButtonColor: 'var(--color-blue)',
+          confirmButtonText: 'OK',
+        });
+      }
+
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error al inscribir empleador',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
+  };
+
+  const onChangeRunEntidadEmpleadora = (event: any) => {
+    const regex = /[^0-9kK\-\.]/g; // solo números, puntos, guiones y la letra K
+    const run = event.target.value as string;
+
+    if (regex.test(run)) {
+      const soloCaracteresValidos = run.replaceAll(regex, '');
+      setValue('rut', soloCaracteresValidos);
+    }
+  };
+
+  const validarComboObligatorio = (mensaje?: string) => {
+    return (valor: number | string) => {
+      if (typeof valor === 'number' && valor === -1) {
+        return mensaje ?? 'Este campo es obligatorio';
+      }
+
+      if (typeof valor === 'string' && valor === '') {
+        return mensaje ?? 'Este campo es obligatorio';
+      }
+    };
+  };
+
+  const trimInput = (campo: keyof FormularioInscribirEntidadEmpleadora) => {
+    const value = getValues(campo);
+
+    if (typeof value === 'string') {
+      setValue(campo, value.trim(), { shouldValidate: true });
+    }
   };
 
   return (
@@ -104,7 +134,9 @@ const ModalInscribirEntidadEmpleadora = ({
         id="Addsempresa"
         tabIndex={-1}
         aria-labelledby="AddsempresaLabel"
-        aria-hidden="true">
+        aria-hidden="true"
+        data-bs-backdrop="static"
+        data-bs-keyboard="false">
         <div className="modal-dialog modal-xl">
           <div className="modal-content">
             <div className="modal-header">
@@ -114,355 +146,544 @@ const ModalInscribirEntidadEmpleadora = ({
               <button
                 type="button"
                 className="btn-close"
+                onClick={onCerrarModal}
                 data-bs-dismiss="modal"
                 aria-label="Close"></button>
             </div>
-            <form onSubmit={onConfirmarAdscripcionInterno}>
-              <div className="modal-body">
-                <div className="ms-3 me-3">
-                  <div
-                    style={{
-                      marginLeft: '15px',
-                      marginRight: '15px',
-                    }}></div>
+            <form onSubmit={handleSubmit(crearNuevaEntidad)}>
+              <IfContainer show={mostrarSpinner || cargandoCombos}>
+                <SpinnerPantallaCompleta></SpinnerPantallaCompleta>
+              </IfContainer>
 
-                  <br />
+              <IfContainer show={erroresCargarCombos.length > 0}>
+                <div className="modal-body">
+                  <h4 className="my-5 text-center">Error al cargar combos</h4>
+                </div>
+              </IfContainer>
+
+              <IfContainer show={erroresCargarCombos.length === 0}>
+                <div className="modal-body mx-lg-4 mb-lg-4">
                   <div className="row">
-                    <div
-                      className="float-end text-end"
-                      style={{
-                        marginRight: '3%',
-                        paddingRight: '3%',
-                        color: 'blueviolet',
-                      }}>
-                      <label>(*) Son campos obligatorios.</label>
+                    <div className="col-12 d-flex justify-content-end">
+                      <div style={{ color: 'blueviolet' }}>
+                        <span>
+                          <small>(*) Son campos obligatorios.</small>
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="ms-5 me-5">
-                    <div className="row mt-2">
-                      <div className="col-md-4">
-                        <label htmlFor="exampleInputEmail1">
-                          RUN Entidad Empleadora/ Persona Trabajadora Independiente (*)
-                        </label>
-                        <input
-                          type="text"
-                          name="inscribeRun"
-                          maxLength={11}
-                          value={inscribeRun}
-                          onChange={onInputValidRut}
-                          autoComplete="new-custom-value"
-                          className="form-control"
-                          aria-describedby="rutHelp"
-                        />
-                      </div>
-                      <div className="col-md-4">
-                        <div className="form-group">
-                          <label htmlFor="exampleInputEmail1">Razón Social/ Nombre (*)</label>
-                          <input
-                            type="text"
-                            name="razonsocial"
-                            value={razonsocial}
-                            onInput={onInputChange}
-                            minLength={4}
-                            maxLength={120}
-                            autoComplete="new-custom-value"
-                            className="form-control"
-                            aria-describedby="razonHelp"
-                            placeholder=""
-                          />
+                  <div className="row mt-2 mt-lg-0 g-3 align-items-baseline">
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="rutEntidadEmpleadora" className="form-label">
+                        <span>RUT Entidad Empleadora /</span>
+                        <br />
+                        <span>Persona Trabajadora Independiente (*)</span>
+                      </label>
+                      <input
+                        id="rutEntidadEmpleadora"
+                        type="text"
+                        autoComplete="new-custom-value"
+                        className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
+                        {...register('rut', {
+                          required: {
+                            value: true,
+                            message: 'Este campo es obligatorio',
+                          },
+                          validate: {
+                            esRut: (rut) =>
+                              validateRut(rut) ? undefined : 'Debe ingresar un RUN válido',
+                          },
+                          onChange: onChangeRunEntidadEmpleadora,
+                          onBlur: (event) => {
+                            const rut = event.target.value;
+                            if (validateRut(rut)) {
+                              setValue('rut', formatRut(rut, false));
+                            }
+                          },
+                        })}
+                      />
+                      <IfContainer show={errors.rut}>
+                        <div className="invalid-tooltip">{errors.rut?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="razonSocial" className="form-label">
+                        Razón Social / Nombre (*)
+                      </label>
+                      <input
+                        id="razonSocial"
+                        type="text"
+                        autoComplete="new-custom-value"
+                        className={`form-control ${errors.razonSocial ? 'is-invalid' : ''}`}
+                        {...register('razonSocial', {
+                          required: {
+                            value: true,
+                            message: 'Este campo es obligatorio',
+                          },
+                          minLength: {
+                            value: 4,
+                            message: 'Debe tener al menos 4 caracteres',
+                          },
+                          maxLength: {
+                            value: 120,
+                            message: 'No puede tener más de 120 caracteres',
+                          },
+                          onBlur: () => trimInput('razonSocial'),
+                        })}
+                      />
+                      <IfContainer show={!!errors.razonSocial}>
+                        <div className="invalid-tooltip">{errors.razonSocial?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="tipoEntidad" className="form-label">
+                        Tipo de Entidad Empleadora (*)
+                      </label>
+                      <select
+                        id="tipoEntidad"
+                        className={`form-select ${
+                          errors.tipoEntidadEmpleadoraId ? 'is-invalid' : ''
+                        }`}
+                        {...register('tipoEntidadEmpleadoraId', {
+                          setValueAs: (v) => parseInt(v, 10),
+                          validate: validarComboObligatorio(),
+                        })}>
+                        <option value={-1}>Seleccionar</option>
+                        {combos &&
+                          combos.tipoEmpleadores.map(({ idtipoempleador, tipoempleador }) => (
+                            <option key={idtipoempleador} value={idtipoempleador}>
+                              {tipoempleador}
+                            </option>
+                          ))}
+                      </select>
+                      <IfContainer show={!!errors.tipoEntidadEmpleadoraId}>
+                        <div className="invalid-tooltip">
+                          {errors.tipoEntidadEmpleadoraId?.message}
                         </div>
-                      </div>
-                      <div className="col-md-4">
-                        <label htmlFor="templeador">Tipo de Entidad Empleadora (*)</label>
-                        <select
-                          className="form-select"
-                          id="templeador"
-                          name="templeador"
-                          value={templeador}
-                          onChange={onInputChange}
-                          required>
-                          <option value={''}>Seleccionar</option>
-                          {/* {CCTIPOEMP && CCTIPOEMP.map(({ idtipoempleador, tipoempleador }) => ( */}
-                          {combos &&
-                            combos.tipoEmpleadores.map(({ idtipoempleador, tipoempleador }) => (
-                              <option key={idtipoempleador} value={idtipoempleador}>
-                                {tipoempleador}
-                              </option>
-                            ))}
-                        </select>
-                      </div>
+                      </IfContainer>
                     </div>
 
-                    <div className="row mt-2">
-                      <div className="col-md-4">
-                        <label htmlFor="ccaf">Seleccione CCAF a la cual está afiliada (*)</label>
-                        <select
-                          className="form-select"
-                          id="ccaf"
-                          name="ccaf"
-                          value={ccaf}
-                          onChange={onInputChange}>
-                          <option value={''}>Seleccionar</option>
-                          {/* {CCAF && CCAF.map(({ idccaf, nombre }) => ( */}
-                          {combos &&
-                            combos.cajasDeCompensacion.map(({ idccaf, nombre }) => (
-                              <option key={idccaf} value={idccaf}>
-                                {nombre}
-                              </option>
-                            ))}
-                        </select>
-                      </div>
-                      <div className="col-md-4">
-                        <label htmlFor="alaboralemp">
-                          Actividad Laboral Entidad Empleadora (*)
-                        </label>
-                        <select
-                          className="form-select"
-                          id="alaboralemp"
-                          name="alaboralemp"
-                          value={alaboralemp}
-                          onChange={onInputChange}>
-                          <option value={''}>Seleccionar</option>
-                          {combos &&
-                            combos.actividadesLaborales.map(
-                              ({ idactividadlaboral, actividadlaboral }) => (
-                                <option key={idactividadlaboral} value={idactividadlaboral}>
-                                  {actividadlaboral}
-                                </option>
-                              ),
-                            )}
-                        </select>
-                      </div>
-                      <div className="col-md-4">
-                        <label htmlFor="region">Región (*)</label>
-                        <select
-                          className="form-select"
-                          id="region"
-                          name="region"
-                          value={region}
-                          onChange={onChangeRegion}
-                          required>
-                          <option value={''}>Seleccionar</option>
-                          {combos &&
-                            combos.regiones.map(({ idregion, nombre }) => (
-                              <option key={idregion} value={idregion}>
-                                {nombre}
-                              </option>
-                            ))}
-                        </select>
-                      </div>
-                    </div>
-
-                    <div className="row mt-2">
-                      <div className="col-md-4">
-                        <label htmlFor="comuna">Comuna (*)</label>
-                        <select
-                          className="form-select"
-                          name="ccomuna"
-                          value={ccomuna}
-                          onChange={onInputChange}
-                          required>
-                          <option value={''}>Seleccionar</option>
-                          {comunas.map(({ idcomuna, nombre }) => (
-                            <option key={idcomuna} value={idcomuna}>
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="cajaCompensacion" className="form-label">
+                        Seleccione CCAF a la cual está afiliada
+                      </label>
+                      <select
+                        id="cajaCompensacion"
+                        className={`form-select ${errors.cajaCompensacionId ? 'is-invalid' : ''}`}
+                        {...register('cajaCompensacionId', {
+                          setValueAs: (v) => parseInt(v, 10),
+                          validate: validarComboObligatorio(),
+                        })}>
+                        <option value={-1}>Seleccionar</option>
+                        {combos &&
+                          combos.cajasDeCompensacion.map(({ idccaf, nombre }) => (
+                            <option key={idccaf} value={idccaf}>
                               {nombre}
                             </option>
                           ))}
-                        </select>
-                      </div>
-                      <div className="col-md-4">
-                        <label htmlFor="exampleInputEmail1">Calle (*)</label>
+                      </select>
+                      <IfContainer show={!!errors.cajaCompensacionId}>
+                        <div className="invalid-tooltip">{errors.cajaCompensacionId?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="actividadLaboral" className="form-label">
+                        Actividad Laboral Entidad Empleadora (*)
+                      </label>
+                      <select
+                        id="actividadLaboral"
+                        className={`form-select ${errors.actividadLaboralId ? 'is-invalid' : ''}`}
+                        {...register('actividadLaboralId', {
+                          setValueAs: (v) => parseInt(v, 10),
+                          validate: validarComboObligatorio(),
+                        })}>
+                        <option value={-1}>Seleccionar</option>
+                        {combos &&
+                          combos.actividadesLaborales.map(
+                            ({ idactividadlaboral, actividadlaboral }) => (
+                              <option key={idactividadlaboral} value={idactividadlaboral}>
+                                {actividadlaboral}
+                              </option>
+                            ),
+                          )}
+                      </select>
+                      <IfContainer show={!!errors.actividadLaboralId}>
+                        <div className="invalid-tooltip">{errors.actividadLaboralId?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="region" className="form-label">
+                        Región
+                      </label>
+                      <select
+                        id="region"
+                        className={`form-select ${errors.regionId ? 'is-invalid' : ''}`}
+                        {...register('regionId', {
+                          validate: validarComboObligatorio(),
+                        })}>
+                        <option value={''}>Seleccionar</option>
+                        {combos &&
+                          combos.regiones.map(({ idregion, nombre }) => (
+                            <option key={idregion} value={idregion}>
+                              {nombre}
+                            </option>
+                          ))}
+                      </select>
+                      <IfContainer show={!!errors.regionId}>
+                        <div className="invalid-tooltip">{errors.regionId?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="comuna" className="form-label">
+                        Comuna (*)
+                      </label>
+                      <select
+                        id="comuna"
+                        className={`form-select ${errors.comunaId ? 'is-invalid' : ''}`}
+                        {...register('comunaId', {
+                          validate: validarComboObligatorio(),
+                        })}>
+                        <option value={''}>Seleccionar</option>
+                        {combos &&
+                          combos.comunas
+                            .filter(({ region: { idregion } }) => idregion == regionSeleccionada)
+                            .map(({ idcomuna, nombre }) => (
+                              <option key={idcomuna} value={idcomuna}>
+                                {nombre}
+                              </option>
+                            ))}
+                      </select>
+                      <IfContainer show={!!errors.comunaId}>
+                        <div className="invalid-tooltip">{errors.comunaId?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="calle" className="form-label">
+                        Calle (*)
+                      </label>
+                      <input
+                        id="calle"
+                        type="text"
+                        autoComplete="new-custom-value"
+                        className={`form-control ${errors.calle ? 'is-invalid' : ''}`}
+                        {...register('calle', {
+                          required: {
+                            message: 'Este campo es obligatorio',
+                            value: true,
+                          },
+                          minLength: {
+                            value: 2,
+                            message: 'Debe tener al menos 2 caracteres',
+                          },
+                          maxLength: {
+                            value: 80,
+                            message: 'No puede tener más de 80 caracteres',
+                          },
+                          onBlur: () => trimInput('calle'),
+                        })}
+                      />
+                      <IfContainer show={!!errors.calle}>
+                        <div className="invalid-tooltip">{errors.calle?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="numero" className="form-label">
+                        Número (*)
+                      </label>
+                      <input
+                        id="numero"
+                        type="text"
+                        autoComplete="new-custom-value"
+                        className={`form-control ${errors.numero ? 'is-invalid' : ''}`}
+                        {...register('numero', {
+                          required: {
+                            message: 'Este campo es obligatorio',
+                            value: true,
+                          },
+                          pattern: {
+                            value: /^\d{1,20}$/g,
+                            message: 'Debe contener solo dígitos',
+                          },
+                          maxLength: {
+                            value: 20,
+                            message: 'No puede tener más de 20 dígitos',
+                          },
+                          onChange: (event) => {
+                            const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                            const valor = event.target.value as string;
+
+                            if (regex.test(valor)) {
+                              setValue('numero', valor.replaceAll(regex, ''));
+                            }
+                          },
+                        })}
+                      />
+                      <IfContainer show={!!errors.numero}>
+                        <div className="invalid-tooltip">{errors.numero?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="departamento" className="form-label">
+                        Block / Departamento
+                      </label>
+                      <input
+                        id="departamento"
+                        type="text"
+                        autoComplete="new-custom-value"
+                        className={`form-control ${errors.departamento ? 'is-invalid' : ''}`}
+                        {...register('departamento', {
+                          maxLength: {
+                            value: 20,
+                            message: 'No puede tener más de 20 carcateres',
+                          },
+                          pattern: {
+                            value: /^[a-zA-Z0-9#]+$/g,
+                            message: 'Solo debe tener números, letras o #',
+                          },
+                        })}
+                      />
+                      <IfContainer show={!!errors.departamento}>
+                        <div className="invalid-tooltip">{errors.departamento?.message}</div>
+                      </IfContainer>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label className="form-label" htmlFor="telefono1">
+                        Teléfono 1 (*)
+                      </label>
+                      <div className="input-group mb-2">
+                        <div className="input-group-prepend">
+                          <div className="input-group-text">+56</div>
+                        </div>
                         <input
+                          id="telefono1"
                           type="text"
-                          name="calle"
-                          value={calle}
                           autoComplete="new-custom-value"
-                          minLength={2}
-                          maxLength={80}
-                          onChange={onInputChange}
-                          className="form-control"
-                          aria-describedby="calleHelp"
-                          placeholder=""
+                          className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
+                          {...register('telefono1', {
+                            required: {
+                              value: true,
+                              message: 'Este campo es obligatorio',
+                            },
+                            pattern: {
+                              value: /^[0-9]{9}$/, // Exactamente 9 digitos
+                              message: 'Debe tener 9 dígitos',
+                            },
+                            onChange: (event: any) => {
+                              const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                              let valorFinal = event.target.value as string;
+
+                              if (regex.test(valorFinal)) {
+                                valorFinal = valorFinal.replaceAll(regex, '');
+                              }
+
+                              if (valorFinal.length > 9) {
+                                valorFinal = valorFinal.substring(0, 9);
+                              }
+
+                              setValue('telefono1', valorFinal);
+                            },
+                          })}
                         />
-                        <small id="calleHelp" className="form-text text-muted"></small>
-                      </div>
-                      <div className="col-md-4">
-                        <label htmlFor="exampleInputEmail1">Número (*)</label>
-                        <input
-                          type="text"
-                          name="numero"
-                          value={numero}
-                          autoComplete="new-custom-value"
-                          minLength={1}
-                          maxLength={20}
-                          onChange={onInputChangeOnlyNum}
-                          className="form-control"
-                          aria-describedby="numHelp"
-                          placeholder=""
-                        />
-                        <small id="numHelp" className="form-text text-muted"></small>
+                        <IfContainer show={!!errors.telefono1}>
+                          <div className="invalid-tooltip">{errors.telefono1?.message}</div>
+                        </IfContainer>
                       </div>
                     </div>
 
-                    <div className="row mt-2">
-                      <div className="col-md-4">
-                        <label htmlFor="exampleInputEmail1">Block / Departamento</label>
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label className="form-label" htmlFor="telefono2">
+                        Teléfono 2
+                      </label>
+                      <div className="input-group mb-2">
+                        <div className="input-group-prepend">
+                          <div className="input-group-text">+56</div>
+                        </div>
                         <input
+                          id="telefono2"
                           type="text"
-                          name="bdep"
-                          value={bdep}
                           autoComplete="new-custom-value"
-                          minLength={1}
-                          maxLength={20}
-                          onChange={onInputChange}
-                          className="form-control"
-                          aria-describedby="bdepHelp"
-                          placeholder=""
+                          className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
+                          {...register('telefono2', {
+                            pattern: {
+                              value: /^[0-9]{9}$/, // Exactamente 9 digitos
+                              message: 'Debe tener 9 dígitos',
+                            },
+                            onChange: (event: any) => {
+                              const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                              let valorFinal = event.target.value as string;
+
+                              if (regex.test(valorFinal)) {
+                                valorFinal = valorFinal.replaceAll(regex, '');
+                              }
+
+                              if (valorFinal.length > 9) {
+                                valorFinal = valorFinal.substring(0, 9);
+                              }
+
+                              setValue('telefono2', valorFinal);
+                            },
+                          })}
                         />
-                        <small id="bdepHelp" className="form-text text-muted"></small>
-                      </div>
-                      <div className="col-md-4">
-                        <label className="sr-only" htmlFor="tel1">
-                          Teléfono 1 (*)
-                        </label>
-                        <div className="input-group mb-2">
-                          <div className="input-group-prepend">
-                            <div className="input-group-text">+56</div>
-                          </div>
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="tel1"
-                            name="tf1"
-                            maxLength={9}
-                            minLength={9}
-                            autoComplete="new-custom-value"
-                            value={tf1}
-                            onChange={onInputChangeOnlyNum}
-                          />
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <label className="sr-only" htmlFor="tel2">
-                          Teléfono 2 (*)
-                        </label>
-                        <div className="input-group mb-2">
-                          <div className="input-group-prepend">
-                            <div className="input-group-text">+56</div>
-                          </div>
-                          <input
-                            type="text"
-                            className="form-control"
-                            id="tel2"
-                            name="tf2"
-                            maxLength={9}
-                            minLength={9}
-                            autoComplete="new-custom-value"
-                            value={tf2}
-                            onChange={onInputChangeOnlyNum}
-                          />
-                        </div>
+                        <IfContainer show={!!errors.telefono2}>
+                          <div className="invalid-tooltip">{errors.telefono2?.message}</div>
+                        </IfContainer>
                       </div>
                     </div>
 
-                    <div className="row mt-2">
-                      <div className="col-md-4">
-                        <label htmlFor="exampleInputEmail1">
-                          Correo electrónico entidad empleadora (*)
-                        </label>
-                        <input
-                          type="mail"
-                          name="cemple"
-                          value={cemple}
-                          onChange={onInputChange}
-                          onPaste={(e) => e.preventDefault()}
-                          onCopy={(e) => e.preventDefault()}
-                          minLength={3}
-                          maxLength={250}
-                          autoComplete="new-custom-value"
-                          className="form-control"
-                          aria-describedby="cempleHelp"
-                          placeholder=""
-                        />
-                        <small id="cempleHelp" className="form-text text-muted">
-                          ejemplo@ejemplo.cl
-                        </small>
-                      </div>
-                      <div className="col-md-4">
-                        <label htmlFor="exampleInputEmail1">
-                          Repetir correo electrónico entidad empleadora (*)
-                        </label>
-                        <input
-                          type="mail"
-                          name="recemple"
-                          value={recemple}
-                          onChange={onInputChange}
-                          minLength={3}
-                          maxLength={350}
-                          onPaste={(e) => e.preventDefault()}
-                          onCopy={(e) => e.preventDefault()}
-                          autoComplete="new-custom-value"
-                          className="form-control"
-                          aria-describedby="recempleHelp"
-                          placeholder=""
-                        />
-                        <small id="recempleHelp" className="form-text text-muted"></small>
-                      </div>
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="email" className="form-label">
+                        Correo electrónico empleador (*)
+                      </label>
+                      <input
+                        id="email"
+                        type="mail"
+                        autoComplete="new-custom-value"
+                        placeholder="ejemplo@ejemplo.cl"
+                        onPaste={(e) => e.preventDefault()}
+                        onCopy={(e) => e.preventDefault()}
+                        className={`form-control ${errors.email ? 'is-invalid' : ''}`}
+                        {...register('email', {
+                          required: {
+                            value: true,
+                            message: 'Este campo es obligatorio',
+                          },
+                          maxLength: {
+                            value: 250,
+                            message: 'No puede tener más de 250 caracteres',
+                          },
+                          validate: {
+                            esEmail: (email) => (isEmail(email) ? undefined : 'Correo inválido'),
+                          },
+                        })}
+                      />
+                      <IfContainer show={!!errors.email}>
+                        <div className="invalid-tooltip">{errors.email?.message}</div>
+                      </IfContainer>
                     </div>
 
-                    <div className="row mt-2">
-                      <div className="col-md-4">
-                        <div className="form-group">
-                          <label htmlFor="qtrabajadores">N° de personas trabajadoras (*)</label>
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="emailConfirma" className="form-label">
+                        Repetir correo electrónico (*)
+                      </label>
+                      <input
+                        id="emailConfirma"
+                        type="mail"
+                        autoComplete="new-custom-value"
+                        placeholder="ejemplo@ejemplo.cl"
+                        onPaste={(e) => e.preventDefault()}
+                        onCopy={(e) => e.preventDefault()}
+                        className={`form-control ${errors.emailConfirma ? 'is-invalid' : ''}`}
+                        {...register('emailConfirma', {
+                          required: {
+                            value: true,
+                            message: 'Este campo es obligatorio',
+                          },
+                          maxLength: {
+                            value: 250,
+                            message: 'No puede tener más de 250 caracteres',
+                          },
+                          validate: {
+                            esEmail: (email) => (isEmail(email) ? undefined : 'Correo inválido'),
+                            emailCoinciden: (emailConfirmar) => {
+                              if (getValues('email') !== emailConfirmar) {
+                                return 'Correos no coinciden';
+                              }
+                            },
+                          },
+                        })}
+                      />
+                      <IfContainer show={!!errors.emailConfirma}>
+                        <div className="invalid-tooltip">{errors.emailConfirma?.message}</div>
+                      </IfContainer>
+                    </div>
 
-                          <select
-                            className="form-select"
-                            id="qtrabajadores"
-                            name="npersonas"
-                            value={npersonas}
-                            onChange={onInputChange}
-                            required>
-                            <option value={''}>Seleccionar</option>
-                            {combos &&
-                              combos.tamanosEmpresas.map(({ idtamanoempresa, descripcion }) => (
-                                <option key={idtamanoempresa} value={idtamanoempresa}>
-                                  {descripcion}
-                                </option>
-                              ))}
-                          </select>
-                        </div>
-                      </div>
-                      <div className="col-md-4">
-                        <label htmlFor="sremuneraciones">Sistema de Remuneración</label>
+                    {/* NOTA: Columna "fantasma" para mover la parte del numero de personas a una nueva linea */}
+                    <div className="d-none d-lg-block col-lg-4"></div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <div className="form-group">
+                        <label htmlFor="tamanoEmpresa" className="form-label">
+                          N° de trabajadores
+                        </label>
                         <select
-                          className="form-select"
-                          id="sremuneraciones"
-                          name="sremun"
-                          value={sremun}
-                          onChange={onInputChange}
-                          required>
-                          <option value={''}>Seleccionar</option>
+                          id="tamanoEmpresa"
+                          className={`form-select ${errors.tamanoEmpresaId ? 'is-invalid' : ''}`}
+                          {...register('tamanoEmpresaId', {
+                            setValueAs: (v) => parseInt(v, 10),
+                            validate: validarComboObligatorio(),
+                          })}>
+                          <option value={-1}>Seleccionar</option>
                           {combos &&
-                            combos.sistemasDeRemuneracion.map(
-                              ({ idsistemaremuneracion, descripcion }) => (
-                                <option key={idsistemaremuneracion} value={idsistemaremuneracion}>
-                                  {' '}
-                                  {descripcion}{' '}
-                                </option>
-                              ),
-                            )}
+                            combos.tamanosEmpresas.map(({ idtamanoempresa, descripcion }) => (
+                              <option key={idtamanoempresa} value={idtamanoempresa}>
+                                {descripcion}
+                              </option>
+                            ))}
                         </select>
+                        <IfContainer show={!!errors.tamanoEmpresaId}>
+                          <div className="invalid-tooltip">{errors.tamanoEmpresaId?.message}</div>
+                        </IfContainer>
                       </div>
+                    </div>
+
+                    <div className="col-12 col-lg-4 position-relative">
+                      <label htmlFor="sistemaRemuneracion" className="form-label">
+                        Sistema de Remuneración
+                      </label>
+                      <select
+                        id="sistemaRemuneracion"
+                        className={`form-select ${
+                          errors.sistemaRemuneracionId ? 'is-invalid' : ''
+                        }`}
+                        {...register('sistemaRemuneracionId', {
+                          setValueAs: (v) => parseInt(v, 10),
+                          validate: validarComboObligatorio(),
+                        })}>
+                        <option value={-1}>Seleccionar</option>
+                        {combos &&
+                          combos.sistemasDeRemuneracion.map(
+                            ({ idsistemaremuneracion, descripcion }) => (
+                              <option key={idsistemaremuneracion} value={idsistemaremuneracion}>
+                                {' '}
+                                {descripcion}{' '}
+                              </option>
+                            ),
+                          )}
+                      </select>
+                      <IfContainer show={!!errors.sistemaRemuneracionId}>
+                        <div className="invalid-tooltip">
+                          {errors.sistemaRemuneracionId?.message}
+                        </div>
+                      </IfContainer>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="modal-footer">
-                <button type="submit" className="btn btn-primary">
-                  Confirmar Adscripción
-                </button>
-              </div>
+
+                <div className="modal-footer">
+                  <div className="w-100 d-flex flex-column flex-md-row-reverse">
+                    <button type="submit" className="btn btn-primary">
+                      Confirmar Adscripción
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-danger mt-2 mt-md-0 me-md-2"
+                      data-bs-dismiss="modal"
+                      onClick={onCerrarModal}>
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              </IfContainer>
             </form>
           </div>
         </div>
