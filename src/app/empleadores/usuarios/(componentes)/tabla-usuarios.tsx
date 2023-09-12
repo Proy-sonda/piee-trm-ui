@@ -17,11 +17,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   onEditarUsuario,
   onEliminarUsuario,
 }) => {
-  const {
-    datosPaginados: usuariosPaginados,
-    cambiarPaginaActual,
-    totalPaginas,
-  } = usePaginacion({
+  const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: usuarios,
     tamanoPagina: 5,
   });
@@ -119,7 +115,11 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
       </Table>
 
       <div className="mt-3">
-        <Paginacion totalPages={totalPaginas} onCambioPagina={cambiarPaginaActual} />
+        <Paginacion
+          paginaActual={paginaActual}
+          numeroDePaginas={totalPaginas}
+          onCambioPagina={cambiarPagina}
+        />
       </div>
     </>
   );

@@ -14,19 +14,6 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
     <>
       <form className="row g-2 align-items-end">
         <div className="col-12 col-md-3 col-xxl-2">
-          <label id="razonSocialBuscar" className="form-label">
-            Razón Social
-          </label>
-          <input
-            type="text"
-            id="razonSocialBuscar"
-            className="form-control"
-            value={razonSocial}
-            onInput={(e) => setRazonSocial(e.currentTarget.value)}
-          />
-        </div>
-
-        <div className="col-12 col-md-3 col-xxl-2">
           <label id="rutBuscar" className="form-label">
             RUT
           </label>
@@ -36,6 +23,19 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
             className="form-control"
             value={rut}
             onInput={(e) => setRut(e.currentTarget.value)}
+          />
+        </div>
+
+        <div className="col-12 col-md-3 col-xxl-2">
+          <label id="razonSocialBuscar" className="form-label">
+            Razón Social
+          </label>
+          <input
+            type="text"
+            id="razonSocialBuscar"
+            className="form-control"
+            value={razonSocial}
+            onInput={(e) => setRazonSocial(e.currentTarget.value)}
           />
         </div>
 

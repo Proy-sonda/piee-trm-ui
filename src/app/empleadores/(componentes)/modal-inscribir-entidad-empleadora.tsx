@@ -174,7 +174,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                   </div>
 
                   <div className="row mt-2 mt-lg-0 g-3 align-items-baseline">
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="rutEntidadEmpleadora" className="form-label">
                         <span>RUT Entidad Empleadora /</span>
                         <br />
@@ -208,7 +208,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="razonSocial" className="form-label">
                         Razón Social / Nombre (*)
                       </label>
@@ -238,7 +238,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="tipoEntidad" className="form-label">
                         Tipo de Entidad Empleadora (*)
                       </label>
@@ -266,9 +266,9 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="cajaCompensacion" className="form-label">
-                        Seleccione CCAF a la cual está afiliada
+                        Seleccione CCAF a la cual está afiliada (*)
                       </label>
                       <select
                         id="cajaCompensacion"
@@ -290,7 +290,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="actividadLaboral" className="form-label">
                         Actividad Laboral Entidad Empleadora (*)
                       </label>
@@ -316,7 +316,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="region" className="form-label">
                         Región
                       </label>
@@ -339,7 +339,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="comuna" className="form-label">
                         Comuna (*)
                       </label>
@@ -364,7 +364,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="calle" className="form-label">
                         Calle (*)
                       </label>
@@ -394,7 +394,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="numero" className="form-label">
                         Número (*)
                       </label>
@@ -431,7 +431,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="departamento" className="form-label">
                         Block / Departamento
                       </label>
@@ -456,7 +456,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="telefono1">
                         Teléfono 1 (*)
                       </label>
@@ -500,7 +500,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </div>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="telefono2">
                         Teléfono 2
                       </label>
@@ -540,7 +540,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </div>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="email" className="form-label">
                         Correo electrónico empleador (*)
                       </label>
@@ -571,7 +571,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="emailConfirma" className="form-label">
                         Repetir correo electrónico (*)
                       </label>
@@ -607,10 +607,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </IfContainer>
                     </div>
 
-                    {/* NOTA: Columna "fantasma" para mover la parte del numero de personas a una nueva linea */}
-                    <div className="d-none d-lg-block col-lg-4"></div>
-
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <div className="form-group">
                         <label htmlFor="tamanoEmpresa" className="form-label">
                           N° de trabajadores
@@ -636,7 +633,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       </div>
                     </div>
 
-                    <div className="col-12 col-lg-4 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="sistemaRemuneracion" className="form-label">
                         Sistema de Remuneración
                       </label>

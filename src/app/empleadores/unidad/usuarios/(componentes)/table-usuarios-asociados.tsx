@@ -9,11 +9,7 @@ type props = {
 };
 
 export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handleDelete }) => {
-  const {
-    datosPaginados: usuariosPaginados,
-    cambiarPaginaActual,
-    totalPaginas,
-  } = usePaginacion({
+  const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: usuarioAsociado,
     tamanoPagina: 5,
   });
@@ -66,7 +62,11 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
       </Table>
 
       <div className="mt-3">
-        <Paginacion totalPages={totalPaginas} onCambioPagina={cambiarPaginaActual} />
+        <Paginacion
+          paginaActual={paginaActual}
+          numeroDePaginas={totalPaginas}
+          onCambioPagina={cambiarPagina}
+        />
       </div>
     </>
   );

@@ -249,7 +249,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="razonSocial" className="form-label">
-                      Razón Social / Nombre particular
+                      Razón Social / Nombre particular (*)
                     </label>
                     <input
                       id="razonSocial"
@@ -281,7 +281,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="nombreFantasia" className="form-label">
-                      Nombre Fantasía (*)
+                      Nombre Fantasía
                     </label>
                     <input
                       id="nombreFantasia"
@@ -314,7 +314,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
               <div className="row mt-2">
                 <div className="col-md-4 position-relative">
                   <label htmlFor="tipoEntidad" className="form-label">
-                    Tipo de Entidad Empleadora
+                    Tipo de Entidad Empleadora (*)
                   </label>
                   <select
                     id="tipoEntidad"
@@ -338,7 +338,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
                 <div className="col-md-4 position-relative">
                   <label htmlFor="cajaCompensacion" className="form-label">
-                    Seleccione CCAF a la cual está afiliada
+                    Seleccione CCAF a la cual está afiliada (*)
                   </label>
                   <select
                     id="cajaCompensacion"
@@ -388,7 +388,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
               <div className="row mt-2">
                 <div className="col-md-4 position-relative">
                   <label htmlFor="region" className="form-label">
-                    Región
+                    Región (*)
                   </label>
                   <select
                     id="region"
@@ -715,7 +715,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="tamanoEmpresa" className="form-label">
-                      N° de trabajadores
+                      N° de trabajadores (*)
                     </label>
                     <select
                       id="tamanoEmpresa"
@@ -740,7 +740,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
                 <div className="col-md-4 position-relative">
                   <label htmlFor="sistemaRemuneracion" className="form-label">
-                    Sistema de Remuneración
+                    Sistema de Remuneración (*)
                   </label>
                   <select
                     id="sistemaRemuneracion"
