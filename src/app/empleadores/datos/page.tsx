@@ -281,7 +281,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="nombreFantasia" className="form-label">
-                      Nombre Fantasía
+                      Nombre Fantasía (*)
                     </label>
                     <input
                       id="nombreFantasia"
