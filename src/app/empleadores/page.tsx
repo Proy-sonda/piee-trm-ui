@@ -13,6 +13,7 @@ import { Empleador } from '@/modelos/empleador';
 import { estaLogueado } from '@/servicios/auth';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
+import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
 import { buscarEmpleadores } from './(servicios)/buscar-empleadores';
@@ -32,15 +33,12 @@ const EmpleadoresPage = () => {
 
   const [empleadoresFiltrados, setEmpleadoresFiltrados] = useState<Empleador[]>([]);
 
-  const [rut, setRut] = useState('');
-  const [razonSocial, setRazonSocial] = useState('');
-
   useEffect(() => {
     if (!empleadores) {
       return;
     }
 
-    filtrarEmpleadores();
+    filtrarEmpleadores('', '');
     cargaEmpleador(empleadores as any);
   }, [empleadores]);
 
@@ -94,18 +92,20 @@ const EmpleadoresPage = () => {
     refrescarPagina();
   };
 
-  const filtrarEmpleadores = () => {
+  const filtrarEmpleadores = (rut: string, razonSocial: string) => {
     const porFiltrar = empleadores ?? [];
+    const rutLimpio = rut.trim().toUpperCase();
+    const razonSocialLimpia = razonSocial.trim().toUpperCase();
 
-    if (razonSocial.trim() === '' && rut.trim() === '') {
+    if (rutLimpio === '' && razonSocialLimpia === '') {
       setEmpleadoresFiltrados(porFiltrar);
       return;
     }
 
     const filtrados = porFiltrar.filter((empleador) => {
       return (
-        empleador.razonsocial.toUpperCase().includes(razonSocial.trim().toUpperCase()) &&
-        empleador.rutempleador.includes(rut.trim())
+        empleador.razonsocial.toUpperCase().includes(razonSocialLimpia) &&
+        empleador.rutempleador.toUpperCase().includes(rutLimpio)
       );
     });
 
@@ -127,42 +127,7 @@ const EmpleadoresPage = () => {
             </Titulo>
           </div>
 
-          <div className="row mt-3">
-            <div className="col-md-3 float-end">
-              <label>Razón Social</label>
-              <input
-                type="text"
-                className="form-control"
-                value={razonSocial}
-                onInput={(e) => setRazonSocial(e.currentTarget.value)}
-              />
-            </div>
-            <div className="col-md-3 float-end">
-              <label>RUT</label>
-              <input
-                type="text"
-                className="form-control"
-                value={rut}
-                onInput={(e) => setRut(e.currentTarget.value)}
-              />
-            </div>
-            <div className="col-md-6 float-end align-self-end">
-              <button
-                className="btn btn-primary"
-                onClick={(e) => {
-                  e.preventDefault();
-                  filtrarEmpleadores();
-                }}>
-                Buscar
-              </button>
-              <button
-                className="ms-2 btn btn-success"
-                data-bs-toggle="modal"
-                data-bs-target="#Addsempresa">
-                Inscribe Entidad Empleadora
-              </button>
-            </div>
-          </div>
+          <BarraBusquedaEntidadesEmpleadoras onBuscar={filtrarEmpleadores} />
 
           <div className="row mt-4">
             <div className="col-md-12 col-xl-12">
