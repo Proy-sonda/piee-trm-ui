@@ -125,6 +125,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: 'Si',
+      confirmButtonColor: 'var(--color-blue)',
       denyButtonText: `No`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
