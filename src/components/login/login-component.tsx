@@ -307,7 +307,9 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
       </div>
 
       <form onSubmit={handleSubmit} className={styles.formlogin}>
-        <label>Ingresa tus credenciales de acceso al Portal Único Empleadores</label>
+        <label>
+          Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
+        </label>
         <br />
 
         <div className="mb-3 mt-3">
