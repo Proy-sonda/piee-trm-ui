@@ -348,7 +348,7 @@ a {
   }
 
   .responsiveTable tbody tr {
-    border: .5px solid transparent;
+    border-bottom: .5px solid #dee2e6;
     padding: .25em;
   }
 
