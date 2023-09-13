@@ -228,8 +228,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
             </Titulo>
 
             <form onSubmit={handleSubmitRH(onGuardarCambios)}>
-              <div className="row mt-3">
-                <div className="col-md-4">
+              <div className="row mt-3 g-3 align-items-baseline">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="rut" className="form-label">
                       RUT Entidad Empleadora (*)
@@ -246,7 +246,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </div>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="razonSocial" className="form-label">
                       Razón Social / Nombre particular (*)
@@ -278,7 +278,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </div>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="nombreFantasia" className="form-label">
                       Nombre Fantasía
@@ -305,10 +305,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     </IfContainer>
                   </div>
                 </div>
-              </div>
 
-              <div className="row mt-2">
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="tipoEntidad" className="form-label">
                     Tipo de Entidad Empleadora (*)
                   </label>
@@ -332,7 +330,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </IfContainer>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="cajaCompensacion" className="form-label">
                     Seleccione CCAF a la cual está afiliada (*)
                   </label>
@@ -356,7 +354,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </IfContainer>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="actividadLaboral" className="form-label">
                     Actividad Laboral Entidad Empleadora (*)
                   </label>
@@ -379,10 +377,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <div className="invalid-tooltip">{errors.actividadLaboralId?.message}</div>
                   </IfContainer>
                 </div>
-              </div>
 
-              <div className="row mt-2">
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="region" className="form-label">
                     Región (*)
                   </label>
@@ -405,7 +401,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </IfContainer>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="comuna" className="form-label">
                     Comuna (*)
                   </label>
@@ -429,10 +425,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <div className="invalid-tooltip">{errors.comunaId?.message}</div>
                   </IfContainer>
                 </div>
-              </div>
 
-              <div className="row mt-2">
-                <div className="col-md-4 position-relative">
+                {/* Para mover filas a la siguiente linea */}
+                <div className="d-none d-lg-block col-lg-4"></div>
+
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="calle" className="form-label">
                     Calle (*)
                   </label>
@@ -462,7 +459,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </IfContainer>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="numero" className="form-label">
                     Número (*)
                   </label>
@@ -492,7 +489,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </IfContainer>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="departamento" className="form-label">
                     Block / Departamento
                   </label>
@@ -516,10 +513,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <div className="invalid-tooltip">{errors.departamento?.message}</div>
                   </IfContainer>
                 </div>
-              </div>
 
-              <div className="row mt-2">
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="puntoReferencia" className="form-label">
                     Punto de referencia (Opcional)
                   </label>
@@ -535,7 +530,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </IfContainer>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label className="form-label" htmlFor="telefono1">
                     Teléfono 1 (*)
                   </label>
@@ -579,7 +574,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </div>
                 </div>
 
-                <div className="col-md-4 postition-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label className="form-label" htmlFor="telefono2">
                     Teléfono 2
                   </label>
@@ -618,10 +613,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     </IfContainer>
                   </div>
                 </div>
-              </div>
 
-              <div className="row mt-2">
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="email" className="form-label">
                     Correo electrónico empleador (*)
                   </label>
@@ -652,7 +645,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </IfContainer>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="emailConfirma" className="form-label">
                     Repetir correo electrónico (*)
                   </label>
@@ -688,7 +681,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </IfContainer>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="holding" className="form-label">
                       Holding
@@ -705,10 +698,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     </IfContainer>
                   </div>
                 </div>
-              </div>
 
-              <div className="row mt-2">
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="tamanoEmpresa" className="form-label">
                       N° de trabajadores (*)
@@ -734,7 +725,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   </div>
                 </div>
 
-                <div className="col-md-4 position-relative">
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="sistemaRemuneracion" className="form-label">
                     Sistema de Remuneración (*)
                   </label>
