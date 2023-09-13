@@ -79,6 +79,11 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
     try {
       await asociarUnidad(formIni);
 
+      setformIni({
+        ...formIni,
+        idusuario: '',
+      });
+
       Swal.fire({
         icon: 'success',
         showConfirmButton: false,

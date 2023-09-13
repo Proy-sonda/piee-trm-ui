@@ -1,5 +1,5 @@
 export interface formUsrUnd {
-  idusuario: number;
-  idempleador: number | undefined;
+  idusuario: number | string;
+  idempleador: number | undefined | string;
   idunidad: number;
 }
