@@ -171,7 +171,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           </div>
 
           <div className="row mt-2">
-            <div className="col-md-6">
+            <div className="col-md-6 col-xs-12">
               <h5>Cargar Trabajadores</h5>
               <sub style={{ color: 'blue' }}>Agregar Persona Trabajadora</sub>
               <br />
@@ -196,30 +196,33 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                     style={{
                       alignSelf: 'end',
                     }}>
-                    <button type="submit" className="btn btn-success">
-                      Agregar
-                    </button>
+                    <div className="d-grid gap-2 d-md-flex">
+                      <button type="submit" className="btn btn-success btn-sm">
+                        Agregar
+                      </button>
+                    </div>
                   </div>
                 </div>
               </form>
             </div>
+            <br />
 
-            <div className="col-md-6">
+            <div className="col-md-6 col-xs-12">
               <h5>Cargar Nómina</h5>
               <sub>
                 Para poder cargar trabajadores de la unidad <b>{unidad}</b>, solo tiene que
                 seleccionar un archivo (formato CSV) según el{' '}
                 <span className={styles['span-link']}>siguiente formato</span>
               </sub>
-              <div className="row mt-2">
+              <div className="row mt-3">
                 <div className="col-md-6">
                   <input type="file" className="form-control" />
                 </div>
 
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6">
                   <div className="d-grid gap-2 d-md-flex">
-                    <button className="btn btn-success">Cargar</button>
-                    <button className="btn btn-danger">Borrar todo</button>
+                    <button className="btn btn-success btn-sm">Cargar</button>
+                    <button className="btn btn-danger btn-sm">Borrar todo</button>
                   </div>
                 </div>
               </div>
