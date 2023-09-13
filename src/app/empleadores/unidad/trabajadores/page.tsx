@@ -10,10 +10,11 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import TablaTrabajadores from './(componentes)/tabla-trabajadores';
-import { Trabajador, UnidadEmpleador } from './(modelos)/';
+import { Trabajador } from './(modelos)/';
 import {
   actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
+  buscarUnidadesDeEmpleador,
   crearTrabajador,
   eliminarTrabajador,
 } from './(servicios)/';
@@ -29,7 +30,6 @@ interface TrabajadoresPageProps {
 
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
   const [unidad, setunidad] = useState('');
-  const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
   let [loading, setLoading] = useState(false);
   const { idunidad, razon, rutempleador } = searchParams;
   const [editar, seteditar] = useState<Trabajador>({
@@ -48,6 +48,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
       trabajadores: buscarTrabajadoresDeUnidad(Number(idunidad)),
+      unidadEmpleador: buscarUnidadesDeEmpleador(rutempleador),
     },
     [refresh],
   );
@@ -298,8 +299,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                   value={editar?.unidad.idunidad}
                   onChange={handleChangeUnidad}>
                   <option value={''}>Seleccionar</option>
-                  {unidadEmpleador.length > 0 ? (
-                    unidadEmpleador.map(({ idunidad, unidad }) => (
+                  {datosPagina?.unidadEmpleador.length || 0 > 0 ? (
+                    datosPagina?.unidadEmpleador.map(({ idunidad, unidad }) => (
                       <option key={idunidad} value={idunidad}>
                         {unidad}
                       </option>

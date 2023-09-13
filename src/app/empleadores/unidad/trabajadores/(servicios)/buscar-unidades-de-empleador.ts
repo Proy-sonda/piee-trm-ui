@@ -1,8 +1,10 @@
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
+import { runFetchAbortable } from '@/servicios/fetch';
+import { UnidadEmpleador } from '../(modelos)';
 
-export const buscarUnidadesDeEmpleador = async (rutempleador: string) => {
-  const data = await fetch(`${apiUrl()}/unidad/rutempleador`, {
+export const buscarUnidadesDeEmpleador = (rutempleador: string) => {
+  return runFetchAbortable<UnidadEmpleador[]>(`${apiUrl()}/unidad/rutempleador`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),
@@ -12,6 +14,4 @@ export const buscarUnidadesDeEmpleador = async (rutempleador: string) => {
       rutempleador: rutempleador,
     }),
   });
-
-  return data;
 };

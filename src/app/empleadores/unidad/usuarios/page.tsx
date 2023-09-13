@@ -1,6 +1,7 @@
 'use client';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRouter } from 'next/navigation';
@@ -25,6 +26,7 @@ interface iUsuarios {
 
 const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
   const { id, unidad, razon, rut } = searchParams;
+  const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const router = useRouter();
   const [err, datosPagina, pendiente] = useMergeFetchObject(
@@ -75,18 +77,27 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
     });
 
     if (!respuesta.isConfirmed) return;
-
+    setspinner(true);
     try {
       await asociarUnidad(formIni);
 
+      setformIni({
+        ...formIni,
+        idusuario: '',
+      });
+
+      setspinner(false);
       Swal.fire({
         icon: 'success',
         showConfirmButton: false,
         timer: 2000,
         html: 'Asociación realizada con éxito',
-        didClose: () => refrescarComponente(),
+        didClose: () => {
+          refrescarComponente();
+        },
       });
     } catch (error) {
+      setspinner(false);
       Swal.fire({
         icon: 'error',
         html: 'Error en asociación, verifique los datos correctamente',
@@ -110,9 +121,10 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
 
     if (!respuesta.isConfirmed) return;
 
+    setspinner(true);
     try {
       await eliminarUsuarioAsociado(idusuario);
-
+      setspinner(false);
       refrescarComponente();
       Swal.fire({
         icon: 'success',
@@ -122,6 +134,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
         didClose: () => refrescarComponente(),
       });
     } catch (error) {
+      setspinner(false);
       Swal.fire({
         icon: 'error',
         html: 'Error en eliminación, verifique los datos correctamente',
@@ -139,6 +152,9 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
 
   return (
     <div className="bgads">
+      <IfContainer show={spinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
       <div className="ms-5 me-5">
         <div className="row">
           <Titulo manual="Manual" url="">

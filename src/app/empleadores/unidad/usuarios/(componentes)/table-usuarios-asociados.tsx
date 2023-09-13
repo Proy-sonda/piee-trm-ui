@@ -16,7 +16,7 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
 
   return (
     <>
-      <Table className="table table-striped">
+      <Table className="table table-striped text-center">
         <Thead>
           <Tr>
             <Th>Run</Th>
