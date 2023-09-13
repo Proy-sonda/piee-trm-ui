@@ -121,11 +121,11 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
         aria-hidden="true"
         data-bs-backdrop="static"
         data-bs-keyboard="false">
-        <div className="modal-dialog modal-xl">
+        <div className="modal-dialog modal-dialog-centered modal-xl">
           <div className="modal-content">
             <div className="modal-header">
               <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Crear nueva Unidad RRHH
+                Crear Nueva Unidad RRHH
               </h1>
               <button
                 type="button"
@@ -148,7 +148,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
 
                 <IfContainer show={erroresCargarCombos.length === 0}>
                   <div className="row mt-2 g-3 align-items-baseline">
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="identificadorUnico">
                         Identificador Único (*)
                       </label>
@@ -178,7 +178,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </IfContainer>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="nombreUnidad">
                         Nombre (*)
                       </label>
@@ -208,7 +208,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </IfContainer>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="region">
                         Región (*)
                       </label>
@@ -231,7 +231,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </IfContainer>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="comuna">
                         Comuna (*)
                       </label>
@@ -256,7 +256,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </IfContainer>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="calle">
                         Calle (*)
                       </label>
@@ -286,7 +286,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </IfContainer>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="numero">
                         N° Calle (*)
                       </label>
@@ -323,7 +323,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </IfContainer>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="departamento">
                         N° casa/Departamento
                       </label>
@@ -348,7 +348,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </IfContainer>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="telefono">
                         Teléfono (*)
                       </label>
@@ -392,7 +392,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </div>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="email">
                         Correo electrónico unidad RRHH (*)
                       </label>
@@ -423,7 +423,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                       </IfContainer>
                     </div>
 
-                    <div className="col-md-3 position-relative">
+                    <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="emailConfirma">
                         Repetir correo electrónico (*)
                       </label>
@@ -462,16 +462,18 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                 </IfContainer>
               </div>
               <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  data-bs-dismiss="modal"
-                  onClick={onCerrarModal}>
-                  Volver
-                </button>
-                <button type="submit" className="btn btn-primary">
-                  Guardar
-                </button>
+                <div className="w-100 d-flex flex-column flex-md-row flex-md-row-reverse">
+                  <button type="submit" className="btn btn-primary">
+                    Guardar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-danger mt-2 mt-md-0 me-0 me-md-2"
+                    data-bs-dismiss="modal"
+                    onClick={onCerrarModal}>
+                    Volver
+                  </button>
+                </div>
               </div>
             </form>
           </div>
