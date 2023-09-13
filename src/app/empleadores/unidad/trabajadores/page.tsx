@@ -150,8 +150,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
         setLoading(false);
       } else {
         setLoading(false);
+        let msgError: string | boolean = await data.text();
+        msgError = msgError.includes('trabajador ya existe');
         Swal.fire({
-          html: 'Existe un problema al momento de grabar ' + (await data.text()),
+          html:
+            'Existe un problema al momento de grabar ' +
+            (msgError ? '<p>Trabajador ya existe</p>' : data.text()),
           icon: 'error',
         });
       }
