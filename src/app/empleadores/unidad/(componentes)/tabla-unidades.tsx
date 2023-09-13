@@ -84,8 +84,8 @@ const TablaUnidades = ({
       <Table className="table table-hover">
         <Thead className="text-center">
           <Tr>
-            <Th>Nombre</Th>
             <Th>Código</Th>
+            <Th>Nombre</Th>
             <Th>Teléfono</Th>
             <Th>Correo electrónico</Th>
             <Th></Th>
@@ -95,8 +95,8 @@ const TablaUnidades = ({
           {unidadesPaginadas.length > 0 ? (
             unidadesPaginadas.map((unidad) => (
               <Tr key={unidad?.idunidad}>
-                <Td>{unidad?.unidad}</Td>
                 <Td>{unidad?.identificador}</Td>
+                <Td>{unidad?.unidad}</Td>
                 <Td>{unidad?.telefono}</Td>
                 <Td>{unidad?.email}</Td>
                 <Td>
