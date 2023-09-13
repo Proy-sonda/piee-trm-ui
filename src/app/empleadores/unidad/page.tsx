@@ -49,7 +49,8 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
   return (
     <div className="bgads">
       <Position position={4} />
-      <div className="container">
+
+      <div className="container pb-3 px-3 px-lg-5">
         <div className="row">
           <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
         </div>

@@ -5,6 +5,7 @@ import { usePaginacion } from '@/hooks/use-paginacion';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import Link from 'next/link';
 import { useState } from 'react';
+import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
@@ -75,6 +76,28 @@ const TablaUnidades = ({
     }
   };
 
+  const linkTrabajadores = (unidad: Unidadrhh) => {
+    return `/empleadores/unidad/trabajadores?idunidad=${unidad.idunidad}&razon=${razon}&rutempleador=${rut}`;
+  };
+
+  const linkUsuarios = (unidad: Unidadrhh) => {
+    return `/empleadores/unidad/usuarios?unidad=${unidad.unidad}&id=${unidad.idunidad}&razon=${razon}&rut=${rut}`;
+  };
+
+  const editarUnidadInterno = (unidad: Unidadrhh) => {
+    return (event: any) => {
+      event.preventDefault();
+      onEditarUnidad(unidad);
+    };
+  };
+
+  const eliminarUnidadInterno = (unidad: Unidadrhh) => {
+    return (event: any) => {
+      event.preventDefault();
+      eliminarUnidadDeRRHH(unidad);
+    };
+  };
+
   return (
     <>
       <IfContainer show={mostrarSpinner}>
@@ -99,36 +122,52 @@ const TablaUnidades = ({
                 <Td>
                   <span
                     className="text-primary cursor-pointer"
-                    onClick={() => onEditarUnidad(unidad)}>
+                    onClick={editarUnidadInterno(unidad)}>
                     {unidad?.unidad}
                   </span>
                 </Td>
                 <Td>{unidad?.telefono}</Td>
                 <Td>{unidad?.email}</Td>
                 <Td>
-                  <button className="btn text-primary" onClick={() => onEditarUnidad(unidad)}>
-                    <i className="bi bi-pencil-square"></i>
-                  </button>
-                  <button
-                    className="btn text-danger"
-                    title={`Eliminar Unidad: ${unidad?.unidad}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      eliminarUnidadDeRRHH(unidad);
-                    }}>
-                    <i className="bi bi-trash3"></i>
-                  </button>
-                  <Link
-                    href={`/empleadores/unidad/trabajadores?idunidad=${unidad.idunidad}&razon=${razon}&rutempleador=${rut}`}
-                    className="btn btn-success btn-sm">
-                    Trabajadores
-                  </Link>{' '}
-                  &nbsp;
-                  <Link
-                    href={`/empleadores/unidad/usuarios?unidad=${unidad.unidad}&id=${unidad.idunidad}&razon=${razon}&rut=${rut}`}
-                    className="btn btn-success btn-sm">
-                    Usuarios
-                  </Link>
+                  <div className="d-none d-lg-flex align-items-center">
+                    <button
+                      className="btn text-primary"
+                      title={`Editar Unidad: ${unidad?.unidad}`}
+                      onClick={editarUnidadInterno(unidad)}>
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                    <button
+                      className="btn text-danger"
+                      title={`Eliminar Unidad: ${unidad?.unidad}`}
+                      onClick={eliminarUnidadInterno(unidad)}>
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                    <Link href={linkTrabajadores(unidad)} className="btn btn-success btn-sm ms-2">
+                      Trabajadores
+                    </Link>
+                    <Link href={linkUsuarios(unidad)} className="btn btn-success btn-sm ms-2">
+                      Usuarios
+                    </Link>
+                  </div>
+
+                  <div className="d-lg-none">
+                    <Dropdown>
+                      <Dropdown.Toggle variant="success" id="dropdown-basic">
+                        Acciones
+                      </Dropdown.Toggle>
+
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={editarUnidadInterno(unidad)}>
+                          Editar unidad
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={eliminarUnidadInterno(unidad)}>
+                          Eliminar Unidad
+                        </Dropdown.Item>
+                        <Dropdown.Item href={linkTrabajadores(unidad)}>Trabajadores</Dropdown.Item>
+                        <Dropdown.Item href={linkUsuarios(unidad)}>Usuarios</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
                 </Td>
               </Tr>
             ))
@@ -144,7 +183,7 @@ const TablaUnidades = ({
           )}
         </Tbody>
       </Table>
-      <div className="mt-4 mb-2 d-flex justify-content-between align-items-start">
+      <div className="mt-4 mb-2 d-flex flex-column flex-sm-row justify-content-sm-between">
         <Paginacion
           paginaActual={paginaActual}
           numeroDePaginas={totalPaginas}
@@ -155,9 +194,11 @@ const TablaUnidades = ({
         {/* Este div vacio sirve para empujar el boton volver a la derecha cuando no se muestra la paginacion */}
         <div></div>
 
-        <Link href={`/empleadores`} className="btn btn-danger">
-          Volver
-        </Link>
+        <div>
+          <Link href={`/empleadores`} className="btn btn-danger d-inline-block">
+            Volver
+          </Link>
+        </div>
       </div>
     </>
   );
