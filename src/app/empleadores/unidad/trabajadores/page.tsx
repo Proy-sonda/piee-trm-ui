@@ -1,20 +1,19 @@
 'use client';
 
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { useForm } from '@/hooks/use-form';
-import { Unidadrhh } from '@/modelos/tramitacion';
+import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { ClipLoader } from 'react-spinners';
-import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
-import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
-import { Trabajador, Trabajadores, UnidadEmpleador } from './(modelos)/';
+import TablaTrabajadores from './(componentes)/tabla-trabajadores';
+import { Trabajador, UnidadEmpleador } from './(modelos)/';
 import {
   actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
-  buscarUnidadesDeEmpleador,
   crearTrabajador,
   eliminarTrabajador,
 } from './(servicios)/';
@@ -31,50 +30,29 @@ interface TrabajadoresPageProps {
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
   const [unidad, setunidad] = useState('');
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
-  let [loading, setLoading] = useState(true);
+  let [loading, setLoading] = useState(false);
   const { idunidad, razon, rutempleador } = searchParams;
-  const [trabajadores, settrabajadores] = useState<Trabajadores[]>([]);
   const [editar, seteditar] = useState<Trabajador>({
     idtrabajador: 0,
     unidad: {
       idunidad: 0,
     },
   });
-  const [rutedit, setrutedit] = useState<string>();
-  const [show, setshow] = useState(false);
-
   const { run, onInputValidRut } = useForm({
     run: '',
   });
+  const [rutedit, setrutedit] = useState<string>();
+  const [show, setshow] = useState(false);
+  const [refresh, setRefresh] = useState(0);
 
-  useEffect(() => {
-    setLoading(true);
+  const [err, datosPagina, pendiente] = useMergeFetchObject(
+    {
+      trabajadores: buscarTrabajadoresDeUnidad(Number(idunidad)),
+    },
+    [refresh],
+  );
 
-    const obtenerTrabajadorUnidad = async () => {
-      const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
-      if (data.ok) {
-        const resp: Trabajadores[] = await data.json();
-
-        if (resp.length > 0) {
-          settrabajadores(resp);
-        }
-        setTimeout(() => setLoading(false), 2000);
-      }
-    };
-
-    obtenerTrabajadorUnidad();
-
-    const obtenerUnidad = async () => {
-      const data = await buscarUnidadPorId(Number(idunidad));
-      if (data.ok) {
-        const resp: Unidadrhh = await data.json();
-        setunidad(resp.unidad);
-      }
-    };
-    obtenerUnidad();
-
-    // window.history.pushState(null, '', '/empleadores/unidad/trabajadores');
-  }, []);
+  const refrescarComponente = () => setRefresh(Math.random());
 
   const handleEditTrabajador = (idtrabajador: number, idunidad: number, ruttrabajador: string) => {
     seteditar({
@@ -83,19 +61,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
         idunidad: idunidad,
       },
     });
-
     setrutedit(ruttrabajador);
-
-    const ObtenerUnidadesEmpleador = async () => {
-      const data = await buscarUnidadesDeEmpleador(rutempleador);
-      if (data.ok) {
-        const resp: UnidadEmpleador[] = await data.json();
-        setunidadEmpleador(resp);
-      }
-    };
-
-    ObtenerUnidadesEmpleador();
-
+    refrescarComponente();
     setshow(true);
   };
 
@@ -106,11 +73,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       const data = await eliminarTrabajador(idtrabajador);
 
       if (data.ok) {
-        const dataund = await buscarTrabajadoresDeUnidad(Number(idunidad));
-        if (data.ok) {
-          const resp: Trabajadores[] = await dataund.json();
-          resp.length > 0 ? settrabajadores(resp) : settrabajadores([]);
-        }
+        refrescarComponente();
         return Swal.fire({
           html: `Persona trabajadora ${rut} fue eliminada con éxito`,
           icon: 'success',
@@ -125,6 +88,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: 'Si',
+      confirmButtonColor: 'var(--color-blue)',
       denyButtonText: `No`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
@@ -151,18 +115,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           showConfirmButton: false,
         });
         setshow(false);
-        const obtenerTrabajadorUnidad = async () => {
-          const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
-          if (data.ok) {
-            const resp: Trabajadores[] = await data.json();
-
-            if (resp.length > 0) {
-              settrabajadores(resp);
-            }
-          }
-        };
-
-        obtenerTrabajadorUnidad();
+        refrescarComponente();
       } else {
         Swal.fire({ html: 'Se ha producido un error', icon: 'error' });
       }
@@ -172,6 +125,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
   };
 
   const handleAddTrabajador = (e: FormEvent) => {
+    setLoading(true);
     e.preventDefault();
 
     const crearTrabajadorAux = async () => {
@@ -190,20 +144,18 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           showConfirmButton: false,
         });
         const obtenerTrabajadorUnidad = async () => {
-          const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
-          if (data.ok) {
-            const resp: Trabajadores[] = await data.json();
-
-            if (resp.length > 0) {
-              settrabajadores(resp);
-            }
-            setTimeout(() => setLoading(false), 2000);
-          }
+          refrescarComponente();
         };
         obtenerTrabajadorUnidad();
+        setLoading(false);
       } else {
+        setLoading(false);
+        let msgError: string | boolean = await data.text();
+        msgError = msgError.includes('trabajador ya existe');
         Swal.fire({
-          html: 'Existe un problema al momento de grabar ' + (await data.text()),
+          html:
+            'Existe un problema al momento de grabar ' +
+            (msgError ? '<p>Trabajador ya existe</p>' : data.text()),
           icon: 'error',
         });
       }
@@ -214,25 +166,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
 
   return (
     <>
-      <div
-        className={'spinner'}
-        style={{
-          display: loading ? '' : 'none',
-        }}>
-        <ClipLoader
-          color={'var(--color-blue)'}
-          loading={loading}
-          size={150}
-          aria-label="Loading Spinner"
-          data-testid="loader"
-        />
-      </div>
-
-      <div
-        className="bgads"
-        style={{
-          display: loading ? 'none' : '',
-        }}>
+      <div className="bgads">
         <div className="me-5 ms-5 animate__animate animate__fadeIn">
           <div className="row mt-5">
             <Titulo url="">
@@ -241,7 +175,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           </div>
 
           <div className="row mt-2">
-            <div className="col-md-6">
+            <div className="col-md-6 col-xs-12">
               <h5>Cargar Trabajadores</h5>
               <sub style={{ color: 'blue' }}>Agregar Persona Trabajadora</sub>
               <br />
@@ -266,81 +200,63 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                     style={{
                       alignSelf: 'end',
                     }}>
-                    <button type="submit" className="btn btn-success">
-                      Agregar
-                    </button>
+                    <div className="d-grid gap-2 d-md-flex">
+                      <button type="submit" className="btn btn-success btn-sm">
+                        Agregar
+                      </button>
+                    </div>
                   </div>
                 </div>
               </form>
             </div>
+            <br />
 
-            <div className="col-md-6">
+            <div className="col-md-6 col-xs-12">
               <h5>Cargar Nómina</h5>
               <sub>
                 Para poder cargar trabajadores de la unidad <b>{unidad}</b>, solo tiene que
                 seleccionar un archivo (formato CSV) según el{' '}
                 <span className={styles['span-link']}>siguiente formato</span>
               </sub>
-              <div className="row mt-2">
+              <div className="row mt-3">
                 <div className="col-md-6">
                   <input type="file" className="form-control" />
                 </div>
 
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6">
                   <div className="d-grid gap-2 d-md-flex">
-                    <button className="btn btn-success">Cargar</button>
-                    <button className="btn btn-danger">Borrar todo</button>
+                    <button className="btn btn-success btn-sm">Cargar</button>
+                    <button className="btn btn-danger btn-sm">Borrar todo</button>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="row mt-2">
-            <h5>Trabajadores</h5>
-            <br />
-            <div className="col-md-6">
-              <Table className="table table-striped">
-                <Thead className="align-middle text-center">
-                  <Tr>
-                    <Th>Run</Th>
-                    <Th>Acciones</Th>
-                  </Tr>
-                </Thead>
-                <Tbody className="align-middle text-center">
-                  {trabajadores.length > 0 ? (
-                    trabajadores.map(({ ruttrabajador, idtrabajador }) => (
-                      <Tr key={ruttrabajador}>
-                        <Td>{ruttrabajador}</Td>
-                        <Td>
-                          <button
-                            className="btn btn-sm btn-primary"
-                            onClick={() =>
-                              handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)
-                            }>
-                            <i
-                              title={`editar ${ruttrabajador}`}
-                              className={'bi bi-pencil-square'}></i>
-                          </button>
-                          &nbsp;
-                          <button
-                            className="btn btn-sm btn-danger"
-                            onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}>
-                            <i
-                              title={`eliminar ${ruttrabajador}`}
-                              className={'bi bi-trash btn-danger'}></i>
-                          </button>
-                        </Td>
-                      </Tr>
-                    ))
-                  ) : (
-                    <Tr>
-                      <Td>-</Td>
-                      <Td>-</Td>
-                    </Tr>
-                  )}
-                </Tbody>
-              </Table>
+          <div className="row mt-5">
+            <div className="col-md-12 text-center">
+              <h5>Trabajadores</h5>
+
+              <hr />
+              <IfContainer show={pendiente || loading}>
+                <div className="mb-5">
+                  <LoadingSpinner titulo="Cargando trabajadores..." />
+                </div>
+              </IfContainer>
+              <IfContainer show={!pendiente || !loading}>
+                {datosPagina?.trabajadores?.length || 0 > 0 ? (
+                  <TablaTrabajadores
+                    handleDeleteTrabajador={handleDeleteTrabajador}
+                    handleEditTrabajador={handleEditTrabajador}
+                    idunidad={idunidad}
+                    trabajadores={datosPagina?.trabajadores || []}
+                  />
+                ) : (
+                  <div className="text-center">
+                    <b>No se han encontrado trabajadores</b>
+                  </div>
+                )}
+              </IfContainer>
             </div>
           </div>
           <div
@@ -350,7 +266,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
             }}>
             <div className="col-md-6"></div>
             <div className="col-md-6 text-end">
-              <button className="btn btn-success" onClick={() => window.history.go(-3)}>
+              <button className="btn btn-danger" onClick={() => window.history.go(-2)}>
                 Volver
               </button>
             </div>
