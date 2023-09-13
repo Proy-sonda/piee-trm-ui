@@ -7,6 +7,7 @@ import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { estaLogueado } from '@/servicios/auth';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm as useFormRH } from 'react-hook-form';
@@ -751,17 +752,13 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
               </div>
 
               <div className="row mt-5">
-                <div className="inline-group text-end">
+                <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
                   <button type="submit" className="btn btn-primary">
                     Actualizar Datos
-                  </button>{' '}
-                  &nbsp;
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={() => router.push('/empleadores')}>
-                    Volver
                   </button>
+                  <Link className="btn btn-danger mt-2 mt-sm-0 me-0 me-sm-2" href={'/empleadores'}>
+                    Volver
+                  </Link>
                 </div>
               </div>
             </form>
