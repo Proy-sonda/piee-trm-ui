@@ -694,7 +694,13 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                       type="text"
                       autoComplete="new-custom-value"
                       className={`form-control ${errors.holding ? 'is-invalid' : ''}`}
-                      {...register('holding')} // TODO: Falta validar el holding
+                      {...register('holding', {
+                        maxLength: {
+                          value: 50,
+                          message: 'No puede tener más de 50 caracteres',
+                        },
+                        onBlur: () => trimInput('holding'),
+                      })}
                     />
                     <IfContainer show={!!errors.holding}>
                       <div className="invalid-tooltip">{errors.holding?.message}</div>
