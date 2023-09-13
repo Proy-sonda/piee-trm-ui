@@ -144,13 +144,17 @@ const TablaUnidades = ({
           )}
         </Tbody>
       </Table>
-      <div className="mt-4 d-flex justify-content-between align-items-start">
+      <div className="mt-4 mb-2 d-flex justify-content-between align-items-start">
         <Paginacion
           paginaActual={paginaActual}
           numeroDePaginas={totalPaginas}
           onCambioPagina={cambiarPagina}
           tamano="md"
         />
+
+        {/* Este div vacio sirve para empujar el boton volver a la derecha cuando no se muestra la paginacion */}
+        <div></div>
+
         <Link href={`/empleadores`} className="btn btn-danger">
           Volver
         </Link>
