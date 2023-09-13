@@ -1,30 +1,11 @@
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { ActualizarEmpleadorBackendRequest } from '../(modelos)/actualizar-empleador-backend-backend';
-
-interface ActualizarEmpleadorRequest {
-  idEmpleador: number;
-  rutEmpleador: string;
-  razonSocial: string;
-  nombreFantasia: string;
-  telefono1: string;
-  telefono2: string;
-  email: string;
-  emailconfirma: string;
-  tipoEmpleadorId: number;
-  cajaCompensacionId: number;
-  actividadLaboralId: number;
-  tamanoEmpresaId: number;
-  sistemaRemuneracionId: number;
-  calle: string;
-  numero: string;
-  depto: string;
-  comunaId: string;
-}
+import { ActualizarEmpleadorRequest } from '../(modelos)/actualizar-empleador-request';
 
 export const actualizarEmpleador = (request: ActualizarEmpleadorRequest) => {
-  const req: ActualizarEmpleadorBackendRequest = {
+  // TODO: Agregar el punto de referencia al payload
+  const payload = {
     idempleador: request.idEmpleador,
     rutempleador: request.rutEmpleador,
     razonsocial: request.razonSocial,
@@ -33,6 +14,7 @@ export const actualizarEmpleador = (request: ActualizarEmpleadorRequest) => {
     telefonomovil: request.telefono2,
     email: request.email,
     emailconfirma: request.emailconfirma,
+    holding: request.holding,
     tipoempleador: {
       idtipoempleador: request.tipoEmpleadorId,
       tipoempleador: ' ',
@@ -71,6 +53,6 @@ export const actualizarEmpleador = (request: ActualizarEmpleadorRequest) => {
       Authorization: obtenerToken(),
       'Content-type': 'application/json',
     },
-    body: JSON.stringify(req),
+    body: JSON.stringify(payload),
   });
 };

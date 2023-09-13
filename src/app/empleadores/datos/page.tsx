@@ -128,6 +128,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
         nombreFantasia: data.nombreFantasia,
         email: data.email,
         emailconfirma: data.emailConfirma,
+        holding: data.holding,
+        puntoReferencia: data.puntoReferencia,
         telefono1: data.telefono1,
         telefono2: data.telefono2,
         calle: data.calle,
