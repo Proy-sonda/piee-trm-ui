@@ -5,7 +5,7 @@ import { HttpError } from '@/servicios/fetch';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { validateRut } from 'rutlib';
+import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/es/lib/isEmail';
 import { CamposFormularioAgregarUsuario } from '../(modelos)/campos-formulario-agregar-usuario';
@@ -41,6 +41,7 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
     register,
     handleSubmit,
     getValues,
+    setValue,
     formState: { errors },
   } = useForm<CamposFormularioAgregarUsuario>();
 
@@ -211,6 +212,7 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                   <input
                     type="text"
                     className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
+                    disabled={idUsuarioEditar !== undefined ? true : false}
                     {...register('rut', {
                       value: datosModal!.usuarioEditar?.rutusuario ?? '',
                       required: {
@@ -220,14 +222,13 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                       validate: {
                         esRut: (rut) => (validateRut(rut) ? undefined : 'RUT inválido'),
                       },
+                      onBlur: (value) => setValue('rut', formatRut(value.target.value, false)),
+                      onChange: (value) => setValue('rut', formatRut(value.target.value, false)),
                     })}
                   />
                   <IfContainer show={!!errors.rut}>
                     <div className="invalid-tooltip">{errors.rut?.message}</div>
                   </IfContainer>
-                  <small id="rutHelp" className="form-text text-muted" style={{ fontSize: '10px' }}>
-                    No debe incluir guiones ni puntos (EJ: 175967044)
-                  </small>
                 </div>
 
                 <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">

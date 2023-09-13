@@ -453,6 +453,11 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                       validate: {
                         esEmail: (email) => (isEmail(email) ? undefined : 'Correo inválido'),
                       },
+                      onBlur: (email) => {
+                        if (getValues('emailConfirma') !== email) {
+                          return 'Correos no coinciden';
+                        }
+                      },
                     })}
                   />
                   <IfContainer show={!!errors.email}>
@@ -488,6 +493,11 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                             return 'Correos no coinciden';
                           }
                         },
+                      },
+                      onBlur: (email) => {
+                        if (getValues('email') !== email) {
+                          return 'Correos no coinciden';
+                        }
                       },
                     })}
                   />
