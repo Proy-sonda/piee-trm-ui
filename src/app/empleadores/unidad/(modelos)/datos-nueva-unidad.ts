@@ -1,30 +1,13 @@
-export interface CrearUnidad {
-  unidad: string;
-  identificador: string;
-  email: string;
-  telefono: string;
-  direccionunidad: DireccionUnidad;
-  estadounidadrrhh: EstadoUnidadRRHH;
-  empleador: Empleador;
-}
-
-interface DireccionUnidad {
+export interface CrearUnidadRRHHRequest {
+  nombre: string;
+  regionId: string;
+  comunaId: string;
   calle: string;
   numero: string;
-  depto: string;
-  comuna: Comuna;
-}
-
-interface Comuna {
-  idcomuna: string;
-  nombre: string;
-}
-
-interface Empleador {
-  idempleador: number;
-}
-
-interface EstadoUnidadRRHH {
-  idestadounidadrrhh: number;
-  descripcion: string;
+  departamento: string;
+  identificadorUnico: string;
+  telefono: string;
+  email: string;
+  emailConfirma: string;
+  empleadorId: number;
 }

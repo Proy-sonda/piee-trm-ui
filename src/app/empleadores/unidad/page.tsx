@@ -16,9 +16,7 @@ import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
 import TablaUnidades from './(componentes)/tabla-unidades';
 import { UpdateUnidad } from './(modelos)/datos-actualizar-unidad';
-import { CrearUnidad } from './(modelos)/datos-nueva-unidad';
 import { actualizarUnidad } from './(servicios)/actualizar-unidad';
-import { crearUnidad } from './(servicios)/crear-unidad';
 
 interface UnidadRRHHPageProps {
   searchParams: {
@@ -43,28 +41,8 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
   );
 
   useEffect(() => {
-    window.history.pushState(null, '', '/empleadores/unidad');
+    // window.history.pushState(null, '', '/empleadores/unidad');
   }, []);
-
-  const crearNuevaUnidad = (nuevaUnidad: CrearUnidad) => {
-    const EnviaSolicitud = async () => {
-      const resp = await crearUnidad(nuevaUnidad);
-      if (resp.ok) {
-        refrescarPagina();
-
-        return Swal.fire({
-          html: 'Unidad creada con éxito',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-
-      return Swal.fire({ html: 'Existe un problema', icon: 'error' });
-    };
-
-    EnviaSolicitud();
-  };
 
   const handleEditUnidad = (DataUnidad: UpdateUnidad) => {
     const updateUnidad = async () => {
@@ -136,7 +114,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
         </div>
       </div>
 
-      <ModalNuevaUnidad idEmpleador={id} onCrearNuevaUnidad={crearNuevaUnidad} />
+      <ModalNuevaUnidad idEmpleador={id} onNuevaUnidadCreada={() => refrescarPagina()} />
 
       <ModalEditarUnidad idEmpleador={id} idUnidad={idunidad} onEditarUnidad={handleEditUnidad} />
     </div>
