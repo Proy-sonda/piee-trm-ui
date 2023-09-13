@@ -86,7 +86,6 @@ const TablaUnidades = ({
           <Tr>
             <Th>Nombre</Th>
             <Th>Código</Th>
-            <Th>Dirección</Th>
             <Th>Teléfono</Th>
             <Th>Correo electrónico</Th>
             <Th></Th>
@@ -98,7 +97,6 @@ const TablaUnidades = ({
               <Tr key={unidad?.idunidad}>
                 <Td>{unidad?.unidad}</Td>
                 <Td>{unidad?.identificador}</Td>
-                <Td>{unidad?.direccionunidad?.numero}</Td>
                 <Td>{unidad?.telefono}</Td>
                 <Td>{unidad?.email}</Td>
                 <Td>
