@@ -376,3 +376,8 @@ a {
     font-weight: 600;
   }
 }
+
+/* Utilidades */
+.cursor-pointer {
+  cursor: pointer !important;
+}

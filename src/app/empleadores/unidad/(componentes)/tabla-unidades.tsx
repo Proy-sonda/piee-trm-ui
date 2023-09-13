@@ -96,7 +96,13 @@ const TablaUnidades = ({
             unidadesPaginadas.map((unidad) => (
               <Tr key={unidad?.idunidad}>
                 <Td>{unidad?.identificador}</Td>
-                <Td>{unidad?.unidad}</Td>
+                <Td>
+                  <span
+                    className="text-primary cursor-pointer"
+                    onClick={() => onEditarUnidad(unidad)}>
+                    {unidad?.unidad}
+                  </span>
+                </Td>
                 <Td>{unidad?.telefono}</Td>
                 <Td>{unidad?.email}</Td>
                 <Td>
