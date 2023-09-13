@@ -1,20 +1,19 @@
 'use client';
 
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { useForm } from '@/hooks/use-form';
-import { Unidadrhh } from '@/modelos/tramitacion';
+import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { ClipLoader } from 'react-spinners';
 import Swal from 'sweetalert2';
-import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
 import TablaTrabajadores from './(componentes)/tabla-trabajadores';
-import { Trabajador, Trabajadores, UnidadEmpleador } from './(modelos)/';
+import { Trabajador, UnidadEmpleador } from './(modelos)/';
 import {
   actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
-  buscarUnidadesDeEmpleador,
   crearTrabajador,
   eliminarTrabajador,
 } from './(servicios)/';
@@ -31,50 +30,29 @@ interface TrabajadoresPageProps {
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
   const [unidad, setunidad] = useState('');
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
-  let [loading, setLoading] = useState(true);
+  let [loading, setLoading] = useState(false);
   const { idunidad, razon, rutempleador } = searchParams;
-  const [trabajadores, settrabajadores] = useState<Trabajadores[]>([]);
   const [editar, seteditar] = useState<Trabajador>({
     idtrabajador: 0,
     unidad: {
       idunidad: 0,
     },
   });
-  const [rutedit, setrutedit] = useState<string>();
-  const [show, setshow] = useState(false);
-
   const { run, onInputValidRut } = useForm({
     run: '',
   });
+  const [rutedit, setrutedit] = useState<string>();
+  const [show, setshow] = useState(false);
+  const [refresh, setRefresh] = useState(0);
 
-  useEffect(() => {
-    setLoading(true);
+  const [err, datosPagina, pendiente] = useMergeFetchObject(
+    {
+      trabajadores: buscarTrabajadoresDeUnidad(Number(idunidad)),
+    },
+    [refresh],
+  );
 
-    const obtenerTrabajadorUnidad = async () => {
-      const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
-      if (data.ok) {
-        const resp: Trabajadores[] = await data.json();
-
-        if (resp.length > 0) {
-          settrabajadores(resp);
-        }
-        setTimeout(() => setLoading(false), 2000);
-      }
-    };
-
-    obtenerTrabajadorUnidad();
-
-    const obtenerUnidad = async () => {
-      const data = await buscarUnidadPorId(Number(idunidad));
-      if (data.ok) {
-        const resp: Unidadrhh = await data.json();
-        setunidad(resp.unidad);
-      }
-    };
-    obtenerUnidad();
-
-    // window.history.pushState(null, '', '/empleadores/unidad/trabajadores');
-  }, []);
+  const refrescarComponente = () => setRefresh(Math.random());
 
   const handleEditTrabajador = (idtrabajador: number, idunidad: number, ruttrabajador: string) => {
     seteditar({
@@ -83,19 +61,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
         idunidad: idunidad,
       },
     });
-
     setrutedit(ruttrabajador);
-
-    const ObtenerUnidadesEmpleador = async () => {
-      const data = await buscarUnidadesDeEmpleador(rutempleador);
-      if (data.ok) {
-        const resp: UnidadEmpleador[] = await data.json();
-        setunidadEmpleador(resp);
-      }
-    };
-
-    ObtenerUnidadesEmpleador();
-
+    refrescarComponente();
     setshow(true);
   };
 
@@ -106,11 +73,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       const data = await eliminarTrabajador(idtrabajador);
 
       if (data.ok) {
-        const dataund = await buscarTrabajadoresDeUnidad(Number(idunidad));
-        if (data.ok) {
-          const resp: Trabajadores[] = await dataund.json();
-          resp.length > 0 ? settrabajadores(resp) : settrabajadores([]);
-        }
+        refrescarComponente();
         return Swal.fire({
           html: `Persona trabajadora ${rut} fue eliminada con éxito`,
           icon: 'success',
@@ -152,16 +115,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           showConfirmButton: false,
         });
         setshow(false);
-        const obtenerTrabajadorUnidad = async () => {
-          const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
-          if (data.ok) {
-            const resp: Trabajadores[] = await data.json();
-
-            settrabajadores(resp);
-          }
-        };
-
-        obtenerTrabajadorUnidad();
+        refrescarComponente();
       } else {
         Swal.fire({ html: 'Se ha producido un error', icon: 'error' });
       }
@@ -189,15 +143,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           showConfirmButton: false,
         });
         const obtenerTrabajadorUnidad = async () => {
-          const data = await buscarTrabajadoresDeUnidad(Number(idunidad));
-          if (data.ok) {
-            const resp: Trabajadores[] = await data.json();
-
-            if (resp.length > 0) {
-              settrabajadores(resp);
-            }
-            setTimeout(() => setLoading(false), 2000);
-          }
+          refrescarComponente();
         };
         obtenerTrabajadorUnidad();
       } else {
@@ -213,25 +159,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
 
   return (
     <>
-      <div
-        className={'spinner'}
-        style={{
-          display: loading ? '' : 'none',
-        }}>
-        <ClipLoader
-          color={'var(--color-blue)'}
-          loading={loading}
-          size={150}
-          aria-label="Loading Spinner"
-          data-testid="loader"
-        />
-      </div>
-
-      <div
-        className="bgads"
-        style={{
-          display: loading ? 'none' : '',
-        }}>
+      <div className="bgads">
         <div className="me-5 ms-5 animate__animate animate__fadeIn">
           <div className="row mt-5">
             <Titulo url="">
@@ -295,17 +223,30 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
             </div>
           </div>
 
-          <div className="row mt-2">
-            <h5>Trabajadores</h5>
+          <div className="row mt-5">
+            <div className="col-md-12 text-center">
+              <h5>Trabajadores</h5>
 
-            <br />
-            <div className="col-md-6">
-              <TablaTrabajadores
-                handleDeleteTrabajador={handleDeleteTrabajador}
-                handleEditTrabajador={handleEditTrabajador}
-                idunidad={idunidad}
-                trabajadores={trabajadores}
-              />
+              <hr />
+              <IfContainer show={pendiente}>
+                <div className="mb-5">
+                  <LoadingSpinner titulo="Cargando trabajadores..." />
+                </div>
+              </IfContainer>
+              <IfContainer show={!pendiente}>
+                {datosPagina?.trabajadores?.length || 0 > 0 ? (
+                  <TablaTrabajadores
+                    handleDeleteTrabajador={handleDeleteTrabajador}
+                    handleEditTrabajador={handleEditTrabajador}
+                    idunidad={idunidad}
+                    trabajadores={datosPagina?.trabajadores || []}
+                  />
+                ) : (
+                  <div className="text-center">
+                    <b>No se han encontrado trabajadores</b>
+                  </div>
+                )}
+              </IfContainer>
             </div>
           </div>
           <div
