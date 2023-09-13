@@ -1,7 +1,7 @@
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { CrearUnidadRRHHRequest } from '../(modelos)/datos-nueva-unidad';
+import { CrearUnidadRRHHRequest } from '../(modelos)/crear-unidad-rrhh-request';
 
 export const crearUnidad = (request: CrearUnidadRRHHRequest) => {
   const payload = {
