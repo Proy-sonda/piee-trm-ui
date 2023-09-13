@@ -13,6 +13,7 @@ interface Direccionunidad {
   iddireccionunidad: number;
   numero: string;
   depto: string;
+  calle: string;
   comuna: Comuna;
 }
 

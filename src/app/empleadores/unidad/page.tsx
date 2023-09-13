@@ -10,13 +10,10 @@ import { estaLogueado } from '@/servicios/auth';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
 import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
 import TablaUnidades from './(componentes)/tabla-unidades';
-import { UpdateUnidad } from './(modelos)/datos-actualizar-unidad';
-import { actualizarUnidad } from './(servicios)/actualizar-unidad';
 
 interface UnidadRRHHPageProps {
   searchParams: {
@@ -41,26 +38,8 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
   );
 
   useEffect(() => {
-    // window.history.pushState(null, '', '/empleadores/unidad');
+    window.history.pushState(null, '', '/empleadores/unidad');
   }, []);
-
-  const handleEditUnidad = (DataUnidad: UpdateUnidad) => {
-    const updateUnidad = async () => {
-      const data = await actualizarUnidad(DataUnidad);
-      if (data.ok) {
-        refrescarPagina();
-
-        return Swal.fire({
-          html: 'Unidad fue actualizada con exito',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-      Swal.fire({ html: 'Existe un problema en la operación', icon: 'error' });
-    };
-    updateUnidad();
-  };
 
   if (!estaLogueado()) {
     router.push('/login');
@@ -116,7 +95,18 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
 
       <ModalNuevaUnidad idEmpleador={id} onNuevaUnidadCreada={() => refrescarPagina()} />
 
-      <ModalEditarUnidad idEmpleador={id} idUnidad={idunidad} onEditarUnidad={handleEditUnidad} />
+      {idunidad !== undefined && (
+        <ModalEditarUnidad
+          idEmpleador={id}
+          idUnidad={idunidad}
+          onUnidadRRHHEditada={() => {
+            refrescarPagina();
+          }}
+          onCerrarModal={() => {
+            setIdunidad(undefined);
+          }}
+        />
+      )}
     </div>
   );
 };

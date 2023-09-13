@@ -102,11 +102,7 @@ const TablaUnidades = ({
                 <Td>{unidad?.telefono}</Td>
                 <Td>{unidad?.email}</Td>
                 <Td>
-                  <button
-                    className="btn text-primary"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modrrhh"
-                    onClick={() => onEditarUnidad(unidad)}>
+                  <button className="btn text-primary" onClick={() => onEditarUnidad(unidad)}>
                     <i className="bi bi-pencil-square"></i>
                   </button>
                   <button
