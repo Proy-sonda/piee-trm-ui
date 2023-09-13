@@ -144,13 +144,16 @@ const TablaUnidades = ({
           )}
         </Tbody>
       </Table>
-      <div className="mt-3">
+      <div className="mt-4 d-flex justify-content-between align-items-start">
         <Paginacion
           paginaActual={paginaActual}
           numeroDePaginas={totalPaginas}
           onCambioPagina={cambiarPagina}
           tamano="md"
         />
+        <Link href={`/empleadores`} className="btn btn-danger">
+          Volver
+        </Link>
       </div>
     </>
   );
