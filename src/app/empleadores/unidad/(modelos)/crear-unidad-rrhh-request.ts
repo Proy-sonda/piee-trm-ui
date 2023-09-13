@@ -1,4 +1,4 @@
-export interface ActualizarUnidadRequest {
+export interface CrearUnidadRRHHRequest {
   nombre: string;
   regionId: string;
   comunaId: string;
@@ -10,5 +10,4 @@ export interface ActualizarUnidadRequest {
   email: string;
   emailConfirma: string;
   empleadorId: number;
-  unidadId: number;
 }

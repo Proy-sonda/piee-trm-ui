@@ -1,24 +1,21 @@
 'use client';
 
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
 import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
-import { Unidadrhh } from '@/modelos/tramitacion';
+import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { estaLogueado } from '@/servicios/auth';
-import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
+import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
 import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
 import TablaUnidades from './(componentes)/tabla-unidades';
-import { UpdateUnidad } from './(modelos)/datos-actualizar-unidad';
-import { CrearUnidad } from './(modelos)/datos-nueva-unidad';
-import { actualizarUnidad } from './(servicios)/actualizar-unidad';
-import { crearUnidad } from './(servicios)/crear-unidad';
-import { eliminarUnidad } from './(servicios)/eliminar-unidad';
 
-interface UnidadRRHHProps {
+interface UnidadRRHHPageProps {
   searchParams: {
     rut: string;
     razon: string;
@@ -26,94 +23,23 @@ interface UnidadRRHHProps {
   };
 }
 
-const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
+const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
   const router = useRouter();
 
   const { rut, razon, id } = searchParams;
-  const [UnidadRRHH, setUnidadRRHH] = useState<Unidadrhh[]>([]);
+
   const [idunidad, setIdunidad] = useState<string | undefined>(undefined);
 
+  const [refrescar, refrescarPagina] = useRefrescarPagina();
+
+  const [erroresCargarUnidad, [unidades], cargandoUnidades] = useMergeFetchArray(
+    [buscarUnidadesDeRRHH(rut)],
+    [refrescar],
+  );
+
   useEffect(() => {
-    const cargaUnidades = async () => {
-      const data = await cargaUnidadrrhh(rut);
-      setUnidadRRHH(data);
-    };
-    cargaUnidades();
     window.history.pushState(null, '', '/empleadores/unidad');
   }, []);
-
-  const handleDelete = (unidadEliminar: Unidadrhh) => {
-    const { idunidad, unidad } = unidadEliminar;
-
-    Swal.fire({
-      icon: 'warning',
-      html: `¿Desea eliminar la unidad: ${unidad}?`,
-      showDenyButton: true,
-      confirmButtonText: 'Si',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        const resp = await eliminarUnidad(idunidad);
-        if (resp.ok) {
-          const cargaUnidades = async () => {
-            const data = await cargaUnidadrrhh(rut);
-
-            setUnidadRRHH(data);
-          };
-
-          cargaUnidades();
-
-          return Swal.fire('Operación realizada con éxito', '', 'success');
-        }
-
-        return Swal.fire('Existe un problema, favor contactar administrador', '', 'error');
-      }
-    });
-  };
-
-  const crearNuevaUnidad = (nuevaUnidad: CrearUnidad) => {
-    const EnviaSolicitud = async () => {
-      const resp = await crearUnidad(nuevaUnidad);
-      if (resp.ok) {
-        const cargaUnidades = async () => {
-          const data = await cargaUnidadrrhh(rut);
-          setUnidadRRHH(data);
-        };
-        cargaUnidades();
-
-        return Swal.fire({
-          html: 'Unidad creada con éxito',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-
-      return Swal.fire({ html: 'Existe un problema', icon: 'error' });
-    };
-
-    EnviaSolicitud();
-  };
-
-  const handleEditUnidad = (DataUnidad: UpdateUnidad) => {
-    const updateUnidad = async () => {
-      const data = await actualizarUnidad(DataUnidad);
-      if (data.ok) {
-        const cargaUnidades = async () => {
-          const data = await cargaUnidadrrhh(rut);
-          setUnidadRRHH(data);
-        };
-        cargaUnidades();
-        return Swal.fire({
-          html: 'Unidad fue actualizada con exito',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      }
-      Swal.fire({ html: 'Existe un problema en la operación', icon: 'error' });
-    };
-    updateUnidad();
-  };
 
   if (!estaLogueado()) {
     router.push('/login');
@@ -123,7 +49,8 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
   return (
     <div className="bgads">
       <Position position={4} />
-      <div className="container">
+
+      <div className="container pb-3 px-3 px-lg-5">
         <div className="row">
           <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
         </div>
@@ -132,36 +59,57 @@ const UnidadRRHH = ({ searchParams }: UnidadRRHHProps) => {
           Entidad Empleadora / Dirección y Unidades RRHH - <b>{razon}</b>
         </Titulo>
 
-        <div className="row mt-2">
-          <div className="col-md-8"></div>
-          <div className="col-md-4 float-end">
-            <button
-              className="btn btn-success btn-sm"
-              data-bs-toggle="modal"
-              data-bs-target="#AddURHH">
-              + Agregar Unidad RRHH
-            </button>
-          </div>
+        <div className="mt-2 d-flex justify-content-end">
+          <button
+            className="btn btn-success btn-sm"
+            disabled={cargandoUnidades || erroresCargarUnidad.length > 0}
+            data-bs-toggle="modal"
+            data-bs-target="#AddURHH">
+            + Agregar Unidad RRHH
+          </button>
         </div>
 
         <div className="row mt-2">
           <div className="col-md-12">
-            <TablaUnidades
-              rut={rut}
-              unidades={UnidadRRHH}
-              razon={razon}
-              onEditarUnidad={({ idunidad }) => setIdunidad(idunidad.toString())}
-              onEliminarUnidad={(unidad) => handleDelete(unidad)}
-            />
+            <IfContainer show={cargandoUnidades}>
+              <div className="my-4">
+                <LoadingSpinner titulo="Cargando unidades " />
+              </div>
+            </IfContainer>
+
+            <IfContainer show={!cargandoUnidades && erroresCargarUnidad.length > 0}>
+              <h4 className="mt-4 mb-5 text-center">Error al cargar las unidades de RRHH</h4>
+            </IfContainer>
+
+            <IfContainer show={!cargandoUnidades && erroresCargarUnidad.length === 0}>
+              <TablaUnidades
+                rut={rut}
+                unidades={unidades ?? []}
+                razon={razon}
+                onEditarUnidad={({ idunidad }) => setIdunidad(idunidad.toString())}
+                onUnidadEliminada={() => refrescarPagina()}
+              />
+            </IfContainer>
           </div>
         </div>
       </div>
 
-      <ModalNuevaUnidad idEmpleador={id} onCrearNuevaUnidad={crearNuevaUnidad} />
+      <ModalNuevaUnidad idEmpleador={id} onNuevaUnidadCreada={() => refrescarPagina()} />
 
-      <ModalEditarUnidad idEmpleador={id} idUnidad={idunidad} onEditarUnidad={handleEditUnidad} />
+      {idunidad !== undefined && (
+        <ModalEditarUnidad
+          idEmpleador={id}
+          idUnidad={idunidad}
+          onUnidadRRHHEditada={() => {
+            refrescarPagina();
+          }}
+          onCerrarModal={() => {
+            setIdunidad(undefined);
+          }}
+        />
+      )}
     </div>
   );
 };
 
-export default UnidadRRHH;
+export default UnidadRRHHPage;
