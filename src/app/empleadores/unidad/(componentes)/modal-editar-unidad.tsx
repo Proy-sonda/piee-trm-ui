@@ -46,7 +46,6 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
     getValues,
     setValue,
     watch,
-    reset,
     formState: { errors },
   } = useForm<FormularioEditarUnidadRRHH>({
     mode: 'onBlur',
@@ -85,6 +84,10 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
       setMostrarSpinner(false);
     }, 1000);
   }, [cargandoCombos, unidadRRHH]);
+
+  const cerrarModalEditarRRHH = () => {
+    onCerrarModal();
+  };
 
   const editarUnidadDeRRHH: SubmitHandler<FormularioEditarUnidadRRHH> = async (data) => {
     try {
@@ -159,7 +162,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
       </IfContainer>
 
       <Modal backdrop="static" size="xl" centered show={true} keyboard={false}>
-        <Modal.Header closeButton onClick={onCerrarModal}>
+        <Modal.Header closeButton onClick={cerrarModalEditarRRHH}>
           <h1 className="modal-title fs-5" id="exampleModalLabel">
             Modificar Unidad RRHH
           </h1>
@@ -497,7 +500,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
           </Modal.Body>
 
           <Modal.Footer>
-            <button type="button" className="btn btn-danger" onClick={onCerrarModal}>
+            <button type="button" className="btn btn-danger" onClick={cerrarModalEditarRRHH}>
               Cancelar
             </button>
             <button type="submit" className="btn btn-primary">
