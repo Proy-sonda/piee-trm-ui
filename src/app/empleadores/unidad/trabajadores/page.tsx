@@ -7,9 +7,9 @@ import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
-import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
+import TablaTrabajadores from './(componentes)/tabla-trabajadores';
 import { Trabajador, Trabajadores, UnidadEmpleador } from './(modelos)/';
 import {
   actualizarTrabajador,
@@ -157,9 +157,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           if (data.ok) {
             const resp: Trabajadores[] = await data.json();
 
-            if (resp.length > 0) {
-              settrabajadores(resp);
-            }
+            settrabajadores(resp);
           }
         };
 
@@ -299,49 +297,15 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
 
           <div className="row mt-2">
             <h5>Trabajadores</h5>
+
             <br />
             <div className="col-md-6">
-              <Table className="table table-striped">
-                <Thead className="align-middle text-center">
-                  <Tr>
-                    <Th>Run</Th>
-                    <Th>Acciones</Th>
-                  </Tr>
-                </Thead>
-                <Tbody className="align-middle text-center">
-                  {trabajadores.length > 0 ? (
-                    trabajadores.map(({ ruttrabajador, idtrabajador }) => (
-                      <Tr key={ruttrabajador}>
-                        <Td>{ruttrabajador}</Td>
-                        <Td>
-                          <button
-                            className="btn btn-sm btn-primary"
-                            onClick={() =>
-                              handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)
-                            }>
-                            <i
-                              title={`editar ${ruttrabajador}`}
-                              className={'bi bi-pencil-square'}></i>
-                          </button>
-                          &nbsp;
-                          <button
-                            className="btn btn-sm btn-danger"
-                            onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}>
-                            <i
-                              title={`eliminar ${ruttrabajador}`}
-                              className={'bi bi-trash btn-danger'}></i>
-                          </button>
-                        </Td>
-                      </Tr>
-                    ))
-                  ) : (
-                    <Tr>
-                      <Td>-</Td>
-                      <Td>-</Td>
-                    </Tr>
-                  )}
-                </Tbody>
-              </Table>
+              <TablaTrabajadores
+                handleDeleteTrabajador={handleDeleteTrabajador}
+                handleEditTrabajador={handleEditTrabajador}
+                idunidad={idunidad}
+                trabajadores={trabajadores}
+              />
             </div>
           </div>
           <div
