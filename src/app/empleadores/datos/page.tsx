@@ -281,7 +281,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                 <div className="col-md-4 position-relative">
                   <div className="form-group">
                     <label htmlFor="nombreFantasia" className="form-label">
-                      Nombre Fantasía (*)
+                      Nombre Fantasía
                     </label>
                     <input
                       id="nombreFantasia"
@@ -289,10 +289,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                       autoComplete="new-custom-value"
                       className={`form-control ${errors.nombreFantasia ? 'is-invalid' : ''}`}
                       {...register('nombreFantasia', {
-                        required: {
-                          message: 'Este campo es obligatorio',
-                          value: true,
-                        },
                         minLength: {
                           value: 4,
                           message: 'Debe tener al menos 4 caracteres',
