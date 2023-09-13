@@ -125,6 +125,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
   };
 
   const handleAddTrabajador = (e: FormEvent) => {
+    setLoading(true);
     e.preventDefault();
 
     const crearTrabajadorAux = async () => {
@@ -146,7 +147,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           refrescarComponente();
         };
         obtenerTrabajadorUnidad();
+        setLoading(false);
       } else {
+        setLoading(false);
         Swal.fire({
           html: 'Existe un problema al momento de grabar ' + (await data.text()),
           icon: 'error',
@@ -228,12 +231,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
               <h5>Trabajadores</h5>
 
               <hr />
-              <IfContainer show={pendiente}>
+              <IfContainer show={pendiente || loading}>
                 <div className="mb-5">
                   <LoadingSpinner titulo="Cargando trabajadores..." />
                 </div>
               </IfContainer>
-              <IfContainer show={!pendiente}>
+              <IfContainer show={!pendiente || !loading}>
                 {datosPagina?.trabajadores?.length || 0 > 0 ? (
                   <TablaTrabajadores
                     handleDeleteTrabajador={handleDeleteTrabajador}
