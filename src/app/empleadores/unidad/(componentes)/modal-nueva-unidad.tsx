@@ -288,7 +288,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
 
                     <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="numero">
-                        N° Calle (*)
+                        Número (*)
                       </label>
                       <input
                         id="numero"
@@ -325,7 +325,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
 
                     <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label className="form-label" htmlFor="departamento">
-                        N° casa/Departamento
+                        Departamento
                       </label>
                       <input
                         id="departamento"
