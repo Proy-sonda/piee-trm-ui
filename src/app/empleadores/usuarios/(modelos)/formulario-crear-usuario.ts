@@ -1,4 +1,4 @@
-export interface CamposFormularioAgregarUsuario {
+export interface FormularioCrearUsuario {
   rut: string;
   nombres: string;
   apellidos: string;
