@@ -41,10 +41,6 @@ label {
   font-size: 14px;
 }
 
-input {
-  font-size: 14px !important;
-}
-
 nav.navbar-dark {
   /* background-color: #001c41 !important; */
   background-image: url('../img/header.png') !important;
