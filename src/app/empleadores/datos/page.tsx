@@ -379,6 +379,79 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <div className="invalid-tooltip">{errors.actividadLaboralId?.message}</div>
                   </IfContainer>
                 </div>
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
+                  <div className="form-group">
+                    <label htmlFor="holding" className="form-label">
+                      Holding
+                    </label>
+                    <input
+                      id="holding"
+                      type="text"
+                      autoComplete="new-custom-value"
+                      className={`form-control ${errors.holding ? 'is-invalid' : ''}`}
+                      {...register('holding', {
+                        maxLength: {
+                          value: 50,
+                          message: 'No puede tener más de 50 caracteres',
+                        },
+                        onBlur: () => trimInput('holding'),
+                      })}
+                    />
+                    <IfContainer show={!!errors.holding}>
+                      <div className="invalid-tooltip">{errors.holding?.message}</div>
+                    </IfContainer>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
+                  <div className="form-group">
+                    <label htmlFor="tamanoEmpresa" className="form-label">
+                      N° de trabajadores (*)
+                    </label>
+                    <select
+                      id="tamanoEmpresa"
+                      className={`form-select ${errors.tamanoEmpresaId ? 'is-invalid' : ''}`}
+                      {...register('tamanoEmpresaId', {
+                        setValueAs: (v) => parseInt(v, 10),
+                        validate: validarComboObligatorio(),
+                      })}>
+                      <option value={-1}>Seleccionar</option>
+                      {comboTamanoEmpresa &&
+                        comboTamanoEmpresa.map(({ idtamanoempresa, descripcion }) => (
+                          <option key={idtamanoempresa} value={idtamanoempresa}>
+                            {descripcion}
+                          </option>
+                        ))}
+                    </select>
+                    <IfContainer show={!!errors.tamanoEmpresaId}>
+                      <div className="invalid-tooltip">{errors.tamanoEmpresaId?.message}</div>
+                    </IfContainer>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6 col-lg-4 position-relative">
+                  <label htmlFor="sistemaRemuneracion" className="form-label">
+                    Sistema de Remuneración (*)
+                  </label>
+                  <select
+                    id="sistemaRemuneracion"
+                    className={`form-select ${errors.sistemaRemuneracionId ? 'is-invalid' : ''}`}
+                    {...register('sistemaRemuneracionId', {
+                      setValueAs: (v) => parseInt(v, 10),
+                      validate: validarComboObligatorio(),
+                    })}>
+                    <option value={-1}>Seleccionar</option>
+                    {comboRemuneracion &&
+                      comboRemuneracion.map(({ idsistemaremuneracion, descripcion }) => (
+                        <option key={idsistemaremuneracion} value={idsistemaremuneracion}>
+                          {descripcion}
+                        </option>
+                      ))}
+                  </select>
+                  <IfContainer show={!!errors.sistemaRemuneracionId}>
+                    <div className="invalid-tooltip">{errors.sistemaRemuneracionId?.message}</div>
+                  </IfContainer>
+                </div>
 
                 <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="region" className="form-label">
@@ -427,10 +500,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <div className="invalid-tooltip">{errors.comunaId?.message}</div>
                   </IfContainer>
                 </div>
-
-                {/* Para mover filas a la siguiente linea */}
-                <div className="d-none d-lg-block col-lg-4"></div>
-
                 <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="calle" className="form-label">
                     Calle (*)
@@ -515,6 +584,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <div className="invalid-tooltip">{errors.departamento?.message}</div>
                   </IfContainer>
                 </div>
+                {/* Para mover filas a la siguiente linea */}
+                <div className="d-none d-lg-block col-lg-4"></div>
 
                 <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label className="form-label" htmlFor="telefono1">
@@ -599,7 +670,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     </IfContainer>
                   </div>
                 </div>
-
+              </div>
+              <div className="row">
                 <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="email" className="form-label">
                     Correo electrónico empleador (*)
@@ -666,86 +738,13 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                     <div className="invalid-tooltip">{errors.emailConfirma?.message}</div>
                   </IfContainer>
                 </div>
-
-                <div className="col-12 col-md-6 col-lg-4 position-relative">
-                  <div className="form-group">
-                    <label htmlFor="holding" className="form-label">
-                      Holding
-                    </label>
-                    <input
-                      id="holding"
-                      type="text"
-                      autoComplete="new-custom-value"
-                      className={`form-control ${errors.holding ? 'is-invalid' : ''}`}
-                      {...register('holding', {
-                        maxLength: {
-                          value: 50,
-                          message: 'No puede tener más de 50 caracteres',
-                        },
-                        onBlur: () => trimInput('holding'),
-                      })}
-                    />
-                    <IfContainer show={!!errors.holding}>
-                      <div className="invalid-tooltip">{errors.holding?.message}</div>
-                    </IfContainer>
-                  </div>
-                </div>
-
-                <div className="col-12 col-md-6 col-lg-4 position-relative">
-                  <div className="form-group">
-                    <label htmlFor="tamanoEmpresa" className="form-label">
-                      N° de trabajadores (*)
-                    </label>
-                    <select
-                      id="tamanoEmpresa"
-                      className={`form-select ${errors.tamanoEmpresaId ? 'is-invalid' : ''}`}
-                      {...register('tamanoEmpresaId', {
-                        setValueAs: (v) => parseInt(v, 10),
-                        validate: validarComboObligatorio(),
-                      })}>
-                      <option value={-1}>Seleccionar</option>
-                      {comboTamanoEmpresa &&
-                        comboTamanoEmpresa.map(({ idtamanoempresa, descripcion }) => (
-                          <option key={idtamanoempresa} value={idtamanoempresa}>
-                            {descripcion}
-                          </option>
-                        ))}
-                    </select>
-                    <IfContainer show={!!errors.tamanoEmpresaId}>
-                      <div className="invalid-tooltip">{errors.tamanoEmpresaId?.message}</div>
-                    </IfContainer>
-                  </div>
-                </div>
-
-                <div className="col-12 col-md-6 col-lg-4 position-relative">
-                  <label htmlFor="sistemaRemuneracion" className="form-label">
-                    Sistema de Remuneración (*)
-                  </label>
-                  <select
-                    id="sistemaRemuneracion"
-                    className={`form-select ${errors.sistemaRemuneracionId ? 'is-invalid' : ''}`}
-                    {...register('sistemaRemuneracionId', {
-                      setValueAs: (v) => parseInt(v, 10),
-                      validate: validarComboObligatorio(),
-                    })}>
-                    <option value={-1}>Seleccionar</option>
-                    {comboRemuneracion &&
-                      comboRemuneracion.map(({ idsistemaremuneracion, descripcion }) => (
-                        <option key={idsistemaremuneracion} value={idsistemaremuneracion}>
-                          {descripcion}
-                        </option>
-                      ))}
-                  </select>
-                  <IfContainer show={!!errors.sistemaRemuneracionId}>
-                    <div className="invalid-tooltip">{errors.sistemaRemuneracionId?.message}</div>
-                  </IfContainer>
-                </div>
               </div>
 
               <div className="row mt-5">
                 <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
                   <button type="submit" className="btn btn-primary">
-                    Actualizar Datos
+                    Grabar &nbsp;
+                    <span className="bi bi-floppy"></span>
                   </button>
                   <Link className="btn btn-danger mt-2 mt-sm-0 me-0 me-sm-2" href={'/empleadores'}>
                     Volver
