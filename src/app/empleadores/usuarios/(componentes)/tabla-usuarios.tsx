@@ -2,6 +2,7 @@ import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import Link from 'next/link';
 import React from 'react';
+import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
@@ -16,7 +17,7 @@ interface TablaUsuariosProps {
 
 const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   usuarios,
-  onEditarUsuario,
+  onEditarUsuario: handleEditarUsuario,
   onUsuarioEliminado,
 }) => {
   const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
@@ -31,7 +32,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     const { isConfirmed } = await Swal.fire({
       icon: 'question',
       title: 'Recuperar clave',
-      html: `¿Desea reenviar clave al correo ${email}?`,
+      html: `¿Desea reenviar clave al correo <b>${email}</b>?`,
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: 'SÍ',
@@ -124,12 +125,12 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 <span
                   className="text-primary cursor-pointer"
                   title="Editar usuario"
-                  onClick={() => onEditarUsuario(usuario.idusuario)}>
+                  onClick={() => handleEditarUsuario(usuario.idusuario)}>
                   {usuario.rutusuario}
                 </span>
               </Td>
               <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
-              <Td>{usuario.telefonouno}</Td>
+              <Td>{usuario.telefonouno.trim() || ' '}</Td>
               <Td>{usuario.email}</Td>
               <Td>
                 <select className="form-select form-select-sm" disabled>
@@ -138,24 +139,46 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               </Td>
               <Td>{usuario.estadousuario.descripcion}</Td>
               <Td>
-                <button
-                  className="btn text-primary"
-                  title="Editar usuario"
-                  onClick={() => onEditarUsuario(usuario.idusuario)}>
-                  <i className="bi bi-pencil-square"></i>
-                </button>
-                <button
-                  className="btn text-primary"
-                  title="Eliminar usuario"
-                  onClick={() => handleEliminarUsuario(usuario)}>
-                  <i className="bi bi-trash3"></i>
-                </button>
-                <button
-                  className="btn text-primary"
-                  title="Reestablecer clave"
-                  onClick={() => reenviarContrasena(usuario)}>
-                  <i className="bi bi-key"></i>
-                </button>
+                <div className="d-none d-lg-inline-block">
+                  <button
+                    className="btn text-primary"
+                    title="Editar usuario"
+                    onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                    <i className="bi bi-pencil-square"></i>
+                  </button>
+                  <button
+                    className="btn text-primary"
+                    title="Eliminar usuario"
+                    onClick={() => handleEliminarUsuario(usuario)}>
+                    <i className="bi bi-trash3"></i>
+                  </button>
+                  <button
+                    className="btn text-primary"
+                    title="Restablecer clave"
+                    onClick={() => reenviarContrasena(usuario)}>
+                    <i className="bi bi-key"></i>
+                  </button>
+                </div>
+
+                <div className="d-lg-none">
+                  <Dropdown>
+                    <Dropdown.Toggle variant="success" id="dropdown-basic">
+                      Acciones
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                        Editar usuario
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
+                        Eliminar usuario
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
+                        Restablecer clave
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </div>
               </Td>
             </Tr>
           ))}
