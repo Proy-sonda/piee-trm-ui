@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { formatRut, validateRut } from 'rutlib';
 
 interface BarraBusquedaEntidadesEmpleadorasProps {
   onBuscar: (rut: string, razonSocial: string) => void;
@@ -9,21 +10,31 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
 }) => {
   const [rut, setRut] = useState('');
   const [razonSocial, setRazonSocial] = useState('');
+  const [error, seterror] = useState(false);
 
   return (
     <>
       <form className="row g-2 align-items-end">
-        <div className="col-12 col-md-3 col-xxl-2">
+        <div className="col-12 col-md-3 col-xxl-2 position-relative">
           <label id="rutBuscar" className="form-label">
             RUT
           </label>
           <input
             type="text"
             id="rutBuscar"
-            className="form-control"
+            className={`form-control ${error ? 'is-invalid' : ''}`}
             value={rut}
             onInput={(e) => setRut(e.currentTarget.value)}
+            onBlur={(e) => {
+              if (!validateRut(e.target.value)) {
+                seterror(true);
+              } else {
+                seterror(false);
+              }
+              setRut(formatRut(e.target.value, false));
+            }}
           />
+          {error && <div className="invalid-tooltip">Debe ingresar un RUT válido</div>}
         </div>
 
         <div className="col-12 col-md-3 col-xxl-2">
