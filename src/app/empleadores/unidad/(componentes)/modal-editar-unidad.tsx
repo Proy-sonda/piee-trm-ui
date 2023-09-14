@@ -530,7 +530,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                 type="button"
                 className="btn btn-danger   mt-2 mt-md-0 me-0 me-md-2"
                 onClick={cerrarModalEditarRRHH}>
-                Salir
+                Volver
               </button>
             </div>
           </Modal.Footer>
