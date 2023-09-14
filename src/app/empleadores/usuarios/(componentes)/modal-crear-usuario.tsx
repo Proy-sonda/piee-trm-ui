@@ -33,6 +33,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     getValues,
     setValue,
     reset,
+    setError,
     formState: { errors },
   } = useForm<FormularioCrearUsuario>({
     mode: 'onBlur',
@@ -119,6 +120,14 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     onCerrarModal();
   };
 
+  const trimInput = (campo: keyof FormularioCrearUsuario) => {
+    const value = getValues(campo);
+
+    if (typeof value === 'string') {
+      setValue(campo, value.trim(), { shouldValidate: true });
+    }
+  };
+
   return (
     <Modal backdrop="static" size="xl" centered={true} scrollable={true} show={true}>
       <Modal.Header closeButton onClick={handleCerrarInterno}>
@@ -197,6 +206,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                       value: 80,
                       message: 'Debe tener a lo más 80 caracteres',
                     },
+                    onBlur: () => trimInput('nombres'),
                   })}
                 />
                 <IfContainer show={!!errors.nombres}>
@@ -226,6 +236,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                       value: 80,
                       message: 'Debe tener a lo más 80 caracteres',
                     },
+                    onBlur: () => trimInput('apellidos'),
                   })}
                 />
                 <IfContainer show={!!errors.apellidos}>
@@ -272,21 +283,23 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                     type="text"
                     className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
                     {...register('telefono1', {
-                      required: {
-                        value: true,
-                        message: 'Este campo es obligatorio',
-                      },
-                      minLength: {
-                        value: 9,
-                        message: 'Debe tener 9 caracteres',
-                      },
-                      maxLength: {
-                        value: 9,
-                        message: 'Debe tener 9 caracteres',
-                      },
                       pattern: {
-                        value: /^[0-9]+$/,
-                        message: 'Deben ser solo dígitos',
+                        value: /^[0-9]{9}$/, // Exactamente 9 digitos
+                        message: 'Debe tener 9 dígitos',
+                      },
+                      onChange: (event: any) => {
+                        const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                        let valorFinal = event.target.value as string;
+
+                        if (regex.test(valorFinal)) {
+                          valorFinal = valorFinal.replaceAll(regex, '');
+                        }
+
+                        if (valorFinal.length > 9) {
+                          valorFinal = valorFinal.substring(0, 9);
+                        }
+
+                        setValue('telefono1', valorFinal);
                       },
                     })}
                   />
@@ -310,21 +323,23 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                     autoComplete="new-custom-value"
                     className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
                     {...register('telefono2', {
-                      required: {
-                        value: true,
-                        message: 'Este campo es obligatorio',
-                      },
-                      minLength: {
-                        value: 9,
-                        message: 'Debe tener 9 caracteres',
-                      },
-                      maxLength: {
-                        value: 9,
-                        message: 'Debe tener 9 caracteres',
-                      },
                       pattern: {
-                        value: /^[0-9]+$/,
-                        message: 'Deben ser solo dígitos',
+                        value: /^[0-9]{9}$/, // Exactamente 9 digitos
+                        message: 'Debe tener 9 dígitos',
+                      },
+                      onChange: (event: any) => {
+                        const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                        let valorFinal = event.target.value as string;
+
+                        if (regex.test(valorFinal)) {
+                          valorFinal = valorFinal.replaceAll(regex, '');
+                        }
+
+                        if (valorFinal.length > 9) {
+                          valorFinal = valorFinal.substring(0, 9);
+                        }
+
+                        setValue('telefono2', valorFinal);
                       },
                     })}
                   />
@@ -353,6 +368,12 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                     },
                     validate: {
                       esEmail: (email) => (isEmail(email) ? undefined : 'Correo inválido'),
+                    },
+                    onBlur: (event) => {
+                      const email = event.target.value as string;
+                      if (getValues('confirmarEmail') !== email) {
+                        setError('confirmarEmail', { message: 'Correos no coinciden' });
+                      }
                     },
                   })}
                 />

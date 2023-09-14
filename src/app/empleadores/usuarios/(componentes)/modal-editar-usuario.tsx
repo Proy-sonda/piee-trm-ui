@@ -13,14 +13,12 @@ import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
 import { buscarUsuarioPorId } from '../(servicios)/buscar-usuario-por-id';
 
 interface ModalEditarUsuarioProps {
-  idEmpleador: string;
   idUsuario: number;
   onCerrarModal: () => void;
   onUsuarioEditado: () => void;
 }
 
 const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
-  idEmpleador,
   idUsuario: idUsuarioUsuario,
   onCerrarModal,
   onUsuarioEditado,
@@ -35,6 +33,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
     handleSubmit,
     getValues,
     setValue,
+    setError,
     formState: { errors },
   } = useForm<FormularioEditarUsuario>({
     mode: 'onBlur',
@@ -133,6 +132,14 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
     };
   };
 
+  const trimInput = (campo: keyof FormularioEditarUsuario) => {
+    const value = getValues(campo);
+
+    if (typeof value === 'string') {
+      setValue(campo, value.trim(), { shouldValidate: true });
+    }
+  };
+
   return (
     <Modal backdrop="static" size="xl" centered scrollable show>
       <Modal.Header closeButton onClick={handleCerrarModal}>
@@ -195,6 +202,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                       value: 80,
                       message: 'Debe tener a lo más 80 caracteres',
                     },
+                    onBlur: () => trimInput('nombres'),
                   })}
                 />
                 <IfContainer show={!!errors.nombres}>
@@ -224,6 +232,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                       value: 80,
                       message: 'Debe tener a lo más 80 caracteres',
                     },
+                    onBlur: () => trimInput('apellidos'),
                   })}
                 />
                 <IfContainer show={!!errors.apellidos}>
@@ -270,21 +279,23 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                     autoComplete="new-custom-value"
                     className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
                     {...register('telefono1', {
-                      required: {
-                        value: true,
-                        message: 'Este campo es obligatorio',
-                      },
-                      minLength: {
-                        value: 9,
-                        message: 'Debe tener 9 caracteres',
-                      },
-                      maxLength: {
-                        value: 9,
-                        message: 'Debe tener 9 caracteres',
-                      },
                       pattern: {
-                        value: /^[0-9]+$/,
+                        value: /^[0-9]{9}$/, // Exactamente 9 digitos
                         message: 'Deben ser solo dígitos',
+                      },
+                      onChange: (event: any) => {
+                        const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                        let valorFinal = event.target.value as string;
+
+                        if (regex.test(valorFinal)) {
+                          valorFinal = valorFinal.replaceAll(regex, '');
+                        }
+
+                        if (valorFinal.length > 9) {
+                          valorFinal = valorFinal.substring(0, 9);
+                        }
+
+                        setValue('telefono1', valorFinal);
                       },
                     })}
                   />
@@ -308,21 +319,23 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                     autoComplete="new-custom-value"
                     className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
                     {...register('telefono2', {
-                      required: {
-                        value: true,
-                        message: 'Este campo es obligatorio',
-                      },
-                      minLength: {
-                        value: 9,
-                        message: 'Debe tener 9 caracteres',
-                      },
-                      maxLength: {
-                        value: 9,
-                        message: 'Debe tener 9 caracteres',
-                      },
                       pattern: {
-                        value: /^[0-9]+$/,
+                        value: /^[0-9]{9}$/, // Exactamente 9 digitos
                         message: 'Deben ser solo dígitos',
+                      },
+                      onChange: (event: any) => {
+                        const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                        let valorFinal = event.target.value as string;
+
+                        if (regex.test(valorFinal)) {
+                          valorFinal = valorFinal.replaceAll(regex, '');
+                        }
+
+                        if (valorFinal.length > 9) {
+                          valorFinal = valorFinal.substring(0, 9);
+                        }
+
+                        setValue('telefono2', valorFinal);
                       },
                     })}
                   />
@@ -351,6 +364,12 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                     },
                     validate: {
                       esEmail: (email) => (isEmail(email) ? undefined : 'Correo inválido'),
+                    },
+                    onBlur: (event) => {
+                      const email = event.target.value as string;
+                      if (getValues('confirmarEmail') !== email) {
+                        setError('confirmarEmail', { message: 'Correos no coinciden' });
+                      }
                     },
                   })}
                 />

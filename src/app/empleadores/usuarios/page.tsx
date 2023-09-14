@@ -150,7 +150,6 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
       {idUsuarioEditar && (
         <ModalEditarUsuario
-          idEmpleador={id}
           idUsuario={idUsuarioEditar}
           onCerrarModal={() => {
             setIdUsuarioEditar(undefined);
