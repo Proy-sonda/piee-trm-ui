@@ -464,7 +464,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
               <div className="modal-footer">
                 <div className="w-100 d-flex flex-column flex-md-row flex-md-row-reverse">
                   <button type="submit" className="btn btn-primary">
-                    Guardar
+                    Grabar
                   </button>
                   <button
                     type="button"
