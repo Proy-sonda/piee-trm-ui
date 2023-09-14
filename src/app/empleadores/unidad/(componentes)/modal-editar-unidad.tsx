@@ -514,13 +514,13 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
           <Modal.Footer>
             <div className="w-100 d-flex flex-column flex-md-row flex-md-row-reverse">
               <button type="submit" className="btn btn-primary">
-                Modificar
+                Grabar
               </button>
               <button
                 type="button"
                 className="btn btn-danger   mt-2 mt-md-0 me-0 me-md-2"
                 onClick={cerrarModalEditarRRHH}>
-                Cancelar
+                Salir
               </button>
             </div>
           </Modal.Footer>
