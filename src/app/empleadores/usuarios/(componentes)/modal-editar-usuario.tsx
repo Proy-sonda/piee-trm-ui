@@ -149,7 +149,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
             <div className="row mb-4 g-3 align-items-baseline">
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="rut">
-                  RUT
+                  RUT (*)
                 </label>
                 <input
                   id="rut"
@@ -171,7 +171,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="nombres">
-                  Nombres
+                  Nombres (*)
                 </label>
                 <input
                   id="nombres"
@@ -200,7 +200,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="apellidos">
-                  Apellidos
+                  Apellidos (*)
                 </label>
                 <input
                   id="apellidos"
@@ -305,7 +305,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="email">
-                  Correo electrónico
+                  Correo electrónico (*)
                 </label>
                 <input
                   id="email"
@@ -332,7 +332,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="emailConfirma">
-                  Repetir Correo
+                  Repetir Correo (*)
                 </label>
                 <input
                   id="emailConfirma"
@@ -364,7 +364,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="rol">
-                  Rol
+                  Rol (*)
                 </label>
                 <select
                   id="rol"
