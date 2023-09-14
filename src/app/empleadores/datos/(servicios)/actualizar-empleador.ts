@@ -4,7 +4,6 @@ import { runFetchConThrow } from '@/servicios/fetch';
 import { ActualizarEmpleadorRequest } from '../(modelos)/actualizar-empleador-request';
 
 export const actualizarEmpleador = (request: ActualizarEmpleadorRequest) => {
-  // TODO: Agregar el punto de referencia al payload
   const payload = {
     idempleador: request.idEmpleador,
     rutempleador: request.rutEmpleador,

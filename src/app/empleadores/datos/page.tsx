@@ -96,7 +96,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
     setValue('calle', empleador.direccionempleador.calle);
     setValue('numero', empleador.direccionempleador.numero);
     setValue('departamento', empleador.direccionempleador.depto);
-    setValue('puntoReferencia', ''); // TODO: Ver de donde sacar el punto de referencia
+
     setValue('telefono1', empleador.telefonohabitual);
     setValue('telefono2', empleador.telefonomovil);
     setValue('email', empleador.email);
@@ -129,7 +129,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
         email: data.email,
         emailconfirma: data.emailConfirma,
         holding: data.holding,
-        puntoReferencia: data.puntoReferencia,
         telefono1: data.telefono1,
         telefono2: data.telefono2,
         calle: data.calle,
@@ -514,22 +513,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
                   />
                   <IfContainer show={!!errors.departamento}>
                     <div className="invalid-tooltip">{errors.departamento?.message}</div>
-                  </IfContainer>
-                </div>
-
-                <div className="col-12 col-md-6 col-lg-4 position-relative">
-                  <label htmlFor="puntoReferencia" className="form-label">
-                    Punto de referencia (Opcional)
-                  </label>
-                  <input
-                    id="puntoReferencia"
-                    type="text"
-                    autoComplete="new-custom-value"
-                    className={`form-control ${errors.puntoReferencia ? 'is-invalid' : ''}`}
-                    {...register('puntoReferencia')}
-                  />
-                  <IfContainer show={!!errors.puntoReferencia}>
-                    <div className="invalid-tooltip">{errors.puntoReferencia?.message}</div>
                   </IfContainer>
                 </div>
 

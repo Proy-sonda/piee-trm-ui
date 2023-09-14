@@ -8,7 +8,6 @@ export interface ActualizarEmpleadorRequest {
   email: string;
   emailconfirma: string;
   holding: string;
-  puntoReferencia: string;
   tipoEmpleadorId: number;
   cajaCompensacionId: number;
   actividadLaboralId: number;
