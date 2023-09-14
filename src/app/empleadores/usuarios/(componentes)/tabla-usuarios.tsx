@@ -2,7 +2,7 @@ import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import Link from 'next/link';
 import React from 'react';
-import { Dropdown } from 'react-bootstrap';
+import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
@@ -161,23 +161,17 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 </div>
 
                 <div className="d-lg-none">
-                  <Dropdown>
-                    <Dropdown.Toggle variant="success" id="dropdown-basic">
-                      Acciones
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu>
-                      <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                        Editar usuario
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
-                        Eliminar usuario
-                      </Dropdown.Item>
-                      <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
-                        Restablecer clave
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
+                  <DropdownButton title="Acciones" size="sm" variant="success">
+                    <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                      Editar usuario
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
+                      Eliminar usuario
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
+                      Restablecer clave
+                    </Dropdown.Item>
+                  </DropdownButton>
                 </div>
               </Td>
             </Tr>
