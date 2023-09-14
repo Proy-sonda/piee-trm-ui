@@ -1,40 +1,34 @@
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { HttpError } from '@/servicios/fetch';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/es/lib/isEmail';
-import { CamposFormularioAgregarUsuario } from '../(modelos)/campos-formulario-agregar-usuario';
+import { FormularioEditarUsuario } from '../(modelos)/formulario-editar-usuario';
 import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
 import { buscarUsuarioPorId } from '../(servicios)/buscar-usuario-por-id';
-import { crearUsuario } from '../(servicios)/crear-usuario';
 
-interface ModalCrearEditarProps {
-  idEmpleador: string;
-  idUsuarioEditar?: number;
+interface ModalEditarUsuarioProps {
+  idUsuario: number;
   onCerrarModal: () => void;
-  onUsuarioCreado: () => void;
   onUsuarioEditado: () => void;
 }
 
-const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
-  idEmpleador,
-  idUsuarioEditar,
+const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
+  idUsuario: idUsuarioUsuario,
   onCerrarModal,
-  onUsuarioCreado,
   onUsuarioEditado,
 }) => {
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+
   const [errDatosModal, datosModal, datosPendientes] = useMergeFetchObject({
     roles: buscarRolesUsuarios(),
-    usuarioEditar:
-      idUsuarioEditar !== undefined
-        ? buscarUsuarioPorId(idUsuarioEditar)
-        : [() => Promise.resolve(undefined), () => {}],
+    usuarioEditar: buscarUsuarioPorId(idUsuarioUsuario),
   });
 
   const {
@@ -42,91 +36,30 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
     handleSubmit,
     getValues,
     setValue,
+    setError,
     formState: { errors },
-  } = useForm<CamposFormularioAgregarUsuario>();
+  } = useForm<FormularioEditarUsuario>({
+    mode: 'onBlur',
+  });
 
-  const buscarValorParaComboRoles = (): string => {
-    const roles = datosModal?.roles ?? [];
-    const usuarioEditar = datosModal?.usuarioEditar;
-
-    if (!usuarioEditar) {
-      return '';
+  // Parchar formulario
+  useEffect(() => {
+    if (datosPendientes || errDatosModal.length > 0 || !datosModal) {
+      return;
     }
 
-    const rol = roles.find((x) => x.idrol === usuarioEditar.rol.idrol);
+    setValue('rut', datosModal.usuarioEditar.rutusuario);
+    setValue('nombres', datosModal.usuarioEditar.nombres);
+    setValue('apellidos', datosModal.usuarioEditar.apellidos);
+    setValue('telefono1', datosModal.usuarioEditar.telefonouno);
+    setValue('telefono2', datosModal.usuarioEditar.telefonodos);
+    setValue('email', datosModal.usuarioEditar.email);
+    setValue('confirmarEmail', datosModal.usuarioEditar.email);
+    setValue('rolId', datosModal.usuarioEditar.rol.idrol);
+  }, [datosModal]);
 
-    return rol?.idrol.toString() ?? '';
-  };
-
-  const onGuardarCambios: SubmitHandler<CamposFormularioAgregarUsuario> = async (data) => {
-    const usuarioEditar = datosModal?.usuarioEditar;
-
-    if (!usuarioEditar) {
-      await agregarUsuario(data);
-    } else {
-      await editarUsuario(data);
-    }
-  };
-
-  const agregarUsuario = async (data: CamposFormularioAgregarUsuario) => {
-    const rol = datosModal!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
-    if (!rol) {
-      throw new Error('El rol no se ha seleccionado o no existe');
-    }
-
-    try {
-      await crearUsuario({
-        rutusuario: data.rut,
-        nombres: data.nombres,
-        apellidos: data.apellidos,
-        email: data.email,
-        emailconfirma: data.confirmarEmail,
-        telefonouno: data.telefono1,
-        telefonodos: data.telefono2,
-        rol: rol,
-        usuarioempleador: [
-          {
-            empleador: {
-              idempleador: parseInt(idEmpleador),
-            },
-          },
-        ],
-      });
-
-      await Swal.fire({
-        title: 'Usuario creado con éxito',
-        icon: 'success',
-        showConfirmButton: true,
-      });
-
-      onUsuarioCreado();
-    } catch (error) {
-      console.error({ error });
-
-      if (error instanceof HttpError) {
-        if (error.body.message === 'Usuario ya existe') {
-          await Swal.fire({
-            title: 'El usuario ya existe',
-            icon: 'error',
-            showConfirmButton: true,
-            confirmButtonColor: 'var(--color-blue)',
-          });
-          return;
-        }
-      }
-
-      await Swal.fire({
-        title: 'Error al crear usuario',
-        text: 'Se ha producido un error desconocido',
-        icon: 'error',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-  };
-
-  const editarUsuario = async (data: CamposFormularioAgregarUsuario) => {
-    const rol = datosModal!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
+  const handleActualizarUsuario: SubmitHandler<FormularioEditarUsuario> = async (data) => {
+    const rol = datosModal!.roles.find((rol) => rol.idrol === data.rolId);
     if (!rol) {
       throw new Error('El rol no se ha seleccionado o no existe');
     }
@@ -137,6 +70,8 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
     }
 
     try {
+      setMostrarSpinner(true);
+
       await actualizarUsuario({
         idusuario: usuarioEditar.idusuario,
         rutusuario: data.rut,
@@ -150,10 +85,14 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
         estadousuario: usuarioEditar.estadousuario,
       });
 
+      setMostrarSpinner(false);
+
       await Swal.fire({
         title: 'Usuario actualizado con éxito',
         icon: 'success',
         showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
       });
 
       onUsuarioEditado();
@@ -162,68 +101,91 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
 
       if (error instanceof HttpError) {
         if (error.body.message === 'Usuario ya existe') {
-          await Swal.fire({
+          return Swal.fire({
             title: 'El usuario ya existe',
             icon: 'error',
             showConfirmButton: true,
             confirmButtonColor: 'var(--color-blue)',
+            confirmButtonText: 'OK',
           });
-          return;
         }
       }
 
-      await Swal.fire({
+      return Swal.fire({
         title: 'Error al actualizar usuario',
         text: 'Se ha producido un error desconocido',
         icon: 'error',
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
       });
+    } finally {
+      setMostrarSpinner(false);
     }
   };
 
-  const onCerrarModalInterno = () => {
+  const handleCerrarModal = () => {
     onCerrarModal();
   };
 
+  const validarComboObligatorio = (mensaje?: string) => {
+    return (valor: number | string) => {
+      if (typeof valor === 'number' && valor === -1) {
+        return mensaje ?? 'Este campo es obligatorio';
+      }
+
+      if (typeof valor === 'string' && valor === '') {
+        return mensaje ?? 'Este campo es obligatorio';
+      }
+    };
+  };
+
+  const trimInput = (campo: keyof FormularioEditarUsuario) => {
+    const value = getValues(campo);
+
+    if (typeof value === 'string') {
+      setValue(campo, value.trim(), { shouldValidate: true });
+    }
+  };
+
   return (
-    <Modal backdrop="static" size="xl" centered={true} scrollable={true} show={true}>
-      <Modal.Header closeButton onClick={onCerrarModalInterno}>
-        <Modal.Title>
-          {`${idUsuarioEditar !== undefined ? 'Editar Usuario' : 'Agregar Nuevo Usuario'}`}
-        </Modal.Title>
-      </Modal.Header>
+    <>
+      <IfContainer show={mostrarSpinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
 
-      <Modal.Body>
-        <IfContainer show={errDatosModal.length > 0}>
-          <h4 className="my-5 text-center">Hubo un error al cargar los datos</h4>
-        </IfContainer>
+      <Modal backdrop="static" size="xl" centered scrollable show>
+        <Modal.Header closeButton onClick={handleCerrarModal}>
+          <Modal.Title>Editar Usuario</Modal.Title>
+        </Modal.Header>
 
-        <IfContainer show={datosPendientes}>
-          <LoadingSpinner />
-        </IfContainer>
+        <Modal.Body>
+          <IfContainer show={errDatosModal.length > 0}>
+            <h4 className="my-5 text-center">Hubo un error al cargar los datos</h4>
+          </IfContainer>
 
-        <IfContainer show={!datosPendientes && errDatosModal.length === 0}>
-          {() => (
-            <form onSubmit={handleSubmit(onGuardarCambios)}>
+          <IfContainer show={datosPendientes}>
+            <LoadingSpinner />
+          </IfContainer>
+
+          <IfContainer show={!datosPendientes && errDatosModal.length === 0}>
+            <form onSubmit={handleSubmit(handleActualizarUsuario)}>
               <div className="row mb-4 g-3 align-items-baseline">
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                  <label>RUT</label>
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
+                  <label className="form-label" htmlFor="rut">
+                    RUT (*)
+                  </label>
                   <input
+                    id="rut"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
-                    disabled={idUsuarioEditar !== undefined ? true : false}
+                    disabled={idUsuarioUsuario !== undefined ? true : false}
                     {...register('rut', {
-                      value: datosModal!.usuarioEditar?.rutusuario ?? '',
                       required: {
                         message: 'El RUT es obligatorio',
                         value: true,
                       },
-                      validate: {
-                        esRut: (rut) => (validateRut(rut) ? undefined : 'RUT inválido'),
-                      },
-                      onBlur: (value) => setValue('rut', formatRut(value.target.value, false)),
-                      onChange: (value) => setValue('rut', formatRut(value.target.value, false)),
                     })}
                   />
                   <IfContainer show={!!errors.rut}>
@@ -231,13 +193,16 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                  <label>Nombres</label>
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
+                  <label className="form-label" htmlFor="nombres">
+                    Nombres (*)
+                  </label>
                   <input
+                    id="nombres"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.nombres ? 'is-invalid' : ''}`}
                     {...register('nombres', {
-                      value: datosModal!.usuarioEditar?.nombres ?? '',
                       required: {
                         message: 'Este campo es obligatorio',
                         value: true,
@@ -250,6 +215,7 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                         value: 80,
                         message: 'Debe tener a lo más 80 caracteres',
                       },
+                      onBlur: () => trimInput('nombres'),
                     })}
                   />
                   <IfContainer show={!!errors.nombres}>
@@ -257,13 +223,16 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                  <label>Apellidos</label>
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
+                  <label className="form-label" htmlFor="apellidos">
+                    Apellidos (*)
+                  </label>
                   <input
+                    id="apellidos"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.apellidos ? 'is-invalid' : ''}`}
                     {...register('apellidos', {
-                      value: datosModal!.usuarioEditar?.apellidos ?? '',
                       required: {
                         message: 'Este campo es obligatorio',
                         value: true,
@@ -276,6 +245,7 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                         value: 80,
                         message: 'Debe tener a lo más 80 caracteres',
                       },
+                      onBlur: () => trimInput('apellidos'),
                     })}
                   />
                   <IfContainer show={!!errors.apellidos}>
@@ -283,8 +253,33 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                  <label className="sr-only" htmlFor="tel1">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
+                  <label className="form-label" htmlFor="rol">
+                    Rol (*)
+                  </label>
+                  <select
+                    id="rol"
+                    autoComplete="new-custom-value"
+                    className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
+                    {...register('rolId', {
+                      setValueAs: (v) => parseInt(v, 10),
+                      validate: validarComboObligatorio(),
+                    })}>
+                    <option value={-1}>Seleccionar</option>
+                    {datosModal &&
+                      datosModal.roles.map((rol) => (
+                        <option key={rol.idrol} value={rol.idrol}>
+                          {rol.rol}
+                        </option>
+                      ))}
+                  </select>
+                  <IfContainer show={!!errors.rolId}>
+                    <div className="invalid-tooltip">{errors.rolId?.message}</div>
+                  </IfContainer>
+                </div>
+
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
+                  <label className="form-label" htmlFor="telefono1">
                     Teléfono 1
                   </label>
                   <div className="input-group mb-2">
@@ -292,26 +287,28 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                       <div className="input-group-text">+56</div>
                     </div>
                     <input
-                      id="tel1"
+                      id="telefono1"
                       type="text"
+                      autoComplete="new-custom-value"
                       className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
                       {...register('telefono1', {
-                        value: datosModal!.usuarioEditar?.telefonouno ?? '',
-                        required: {
-                          value: true,
-                          message: 'Este campo es obligatorio',
-                        },
-                        minLength: {
-                          value: 9,
-                          message: 'Debe tener 9 caracteres',
-                        },
-                        maxLength: {
-                          value: 9,
-                          message: 'Debe tener 9 caracteres',
-                        },
                         pattern: {
-                          value: /^[0-9]+$/,
+                          value: /^[0-9]{9}$/, // Exactamente 9 digitos
                           message: 'Deben ser solo dígitos',
+                        },
+                        onChange: (event: any) => {
+                          const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                          let valorFinal = event.target.value as string;
+
+                          if (regex.test(valorFinal)) {
+                            valorFinal = valorFinal.replaceAll(regex, '');
+                          }
+
+                          if (valorFinal.length > 9) {
+                            valorFinal = valorFinal.substring(0, 9);
+                          }
+
+                          setValue('telefono1', valorFinal);
                         },
                       })}
                     />
@@ -321,8 +318,8 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                   </div>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                  <label className="sr-only" htmlFor="tel2">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
+                  <label className="form-label" htmlFor="telefono2">
                     Teléfono 2
                   </label>
                   <div className="input-group mb-2">
@@ -330,25 +327,28 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                       <div className="input-group-text">+56</div>
                     </div>
                     <input
+                      id="telefono2"
                       type="text"
+                      autoComplete="new-custom-value"
                       className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
                       {...register('telefono2', {
-                        value: datosModal!.usuarioEditar?.telefonodos ?? '',
-                        required: {
-                          value: true,
-                          message: 'Este campo es obligatorio',
-                        },
-                        minLength: {
-                          value: 9,
-                          message: 'Debe tener 9 caracteres',
-                        },
-                        maxLength: {
-                          value: 9,
-                          message: 'Debe tener 9 caracteres',
-                        },
                         pattern: {
-                          value: /^[0-9]+$/,
+                          value: /^[0-9]{9}$/, // Exactamente 9 digitos
                           message: 'Deben ser solo dígitos',
+                        },
+                        onChange: (event: any) => {
+                          const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                          let valorFinal = event.target.value as string;
+
+                          if (regex.test(valorFinal)) {
+                            valorFinal = valorFinal.replaceAll(regex, '');
+                          }
+
+                          if (valorFinal.length > 9) {
+                            valorFinal = valorFinal.substring(0, 9);
+                          }
+
+                          setValue('telefono2', valorFinal);
                         },
                       })}
                     />
@@ -358,23 +358,31 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                   </div>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                  <label htmlFor="exampleInputEmail1">Correo electrónico</label>
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
+                  <label className="form-label" htmlFor="email">
+                    Correo electrónico (*)
+                  </label>
                   <input
+                    id="email"
                     type="mail"
-                    autoComplete="off"
+                    autoComplete="new-custom-value"
                     placeholder="ejemplo@ejemplo.cl"
                     onPaste={(e) => e.preventDefault()}
                     onCopy={(e) => e.preventDefault()}
                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                     {...register('email', {
-                      value: datosModal!.usuarioEditar?.email ?? '',
                       required: {
                         value: true,
                         message: 'Este campo es obligatorio',
                       },
                       validate: {
                         esEmail: (email) => (isEmail(email) ? undefined : 'Correo inválido'),
+                      },
+                      onBlur: (event) => {
+                        const email = event.target.value as string;
+                        if (getValues('confirmarEmail') !== email) {
+                          setError('confirmarEmail', { message: 'Correos no coinciden' });
+                        }
                       },
                     })}
                   />
@@ -383,17 +391,19 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                  <label htmlFor="exampleInputEmail1">Repetir Correo</label>
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
+                  <label className="form-label" htmlFor="emailConfirma">
+                    Repetir Correo (*)
+                  </label>
                   <input
+                    id="emailConfirma"
                     type="mail"
-                    autoComplete="off"
+                    autoComplete="new-custom-value"
                     placeholder="ejemplo@ejemplo.cl"
                     onPaste={(e) => e.preventDefault()}
                     onCopy={(e) => e.preventDefault()}
                     className={`form-control ${errors.confirmarEmail ? 'is-invalid' : ''}`}
                     {...register('confirmarEmail', {
-                      value: datosModal!.usuarioEditar?.email ?? '',
                       required: {
                         value: true,
                         message: 'Este campo es obligatorio',
@@ -412,48 +422,27 @@ const ModalCrearEditarUsuario: React.FC<ModalCrearEditarProps> = ({
                     <div className="invalid-tooltip">{errors.confirmarEmail?.message}</div>
                   </IfContainer>
                 </div>
-
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                  <label className="form-text">Rol</label>
-                  <select
-                    className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
-                    {...register('rolId', {
-                      value: buscarValorParaComboRoles(),
-                      validate: (rolId) => (rolId === '' ? 'Este campo es obligatorio' : undefined),
-                    })}>
-                    <option value={''}>Seleccionar</option>
-                    {datosModal &&
-                      datosModal.roles.map((rol) => (
-                        <option key={rol.idrol} value={rol.idrol}>
-                          {rol.rol}
-                        </option>
-                      ))}
-                  </select>
-                  <IfContainer show={!!errors.rolId}>
-                    <div className="invalid-tooltip">{errors.rolId?.message}</div>
-                  </IfContainer>
-                </div>
               </div>
 
               <div className="row mt-4">
-                <div className="d-flex flex-column flex-md-row-reverse">
+                <div className="d-flex flex-column flex-sm-row-reverse">
                   <button type="submit" className="btn btn-primary" disabled={datosPendientes}>
                     Guardar
                   </button>
                   <button
                     type="button"
-                    className="btn btn-danger mt-2 mt-md-0 me-md-2"
-                    onClick={onCerrarModalInterno}>
+                    className="btn btn-danger mt-2 mt-sm-0 me-sm-2"
+                    onClick={handleCerrarModal}>
                     Volver
                   </button>
                 </div>
               </div>
             </form>
-          )}
-        </IfContainer>
-      </Modal.Body>
-    </Modal>
+          </IfContainer>
+        </Modal.Body>
+      </Modal>
+    </>
   );
 };
 
-export default ModalCrearEditarUsuario;
+export default ModalEditarUsuario;

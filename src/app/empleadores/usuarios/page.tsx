@@ -4,17 +4,16 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
 import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
-import ModalCrearEditarUsuario from './(componentes)/modal-crear-editar-usuario';
+import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
+import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
 import TablaUsuarios from './(componentes)/tabla-usuarios';
-import { UsuarioEntidadEmpleadora } from './(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from './(servicios)/buscar-usuarios';
-import { eliminarUsuario } from './(servicios)/eliminar-usuario';
 
 interface UsuariosPageProps {
   searchParams: {
@@ -29,74 +28,17 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
   const { id, rut, razon } = searchParams;
 
-  const [refresh, setRefresh] = useState(0);
-  const [mostrarModal, setMostrarModal] = useState(false);
+  const [refresh, refrescarComponente] = useRefrescarPagina();
+
+  const [abrirModalCrearUsuario, setAbrirModalCrearUsuario] = useState(false);
+
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
-  const [err, datosPagina, pendiente] = useMergeFetchObject(
-    {
-      usuarios: buscarUsuarios(rut),
-    },
-    [refresh],
-  );
 
-  const refrescarComponente = () => {
-    /* Hay que setearlo a un valor distinto al anterior para que vuelva a cargar los usuarios */
-    setRefresh(Math.random());
-  };
-
-  const onEditarUsuario = (idUsuarioEditar: number): void => {
-    setIdUsuarioEditar(idUsuarioEditar);
-    setMostrarModal(true);
-  };
-
-  const onCerrarModal = () => {
-    setMostrarModal(false);
-    setIdUsuarioEditar(undefined);
-  };
+  const [err, [usuarios], pendiente] = useMergeFetchArray([buscarUsuarios(rut)], [refresh]);
 
   useEffect(() => {
     window.history.pushState(null, '', '/empleadores/usuarios');
   }, []);
-
-  const onEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
-    const respuesta = await Swal.fire({
-      html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
-      icon: 'question',
-      showConfirmButton: true,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'NO',
-      cancelButtonColor: 'var(--bs-danger)',
-    });
-
-    if (!respuesta.isConfirmed) {
-      return;
-    }
-
-    try {
-      await eliminarUsuario(usuario.idusuario);
-
-      /** NOTA: No usar await en esta alerta para que refresque el componente en el fondo */
-      Swal.fire({
-        title: `${usuario.nombres} ${usuario.apellidos} fue eliminado con éxito`,
-        icon: 'success',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-      });
-
-      refrescarComponente();
-    } catch (error) {
-      console.error({ error });
-
-      await Swal.fire({
-        title: 'Error al eliminar usuario',
-        icon: 'error',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-  };
 
   if (!estaLogueado) {
     router.push('/login');
@@ -118,7 +60,9 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
         <div className="mt-2 row">
           <div className="d-flex justify-content-end">
-            <button className="btn btn-success btn-sm" onClick={() => setMostrarModal(true)}>
+            <button
+              className="btn btn-success btn-sm"
+              onClick={() => setAbrirModalCrearUsuario(true)}>
               + Agregar Usuario
             </button>
           </div>
@@ -138,22 +82,31 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
             <IfContainer show={!pendiente && err.length === 0}>
               <TablaUsuarios
-                usuarios={datosPagina?.usuarios ?? []}
-                onEditarUsuario={onEditarUsuario}
-                onEliminarUsuario={onEliminarUsuario}
+                usuarios={usuarios ?? []}
+                onEditarUsuario={(idUsuario) => setIdUsuarioEditar(idUsuario)}
+                onUsuarioEliminado={() => refrescarComponente()}
               />
             </IfContainer>
           </div>
         </div>
       </div>
 
-      {mostrarModal && (
-        <ModalCrearEditarUsuario
+      {abrirModalCrearUsuario && (
+        <ModalCrearUsuario
           idEmpleador={id}
-          idUsuarioEditar={idUsuarioEditar}
-          onCerrarModal={onCerrarModal}
-          onUsuarioCreado={refrescarComponente}
-          onUsuarioEditado={refrescarComponente}
+          onCerrarModal={() => setAbrirModalCrearUsuario(false)}
+          onUsuarioCreado={() => refrescarComponente()}
+        />
+      )}
+
+      {idUsuarioEditar && (
+        <ModalEditarUsuario
+          idUsuario={idUsuarioEditar}
+          onCerrarModal={() => setIdUsuarioEditar(undefined)}
+          onUsuarioEditado={() => {
+            setIdUsuarioEditar(undefined);
+            refrescarComponente();
+          }}
         />
       )}
     </div>
