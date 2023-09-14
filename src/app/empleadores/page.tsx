@@ -48,6 +48,7 @@ const EmpleadoresPage = () => {
 
     const { isConfirmed } = await Swal.fire({
       title: 'Desadscribir',
+      icon: 'warning',
       html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
       showCancelButton: true,
       showConfirmButton: true,
