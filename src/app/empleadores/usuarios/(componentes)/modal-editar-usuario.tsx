@@ -85,6 +85,8 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
         title: 'Usuario actualizado con éxito',
         icon: 'success',
         showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
       });
 
       onUsuarioEditado();
@@ -98,6 +100,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
             icon: 'error',
             showConfirmButton: true,
             confirmButtonColor: 'var(--color-blue)',
+            confirmButtonText: 'OK',
           });
           return;
         }
@@ -109,6 +112,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
         icon: 'error',
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
       });
     }
   };
