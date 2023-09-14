@@ -32,12 +32,15 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     handleSubmit,
     getValues,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<FormularioCrearUsuario>({
     mode: 'onBlur',
   });
 
-  const onGuardarCambios: SubmitHandler<FormularioCrearUsuario> = async (data) => {
+  const limpiarFormulario = reset;
+
+  const handleCrearUsuario: SubmitHandler<FormularioCrearUsuario> = async (data) => {
     const rol = datosModal!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
     if (!rol) {
       throw new Error('El rol no se ha seleccionado o no existe');
@@ -66,7 +69,11 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
         title: 'Usuario creado con éxito',
         icon: 'success',
         showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
       });
+
+      limpiarFormulario();
 
       onUsuarioCreado();
     } catch (error) {
@@ -79,6 +86,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
             icon: 'error',
             showConfirmButton: true,
             confirmButtonColor: 'var(--color-blue)',
+            confirmButtonText: 'OK',
           });
           return;
         }
@@ -90,6 +98,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
         icon: 'error',
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
       });
     }
   };
@@ -106,13 +115,13 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     };
   };
 
-  const onCerrarModalInterno = () => {
+  const handleCerrarInterno = () => {
     onCerrarModal();
   };
 
   return (
     <Modal backdrop="static" size="xl" centered={true} scrollable={true} show={true}>
-      <Modal.Header closeButton onClick={onCerrarModalInterno}>
+      <Modal.Header closeButton onClick={handleCerrarInterno}>
         <Modal.Title>Agregar Nuevo Usuario</Modal.Title>
       </Modal.Header>
 
@@ -126,7 +135,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
         </IfContainer>
 
         <IfContainer show={!datosPendientes && errDatosModal.length === 0}>
-          <form onSubmit={handleSubmit(onGuardarCambios)}>
+          <form onSubmit={handleSubmit(handleCrearUsuario)}>
             <div className="row mb-4 g-3 align-items-baseline">
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="rut">
@@ -393,7 +402,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                 <button
                   type="button"
                   className="btn btn-danger mt-2 mt-md-0 me-md-2"
-                  onClick={onCerrarModalInterno}>
+                  onClick={handleCerrarInterno}>
                   Volver
                 </button>
               </div>
