@@ -1,0 +1,69 @@
+.stepper-link {
+  display: inline-block !important;
+  position: relative !important;
+  height: 25px !important;
+  line-height: 25px !important;
+  padding: 0 20px !important;
+  border: 1px solid #ccc !important;
+  margin-right: 10px !important;
+  background-color: #d1d9ec !important;
+  color: black;
+}
+
+.right:after {
+  content: '';
+  border-top: 1px solid #ccc !important;
+  border-right: 1px solid #ccc !important;
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  right: 0;
+  top: -1px;
+  background-color: #d1d9ec !important;
+  z-index: 150;
+
+  -webkit-transform: translate(10px, 4px) rotate(45deg);
+  -moz-transform: translate(10px, 4px) rotate(45deg);
+  -ms-transform: translate(10px, 4px) rotate(45deg);
+  -o-transform: translate(10px, 4px) rotate(20deg);
+  transform: translate(10px, 4px) rotate(45deg);
+}
+
+.left:before {
+  content: '';
+  border-top: 1px solid #ccc !important;
+  border-right: 1px solid #ccc !important;
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  left: 0;
+  top: -1px;
+  background-color: white !important;
+  z-index: 50;
+
+  -webkit-transform: translate(-10px, 4px) rotate(45deg);
+  -moz-transform: translate(-10px, 4px) rotate(45deg);
+  -ms-transform: translate(-10px, 4px) rotate(45deg);
+  -o-transform: translate(-10px, 4px) rotate(20deg);
+  transform: translate(-10px, 4px) rotate(45deg);
+}
+
+.active {
+  background-color: var(--color-blue) !important;
+  color: white !important;
+}
+
+.active:after {
+  background-color: var(--color-blue) !important;
+}
+
+.espaciado {
+  margin-top: 10px !important;
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .espaciado {
+    margin: 0 10px !important;
+  }
+}
