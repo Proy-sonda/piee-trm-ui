@@ -148,9 +148,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
           <form onSubmit={handleSubmit(handleActualizarUsuario)}>
             <div className="row mb-4 g-3 align-items-baseline">
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label>RUT</label>
+                <label className="form-label" htmlFor="rut">
+                  RUT
+                </label>
                 <input
+                  id="rut"
                   type="text"
+                  autoComplete="new-custom-value"
                   className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
                   disabled={idUsuarioUsuario !== undefined ? true : false}
                   {...register('rut', {
@@ -166,9 +170,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label>Nombres</label>
+                <label className="form-label" htmlFor="nombres">
+                  Nombres
+                </label>
                 <input
+                  id="nombres"
                   type="text"
+                  autoComplete="new-custom-value"
                   className={`form-control ${errors.nombres ? 'is-invalid' : ''}`}
                   {...register('nombres', {
                     required: {
@@ -191,9 +199,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label>Apellidos</label>
+                <label className="form-label" htmlFor="apellidos">
+                  Apellidos
+                </label>
                 <input
+                  id="apellidos"
                   type="text"
+                  autoComplete="new-custom-value"
                   className={`form-control ${errors.apellidos ? 'is-invalid' : ''}`}
                   {...register('apellidos', {
                     required: {
@@ -216,7 +228,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label className="sr-only" htmlFor="tel1">
+                <label className="form-label" htmlFor="telefono1">
                   Teléfono 1
                 </label>
                 <div className="input-group mb-2">
@@ -224,8 +236,9 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                     <div className="input-group-text">+56</div>
                   </div>
                   <input
-                    id="tel1"
+                    id="telefono1"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
                     {...register('telefono1', {
                       required: {
@@ -253,7 +266,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label className="sr-only" htmlFor="tel2">
+                <label className="form-label" htmlFor="telefono2">
                   Teléfono 2
                 </label>
                 <div className="input-group mb-2">
@@ -261,7 +274,9 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                     <div className="input-group-text">+56</div>
                   </div>
                   <input
+                    id="telefono2"
                     type="text"
+                    autoComplete="new-custom-value"
                     className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
                     {...register('telefono2', {
                       required: {
@@ -289,10 +304,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label htmlFor="exampleInputEmail1">Correo electrónico</label>
+                <label className="form-label" htmlFor="email">
+                  Correo electrónico
+                </label>
                 <input
+                  id="email"
                   type="mail"
-                  autoComplete="off"
+                  autoComplete="new-custom-value"
                   placeholder="ejemplo@ejemplo.cl"
                   onPaste={(e) => e.preventDefault()}
                   onCopy={(e) => e.preventDefault()}
@@ -313,10 +331,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label htmlFor="exampleInputEmail1">Repetir Correo</label>
+                <label className="form-label" htmlFor="emailConfirma">
+                  Repetir Correo
+                </label>
                 <input
+                  id="emailConfirma"
                   type="mail"
-                  autoComplete="off"
+                  autoComplete="new-custom-value"
                   placeholder="ejemplo@ejemplo.cl"
                   onPaste={(e) => e.preventDefault()}
                   onCopy={(e) => e.preventDefault()}
@@ -342,8 +363,12 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label className="form-text">Rol</label>
+                <label className="form-label" htmlFor="rol">
+                  Rol
+                </label>
                 <select
+                  id="rol"
+                  autoComplete="new-custom-value"
                   className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
                   {...register('rolId', {
                     setValueAs: (v) => parseInt(v, 10),
