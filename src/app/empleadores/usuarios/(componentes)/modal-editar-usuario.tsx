@@ -171,7 +171,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
           <IfContainer show={!datosPendientes && errDatosModal.length === 0}>
             <form onSubmit={handleSubmit(handleActualizarUsuario)}>
               <div className="row mb-4 g-3 align-items-baseline">
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="rut">
                     RUT (*)
                   </label>
@@ -193,7 +193,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="nombres">
                     Nombres (*)
                   </label>
@@ -223,7 +223,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="apellidos">
                     Apellidos (*)
                   </label>
@@ -253,7 +253,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="rol">
                     Rol (*)
                   </label>
@@ -278,7 +278,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="telefono1">
                     Teléfono 1
                   </label>
@@ -318,7 +318,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   </div>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="telefono2">
                     Teléfono 2
                   </label>
@@ -358,7 +358,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   </div>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="email">
                     Correo electrónico (*)
                   </label>
@@ -391,7 +391,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   </IfContainer>
                 </div>
 
-                <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="emailConfirma">
                     Repetir Correo (*)
                   </label>
@@ -425,13 +425,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
               </div>
 
               <div className="row mt-4">
-                <div className="d-flex flex-column flex-md-row-reverse">
+                <div className="d-flex flex-column flex-sm-row-reverse">
                   <button type="submit" className="btn btn-primary" disabled={datosPendientes}>
                     Guardar
                   </button>
                   <button
                     type="button"
-                    className="btn btn-danger mt-2 mt-md-0 me-md-2"
+                    className="btn btn-danger mt-2 mt-sm-0 me-sm-2"
                     onClick={handleCerrarModal}>
                     Volver
                   </button>
