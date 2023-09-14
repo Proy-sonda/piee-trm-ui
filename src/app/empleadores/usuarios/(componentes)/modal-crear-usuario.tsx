@@ -225,6 +225,31 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
               </div>
 
               <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
+                <label className="form-label" htmlFor="rol">
+                  Rol (*)
+                </label>
+                <select
+                  id="rol"
+                  autoComplete="new-custom-value"
+                  className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
+                  {...register('rolId', {
+                    setValueAs: (v) => parseInt(v, 10),
+                    validate: validarComboObligatorio(),
+                  })}>
+                  <option value={-1}>Seleccionar</option>
+                  {datosModal &&
+                    datosModal.roles.map((rol) => (
+                      <option key={rol.idrol} value={rol.idrol}>
+                        {rol.rol}
+                      </option>
+                    ))}
+                </select>
+                <IfContainer show={!!errors.rolId}>
+                  <div className="invalid-tooltip">{errors.rolId?.message}</div>
+                </IfContainer>
+              </div>
+
+              <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="telefono1">
                   Teléfono 1
                 </label>
@@ -356,31 +381,6 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                 />
                 <IfContainer show={!!errors.confirmarEmail}>
                   <div className="invalid-tooltip">{errors.confirmarEmail?.message}</div>
-                </IfContainer>
-              </div>
-
-              <div className="col-12 col-md-6 col-lg-4 col-xl-3 position-relative">
-                <label className="form-label" htmlFor="rol">
-                  Rol (*)
-                </label>
-                <select
-                  id="rol"
-                  autoComplete="new-custom-value"
-                  className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
-                  {...register('rolId', {
-                    setValueAs: (v) => parseInt(v, 10),
-                    validate: validarComboObligatorio(),
-                  })}>
-                  <option value={-1}>Seleccionar</option>
-                  {datosModal &&
-                    datosModal.roles.map((rol) => (
-                      <option key={rol.idrol} value={rol.idrol}>
-                        {rol.rol}
-                      </option>
-                    ))}
-                </select>
-                <IfContainer show={!!errors.rolId}>
-                  <div className="invalid-tooltip">{errors.rolId?.message}</div>
                 </IfContainer>
               </div>
             </div>
