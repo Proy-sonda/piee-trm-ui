@@ -37,7 +37,6 @@ body {
   }
 }
 
-
 label {
   font-size: 14px;
 }
@@ -172,76 +171,6 @@ table tbody tr td div button {
   background-color: var(--color-blue) !important;
 }
 
-#flowBoxes {
-  margin-bottom: 10px !important;
-  /* padding:20px !important; */
-  /* min-width:700px !important; */
-}
-#flowBoxes div {
-  display: inline-block !important;
-  position: relative !important;
-  height: 25px !important;
-  line-height: 25px !important;
-  padding: 0 20px !important;
-  border: 1px solid #ccc !important;
-  margin-right: 10px !important;
-  background-color: #d1d9ec !important;
-}
-
-#flowBoxes div a {
-  color: black;
-}
-
-#flowBoxes div.right:after {
-  content: '';
-  border-top: 1px solid #ccc !important;
-  border-right: 1px solid #ccc !important;
-  width: 18px;
-  height: 18px;
-  position: absolute;
-  right: 0;
-  top: -1px;
-  background-color: #d1d9ec !important;
-  z-index: 150;
-
-  -webkit-transform: translate(10px, 4px) rotate(45deg);
-  -moz-transform: translate(10px, 4px) rotate(45deg);
-  -ms-transform: translate(10px, 4px) rotate(45deg);
-  -o-transform: translate(10px, 4px) rotate(20deg);
-  transform: translate(10px, 4px) rotate(45deg);
-}
-
-#flowBoxes div.left:before {
-  content: '';
-  border-top: 1px solid #ccc !important;
-  border-right: 1px solid #ccc !important;
-  width: 18px;
-  height: 18px;
-  position: absolute;
-  left: 0;
-  top: -1px;
-  background-color: white !important;
-  z-index: 50;
-
-  -webkit-transform: translate(-10px, 4px) rotate(45deg);
-  -moz-transform: translate(-10px, 4px) rotate(45deg);
-  -ms-transform: translate(-10px, 4px) rotate(45deg);
-  -o-transform: translate(-10px, 4px) rotate(20deg);
-  transform: translate(-10px, 4px) rotate(45deg);
-}
-#flowBoxes .active {
-  background-color: var(--color-blue) !important;
-  color: white !important;
-}
-
-#flowBoxes .active a {
-  color: white !important;
-}
-
-#flowBoxes div.active:after {
-  background-color: var(--color-blue) !important;
-}
-
 .font-sm {
   font-size: 11.5px !important;
 }
@@ -315,7 +244,6 @@ a {
   filter: blur(5px); /* Aplica un desenfoque de 5px al elemento principal de la página */
 }
 
-
 /* inspired by: https://css-tricks.com/responsive-data-tables/ */
 .responsiveTable {
   width: 100%;
@@ -348,8 +276,8 @@ a {
   }
 
   .responsiveTable tbody tr {
-    border-bottom: .5px solid #dee2e6;
-    padding: .25em;
+    border-bottom: 0.5px solid #dee2e6;
+    padding: 0.25em;
   }
 
   .responsiveTable td.pivoted {
