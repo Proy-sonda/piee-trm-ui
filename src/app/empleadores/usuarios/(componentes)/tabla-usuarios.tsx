@@ -1,46 +1,49 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import Link from 'next/link';
-import React, { FormEvent } from 'react';
+import React from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
+import { eliminarUsuario } from '../(servicios)/eliminar-usuario';
 import { recuperarContrasena } from '../(servicios)/recuperar-clave';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
   onEditarUsuario: (usuarioId: number) => void;
-  onEliminarUsuario: (usuario: UsuarioEntidadEmpleadora) => void | Promise<void>;
+  onUsuarioEliminado: () => void | Promise<void>;
 }
 
 const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   usuarios,
   onEditarUsuario,
-  onEliminarUsuario,
+  onUsuarioEliminado,
 }) => {
   const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: usuarios,
     tamanoPagina: 5,
   });
 
-  const reenviarContrasena = async (
-    e: FormEvent<HTMLButtonElement>,
-    rut: string,
-    email: string,
-  ) => {
-    const resp = await Swal.fire({
+  const reenviarContrasena = async (usuario: UsuarioEntidadEmpleadora) => {
+    const rut = usuario.rutusuario;
+    const email = usuario.email;
+
+    const { isConfirmed } = await Swal.fire({
+      icon: 'question',
       title: 'Recuperar clave',
       html: `¿Desea reenviar clave al correo ${email}?`,
       showDenyButton: true,
       showCancelButton: false,
-      confirmButtonText: 'Si',
+      confirmButtonText: 'SÍ',
       confirmButtonColor: 'var(--color-blue)',
-      denyButtonText: `No`,
+      denyButtonText: `NO`,
+      denyButtonColor: 'var(--bs-danger)',
     });
 
-    if (resp.isDenied || resp.isDismissed) return;
+    if (!isConfirmed) {
+      return;
+    }
 
-    e.preventDefault();
     try {
       await recuperarContrasena(rut);
       Swal.fire({
@@ -55,6 +58,47 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
         icon: 'error',
         timer: 2000,
         showConfirmButton: false,
+      });
+    }
+  };
+
+  const handleEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
+    const { isConfirmed } = await Swal.fire({
+      html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
+      icon: 'warning',
+      showConfirmButton: true,
+      confirmButtonText: 'SÍ',
+      confirmButtonColor: 'var(--color-blue)',
+      showCancelButton: true,
+      cancelButtonText: 'NO',
+      cancelButtonColor: 'var(--bs-danger)',
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    try {
+      await eliminarUsuario(usuario.idusuario);
+
+      Swal.fire({
+        title: `${usuario.nombres} ${usuario.apellidos} fue eliminado con éxito`,
+        icon: 'success',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
+      });
+
+      onUsuarioEliminado();
+    } catch (error) {
+      console.error({ error });
+
+      await Swal.fire({
+        title: 'Error al eliminar usuario',
+        icon: 'error',
+        showConfirmButton: true,
+        confirmButtonColor: 'var(--color-blue)',
+        confirmButtonText: 'OK',
       });
     }
   };
@@ -103,13 +147,13 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 <button
                   className="btn text-primary"
                   title="Eliminar usuario"
-                  onClick={() => onEliminarUsuario(usuario)}>
+                  onClick={() => handleEliminarUsuario(usuario)}>
                   <i className="bi bi-trash3"></i>
                 </button>
                 <button
                   className="btn text-primary"
                   title="Reestablecer clave"
-                  onClick={(e) => reenviarContrasena(e, usuario.rutusuario, usuario.email)}>
+                  onClick={() => reenviarContrasena(usuario)}>
                   <i className="bi bi-key"></i>
                 </button>
               </Td>
