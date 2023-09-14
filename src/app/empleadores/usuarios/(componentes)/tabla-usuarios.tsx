@@ -1,5 +1,6 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
+import Link from 'next/link';
 import React, { FormEvent } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
@@ -75,7 +76,14 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
         <Tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
             <Tr key={usuario.idusuario}>
-              <Td>{usuario.rutusuario}</Td>
+              <Td>
+                <span
+                  className="text-primary cursor-pointer"
+                  title="Editar usuario"
+                  onClick={() => onEditarUsuario(usuario.idusuario)}>
+                  {usuario.rutusuario}
+                </span>
+              </Td>
               <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
               <Td>{usuario.telefonouno}</Td>
               <Td>{usuario.email}</Td>
@@ -88,23 +96,19 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               <Td>
                 <button
                   className="btn text-primary"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onEditarUsuario(usuario.idusuario);
-                  }}>
+                  title="Editar usuario"
+                  onClick={() => onEditarUsuario(usuario.idusuario)}>
                   <i className="bi bi-pencil-square"></i>
                 </button>
                 <button
                   className="btn text-primary"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    onEliminarUsuario(usuario);
-                  }}>
+                  title="Eliminar usuario"
+                  onClick={() => onEliminarUsuario(usuario)}>
                   <i className="bi bi-trash3"></i>
                 </button>
                 <button
                   className="btn text-primary"
-                  title="Reenviar clave"
+                  title="Reestablecer clave"
                   onClick={(e) => reenviarContrasena(e, usuario.rutusuario, usuario.email)}>
                   <i className="bi bi-key"></i>
                 </button>
@@ -114,12 +118,21 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
         </Tbody>
       </Table>
 
-      <div className="mt-3">
+      <div className="mt-4 mb-2 d-flex flex-column flex-sm-row justify-content-sm-between">
         <Paginacion
           paginaActual={paginaActual}
           numeroDePaginas={totalPaginas}
           onCambioPagina={cambiarPagina}
         />
+
+        {/* Este div vacio sirve para empujar el boton volver a la derecha cuando no se muestra la paginacion */}
+        <div></div>
+
+        <div>
+          <Link href={`/empleadores`} className="btn btn-danger d-inline-block">
+            Volver
+          </Link>
+        </div>
       </div>
     </>
   );
