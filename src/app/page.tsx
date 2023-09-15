@@ -12,7 +12,7 @@ export default function Home() {
         <div className="col-md-6">
           {/* <ButtonImage url='/tramitacion' text='Ingreso al portal' img={redcross.src} /> */}
 
-          <LoginComponent buttonText="Ingresar" />
+          <LoginComponent />
         </div>
       </div>
     </div>
