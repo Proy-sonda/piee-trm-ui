@@ -10,29 +10,33 @@ const Usuario: React.FC = () => {
 
   const router = useRouter();
 
-  const handleLogout = (e: FormEvent) => {
+  const handleLogout = async (e: FormEvent) => {
     e.preventDefault();
-    logout().then((value) => {
-      if (value.ok) {
-        CompletarUsuario({
-          exp: 0,
-          iat: 0,
-          user: {
-            nombres: '',
-            apellidos: '',
-            rol: {
-              idrol: 0,
-              rol: '',
-            },
-            rutusuario: '',
-            email: '',
-          },
-        });
-        return router.push('/');
-      }
 
-      Swal.fire({ html: value.text(), timer: 2000 });
-    });
+    try {
+      await logout();
+
+      CompletarUsuario({
+        exp: 0,
+        iat: 0,
+        user: {
+          nombres: '',
+          apellidos: '',
+          rol: {
+            idrol: 0,
+            rol: '',
+          },
+          rutusuario: '',
+          email: '',
+        },
+      });
+
+      router.push('/');
+    } catch (error) {
+      console.error('ERROR EN LOGOUT: ', error);
+
+      Swal.fire({ html: 'Error al desloguear', timer: 2000 });
+    }
   };
 
   return (

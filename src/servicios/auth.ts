@@ -39,9 +39,13 @@ export const loguearUsuario = async (usuario: UsuarioLogin): Promise<UserData> =
       },
     );
 
-    setCookie(null, 'token', token, { maxAge: 3600, path: '/' });
+    const tokenDecodificado = jwt_decode(token.substring('Bearer '.length)) as UserData;
+    const ahoraEnSegundos = Math.round(Date.now() / 1000);
+    const maxAge = tokenDecodificado.exp - ahoraEnSegundos;
 
-    return jwt_decode(token.substring('Bearer '.length)) as UserData;
+    setCookie(null, 'token', token, { maxAge, path: '/' });
+
+    return tokenDecodificado;
   } catch (error) {
     if (error instanceof HttpError) {
       if (error.status === 400 && error.body.message.includes('rutusuario|invalido')) {
@@ -80,24 +84,37 @@ export const esTokenValido = async (token: string) => {
 };
 
 export const logout = async () => {
-  const data = await fetch(`${apiUrl()}/auth/logout`, {
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
-    },
-  });
-
-  destroyCookie(null, 'token');
-
-  return data;
+  try {
+    await runFetchConThrow<void>(`${apiUrl()}/auth/logout`, {
+      headers: {
+        Authorization: obtenerToken(),
+        'Content-type': 'application/json',
+      },
+    });
+  } catch (error) {
+    return;
+  } finally {
+    destroyCookie(null, 'token');
+  }
 };
 
 export const renovarToken = async () => {
-  const data = await fetch(`${apiUrl()}/auth/refresh`, {
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
+  const token = await runFetchConThrow<string>(
+    `${apiUrl()}/auth/refresh`,
+    {
+      headers: {
+        Authorization: obtenerToken(),
+        'Content-type': 'application/json',
+      },
     },
-  });
-  return data;
+    {
+      bodyAs: 'text',
+    },
+  );
+
+  const tokenDecodificado = jwt_decode(token.substring('Bearer '.length)) as UserData;
+  const ahoraEnSegundos = Math.round(Date.now() / 1000);
+  const maxAge = tokenDecodificado.exp - ahoraEnSegundos;
+
+  setCookie(null, 'token', token, { maxAge, path: '/' });
 };
