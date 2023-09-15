@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { Trabajadores } from '../(modelos)/trabajadores';
 
@@ -26,7 +27,13 @@ const TablaTrabajadores: React.FC<props> = ({
         {trabajadores.length > 0 ? (
           trabajadores.map(({ ruttrabajador, idtrabajador }) => (
             <Tr key={ruttrabajador}>
-              <Td>{ruttrabajador}</Td>
+              <Td>
+                <Link
+                  href={''}
+                  onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
+                  {ruttrabajador}
+                </Link>
+              </Td>
               <Td>
                 <button
                   className="btn btn-sm btn-primary"
