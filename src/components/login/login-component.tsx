@@ -9,7 +9,7 @@ import {
   UsuarioNoExisteError,
 } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useContext, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { validateRut } from 'rutlib';
@@ -32,6 +32,8 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({}) => {
   const [showModalRecu2, setshowModalRecu2] = useState(false);
 
   const router = useRouter();
+
+  const searchParams = useSearchParams();
 
   const handleShowModalRecu = () => {
     setShowModalRecu(true);
@@ -78,7 +80,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({}) => {
     clavenuevados: false,
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLoginUsuario = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!rutusuario || !clave) {
@@ -93,7 +95,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({}) => {
         icon: 'success',
         timer: 2000,
         showConfirmButton: false,
-        didClose: () => router.push('/tramitacion'),
+        didClose: () => router.push(searchParams.get('path') ?? '/tramitacion'),
       });
     } catch (error) {
       let messageError = '';
@@ -377,7 +379,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({}) => {
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles.formlogin}>
+      <form onSubmit={handleLoginUsuario} className={styles.formlogin}>
         <label>
           Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
         </label>
