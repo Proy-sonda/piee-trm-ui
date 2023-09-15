@@ -201,7 +201,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
           </div>
         </form>
 
-        <div className="row mt-3">
+        <div className="row mt-3 text-center">
           <h5>Usuarios</h5>
           <div className="col-md-12 col-sm-12 col-xl-12">
             <IfContainer show={!pendiente && err.length > 0}>
