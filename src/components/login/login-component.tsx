@@ -16,7 +16,9 @@ import { validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import styles from './login.module.css';
 
-type LoginComponentProps = {};
+type LoginComponentProps = {
+  buttonText?: string;
+};
 
 type changePass = {
   rutusuario: string;
@@ -25,7 +27,7 @@ type changePass = {
   clavenuevados: string;
 };
 
-export const LoginComponent: React.FC<LoginComponentProps> = ({}) => {
+export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'Ingresar' }) => {
   const [show, setShow] = useState('');
   const [display, setDisplay] = useState('none');
   const [showModalRecu, setShowModalRecu] = useState(false);
