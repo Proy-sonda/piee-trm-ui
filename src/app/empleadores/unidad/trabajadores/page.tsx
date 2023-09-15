@@ -85,11 +85,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       Swal.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
     };
     Swal.fire({
-      title: `¿Desea eliminar a la persona trabajadora ${rut}?`,
+      icon: 'question',
+      html: `¿Desea eliminar a la persona trabajadora <b>${rut}</b>?`,
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: 'Si',
       confirmButtonColor: 'var(--color-blue)',
+      denyButtonColor: 'var(--bs-danger)',
       denyButtonText: `No`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
