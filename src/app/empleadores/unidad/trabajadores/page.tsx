@@ -315,12 +315,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <button type="submit" className="btn btn-primary" onClick={() => handleSubmitEdit()}>
-              Modificar
-            </button>{' '}
-            &nbsp;
             <button className="btn btn-danger" onClick={() => handleClose()}>
               Volver
+            </button>{' '}
+            &nbsp;
+            <button type="submit" className="btn btn-primary" onClick={() => handleSubmitEdit()}>
+              Grabar <i className="bi bi-floppy"></i>
             </button>
           </Modal.Footer>
         </Modal>
