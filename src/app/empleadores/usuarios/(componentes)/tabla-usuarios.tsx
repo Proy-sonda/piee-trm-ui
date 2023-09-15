@@ -1,5 +1,7 @@
+import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
+import { useWindowSize } from '@/hooks/use-window-size';
 import Link from 'next/link';
 import React from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
@@ -20,6 +22,8 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   onEditarUsuario: handleEditarUsuario,
   onUsuarioEliminado,
 }) => {
+  const [anchoVentana] = useWindowSize();
+
   const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: usuarios,
     tamanoPagina: 5,
@@ -106,6 +110,10 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     }
   };
 
+  const noEsTablet = () => {
+    return anchoVentana < 768 || anchoVentana > 992;
+  };
+
   return (
     <>
       <Table className="table table-hover">
@@ -113,8 +121,10 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
           <Tr>
             <Th>RUT</Th>
             <Th>Nombre</Th>
-            <Th>Teléfono</Th>
-            <Th>Correo electrónico</Th>
+            <IfContainer show={noEsTablet()}>
+              <Th>Teléfono</Th>
+              <Th>Correo electrónico</Th>
+            </IfContainer>
             <Th>Rol</Th>
             <Th>Estado</Th>
             <Th></Th>
@@ -132,8 +142,10 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 </span>
               </Td>
               <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
-              <Td>{usuario.telefonouno.trim() || ' '}</Td>
-              <Td>{usuario.email}</Td>
+              <IfContainer show={noEsTablet()}>
+                <Td>{usuario.telefonouno.trim() || ' '}</Td>
+                <Td>{usuario.email}</Td>
+              </IfContainer>
               <Td>
                 <select className="form-select form-select-sm" disabled>
                   <option>{usuario.rol.rol}</option>
