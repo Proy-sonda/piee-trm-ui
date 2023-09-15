@@ -65,11 +65,11 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
   const onHandleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const respuesta = await Swal.fire({
-      icon: 'info',
+      icon: 'question',
       title: 'Asociar Usuario/a',
       html: `¿Desea asociar al usuario a la unidad ${unidad}?`,
       showConfirmButton: true,
-      confirmButtonText: 'SI',
+      confirmButtonText: 'SÍ',
       confirmButtonColor: 'var(--color-blue)',
       showCancelButton: true,
       cancelButtonText: 'NO',
@@ -108,11 +108,11 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
   const handleDelete = async (idusuario: number) => {
     console.log(idusuario);
     const respuesta = await Swal.fire({
-      icon: 'info',
+      icon: 'question',
       title: 'Eliminar Usuario/a',
       html: `¿Desea eliminar al usuario de la unidad ${unidad}?`,
       showConfirmButton: true,
-      confirmButtonText: 'SI',
+      confirmButtonText: 'SÍ',
       confirmButtonColor: 'var(--color-blue)',
       showCancelButton: true,
       cancelButtonText: 'NO',
