@@ -1,4 +1,4 @@
-import { Logout, renovacionToken } from '@/helpers/tramitacion/empleadores';
+import { logout, renovarToken } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import { destroyCookie, setCookie } from 'nookies';
 import { useEffect, useState } from 'react';
@@ -44,7 +44,7 @@ const SessionTimer = () => {
           }).then((result) => {
             if (result.isConfirmed) {
               const resp = async () => {
-                const data = await renovacionToken();
+                const data = await renovarToken();
                 if (data.ok) {
                   let token = await data.text();
                   setCookie(null, 'token', token, { maxAge: 3600, path: '/' });
@@ -53,7 +53,7 @@ const SessionTimer = () => {
               resp();
             } else {
               const resp = async () => {
-                const data = await Logout();
+                const data = await logout();
                 if (data.ok) {
                   destroyCookie(null, 'token');
                   router.push('/');

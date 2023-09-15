@@ -16,24 +16,3 @@ export const ComboEntidadEmpleador = async () => {
 
   return resp;
 };
-
-export const renovacionToken = async () => {
-  const data = await fetch(`${apiUrl()}/auth/refresh`, {
-    headers: {
-      Authorization: token,
-      'Content-type': 'application/json',
-    },
-  });
-  return data;
-};
-
-export const Logout = async () => {
-  const data = await fetch(`${apiUrl()}/auth/logout`, {
-    headers: {
-      Authorization: token,
-      'Content-type': 'application/json',
-    },
-  });
-
-  return data;
-};

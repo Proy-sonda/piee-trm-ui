@@ -1,6 +1,6 @@
 'use client';
 import { AuthContext } from '@/contexts';
-import { Logout } from '@/helpers/tramitacion/empleadores';
+import { logout } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useContext } from 'react';
 import Swal from 'sweetalert2';
@@ -12,7 +12,7 @@ const Usuario: React.FC = () => {
 
   const handleLogout = (e: FormEvent) => {
     e.preventDefault();
-    Logout().then((value) => {
+    logout().then((value) => {
       if (value.ok) {
         CompletarUsuario({
           exp: 0,

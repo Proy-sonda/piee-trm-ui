@@ -1,6 +1,6 @@
 import { UserData, UsuarioLogin } from '@/contexts/modelos/types';
 import jwt_decode from 'jwt-decode';
-import { parseCookies, setCookie } from 'nookies';
+import { destroyCookie, parseCookies, setCookie } from 'nookies';
 import { apiUrl } from './environment';
 import { HttpError, runFetchConThrow } from './fetch';
 
@@ -13,27 +13,6 @@ export const estaLogueado = (): boolean => {
   const token = obtenerToken();
 
   return token !== undefined && token !== null;
-};
-
-export const renovacionToken = async () => {
-  const data = await fetch(`${apiUrl()}/auth/refresh`, {
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
-    },
-  });
-  return data;
-};
-
-export const Logout = async () => {
-  const data = await fetch(`${apiUrl()}/auth/logout`, {
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
-    },
-  });
-
-  return data;
 };
 
 export class RutInvalidoError extends Error {}
@@ -98,4 +77,27 @@ export const esTokenValido = async (token: string) => {
   } catch (error) {
     return false;
   }
+};
+
+export const logout = async () => {
+  const data = await fetch(`${apiUrl()}/auth/logout`, {
+    headers: {
+      Authorization: obtenerToken(),
+      'Content-type': 'application/json',
+    },
+  });
+
+  destroyCookie(null, 'token');
+
+  return data;
+};
+
+export const renovarToken = async () => {
+  const data = await fetch(`${apiUrl()}/auth/refresh`, {
+    headers: {
+      Authorization: obtenerToken(),
+      'Content-type': 'application/json',
+    },
+  });
+  return data;
 };
