@@ -6,7 +6,7 @@ import Titulo from '@/components/titulo/titulo';
 import { useForm } from '@/hooks/use-form';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import TablaTrabajadores from './(componentes)/tabla-trabajadores';
@@ -52,6 +52,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
     },
     [refresh],
   );
+
+  useEffect(() => setunidad(datosPagina?.unidadEmpleador[0].unidad || ''), [datosPagina]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 
