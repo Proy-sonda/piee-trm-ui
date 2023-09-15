@@ -86,16 +86,16 @@ export const loguearUsuario = async (usuario: UsuarioLogin): Promise<UserData> =
   }
 };
 
-export const CompruebaToken = async (token: string) => {
+export const esTokenValido = async (token: string) => {
   try {
-    const resp = await fetch(`${apiUrl()}/auth/islogin`, {
+    await runFetchConThrow(`${apiUrl()}/auth/islogin`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `${token}`,
       },
     });
 
-    if (resp.status == 200) return console.log('token valido');
+    return true;
   } catch (error) {
-    console.log('error: ' + error);
+    return false;
   }
 };

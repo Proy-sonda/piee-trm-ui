@@ -1,9 +1,7 @@
 'use client';
 
-import { LoginComponent } from '@/components/login/login-component';
 import Position from '@/components/stage/position';
 import { AuthContext } from '@/contexts';
-import { CompruebaToken } from '@/helpers/adscripcion/login-usuario';
 import { ComboEntidadEmpleador } from '@/helpers/tramitacion/empleadores';
 import { useForm } from '@/hooks/use-form';
 import { Empleador } from '@/modelos/empleador';
@@ -47,12 +45,6 @@ const TramitacionPage = () => {
 
     EntidadEmpleadora();
   }, [token]);
-
-  if (token == '') return <LoginComponent buttonText="Ingresar" />;
-
-  token = token?.replaceAll('Bearer ', '');
-
-  CompruebaToken(token);
 
   const onChangeEmp = (event: any) => {
     let value = event.target.value;
