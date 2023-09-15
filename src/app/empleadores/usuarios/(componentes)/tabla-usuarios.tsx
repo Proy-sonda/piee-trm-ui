@@ -31,8 +31,8 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
     const { isConfirmed } = await Swal.fire({
       icon: 'question',
-      title: 'Recuperar clave',
-      html: `¿Desea reenviar clave al correo <b>${email}</b>?`,
+      title: 'Restablecer Clave',
+      html: `¿Desea enviar una nueva clave temporal al correo <b>${email}</b>?`,
       showDenyButton: true,
       showCancelButton: false,
       confirmButtonText: 'SÍ',
@@ -48,15 +48,17 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     try {
       await recuperarContrasena(rut);
       Swal.fire({
-        html: `<p>Clave recuperada</p> se ha enviado al correo ${email}`,
         icon: 'success',
+        title: 'Clave reenviada',
+        html: `Se ha enviado con éxito una nueva clave temporal al correo <b>${email}</b>`,
         timer: 4000,
         showConfirmButton: false,
       });
     } catch (error: any) {
       Swal.fire({
-        html: 'Usuario se encuentra deshabilitado',
         icon: 'error',
+        title: 'Error',
+        html: 'El usuario se encuentra deshabilitado',
         timer: 2000,
         showConfirmButton: false,
       });
