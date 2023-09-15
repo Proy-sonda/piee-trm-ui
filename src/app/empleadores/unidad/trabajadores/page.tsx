@@ -3,11 +3,13 @@
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
-import { useForm } from '@/hooks/use-form';
+
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import TablaTrabajadores from './(componentes)/tabla-trabajadores';
 import { Trabajador } from './(modelos)/';
@@ -31,6 +33,7 @@ interface TrabajadoresPageProps {
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
   const [unidad, setunidad] = useState('');
   let [loading, setLoading] = useState(false);
+  const [error, seterror] = useState(false);
   const { idunidad, razon, rutempleador } = searchParams;
   const [editar, seteditar] = useState<Trabajador>({
     idtrabajador: 0,
@@ -38,8 +41,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       idunidad: 0,
     },
   });
-  const { run, onInputValidRut } = useForm({
-    run: '',
+  const { register, setValue, getValues } = useForm<{ run: string }>({
+    mode: 'onBlur',
   });
   const [rutedit, setrutedit] = useState<string>();
   const [show, setshow] = useState(false);
@@ -130,12 +133,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
   };
 
   const handleAddTrabajador = (e: FormEvent) => {
-    setLoading(true);
     e.preventDefault();
+    if (error) return;
+    setLoading(true);
 
     const crearTrabajadorAux = async () => {
       const data = await crearTrabajador({
-        ruttrabajador: run,
+        ruttrabajador: getValues('run'),
         unidad: {
           idunidad: Number(idunidad),
         },
@@ -156,11 +160,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       } else {
         setLoading(false);
         let msgError: string | boolean = await data.text();
-        msgError = msgError.includes('trabajador ya existe');
+        if (msgError.includes('trabajador ya existe')) msgError = '<p>Trabajador ya existe</p>';
+        if (msgError.includes('verificador invalido'))
+          msgError = '<p>Código verificador invalido</p>';
+
         Swal.fire({
-          html:
-            'Existe un problema al momento de grabar ' +
-            (msgError ? '<p>Trabajador ya existe</p>' : data.text()),
+          html: 'Existe un problema al momento de grabar ' + (msgError ? msgError : data.text()),
           icon: 'error',
         });
       }
@@ -186,19 +191,42 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
               <br />
               <form onSubmit={handleAddTrabajador}>
                 <div className="row mt-2">
-                  <div className="col-md-8">
+                  <div className="col-md-8 position-relative">
                     <label htmlFor="run">RUN</label>
                     <input
-                      id="run"
                       type="text"
-                      className="form-control"
+                      className={error ? 'form-control is-invalid' : 'form-control'}
                       minLength={4}
                       maxLength={11}
-                      name="run"
-                      value={run}
-                      onChange={onInputValidRut}
-                      required
+                      {...register('run', {
+                        required: {
+                          value: true,
+                          message: 'Este campo es obligatorio',
+                        },
+                        onChange: (event) => {
+                          if (!validateRut(formatRut(event.target.value))) {
+                            seterror(true);
+                            setValue('run', formatRut(event.target.value, false));
+                          } else {
+                            seterror(false);
+                            setValue('run', formatRut(event.target.value, false));
+                          }
+                        },
+
+                        onBlur: (event) => {
+                          if (!validateRut(formatRut(event.target.value))) {
+                            seterror(true);
+                            setValue('run', formatRut(event.target.value, false));
+                          } else {
+                            seterror(false);
+                            setValue('run', formatRut(event.target.value, false));
+                          }
+                        },
+                      })}
                     />
+                    <IfContainer show={error}>
+                      <div className="invalid-tooltip">Debe ingresar un RUT valido</div>
+                    </IfContainer>
                   </div>
                   <div
                     className="col-md-4"
