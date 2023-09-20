@@ -33,7 +33,10 @@ interface TrabajadoresPageProps {
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
   const [unidad, setunidad] = useState('');
   let [loading, setLoading] = useState(false);
-  const [error, seterror] = useState(false);
+  const [error, seterror] = useState({
+    run: false,
+    file: false,
+  });
   const { idunidad, razon, rutempleador } = searchParams;
   const [editar, seteditar] = useState<Trabajador>({
     idtrabajador: 0,
@@ -41,7 +44,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       idunidad: 0,
     },
   });
-  const { register, setValue, getValues } = useForm<{ run: string }>({
+  const { register, setValue, getValues } = useForm<{ run: string; file: FileList | null }>({
     mode: 'onBlur',
   });
   const [rutedit, setrutedit] = useState<string>();
@@ -174,6 +177,16 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
     crearTrabajadorAux();
   };
 
+  const handleClickNomina = (event: FormEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (error.file)
+      return Swal.fire({
+        icon: 'error',
+        html: 'Debe cargar solo archivos de tipo "csv"',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+  };
+
   return (
     <>
       <div className="bgads">
@@ -195,7 +208,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                     <label htmlFor="run">RUN</label>
                     <input
                       type="text"
-                      className={error ? 'form-control is-invalid' : 'form-control'}
+                      className={error.run ? 'form-control is-invalid' : 'form-control'}
                       minLength={4}
                       maxLength={11}
                       {...register('run', {
@@ -205,26 +218,38 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                         },
                         onChange: (event) => {
                           if (!validateRut(formatRut(event.target.value))) {
-                            seterror(true);
+                            seterror({
+                              ...error,
+                              run: true,
+                            });
                             setValue('run', formatRut(event.target.value, false));
                           } else {
-                            seterror(false);
+                            seterror({
+                              ...error,
+                              run: false,
+                            });
                             setValue('run', formatRut(event.target.value, false));
                           }
                         },
 
                         onBlur: (event) => {
                           if (!validateRut(formatRut(event.target.value))) {
-                            seterror(true);
+                            seterror({
+                              ...error,
+                              run: true,
+                            });
                             setValue('run', formatRut(event.target.value, false));
                           } else {
-                            seterror(false);
+                            seterror({
+                              ...error,
+                              run: false,
+                            });
                             setValue('run', formatRut(event.target.value, false));
                           }
                         },
                       })}
                     />
-                    <IfContainer show={error}>
+                    <IfContainer show={error.run}>
                       <div className="invalid-tooltip">Debe ingresar un RUT valido</div>
                     </IfContainer>
                   </div>
@@ -252,13 +277,31 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                 <span className={styles['span-link']}>siguiente formato</span>
               </sub>
               <div className="row mt-3">
-                <div className="col-md-6">
-                  <input type="file" className="form-control" />
+                <div className="col-md-6 position-relative">
+                  <input
+                    type="file"
+                    className={error.file ? 'form-control is-invalid' : 'form-control'}
+                    {...register('file', {
+                      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                        if (!event.target.files) setValue('file', event.target.files);
+                        if (!getValues('file')![0].name.includes('csv')) {
+                          seterror({ ...error, file: true });
+                        } else {
+                          seterror({ ...error, file: false });
+                        }
+                      },
+                    })}
+                  />
+                  <IfContainer show={error.file}>
+                    <div className="invalid-tooltip">Debe ingresar un archivo con formato .csv</div>
+                  </IfContainer>
                 </div>
 
                 <div className="col-md-6 col-xs-6">
                   <div className="d-grid gap-2 d-md-flex">
-                    <button className="btn btn-success btn-sm">Cargar</button>
+                    <button className="btn btn-success btn-sm" onClick={handleClickNomina}>
+                      Grabar
+                    </button>
                     <button className="btn btn-danger btn-sm">Borrar todo</button>
                   </div>
                 </div>
