@@ -16,7 +16,7 @@ const SessionTimer = () => {
     const resetTimer = () => {
       clearTimeout(inactivityTimer);
 
-      let timerInterval;
+      let timerInterval: any;
       inactivityTimer = setTimeout(
         () => {
           setIsActive(false);
@@ -25,7 +25,7 @@ const SessionTimer = () => {
             title: 'Aviso de cierre de sesión',
             html: `
             <p>Su sesión está a punto de expirar, ¿Necesita más tiempo?</p>
-            <b></b>
+            <b>15</b>
           `,
             icon: 'warning',
             showConfirmButton: true,
@@ -37,11 +37,13 @@ const SessionTimer = () => {
             cancelButtonText: 'Cerrar sesión',
             cancelButtonColor: 'var(--bs-danger)',
             didOpen: () => {
-              // Swal.showLoading()
               const b: any = Swal.getHtmlContainer()?.querySelector('b');
               timerInterval = setInterval(() => {
-                b.textContent = Swal.getTimerLeft();
-              }, 100);
+                b.textContent = Math.round((Swal.getTimerLeft() ?? 0) / 1000);
+              }, 1000);
+            },
+            didClose: () => {
+              clearInterval(timerInterval);
             },
           }).then((result) => {
             if (result.isConfirmed) {
@@ -66,7 +68,7 @@ const SessionTimer = () => {
             }
           });
         },
-        (60 - alertThreshold) * 1000,
+        (10 - alertThreshold) * 1000,
       ); // 60 segundos - alertThreshold
 
       document.addEventListener('mousemove', resetTimer);
