@@ -1,7 +1,7 @@
 'use client';
 
-import { loguearUsuario } from '@/servicios/auth';
-import { createContext, useState } from 'react';
+import { loguearUsuario, obtenerUserData } from '@/servicios/auth';
+import { createContext, useEffect, useState } from 'react';
 import { ChildrenApp, UserData, UsuarioLogin } from './modelos/types';
 
 type AuthContextType = {
@@ -69,6 +69,15 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
       rutusuario: '',
     },
   });
+
+  useEffect(() => {
+    const userData = obtenerUserData();
+    if (!userData) {
+      return;
+    }
+
+    DatosUser(userData);
+  }, []);
 
   const Login = async (usuario: UsuarioLogin) => {
     if (usuario.rutusuario == '') {
