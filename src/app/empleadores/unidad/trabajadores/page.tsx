@@ -9,6 +9,7 @@ import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
+import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import TablaTrabajadores from './(componentes)/tabla-trabajadores';
@@ -32,8 +33,15 @@ interface TrabajadoresPageProps {
 
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
   const [unidad, setunidad] = useState('');
+  const [arrerror, setarrerror] = useState(false);
+  const [rutconerror, setrutconerror] = useState<any[]>([]);
+  const [csvData, setCsvData] = useState<any>([]);
   let [loading, setLoading] = useState(false);
-  const [error, seterror] = useState(false);
+  const [error, seterror] = useState({
+    run: false,
+    file: false,
+    lecturarut: false,
+  });
   const { idunidad, razon, rutempleador } = searchParams;
   const [editar, seteditar] = useState<Trabajador>({
     idtrabajador: 0,
@@ -41,7 +49,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
       idunidad: 0,
     },
   });
-  const { register, setValue, getValues } = useForm<{ run: string }>({
+  const { register, setValue, getValues } = useForm<{ run: string; file: FileList | null }>({
     mode: 'onBlur',
   });
   const [rutedit, setrutedit] = useState<string>();
@@ -152,10 +160,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
           timer: 2000,
           showConfirmButton: false,
         });
-        const obtenerTrabajadorUnidad = async () => {
-          refrescarComponente();
-        };
-        obtenerTrabajadorUnidad();
+        refrescarComponente();
         setLoading(false);
       } else {
         setLoading(false);
@@ -174,8 +179,111 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
     crearTrabajadorAux();
   };
 
+  const handleClickNomina = async (event: FormEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (!getValues('file') || getValues('file')?.length === 0) return;
+    if (csvData.length == 0 || csvData == undefined) return;
+    if (error.file)
+      return Swal.fire({
+        icon: 'error',
+        html: 'Debe cargar solo archivos de tipo "csv"',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+
+    let errorEncontrado = csvData.find((rut: string) => !validateRut(formatRut(rut, false)));
+    setCsvData(csvData.filter((rut: string) => !validateRut(formatRut(rut, false)) === true));
+
+    if (errorEncontrado?.trim() != '' && errorEncontrado != undefined) {
+      return Swal.fire({
+        icon: 'error',
+        html: `Existe un error en el formato del RUT <b>${errorEncontrado}</b> <br/> Verifique el documento`,
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+
+    let cuentaGrabados = 0;
+
+    for (let index = 0; index < csvData.length; index++) {
+      const element = csvData[index];
+
+      if (element.trim() != '') {
+        const data = await crearTrabajador({
+          ruttrabajador: formatRut(element, false),
+          unidad: {
+            idunidad: Number(idunidad),
+          },
+        });
+
+        if (data.ok) {
+          cuentaGrabados++;
+        } else {
+          setrutconerror([
+            ...rutconerror,
+            {
+              rut: element,
+              error: (await data.text()).includes('trabajador ya existe')
+                ? 'Trabajador ya existe'
+                : 'Formato de rut',
+            },
+          ]);
+        }
+      }
+    }
+
+    if (cuentaGrabados > 0) {
+      Swal.fire({
+        icon: 'success',
+        html: `Se han grabado ${cuentaGrabados} trabajadores con éxito`,
+        showConfirmButton: false,
+        timer: 2000,
+        didClose: () => {
+          if (rutconerror.length > 0) setarrerror(true);
+        },
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        html: 'No se ha añadido ningún trabajador',
+        confirmButtonColor: 'var(--color-blue)',
+        didClose: () => {
+          if (rutconerror.length > 0) setarrerror(true);
+        },
+      });
+    }
+
+    refrescarComponente();
+  };
+
   return (
     <>
+      <Modal
+        show={arrerror}
+        onHide={() => {
+          setarrerror(false);
+        }}>
+        <Modal.Header closeButton>
+          <Modal.Title>Rut con errores</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Table className="table table-hover text-center">
+            <Thead>
+              <Tr>
+                <Th>RUT</Th>
+                <Th>ERROR</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              {rutconerror.map((value: any) => (
+                <Tr>
+                  <Td>{value.rut}</Td>
+                  <Td>{value.error}</Td>
+                </Tr>
+              ))}
+            </Tbody>
+          </Table>
+        </Modal.Body>
+        <Modal.Footer></Modal.Footer>
+      </Modal>
       <div className="bgads">
         <div className="me-5 ms-5 animate__animate animate__fadeIn">
           <div className="row mt-5">
@@ -195,7 +303,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                     <label htmlFor="run">RUN</label>
                     <input
                       type="text"
-                      className={error ? 'form-control is-invalid' : 'form-control'}
+                      className={error.run ? 'form-control is-invalid' : 'form-control'}
                       minLength={4}
                       maxLength={11}
                       {...register('run', {
@@ -205,26 +313,38 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                         },
                         onChange: (event) => {
                           if (!validateRut(formatRut(event.target.value))) {
-                            seterror(true);
+                            seterror({
+                              ...error,
+                              run: true,
+                            });
                             setValue('run', formatRut(event.target.value, false));
                           } else {
-                            seterror(false);
+                            seterror({
+                              ...error,
+                              run: false,
+                            });
                             setValue('run', formatRut(event.target.value, false));
                           }
                         },
 
                         onBlur: (event) => {
                           if (!validateRut(formatRut(event.target.value))) {
-                            seterror(true);
+                            seterror({
+                              ...error,
+                              run: true,
+                            });
                             setValue('run', formatRut(event.target.value, false));
                           } else {
-                            seterror(false);
+                            seterror({
+                              ...error,
+                              run: false,
+                            });
                             setValue('run', formatRut(event.target.value, false));
                           }
                         },
                       })}
                     />
-                    <IfContainer show={error}>
+                    <IfContainer show={error.run}>
                       <div className="invalid-tooltip">Debe ingresar un RUT valido</div>
                     </IfContainer>
                   </div>
@@ -235,7 +355,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                     }}>
                     <div className="d-grid gap-2 d-md-flex">
                       <button type="submit" className="btn btn-success btn-sm">
-                        Agregar
+                        Grabar
                       </button>
                     </div>
                   </div>
@@ -249,17 +369,101 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
               <sub>
                 Para poder cargar trabajadores de la unidad <b>{unidad}</b>, solo tiene que
                 seleccionar un archivo (formato CSV) según el{' '}
-                <span className={styles['span-link']}>siguiente formato</span>
+                <a
+                  className={styles['span-link']}
+                  download="formato.csv"
+                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3CjI0Njk3ODk5LTkK">
+                  siguiente formato
+                </a>
               </sub>
               <div className="row mt-3">
-                <div className="col-md-6">
-                  <input type="file" className="form-control" />
+                <div className="col-md-6 position-relative">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    className={error.file ? 'form-control is-invalid' : 'form-control'}
+                    {...register('file', {
+                      onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                        if (event.target.files?.length == 0) return setValue('file', null);
+                        if (!event.target.files) setValue('file', event.target.files);
+                        if (!getValues('file')![0].name.includes('csv')) {
+                          seterror({ ...error, file: true });
+                        } else {
+                          seterror({ ...error, file: false });
+                          const file = event.target.files![0];
+                          const reader = new FileReader();
+                          reader.onload = (e: any) => {
+                            const content = e.target.result.trim();
+                            const lines = content.split('\n');
+                            setCsvData(lines);
+                          };
+
+                          reader.readAsText(file);
+                        }
+                      },
+                      onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                        if (event.target.files?.length == 0) return setValue('file', null);
+                        if (!event.target.files) setValue('file', event.target.files);
+                        if (!getValues('file')![0].name.includes('csv')) {
+                          seterror({ ...error, file: true });
+                        } else {
+                          seterror({ ...error, file: false });
+                          const file = event.target.files![0];
+                          const reader = new FileReader();
+                          reader.onload = (e: any) => {
+                            const content = e.target.result.trim();
+                            const lines = content.split('\n');
+                            setCsvData(lines);
+                          };
+
+                          reader.readAsText(file);
+                        }
+                      },
+                    })}
+                  />
+                  <IfContainer show={error.file}>
+                    <div className="invalid-tooltip">Debe ingresar un archivo con formato .csv</div>
+                  </IfContainer>
                 </div>
 
                 <div className="col-md-6 col-xs-6">
                   <div className="d-grid gap-2 d-md-flex">
-                    <button className="btn btn-success btn-sm">Cargar</button>
-                    <button className="btn btn-danger btn-sm">Borrar todo</button>
+                    <button
+                      disabled={
+                        getValues('file')?.length === 0 || !getValues('file') ? true : false
+                      }
+                      className="btn btn-success btn-sm"
+                      onClick={handleClickNomina}>
+                      Grabar
+                    </button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      disabled={
+                        getValues('file')?.length === 0 || !getValues('file') ? true : false
+                      }
+                      onClick={async (event) => {
+                        event.preventDefault();
+                        console.log(getValues('file'));
+                        if (getValues('file')?.length === 0) return;
+                        const resp = await Swal.fire({
+                          icon: 'question',
+                          html: `¿Desea eliminar el archivo <b>${
+                            getValues('file')![0].name
+                          }</b> cargado?`,
+                          confirmButtonColor: 'var(--color-blue)',
+                          confirmButtonText: 'Sí',
+                          showDenyButton: true,
+                          denyButtonColor: 'var(--bs-danger)',
+                        });
+                        if (resp.isDenied || resp.isDismissed) return;
+                        seterror({
+                          ...error,
+                          file: false,
+                        });
+                        setValue('file', null);
+                      }}>
+                      Borrar
+                    </button>
                   </div>
                 </div>
               </div>
