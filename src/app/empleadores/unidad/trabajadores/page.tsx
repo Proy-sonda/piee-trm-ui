@@ -279,6 +279,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
               <div className="row mt-3">
                 <div className="col-md-6 position-relative">
                   <input
+                    id="file"
                     type="file"
                     className={error.file ? 'form-control is-invalid' : 'form-control'}
                     {...register('file', {
@@ -302,7 +303,31 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                     <button className="btn btn-success btn-sm" onClick={handleClickNomina}>
                       Grabar
                     </button>
-                    <button className="btn btn-danger btn-sm">Borrar todo</button>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      disabled={!getValues('file') ? true : false}
+                      onClick={async (event) => {
+                        event.preventDefault();
+                        if (!getValues('file')) return;
+                        const resp = await Swal.fire({
+                          icon: 'question',
+                          html: `¿Desea eliminar el archivo <b>${
+                            getValues('file')![0].name
+                          }</b> cargado?`,
+                          confirmButtonColor: 'var(--color-blue)',
+                          confirmButtonText: 'Sí',
+                          showDenyButton: true,
+                          denyButtonColor: 'var(--bs-danger)',
+                        });
+                        if (resp.isDenied || resp.isDismissed) return;
+                        seterror({
+                          ...error,
+                          file: false,
+                        });
+                        setValue('file', null);
+                      }}>
+                      Borrar
+                    </button>
                   </div>
                 </div>
               </div>
