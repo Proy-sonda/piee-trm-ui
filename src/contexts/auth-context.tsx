@@ -24,6 +24,7 @@ type AuthContextType = {
   };
   login: (usuario: UsuarioLogin) => Promise<void>;
   CompletarUsuario: (DataUsuario: UserData) => void;
+  resetearUsuario: () => void;
 };
 
 export const AuthContext = createContext<AuthContextType>({
@@ -46,16 +47,11 @@ export const AuthContext = createContext<AuthContextType>({
   },
   login: async () => {},
   CompletarUsuario: () => {},
+  resetearUsuario: () => {},
 });
 
 export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
-  const [usuario, setusuario] = useState({
-    rutusuario: '',
-    clave: '',
-    error: '',
-  });
-
-  const [datosUsuario, setDatosUsuario] = useState({
+  const datosUsuarioPorDefecto = {
     exp: 0,
     iat: 0,
     user: {
@@ -68,7 +64,15 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
       },
       rutusuario: '',
     },
+  };
+
+  const [usuario, setusuario] = useState({
+    rutusuario: '',
+    clave: '',
+    error: '',
   });
+
+  const [datosUsuario, setDatosUsuario] = useState(datosUsuarioPorDefecto);
 
   useEffect(() => {
     const userData = obtenerUserData();
@@ -99,6 +103,10 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
     return setDatosUsuario(DataUsuario);
   };
 
+  const resetearUsuario = () => {
+    DatosUser(datosUsuarioPorDefecto);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -106,6 +114,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
         datosusuario: datosUsuario,
         login: Login,
         CompletarUsuario: DatosUser,
+        resetearUsuario,
       }}>
       {children}
     </AuthContext.Provider>

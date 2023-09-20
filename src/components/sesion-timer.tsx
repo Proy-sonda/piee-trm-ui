@@ -1,6 +1,7 @@
+import { AuthContext } from '@/contexts';
 import { logout, renovarToken } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
 const SessionTimer = () => {
@@ -9,6 +10,8 @@ const SessionTimer = () => {
   const alertThreshold = 5; // Mostrar la alerta 5 segundos antes de expirar
 
   const router = useRouter();
+
+  const { resetearUsuario } = useContext(AuthContext);
 
   useEffect(() => {
     let inactivityTimer: any;
@@ -51,7 +54,8 @@ const SessionTimer = () => {
                 try {
                   await renovarToken();
                 } catch (error) {
-                  await logout();
+                  logout();
+                  resetearUsuario();
                   router.push('/');
                 }
               })();
@@ -62,13 +66,14 @@ const SessionTimer = () => {
                 } catch (error) {
                   console.error('[SESION TIMER] ERROR EN LOGOUT: ', error);
                 } finally {
+                  resetearUsuario();
                   router.push('/');
                 }
               })();
             }
           });
         },
-        (10 - alertThreshold) * 1000,
+        (60 - alertThreshold) * 1000,
       ); // 60 segundos - alertThreshold
 
       document.addEventListener('mousemove', resetTimer);

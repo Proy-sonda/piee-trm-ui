@@ -1,4 +1,5 @@
 'use client';
+
 import { AuthContext } from '@/contexts';
 import { logout } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
@@ -6,7 +7,7 @@ import { FormEvent, useContext } from 'react';
 import Swal from 'sweetalert2';
 
 const Usuario: React.FC = () => {
-  const { datosusuario, CompletarUsuario } = useContext(AuthContext);
+  const { datosusuario, resetearUsuario } = useContext(AuthContext);
 
   const router = useRouter();
 
@@ -16,20 +17,7 @@ const Usuario: React.FC = () => {
     try {
       await logout();
 
-      CompletarUsuario({
-        exp: 0,
-        iat: 0,
-        user: {
-          nombres: '',
-          apellidos: '',
-          rol: {
-            idrol: 0,
-            rol: '',
-          },
-          rutusuario: '',
-          email: '',
-        },
-      });
+      resetearUsuario();
 
       router.push('/');
     } catch (error) {
