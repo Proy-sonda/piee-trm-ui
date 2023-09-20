@@ -3,7 +3,7 @@ import { runFetchConThrow } from '@/servicios/fetch';
 import { destroyCookie } from 'nookies';
 import { obtenerToken } from './obtener-token';
 
-export const logout = async () => {
+export const desloguearUsuario = async () => {
   try {
     await runFetchConThrow<void>(`${apiUrl()}/auth/logout`, {
       headers: {

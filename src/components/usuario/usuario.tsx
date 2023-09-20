@@ -1,13 +1,12 @@
 'use client';
 
 import { AuthContext } from '@/contexts';
-import { logout } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import { FormEvent, useContext } from 'react';
 import Swal from 'sweetalert2';
 
 const Usuario: React.FC = () => {
-  const { datosusuario, resetearUsuario } = useContext(AuthContext);
+  const { datosusuario, logout } = useContext(AuthContext);
 
   const router = useRouter();
 
@@ -17,14 +16,24 @@ const Usuario: React.FC = () => {
     try {
       await logout();
 
-      resetearUsuario();
-
       router.push('/');
     } catch (error) {
       console.error('ERROR EN LOGOUT: ', error);
 
       Swal.fire({ html: 'Error al desloguear', timer: 2000 });
     }
+
+    // try {
+    //   await desloguearUsuario();
+
+    //   resetearUsuario();
+
+    //   router.push('/');
+    // } catch (error) {
+    //   console.error('ERROR EN LOGOUT: ', error);
+
+    //   Swal.fire({ html: 'Error al desloguear', timer: 2000 });
+    // }
   };
 
   return (

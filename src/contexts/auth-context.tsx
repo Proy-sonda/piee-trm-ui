@@ -1,6 +1,12 @@
 'use client';
 
-import { loguearUsuario, obtenerUserData } from '@/servicios/auth';
+import {
+  desloguearUsuario,
+  loguearUsuario,
+  obtenerToken,
+  obtenerUserData,
+  renovarToken,
+} from '@/servicios/auth';
 import { createContext, useEffect, useState } from 'react';
 import { ChildrenApp, UserData, UsuarioLogin } from './modelos/types';
 
@@ -23,8 +29,8 @@ type AuthContextType = {
     };
   };
   login: (usuario: UsuarioLogin) => Promise<void>;
+  logout: () => Promise<void>;
   CompletarUsuario: (DataUsuario: UserData) => void;
-  resetearUsuario: () => void;
 };
 
 export const AuthContext = createContext<AuthContextType>({
@@ -46,8 +52,8 @@ export const AuthContext = createContext<AuthContextType>({
     },
   },
   login: async () => {},
+  logout: async () => {},
   CompletarUsuario: () => {},
-  resetearUsuario: () => {},
 });
 
 export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
@@ -74,6 +80,9 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
   const [datosUsuario, setDatosUsuario] = useState(datosUsuarioPorDefecto);
 
+  const [refreshToken, setRefreshToken] = useState(false);
+
+  // Recargar usuario del token
   useEffect(() => {
     const userData = obtenerUserData();
     if (!userData) {
@@ -81,7 +90,36 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
     }
 
     DatosUser(userData);
+
+    setRefreshToken(true);
   }, []);
+
+  // Renovar token de autenticacion automaticamente
+  useEffect(() => {
+    let timeoutRenovacion: NodeJS.Timeout | undefined = undefined;
+    const token = obtenerToken()?.substring('Bearer '.length);
+
+    if (!refreshToken || !token) {
+      clearTimeout(timeoutRenovacion);
+      return;
+    }
+
+    const setTimeoutParaRefrescarToken = (token: string) => {
+      // TODO: Calcular aqui tiempo de expiracion del token
+
+      timeoutRenovacion = setTimeout(() => {
+        renovarToken().then((nuevoToken) => {
+          setTimeoutParaRefrescarToken(nuevoToken);
+        });
+      }, 10 * 1000); //TODO: Hacer esto 1 minuto antes de que venza el token
+    };
+
+    setTimeoutParaRefrescarToken(token);
+
+    return () => {
+      clearTimeout(timeoutRenovacion);
+    };
+  }, [refreshToken]);
 
   const Login = async (usuario: UsuarioLogin) => {
     if (usuario.rutusuario == '') {
@@ -90,7 +128,21 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
     const datosUsuario = await loguearUsuario(usuario);
 
+    setRefreshToken(true);
+
     DatosUser(datosUsuario);
+  };
+
+  const logout = async () => {
+    try {
+      await desloguearUsuario();
+
+      DatosUser(datosUsuarioPorDefecto);
+
+      setRefreshToken(false);
+    } catch (error) {
+      console.error('ERROR EN LOGOUT: ', error);
+    }
   };
 
   const DatosUser = (DataUsuario: UserData) => {
@@ -103,10 +155,6 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
     return setDatosUsuario(DataUsuario);
   };
 
-  const resetearUsuario = () => {
-    DatosUser(datosUsuarioPorDefecto);
-  };
-
   return (
     <AuthContext.Provider
       value={{
@@ -114,7 +162,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
         datosusuario: datosUsuario,
         login: Login,
         CompletarUsuario: DatosUser,
-        resetearUsuario,
+        logout,
       }}>
       {children}
     </AuthContext.Provider>

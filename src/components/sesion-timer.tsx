@@ -1,5 +1,5 @@
 import { AuthContext } from '@/contexts';
-import { logout, renovarToken } from '@/servicios/auth';
+import { desloguearUsuario as logout, renovarToken } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';

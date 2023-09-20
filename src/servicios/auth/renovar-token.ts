@@ -5,7 +5,7 @@ import jwt_decode from 'jwt-decode';
 import { setCookie } from 'nookies';
 import { obtenerToken } from './obtener-token';
 
-export const renovarToken = async () => {
+export const renovarToken = async (): Promise<string> => {
   const token = await runFetchConThrow<string>(
     `${apiUrl()}/auth/refresh`,
     {
@@ -24,4 +24,6 @@ export const renovarToken = async () => {
   const maxAge = tokenDecodificado.exp - ahoraEnSegundos;
 
   setCookie(null, 'token', token, { maxAge, path: '/' });
+
+  return token;
 };
