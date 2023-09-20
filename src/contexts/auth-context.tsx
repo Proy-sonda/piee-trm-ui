@@ -7,7 +7,10 @@ import {
   obtenerUserData,
   renovarToken,
 } from '@/servicios/auth';
+import { maximoTiempoDeInactividad } from '@/servicios/environment';
+import { useRouter } from 'next/navigation';
 import { createContext, useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
 import { ChildrenApp, UserData, UsuarioLogin } from './modelos/types';
 
 type AuthContextType = {
@@ -80,7 +83,11 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
   const [datosUsuario, setDatosUsuario] = useState(datosUsuarioPorDefecto);
 
-  const [refreshToken, setRefreshToken] = useState(false);
+  const [debeRefrescarToken, setDebeRefrescarToken] = useState(false);
+
+  const [mostrarAlertaExpiraSesion, setMostrarAlertaExpiraSesion] = useState(false);
+
+  const router = useRouter();
 
   // Recargar usuario del token
   useEffect(() => {
@@ -91,7 +98,9 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
     DatosUser(userData);
 
-    setRefreshToken(true);
+    setDebeRefrescarToken(true);
+
+    setMostrarAlertaExpiraSesion(true);
   }, []);
 
   // Renovar token de autenticacion automaticamente
@@ -99,7 +108,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
     let timeoutRenovacion: NodeJS.Timeout | undefined = undefined;
     const token = obtenerToken()?.substring('Bearer '.length);
 
-    if (!refreshToken || !token) {
+    if (!debeRefrescarToken || !token) {
       clearTimeout(timeoutRenovacion);
       return;
     }
@@ -111,7 +120,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
         renovarToken().then((nuevoToken) => {
           setTimeoutParaRefrescarToken(nuevoToken);
         });
-      }, 10 * 1000); //TODO: Hacer esto 1 minuto antes de que venza el token
+      }, 120 * 1000); //TODO: Hacer esto 1 minuto antes de que venza el token
     };
 
     setTimeoutParaRefrescarToken(token);
@@ -119,18 +128,86 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
     return () => {
       clearTimeout(timeoutRenovacion);
     };
-  }, [refreshToken]);
+  }, [debeRefrescarToken]);
 
-  const Login = async (usuario: UsuarioLogin) => {
+  // Alerta de expiracion de sesion
+  useEffect(() => {
+    let idTimeoutAlerta: NodeJS.Timeout | undefined;
+    let idTimerTiempoRestante: NodeJS.Timer | undefined;
+
+    const activarAlertaDeExpiracionDeSesion = () => {
+      clearTimeout(idTimeoutAlerta);
+
+      idTimeoutAlerta = setTimeout(() => {
+        Swal.fire({
+          title: 'Aviso de cierre de sesión',
+          html: `
+            <p>Su sesión está a punto de expirar, ¿Necesita más tiempo?</p>
+            <b>15</b>
+            `,
+          icon: 'warning',
+          showConfirmButton: true,
+          timer: 15000,
+          timerProgressBar: true,
+          confirmButtonText: 'Mantener sesión activa',
+          confirmButtonColor: 'var(--color-blue)',
+          showCancelButton: true,
+          cancelButtonText: 'Cerrar sesión',
+          cancelButtonColor: 'var(--bs-danger)',
+          allowEscapeKey: false,
+          allowOutsideClick: false,
+          didOpen: () => {
+            const b: any = Swal.getHtmlContainer()?.querySelector('b');
+            idTimerTiempoRestante = setInterval(() => {
+              b.textContent = Math.round((Swal.getTimerLeft() ?? 0) / 1000);
+            }, 1000);
+          },
+          didClose: () => {
+            clearInterval(idTimerTiempoRestante);
+          },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            return;
+          }
+
+          (async () => {
+            try {
+              await logout();
+            } catch (error) {
+              console.error('[SESION TIMER] ERROR EN LOGOUT: ', error);
+            } finally {
+              router.push('/');
+            }
+          })();
+        });
+      }, maximoTiempoDeInactividad());
+    };
+
+    if (mostrarAlertaExpiraSesion) {
+      document.addEventListener('mousemove', activarAlertaDeExpiracionDeSesion);
+      document.addEventListener('keydown', activarAlertaDeExpiracionDeSesion);
+      activarAlertaDeExpiracionDeSesion();
+    }
+
+    return () => {
+      clearTimeout(idTimeoutAlerta);
+      document.removeEventListener('mousemove', activarAlertaDeExpiracionDeSesion);
+      document.removeEventListener('keydown', activarAlertaDeExpiracionDeSesion);
+    };
+  }, [mostrarAlertaExpiraSesion]);
+
+  const login = async (usuario: UsuarioLogin) => {
     if (usuario.rutusuario == '') {
       return setusuario({ ...usuario, error: 'El usuario no puede estar Vació' });
     }
 
     const datosUsuario = await loguearUsuario(usuario);
 
-    setRefreshToken(true);
-
     DatosUser(datosUsuario);
+
+    setDebeRefrescarToken(true);
+
+    setMostrarAlertaExpiraSesion(true);
   };
 
   const logout = async () => {
@@ -139,7 +216,8 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
       DatosUser(datosUsuarioPorDefecto);
 
-      setRefreshToken(false);
+      setDebeRefrescarToken(false);
+      setMostrarAlertaExpiraSesion(false);
     } catch (error) {
       console.error('ERROR EN LOGOUT: ', error);
     }
@@ -160,7 +238,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
       value={{
         ...usuario,
         datosusuario: datosUsuario,
-        login: Login,
+        login,
         CompletarUsuario: DatosUser,
         logout,
       }}>

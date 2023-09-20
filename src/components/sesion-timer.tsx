@@ -11,7 +11,7 @@ const SessionTimer = () => {
 
   const router = useRouter();
 
-  const { resetearUsuario } = useContext(AuthContext);
+  const {} = useContext(AuthContext);
 
   useEffect(() => {
     let inactivityTimer: any;
@@ -55,7 +55,7 @@ const SessionTimer = () => {
                   await renovarToken();
                 } catch (error) {
                   logout();
-                  resetearUsuario();
+                  // resetearUsuario();
                   router.push('/');
                 }
               })();
@@ -66,7 +66,7 @@ const SessionTimer = () => {
                 } catch (error) {
                   console.error('[SESION TIMER] ERROR EN LOGOUT: ', error);
                 } finally {
-                  resetearUsuario();
+                  // resetearUsuario();
                   router.push('/');
                 }
               })();
