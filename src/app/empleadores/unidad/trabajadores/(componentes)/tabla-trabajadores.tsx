@@ -1,3 +1,5 @@
+import Paginacion from '@/components/paginacion';
+import { usePaginacion } from '@/hooks/use-paginacion';
 import Link from 'next/link';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { Trabajadores } from '../(modelos)/trabajadores';
@@ -15,48 +17,62 @@ const TablaTrabajadores: React.FC<props> = ({
   handleDeleteTrabajador,
   idunidad,
 }) => {
+  const [trabajadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
+    datos: trabajadores,
+    tamanoPagina: 5,
+  });
   return (
-    <Table className="table table-striped">
-      <Thead className="align-middle text-center">
-        <Tr>
-          <Th>Run</Th>
-          <Th>Acciones</Th>
-        </Tr>
-      </Thead>
-      <Tbody className="align-middle text-center">
-        {trabajadores.length > 0 ? (
-          trabajadores.map(({ ruttrabajador, idtrabajador }) => (
-            <Tr key={ruttrabajador}>
-              <Td>
-                <Link
-                  href={''}
-                  onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
-                  {ruttrabajador}
-                </Link>
-              </Td>
-              <Td>
-                <button
-                  className="btn btn-sm btn-primary"
-                  onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
-                  <i title={`editar ${ruttrabajador}`} className={'bi bi-pencil-square'}></i>
-                </button>
-                &nbsp;
-                <button
-                  className="btn btn-sm btn-danger"
-                  onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}>
-                  <i title={`eliminar ${ruttrabajador}`} className={'bi bi-trash btn-danger'}></i>
-                </button>
-              </Td>
-            </Tr>
-          ))
-        ) : (
+    <>
+      <Table className="table table-striped">
+        <Thead className="align-middle text-center">
           <Tr>
-            <Td>-</Td>
-            <Td>-</Td>
+            <Th>Run</Th>
+            <Th>Acciones</Th>
           </Tr>
-        )}
-      </Tbody>
-    </Table>
+        </Thead>
+        <Tbody className="align-middle text-center">
+          {trabajadoresPaginados.length > 0 ? (
+            trabajadoresPaginados.map(({ ruttrabajador, idtrabajador }) => (
+              <Tr key={ruttrabajador}>
+                <Td>
+                  <Link
+                    href={''}
+                    onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
+                    {ruttrabajador}
+                  </Link>
+                </Td>
+                <Td>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
+                    <i title={`editar ${ruttrabajador}`} className={'bi bi-pencil-square'}></i>
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}>
+                    <i title={`eliminar ${ruttrabajador}`} className={'bi bi-trash btn-danger'}></i>
+                  </button>
+                </Td>
+              </Tr>
+            ))
+          ) : (
+            <Tr>
+              <Td>-</Td>
+              <Td>-</Td>
+            </Tr>
+          )}
+        </Tbody>
+      </Table>
+      <div className="mt-3">
+        <Paginacion
+          numeroDePaginas={totalPaginas}
+          onCambioPagina={cambiarPagina}
+          tamano="sm"
+          paginaActual={paginaActual}
+        />
+      </div>
+    </>
   );
 };
 
