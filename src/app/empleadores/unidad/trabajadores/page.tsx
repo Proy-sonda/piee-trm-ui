@@ -37,6 +37,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
   const [error, seterror] = useState({
     run: false,
     file: false,
+    lecturarut: false,
   });
   const { idunidad, razon, rutempleador } = searchParams;
   const [editar, seteditar] = useState<Trabajador>({
@@ -192,14 +193,28 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
     const reader = new FileReader();
 
     reader.onload = (e: any) => {
-      const content = e.target.result;
+      const content = e.target.result.trim();
       const lines = content.split('\n');
-
       setCsvData(lines);
+
+      for (let index = 0; index < csvData.length; index++) {
+        const element = csvData[index];
+        if (!validateRut(formatRut(element, false)) && element.trim() != '') {
+          seterror({
+            ...error,
+            lecturarut: true,
+          });
+          Swal.fire({
+            icon: 'error',
+            html: `El formato del rut <b>${element}</b> es incorrecto, favor validar en archivo`,
+            confirmButtonColor: 'var(--color-blue)',
+          });
+          break;
+        }
+      }
     };
 
     reader.readAsText(file);
-    console.log(csvData);
   };
 
   return (
