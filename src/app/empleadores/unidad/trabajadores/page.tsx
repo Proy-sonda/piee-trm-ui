@@ -369,7 +369,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
               <sub>
                 Para poder cargar trabajadores de la unidad <b>{unidad}</b>, solo tiene que
                 seleccionar un archivo (formato CSV) según el{' '}
-                <span className={styles['span-link']}>siguiente formato</span>
+                <a
+                  className={styles['span-link']}
+                  download="formato.csv"
+                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3CjI0Njk3ODk5LTkK">
+                  siguiente formato
+                </a>
               </sub>
               <div className="row mt-3">
                 <div className="col-md-6 position-relative">
