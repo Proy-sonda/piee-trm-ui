@@ -1,17 +1,30 @@
+'use client';
+
 import { ButtonImage } from '@/components/button-image';
 import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
 import insemp from '@/img/Inscribeem.png';
+import { estaLogueado } from '@/servicios/auth';
 import { adsUrl } from '@/servicios/environment';
+import { useRouter } from 'next/navigation';
+import React from 'react';
 
-interface HomeProps {
+interface HomePageProps {
   searchParams: {
     path?: string;
   };
 }
 
-export default function Home({ searchParams }: HomeProps) {
+const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
   const _adsUrl: string = adsUrl();
+
+  const router = useRouter();
+
+  if (estaLogueado()) {
+    router.push('/tramitacion');
+    return null;
+  }
+
   return (
     <div className="bgads">
       <div className="row">
@@ -46,4 +59,6 @@ export default function Home({ searchParams }: HomeProps) {
       </div>
     </div>
   );
-}
+};
+
+export default HomePage;
