@@ -1,6 +1,6 @@
 'use client';
 
-import { LoginUsuario } from '@/helpers/adscripcion/login-usuario';
+import { loguearUsuario } from '@/servicios/auth';
 import { createContext, useState } from 'react';
 import { ChildrenApp, UserData, UsuarioLogin } from './modelos/types';
 
@@ -22,7 +22,7 @@ type AuthContextType = {
       rutusuario: string;
     };
   };
-  login: (usuario: UsuarioLogin) => void;
+  login: (usuario: UsuarioLogin) => Promise<void>;
   CompletarUsuario: (DataUsuario: UserData) => void;
 };
 
@@ -44,7 +44,7 @@ export const AuthContext = createContext<AuthContextType>({
       rutusuario: '',
     },
   },
-  login: () => {},
+  login: async () => {},
   CompletarUsuario: () => {},
 });
 
@@ -71,18 +71,22 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
   });
 
   const Login = async (usuario: UsuarioLogin) => {
-    if (usuario.rutusuario == '')
+    if (usuario.rutusuario == '') {
       return setusuario({ ...usuario, error: 'El usuario no puede estar Vació' });
+    }
 
-    const respLogin = await LoginUsuario(usuario);
-    return respLogin;
+    const datosUsuario = await loguearUsuario(usuario);
+
+    DatosUser(datosUsuario);
   };
 
   const DatosUser = (DataUsuario: UserData) => {
     setDatosUsuario(DataUsuario);
+
     if (!DataUsuario.user.rutusuario) {
       return;
     }
+
     return setDatosUsuario(DataUsuario);
   };
 

@@ -1,17 +1,12 @@
 'use client';
 
-import { LoginComponent } from '@/components/login/login-component';
 import Position from '@/components/stage/position';
 import { AuthContext } from '@/contexts';
-import { CompruebaToken } from '@/helpers/adscripcion/login-usuario';
-import { ComboEntidadEmpleador } from '@/helpers/tramitacion/empleadores';
 import { useForm } from '@/hooks/use-form';
 import { Empleador } from '@/modelos/empleador';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
-import jwt_decode from 'jwt-decode';
-import { parseCookies } from 'nookies';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Table, Tbody, Th, Thead, Tr } from 'react-super-responsive-table';
 import styles from './tramitacion.module.css';
 
@@ -30,6 +25,8 @@ const TramitacionPage = () => {
     entidadempleador: '',
     urrhh: '',
   });
+
+  /* TODO: Usar los hooks para obtener la entidad empleadora y no usar cookies en esta parte
   let cookie = parseCookies();
   let token = '';
   token = cookie.token;
@@ -46,13 +43,7 @@ const TramitacionPage = () => {
     };
 
     EntidadEmpleadora();
-  }, [token]);
-
-  if (token == '') return <LoginComponent buttonText="Ingresar" />;
-
-  token = token?.replaceAll('Bearer ', '');
-
-  CompruebaToken(token);
+  }, [token]);  */
 
   const onChangeEmp = (event: any) => {
     let value = event.target.value;

@@ -23,12 +23,18 @@ import { ErrorFetchDesconocido, HttpError } from './errores';
 export const runFetchConThrow = async <T>(
   url: RequestInfo | URL,
   init?: RequestInit,
+  options?: FetchOptions,
 ): Promise<T> => {
+  const opts = {
+    ...defaultOptions,
+    ...options,
+  };
+
   const fetchRequest = !init ? fetch(url) : fetch(url, init);
 
-  const res = await fetchRequest;
-
   try {
+    const res = await fetchRequest;
+
     if (!res.ok) {
       throw new HttpError(
         res.status,
@@ -41,7 +47,11 @@ export const runFetchConThrow = async <T>(
 
     const contentLengthHeader = res.headers.get('Content-Length');
     if (contentLengthHeader && parseInt(contentLengthHeader) !== 0) {
-      return res.json() as Promise<T>;
+      if (opts.bodyAs === 'text') {
+        return res.text() as Promise<T>;
+      } else {
+        return res.json() as Promise<T>;
+      }
     } else {
       return undefined as unknown as Promise<any>;
     }
@@ -51,4 +61,12 @@ export const runFetchConThrow = async <T>(
 
     throw fetchError;
   }
+};
+
+export interface FetchOptions {
+  bodyAs: 'text' | 'json';
+}
+
+export const defaultOptions: Readonly<FetchOptions> = {
+  bodyAs: 'json',
 };

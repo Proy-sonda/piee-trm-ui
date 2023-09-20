@@ -1,19 +1,23 @@
 'use client';
+
 import { AuthContext } from '@/contexts/auth-context';
-import { UsuarioLogin } from '@/contexts/interfaces/types';
 import { useForm } from '@/hooks/use-form';
+import {
+  AutenticacionTransitoriaError,
+  LoginPasswordInvalidoError,
+  RutInvalidoError,
+  UsuarioNoExisteError,
+} from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
-import jwt_decode from 'jwt-decode';
-import { useRouter } from 'next/navigation';
-import { setCookie } from 'nookies';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useContext, useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import styles from './login.module.css';
 
-type appsProps = {
-  buttonText: string;
+type LoginComponentProps = {
+  buttonText?: string;
 };
 
 type changePass = {
@@ -23,7 +27,7 @@ type changePass = {
   clavenuevados: string;
 };
 
-export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' }) => {
+export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'Ingresar' }) => {
   const [show, setShow] = useState('');
   const [display, setDisplay] = useState('none');
   const [showModalRecu, setShowModalRecu] = useState(false);
@@ -31,20 +35,25 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
 
   const router = useRouter();
 
+  const searchParams = useSearchParams();
+
   const handleShowModalRecu = () => {
     setShowModalRecu(true);
   };
+
   const handleCloseModalRecu = () => {
     setShowModalRecu(false);
     onResetForm();
   };
+
   const handleCloseModalRecu2 = () => {
     setshowModalRecu2(false);
   };
+
   const handleShowModalRecu2 = () => {
     setshowModalRecu2(true);
   };
-  const { CompletarUsuario } = useContext(AuthContext);
+
   const { login } = useContext(AuthContext);
 
   const {
@@ -65,6 +74,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
     clave: '',
     rutrecu: '',
   });
+
   const input: any = {
     clave: false,
     claveanterior: false,
@@ -72,63 +82,48 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
     clavenuevados: false,
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleLoginUsuario = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    let usuario: UsuarioLogin = {
-      rutusuario,
-      clave,
-    };
+    if (!rutusuario || !clave) {
+      return Swal.fire('Error', 'Debe completar los campos', 'error');
+    }
 
-    if (!rutusuario || !clave) return Swal.fire('Error', 'Debe completar los campos', 'error');
+    try {
+      await login({ rutusuario, clave });
 
-    let respuesta: any = await login(usuario);
-
-    if (respuesta?.resp == undefined)
-      return Swal.fire('Error', 'Ocurrió un problema en el sistema', 'error');
-
-    let messageError: string = '';
-    if (respuesta.resp?.statusCode == 400) {
-      respuesta.resp.message.map((message: string) => {
-        if (message == 'rutusuario|invalido') messageError += `<br/> Rut Invalido`;
+      return Swal.fire({
+        html: 'Sesión iniciada correctamente',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false,
+        didClose: () => router.push(searchParams.get('path') ?? '/tramitacion'),
       });
-    }
+    } catch (error) {
+      let messageError = '';
 
-    if (respuesta.resp.statusCode == 401) {
-      if (respuesta.resp.message == 'Login/Password invalida')
-        messageError += 'Contraseña invalida';
-    }
-
-    if (respuesta.resp?.statusCode == 412) {
-      if (respuesta.resp.message == 'Autenticación Transitoria') {
+      if (error instanceof RutInvalidoError) {
+        messageError = `<br/> Rut Invalido`;
+      } else if (
+        error instanceof LoginPasswordInvalidoError ||
+        error instanceof UsuarioNoExisteError
+      ) {
+        messageError = 'Contraseña invalida';
+      } else if (error instanceof AutenticacionTransitoriaError) {
         setShow('show');
         setDisplay('block');
+      } else {
+        messageError = 'Ocurrió un problema en el sistema';
       }
-    }
 
-    if (respuesta.resp.statusCode == 200) {
-      if (respuesta.resp.message.includes('Bearer')) {
-        setCookie(null, 'token', respuesta.resp.message, { maxAge: 3600, path: '/' });
-
-        let data: any = jwt_decode(respuesta.resp.message);
-        CompletarUsuario(data);
-        return Swal.fire({
-          html: 'Sesión iniciada correctamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-          didClose: () => router.push('/tramitacion'),
+      if (messageError != '')
+        Swal.fire({
+          title: 'Error',
+          icon: 'error',
+          html: messageError,
+          confirmButtonColor: 'var(--color-blue)',
         });
-      }
     }
-
-    if (messageError != '')
-      Swal.fire({
-        title: 'Error',
-        icon: 'error',
-        html: messageError,
-        confirmButtonColor: '#225F9D',
-      });
   };
 
   const ChangeTemporal = async () => {
@@ -386,7 +381,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className={styles.formlogin}>
+      <form onSubmit={handleLoginUsuario} className={styles.formlogin}>
         <label>
           Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
         </label>
@@ -445,7 +440,7 @@ export const LoginComponent: React.FC<appsProps> = ({ buttonText = 'Ingresar' })
           </label>{' '}
           &nbsp;
           <button type="submit" className={'btn btn-primary'}>
-            {buttonText}
+            Ingresar
           </button>
         </div>
       </form>

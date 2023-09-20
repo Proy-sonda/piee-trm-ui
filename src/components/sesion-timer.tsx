@@ -1,6 +1,5 @@
-import { Logout, renovacionToken } from '@/helpers/tramitacion/empleadores';
+import { logout, renovarToken } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
-import { destroyCookie, setCookie } from 'nookies';
 import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
@@ -16,6 +15,7 @@ const SessionTimer = () => {
 
     const resetTimer = () => {
       clearTimeout(inactivityTimer);
+
       let timerInterval;
       inactivityTimer = setTimeout(
         () => {
@@ -24,7 +24,7 @@ const SessionTimer = () => {
           Swal.fire({
             title: 'Aviso de cierre de sesión',
             html: `
-            <p>Tu sesión está a punto de expirar, ¿Necesitas más tiempo?</p>
+            <p>Su sesión está a punto de expirar, ¿Necesita más tiempo?</p>
             <b></b>
           `,
             icon: 'warning',
@@ -32,8 +32,10 @@ const SessionTimer = () => {
             timer: 15000,
             timerProgressBar: true,
             confirmButtonText: 'Mantener sesión activa',
+            confirmButtonColor: 'var(--color-blue)',
             showCancelButton: true,
             cancelButtonText: 'Cerrar sesión',
+            cancelButtonColor: 'var(--bs-danger)',
             didOpen: () => {
               // Swal.showLoading()
               const b: any = Swal.getHtmlContainer()?.querySelector('b');
@@ -43,24 +45,24 @@ const SessionTimer = () => {
             },
           }).then((result) => {
             if (result.isConfirmed) {
-              const resp = async () => {
-                const data = await renovacionToken();
-                if (data.ok) {
-                  let token = await data.text();
-                  setCookie(null, 'token', token, { maxAge: 3600, path: '/' });
-                }
-              };
-              resp();
-            } else {
-              const resp = async () => {
-                const data = await Logout();
-                if (data.ok) {
-                  destroyCookie(null, 'token');
+              (async () => {
+                try {
+                  await renovarToken();
+                } catch (error) {
+                  await logout();
                   router.push('/');
                 }
-              };
-
-              resp();
+              })();
+            } else {
+              (async () => {
+                try {
+                  await logout();
+                } catch (error) {
+                  console.error('[SESION TIMER] ERROR EN LOGOUT: ', error);
+                } finally {
+                  router.push('/');
+                }
+              })();
             }
           });
         },
