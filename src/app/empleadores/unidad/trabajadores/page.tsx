@@ -32,6 +32,7 @@ interface TrabajadoresPageProps {
 
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
   const [unidad, setunidad] = useState('');
+  const [csvData, setCsvData] = useState<any>([]);
   let [loading, setLoading] = useState(false);
   const [error, seterror] = useState({
     run: false,
@@ -179,12 +180,26 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
 
   const handleClickNomina = (event: FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    if (!getValues('file')) return;
     if (error.file)
       return Swal.fire({
         icon: 'error',
         html: 'Debe cargar solo archivos de tipo "csv"',
         confirmButtonColor: 'var(--color-blue)',
       });
+
+    const file = getValues('file')![0];
+    const reader = new FileReader();
+
+    reader.onload = (e: any) => {
+      const content = e.target.result;
+      const lines = content.split('\n');
+
+      setCsvData(lines);
+    };
+
+    reader.readAsText(file);
+    console.log(csvData);
   };
 
   return (
@@ -279,8 +294,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
               <div className="row mt-3">
                 <div className="col-md-6 position-relative">
                   <input
-                    id="file"
                     type="file"
+                    accept=".csv"
                     className={error.file ? 'form-control is-invalid' : 'form-control'}
                     {...register('file', {
                       onChange: (event: ChangeEvent<HTMLInputElement>) => {
