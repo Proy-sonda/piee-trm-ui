@@ -7,9 +7,9 @@ export const adsUrl = () => {
 };
 
 /**
- * Maximo tiempo en milisegundos que puede estar la aplicación sin actividad del usuario antes de
- * mostrar el modal de que la sesión va a expirar.
+ * Cuanto tiempo antes de que expire la sesion (en milisegunos) se debe mostrar la alerta para
+ * confirmar la sesion
  */
-export const maximoTiempoDeInactividad = () => {
-  return parseInt(process.env.NEXT_PUBLIC_MAXIMO_TIEMPO_DE_INACTIVIDAD_MS!, 10);
+export const thresholdAlertaExpiraSesion = () => {
+  return parseInt(process.env.NEXT_PUBLIC_THRESHOLD_ALERTA_EXPIRA_SESION_MS!, 10);
 };

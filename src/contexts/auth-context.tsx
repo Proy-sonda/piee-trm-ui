@@ -1,13 +1,7 @@
 'use client';
 
-import {
-  desloguearUsuario,
-  loguearUsuario,
-  obtenerToken,
-  obtenerUserData,
-  renovarToken,
-} from '@/servicios/auth';
-import { maximoTiempoDeInactividad } from '@/servicios/environment';
+import { desloguearUsuario, loguearUsuario, obtenerUserData, renovarToken } from '@/servicios/auth';
+import { thresholdAlertaExpiraSesion } from '@/servicios/environment';
 import { useRouter } from 'next/navigation';
 import { createContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
@@ -83,8 +77,6 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
   const [datosUsuario, setDatosUsuario] = useState(datosUsuarioPorDefecto);
 
-  const [debeRefrescarToken, setDebeRefrescarToken] = useState(false);
-
   const [mostrarAlertaExpiraSesion, setMostrarAlertaExpiraSesion] = useState(false);
 
   const router = useRouter();
@@ -98,79 +90,76 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
     DatosUser(userData);
 
-    setDebeRefrescarToken(true);
-
     setMostrarAlertaExpiraSesion(true);
   }, []);
-
-  // Renovar token de autenticacion automaticamente
-  useEffect(() => {
-    let timeoutRenovacion: NodeJS.Timeout | undefined = undefined;
-    const token = obtenerToken()?.substring('Bearer '.length);
-
-    if (!debeRefrescarToken || !token) {
-      clearTimeout(timeoutRenovacion);
-      return;
-    }
-
-    const setTimeoutParaRefrescarToken = (token: string) => {
-      // TODO: Calcular aqui tiempo de expiracion del token
-
-      timeoutRenovacion = setTimeout(() => {
-        renovarToken().then((nuevoToken) => {
-          setTimeoutParaRefrescarToken(nuevoToken);
-        });
-      }, 120 * 1000); //TODO: Hacer esto 1 minuto antes de que venza el token
-    };
-
-    setTimeoutParaRefrescarToken(token);
-
-    return () => {
-      clearTimeout(timeoutRenovacion);
-    };
-  }, [debeRefrescarToken]);
 
   // Alerta de expiracion de sesion
   useEffect(() => {
     let idTimeoutAlerta: NodeJS.Timeout | undefined;
     let idTimerTiempoRestante: NodeJS.Timer | undefined;
+    const datosUsuario = obtenerUserData();
 
     const activarAlertaDeExpiracionDeSesion = () => {
       clearTimeout(idTimeoutAlerta);
 
+      if (!datosUsuario) {
+        return;
+      }
+
+      const tokenExpiraEn = (datosUsuario.exp - datosUsuario.iat) * 1000;
+
       idTimeoutAlerta = setTimeout(() => {
-        Swal.fire({
-          title: 'Aviso de cierre de sesión',
-          html: `
+        (async () => {
+          const { isConfirmed } = await Swal.fire({
+            title: 'Aviso de cierre de sesión',
+            html: `
             <p>Su sesión está a punto de expirar, ¿Necesita más tiempo?</p>
             <b>15</b>
             `,
-          icon: 'warning',
-          showConfirmButton: true,
-          timer: 15000,
-          timerProgressBar: true,
-          confirmButtonText: 'Mantener sesión activa',
-          confirmButtonColor: 'var(--color-blue)',
-          showCancelButton: true,
-          cancelButtonText: 'Cerrar sesión',
-          cancelButtonColor: 'var(--bs-danger)',
-          allowEscapeKey: false,
-          allowOutsideClick: false,
-          didOpen: () => {
-            const b: any = Swal.getHtmlContainer()?.querySelector('b');
-            idTimerTiempoRestante = setInterval(() => {
-              b.textContent = Math.round((Swal.getTimerLeft() ?? 0) / 1000);
-            }, 1000);
-          },
-          didClose: () => {
-            clearInterval(idTimerTiempoRestante);
-          },
-        }).then((result) => {
-          if (result.isConfirmed) {
-            return;
-          }
+            icon: 'warning',
+            showConfirmButton: true,
+            timer: 15000,
+            timerProgressBar: true,
+            confirmButtonText: 'Mantener sesión activa',
+            confirmButtonColor: 'var(--color-blue)',
+            showCancelButton: true,
+            cancelButtonText: 'Cerrar sesión',
+            cancelButtonColor: 'var(--bs-danger)',
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+            didOpen: () => {
+              const b: any = Swal.getHtmlContainer()?.querySelector('b');
+              idTimerTiempoRestante = setInterval(() => {
+                b.textContent = Math.round((Swal.getTimerLeft() ?? 0) / 1000);
+              }, 1000);
+            },
+            didClose: () => {
+              clearInterval(idTimerTiempoRestante);
+            },
+          });
 
-          (async () => {
+          if (isConfirmed) {
+            try {
+              await renovarToken();
+
+              activarAlertaDeExpiracionDeSesion();
+            } catch (error) {
+              logout();
+
+              await Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                titleText: 'Se generó un problema al extender la sesión',
+                confirmButtonText: 'OK',
+                confirmButtonColor: 'var(--color-blue)',
+                showCancelButton: true,
+              });
+
+              DatosUser(datosUsuarioPorDefecto);
+
+              router.push('/');
+            }
+          } else {
             try {
               await logout();
             } catch (error) {
@@ -178,21 +167,17 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
             } finally {
               router.push('/');
             }
-          })();
-        });
-      }, maximoTiempoDeInactividad());
+          }
+        })();
+      }, tokenExpiraEn - thresholdAlertaExpiraSesion());
     };
 
     if (mostrarAlertaExpiraSesion) {
-      document.addEventListener('mousemove', activarAlertaDeExpiracionDeSesion);
-      document.addEventListener('keydown', activarAlertaDeExpiracionDeSesion);
       activarAlertaDeExpiracionDeSesion();
     }
 
     return () => {
       clearTimeout(idTimeoutAlerta);
-      document.removeEventListener('mousemove', activarAlertaDeExpiracionDeSesion);
-      document.removeEventListener('keydown', activarAlertaDeExpiracionDeSesion);
     };
   }, [mostrarAlertaExpiraSesion]);
 
@@ -205,21 +190,18 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
     DatosUser(datosUsuario);
 
-    setDebeRefrescarToken(true);
-
     setMostrarAlertaExpiraSesion(true);
   };
 
   const logout = async () => {
     try {
       await desloguearUsuario();
-
-      DatosUser(datosUsuarioPorDefecto);
-
-      setDebeRefrescarToken(false);
-      setMostrarAlertaExpiraSesion(false);
     } catch (error) {
       console.error('ERROR EN LOGOUT: ', error);
+    } finally {
+      DatosUser(datosUsuarioPorDefecto);
+
+      setMostrarAlertaExpiraSesion(false);
     }
   };
 
