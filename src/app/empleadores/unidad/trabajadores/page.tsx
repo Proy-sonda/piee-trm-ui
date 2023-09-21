@@ -142,7 +142,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
 
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
-    if (error) return;
+
+    if (error.run) return;
     setLoading(true);
 
     const crearTrabajadorAux = async () => {
@@ -274,7 +275,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
             </Thead>
             <Tbody>
               {rutconerror.map((value: any) => (
-                <Tr>
+                <Tr key={value.rut}>
                   <Td>{value.rut}</Td>
                   <Td>{value.error}</Td>
                 </Tr>
@@ -346,7 +347,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                     }}>
                     <div className="d-grid gap-2 d-md-flex">
                       <button type="submit" className="btn btn-success">
-                        Grabar
+                        Agregar
                       </button>
                     </div>
                   </div>
@@ -425,7 +426,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                       }
                       className="btn btn-success"
                       onClick={handleClickNomina}>
-                      Grabar
+                      Cargar
                     </button>
                     <button
                       className="btn btn-danger"
@@ -434,7 +435,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                       }
                       onClick={async (event) => {
                         event.preventDefault();
-                        console.log(getValues('file'));
                         if (getValues('file')?.length === 0) return;
                         const resp = await Swal.fire({
                           icon: 'question',
@@ -453,7 +453,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                         });
                         setValue('file', null);
                       }}>
-                      Borrar
+                      Borrar todo
                     </button>
                   </div>
                 </div>
