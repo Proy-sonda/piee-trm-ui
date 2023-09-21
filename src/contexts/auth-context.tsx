@@ -1,5 +1,6 @@
 'use client';
 
+import { useUrl } from '@/hooks/use-url';
 import { UserData } from '@/modelos/user-data';
 import { desloguearUsuario, loguearUsuario, obtenerUserData, renovarToken } from '@/servicios/auth';
 import { thresholdAlertaExpiraSesion } from '@/servicios/environment';
@@ -20,6 +21,8 @@ export const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const { fullPath } = useUrl();
+
   const [datosUsuario, setDatosUsuario] = useState<UserData | undefined>(undefined);
 
   const [mostrarAlertaExpiraSesion, setMostrarAlertaExpiraSesion] = useState(false);
@@ -51,7 +54,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         return;
       }
 
-      const tokenExpiraEn = (datosUsuario.exp - datosUsuario.iat) * 1000;
+      /* Nota: El punto de referencia tiene que ser Date.now() y no datosUsuario.iat para que al
+       * ingresar por URL despues de creada la sesion muestre la alerta antes de que venza la
+       * sesion, es posible que muestre la alerta una vez que la sesion haya vencido y la cookie
+       * eliminada del navegador. */
+      const tokenExpiraEn = datosUsuario.exp * 1000 - Date.now();
+      const tiempoParaMostrarAlerta = tokenExpiraEn - thresholdAlertaExpiraSesion();
+      if (tiempoParaMostrarAlerta < 0) {
+        logout(); // por si acaso
+        const searchParams = new URLSearchParams({ redirectTo: fullPath });
+        router.push(`/?${searchParams.toString()}`);
+        return;
+      }
 
       idTimeoutAlerta = setTimeout(() => {
         (async () => {
@@ -114,7 +128,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             }
           }
         })();
-      }, tokenExpiraEn - thresholdAlertaExpiraSesion());
+      }, tiempoParaMostrarAlerta);
     };
 
     if (mostrarAlertaExpiraSesion) {

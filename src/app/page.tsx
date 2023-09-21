@@ -11,7 +11,7 @@ import React from 'react';
 
 interface HomePageProps {
   searchParams: {
-    path?: string;
+    redirectTo?: string;
   };
 }
 
@@ -20,7 +20,7 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
 
   const router = useRouter();
 
-  if (estaLogueado()) {
+  if (estaLogueado() && !searchParams.redirectTo) {
     router.push('/tramitacion');
     return null;
   }
@@ -28,7 +28,7 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
   return (
     <div className="bgads">
       <div className="row">
-        <IfContainer show={searchParams.path}>
+        <IfContainer show={searchParams.redirectTo}>
           <div className="col-12">
             <div
               className="alert alert-danger d-flex align-items-center alert-dismissible fade show"
