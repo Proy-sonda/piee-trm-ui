@@ -6,15 +6,9 @@ import styles from './styles.module.css';
 
 interface NavegacionEntidadEmpleadoraProps {
   id: number;
-  rut: string;
-  razon: string;
 }
 
-const NavegacionEntidadEmpleadora: React.FC<NavegacionEntidadEmpleadoraProps> = ({
-  id,
-  rut,
-  razon,
-}) => {
+const NavegacionEntidadEmpleadora: React.FC<NavegacionEntidadEmpleadoraProps> = ({ id }) => {
   const links: LinkNavegacionEntidadEmpleadora[] = [
     {
       titulo: 'Datos Entidad Empleadora',

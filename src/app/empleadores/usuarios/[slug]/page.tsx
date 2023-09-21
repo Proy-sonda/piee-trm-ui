@@ -64,7 +64,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
       <div className="container">
         <div className="row">
-          <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
+          <NavegacionEntidadEmpleadora id={id} />
         </div>
 
         <Titulo url="">

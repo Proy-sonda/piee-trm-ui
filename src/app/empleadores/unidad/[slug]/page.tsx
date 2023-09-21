@@ -77,7 +77,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params }) => {
 
       <div className="container pb-3 px-3 px-lg-5">
         <div className="row">
-          <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
+          <NavegacionEntidadEmpleadora id={id} />
         </div>
 
         <Titulo url="">

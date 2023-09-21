@@ -205,7 +205,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
 
         <div className="container pb-4">
           <div className="row">
-            <NavegacionEntidadEmpleadora rut={rut} razon={empleador?.razonsocial || ''} id={id} />
+            <NavegacionEntidadEmpleadora id={id} />
           </div>
 
           <IfContainer show={cargandoCombos || cargandoEmpleador || spinnerCargar}>
