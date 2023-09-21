@@ -318,7 +318,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
 
                     <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="region" className="form-label">
-                        Región
+                        Región (*)
                       </label>
                       <select
                         id="region"
@@ -610,7 +610,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                     <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <div className="form-group">
                         <label htmlFor="tamanoEmpresa" className="form-label">
-                          N° de trabajadores
+                          N° de trabajadores (*)
                         </label>
                         <select
                           id="tamanoEmpresa"
@@ -635,7 +635,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
 
                     <div className="col-12 col-lg-6 col-xl-3 position-relative">
                       <label htmlFor="sistemaRemuneracion" className="form-label">
-                        Sistema de Remuneración
+                        Sistema de Remuneración (*)
                       </label>
                       <select
                         id="sistemaRemuneracion"
