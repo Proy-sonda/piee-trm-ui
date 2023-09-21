@@ -6,40 +6,65 @@ import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { Unidadrhh } from '@/modelos/tramitacion';
 import { estaLogueado } from '@/servicios/auth';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
-import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
-import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
-import TablaUnidades from './(componentes)/tabla-unidades';
+import ModalEditarUnidad from '../(componentes)/modal-editar-unidad';
+import ModalNuevaUnidad from '../(componentes)/modal-nueva-unidad';
+import TablaUnidades from '../(componentes)/tabla-unidades';
+import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
+import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-por-id';
 
 interface UnidadRRHHPageProps {
-  searchParams: {
-    rut: string;
-    razon: string;
-    id: string;
+  params: {
+    slug: {
+      id: number;
+    };
   };
 }
 
-const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
+const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params }) => {
   const router = useRouter();
 
-  const { rut, razon, id } = searchParams;
+  const id = Number(params.slug);
+
+  const [rut, setrut] = useState('');
+  const [unidades, setunidades] = useState<Unidadrhh[]>([]);
 
   const [idunidad, setIdunidad] = useState<string | undefined>(undefined);
+  const [razon, setrazon] = useState<string>('');
 
   const [refrescar, refrescarPagina] = useRefrescarPagina();
 
-  const [erroresCargarUnidad, [unidades], cargandoUnidades] = useMergeFetchArray(
-    [buscarUnidadesDeRRHH(rut)],
+  const [erroresCargarUnidad, [empleadores], cargandoUnidades] = useMergeFetchArray(
+    [buscarEmpleadorPorId(id)],
     [refrescar],
   );
 
   useEffect(() => {
-    window.history.pushState(null, '', '/empleadores/unidad');
-  }, []);
+    if (empleadores != undefined) {
+      const [unidadesbusqueda] = buscarUnidadesDeRRHH(empleadores?.rutempleador);
+      setrut(empleadores.rutempleador);
+
+      const busquedaUnidades = async () => {
+        const resp = await unidadesbusqueda();
+        setunidades(resp);
+      };
+      busquedaUnidades();
+    }
+  }, [empleadores]);
+
+  useEffect(() => {
+    if (unidades != undefined) {
+      const busquedaEmpleador = async () => {
+        const [resp] = await buscarEmpleadorPorId(Number(id));
+        await setrazon(await resp().then((resp: any) => resp.razonsocial));
+      };
+      busquedaEmpleador();
+    }
+  }, [unidades]);
 
   if (!estaLogueado()) {
     router.push('/login');
@@ -56,7 +81,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ searchParams }) => {
         </div>
 
         <Titulo url="">
-          Entidad Empleadora / Dirección y Unidades RRHH - <b>{razon}</b>
+          Entidad Empleadora / Dirección y Unidades RRHH - <b>{razon.replaceAll('%20', ' ')}</b>
         </Titulo>
 
         <div className="mt-2 d-flex justify-content-end">

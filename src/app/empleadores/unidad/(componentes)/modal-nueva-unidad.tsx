@@ -11,7 +11,7 @@ import { FormularioCrearUnidadRRHH } from '../(modelos)/formulario-crear-unidad-
 import { crearUnidad } from '../(servicios)/crear-unidad';
 
 interface ModalNuevaUnidadProps {
-  idEmpleador: string;
+  idEmpleador: number;
   onNuevaUnidadCreada: () => void;
 }
 
@@ -63,7 +63,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
         telefono: data.telefono,
         email: data.email,
         emailConfirma: data.emailConfirma,
-        empleadorId: parseInt(idEmpleador, 10),
+        empleadorId: idEmpleador,
       });
 
       Swal.fire({

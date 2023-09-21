@@ -14,7 +14,7 @@ import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
 import { crearUsuario } from '../(servicios)/crear-usuario';
 
 interface ModalCrearUsuarioProps {
-  idEmpleador: string;
+  idEmpleador: number;
   onCerrarModal: () => void;
   onUsuarioCreado: () => void;
 }
@@ -65,7 +65,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
         usuarioempleador: [
           {
             empleador: {
-              idempleador: parseInt(idEmpleador),
+              idempleador: idEmpleador,
             },
           },
         ],
