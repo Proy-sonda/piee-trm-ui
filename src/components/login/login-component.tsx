@@ -8,11 +8,11 @@ import {
   RutInvalidoError,
   UsuarioNoExisteError,
 } from '@/servicios/auth';
-import { apiUrl } from '@/servicios/environment';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useContext, useState } from 'react';
 import Swal from 'sweetalert2';
 import styles from './login.module.css';
+import ModalCambiarClaveTemporal from './modal-cambiar-clave-temporal';
 import ModalClaveEnviada from './modal-clave-enviada';
 import ModalRecuperarClave from './modal-recuperar-clave';
 
@@ -30,7 +30,11 @@ type changePass = {
 export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'Ingresar' }) => {
   const [show, setShow] = useState('');
   const [display, setDisplay] = useState('none');
+
+  const [showModalCambiarClave, setShowModalCambiarClave] = useState(false);
+
   const [showModalRecuperarClave, setShowModalRecuperarClave] = useState(false);
+
   const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
 
   const router = useRouter();
@@ -97,8 +101,9 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
       ) {
         messageError = 'Contraseña invalida';
       } else if (error instanceof AutenticacionTransitoriaError) {
-        setShow('show');
-        setDisplay('block');
+        // setShow('show');
+        // setDisplay('block');
+        setShowModalCambiarClave(true);
       } else {
         messageError = 'Ocurrió un problema en el sistema';
       }
@@ -113,78 +118,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
     }
   };
 
-  const ChangeTemporal = async () => {
-    if (!claveanterior) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Debe ingresar clave transitoria',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-
-    if (clavenuevauno != clavenuevados) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Las contraseñas deben coincidir',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-
-    let PostVal: changePass = {
-      rutusuario: rutusuario,
-      claveanterior: claveanterior,
-      clavenuevauno: clavenuevauno,
-      clavenuevados: clavenuevados,
-    };
-
-    const resp = await fetch(`${apiUrl()}/auth/change`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(PostVal),
-    });
-
-    if (resp.ok) {
-      return Swal.fire({
-        html: 'Contraseña actualizada correctamente, vuelva a iniciar sesión',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-        willClose: () => {
-          OncloseModal();
-          onResetForm();
-        },
-      });
-    }
-
-    const body = await resp.json();
-    if (body.message === 'Login/Password invalida') {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'La clave temporal es inválida',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-
-    return Swal.fire({
-      icon: 'error',
-      title: 'Error',
-      text: 'Hubo un error al actualizar la contraseña',
-      showConfirmButton: true,
-      confirmButtonText: 'OK',
-      confirmButtonColor: 'var(--color-blue)',
-    });
-  };
+  const ChangeTemporal = async () => {};
 
   const OncloseModal = () => {
     setShow('');
@@ -205,7 +139,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
 
   return (
     <>
-      <div
+      {/* <div
         className={`modal fade ${show}`}
         style={{ display: display }}
         id="modalclavetransitoria"
@@ -318,7 +252,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <form onSubmit={handleLoginUsuario} className={styles.formlogin}>
         <label>
@@ -383,6 +317,14 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
           </button>
         </div>
       </form>
+
+      <ModalCambiarClaveTemporal
+        show={showModalCambiarClave}
+        onCerrarModal={() => {
+          setShowModalCambiarClave(false);
+        }}
+        onClaveCambiada={() => {}}
+      />
 
       <ModalRecuperarClave
         show={showModalRecuperarClave}
