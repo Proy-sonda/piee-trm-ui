@@ -11,11 +11,10 @@ import {
 import { apiUrl } from '@/servicios/environment';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FormEvent, useContext, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
-import { validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import styles from './login.module.css';
 import ModalClaveEnviada from './modal-clave-enviada';
+import ModalRecuperarClave from './modal-recuperar-clave';
 
 type LoginComponentProps = {
   buttonText?: string;
@@ -31,7 +30,7 @@ type changePass = {
 export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'Ingresar' }) => {
   const [show, setShow] = useState('');
   const [display, setDisplay] = useState('none');
-  const [showModalRecu, setShowModalRecu] = useState(false);
+  const [showModalRecuperarClave, setShowModalRecuperarClave] = useState(false);
   const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
 
   const router = useRouter();
@@ -39,20 +38,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
   const searchParams = useSearchParams();
 
   const handleShowModalRecu = () => {
-    setShowModalRecu(true);
-  };
-
-  const handleCloseModalRecu = () => {
-    setShowModalRecu(false);
-    onResetForm();
-  };
-
-  const handleCloseModalRecu2 = () => {
-    setShowModalClaveEnviada(false);
-  };
-
-  const handleShowModalRecu2 = () => {
-    setShowModalClaveEnviada(true);
+    setShowModalRecuperarClave(true);
   };
 
   const { login } = useContext(AuthContext);
@@ -198,54 +184,6 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
       confirmButtonText: 'OK',
       confirmButtonColor: 'var(--color-blue)',
     });
-  };
-
-  const validaRut = async () => {
-    if (rutrecu == '') {
-      return Swal.fire({
-        html: 'El campo RUT no puede estar vació',
-        icon: 'error',
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    }
-
-    if (!validateRut(rutrecu)) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'El RUT ingresado no es válido',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-
-    handleCloseModalRecu();
-
-    const data = await fetch(`${apiUrl()}/auth/recover`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        rutusuario: rutrecu,
-      }),
-    });
-
-    if (data.ok) {
-      OncloseModal();
-      return handleShowModalRecu2();
-    }
-
-    const resp = await data.json();
-    if (resp.statusCode == 401)
-      return Swal.fire({
-        html: resp.message,
-        icon: 'error',
-        showConfirmButton: false,
-        timer: 2000,
-      });
   };
 
   const OncloseModal = () => {
@@ -446,34 +384,14 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
         </div>
       </form>
 
-      <Modal show={showModalRecu} onHide={handleCloseModalRecu} backdrop="static" keyboard={false}>
-        <Modal.Header closeButton>
-          <Modal.Title>Recuperar Clave de acceso</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>Escriba su RUT para solicitar una nueva clave de acceso</p>
-          <div className="row">
-            <div className="col-md-12">
-              <input
-                type="text"
-                className="form-control"
-                name="rutrecu"
-                value={rutrecu}
-                onChange={onInputValidRut}
-                autoComplete="off"
-              />
-            </div>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseModalRecu}>
-            Cerrar
-          </Button>
-          <button type="button" className="btn btn-primary" onClick={validaRut}>
-            Recuperar Clave
-          </button>
-        </Modal.Footer>
-      </Modal>
+      <ModalRecuperarClave
+        show={showModalRecuperarClave}
+        onCerrarModal={() => setShowModalRecuperarClave(false)}
+        onClaveEnviada={() => {
+          setShowModalRecuperarClave(false);
+          setShowModalClaveEnviada(true);
+        }}
+      />
 
       <ModalClaveEnviada
         show={showModalClaveEnviada}
