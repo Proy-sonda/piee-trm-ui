@@ -26,12 +26,17 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
             value={rut}
             onInput={(e) => setRut(e.currentTarget.value)}
             onBlur={(e) => {
-              if (!validateRut(e.target.value)) {
-                seterror(true);
+              if (e.target.value.length > 8) {
+                if (!validateRut(e.target.value)) {
+                  seterror(true);
+                } else {
+                  seterror(false);
+                }
+                setRut(formatRut(e.target.value, false));
               } else {
+                setRut(e.target.value);
                 seterror(false);
               }
-              setRut(formatRut(e.target.value, false));
             }}
           />
           {error && <div className="invalid-tooltip">Debe ingresar un RUT válido</div>}
