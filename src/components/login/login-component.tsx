@@ -15,6 +15,7 @@ import { Button, Modal } from 'react-bootstrap';
 import { validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import styles from './login.module.css';
+import ModalClaveEnviada from './modal-clave-enviada';
 
 type LoginComponentProps = {
   buttonText?: string;
@@ -31,7 +32,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
   const [show, setShow] = useState('');
   const [display, setDisplay] = useState('none');
   const [showModalRecu, setShowModalRecu] = useState(false);
-  const [showModalRecu2, setshowModalRecu2] = useState(false);
+  const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
 
   const router = useRouter();
 
@@ -47,11 +48,11 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
   };
 
   const handleCloseModalRecu2 = () => {
-    setshowModalRecu2(false);
+    setShowModalClaveEnviada(false);
   };
 
   const handleShowModalRecu2 = () => {
-    setshowModalRecu2(true);
+    setShowModalClaveEnviada(true);
   };
 
   const { login } = useContext(AuthContext);
@@ -474,31 +475,10 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
         </Modal.Footer>
       </Modal>
 
-      <Modal
-        show={showModalRecu2}
-        onHide={handleCloseModalRecu2}
-        backdrop="static"
-        keyboard={false}>
-        <Modal.Header closeButton>
-          <Modal.Title>Recuperar Clave de acceso</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div className="row text-center" style={{ textAlign: 'justify' }}>
-            <p>¡Felicitaciones!</p>
-            <p>
-              Hemos creado y enviado a su correo una nueva clave temporal para acceder al Portal de
-              Tramitación.
-            </p>
-            {/* Descomentar cuando se implemente la vigencia de la clave temporal */}
-            {/* <p>Esta clave tiene una vigencia de 48 horas</p> */}
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <button onClick={handleCloseModalRecu2} className="btn btn-primary">
-            Aceptar
-          </button>
-        </Modal.Footer>
-      </Modal>
+      <ModalClaveEnviada
+        show={showModalClaveEnviada}
+        onCerrarModal={() => setShowModalClaveEnviada(false)}
+      />
     </>
   );
 };
