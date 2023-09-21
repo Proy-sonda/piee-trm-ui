@@ -5,3 +5,11 @@ export const apiUrl = () => {
 export const adsUrl = () => {
   return process.env.NEXT_PUBLIC_ADS_URL!;
 };
+
+/**
+ * Cuanto tiempo antes de que expire la sesion (en milisegunos) se debe mostrar la alerta para
+ * confirmar la sesion
+ */
+export const thresholdAlertaExpiraSesion = () => {
+  return parseInt(process.env.NEXT_PUBLIC_THRESHOLD_ALERTA_EXPIRA_SESION_MS!, 10);
+};

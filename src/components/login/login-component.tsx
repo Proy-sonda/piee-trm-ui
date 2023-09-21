@@ -1,6 +1,6 @@
 'use client';
 
-import { AuthContext } from '@/contexts/auth-context';
+import { AuthContext } from '@/contexts';
 import { useForm } from '@/hooks/use-form';
 import {
   AutenticacionTransitoriaError,
@@ -90,14 +90,14 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
     }
 
     try {
-      await login({ rutusuario, clave });
+      await login(rutusuario, clave);
 
       return Swal.fire({
         html: 'Sesión iniciada correctamente',
         icon: 'success',
         timer: 2000,
         showConfirmButton: false,
-        didClose: () => router.push(searchParams.get('path') ?? '/tramitacion'),
+        didClose: () => router.push(searchParams.get('redirectTo') ?? '/tramitacion'),
       });
     } catch (error) {
       let messageError = '';

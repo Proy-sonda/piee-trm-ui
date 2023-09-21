@@ -1,21 +1,34 @@
+'use client';
+
 import { ButtonImage } from '@/components/button-image';
 import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
 import insemp from '@/img/Inscribeem.png';
+import { estaLogueado } from '@/servicios/auth';
 import { adsUrl } from '@/servicios/environment';
+import { useRouter } from 'next/navigation';
+import React from 'react';
 
-interface HomeProps {
+interface HomePageProps {
   searchParams: {
-    path?: string;
+    redirectTo?: string;
   };
 }
 
-export default function Home({ searchParams }: HomeProps) {
+const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
   const _adsUrl: string = adsUrl();
+
+  const router = useRouter();
+
+  if (estaLogueado() && !searchParams.redirectTo) {
+    router.push('/tramitacion');
+    return null;
+  }
+
   return (
     <div className="bgads">
       <div className="row">
-        <IfContainer show={searchParams.path}>
+        <IfContainer show={searchParams.redirectTo}>
           <div className="col-12">
             <div
               className="alert alert-danger d-flex align-items-center alert-dismissible fade show"
@@ -46,4 +59,6 @@ export default function Home({ searchParams }: HomeProps) {
       </div>
     </div>
   );
-}
+};
+
+export default HomePage;

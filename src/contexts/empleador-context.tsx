@@ -1,6 +1,5 @@
 import { DatoEmpleador } from '@/modelos/dato-empleador';
-import { createContext, useState } from 'react';
-import { ChildrenApp } from './modelos/types';
+import { ReactNode, createContext, useState } from 'react';
 
 type EmpleadorContextType = {
   empleador: DatoEmpleador[];
@@ -12,7 +11,7 @@ export const EmpleadorContext = createContext<EmpleadorContextType>({
   cargaEmpleador: () => {},
 });
 
-export const EmpleadorProvider: React.FC<ChildrenApp> = ({ children }) => {
+export const EmpleadorProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [empleador, setempleador] = useState<DatoEmpleador[]>([]);
 
   const cargaEmpleador = (empleador: DatoEmpleador[]) => {

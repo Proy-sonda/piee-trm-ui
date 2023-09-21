@@ -32,8 +32,9 @@ export async function middleware(request: NextRequest) {
 function redirigirAlLogin(request: NextRequest) {
   const rutaSolicitada = request.nextUrl.href.replace(request.nextUrl.origin, '');
 
-  const searchParams = new URLSearchParams();
-  searchParams.append('path', rutaSolicitada);
+  const searchParams = new URLSearchParams({
+    redirectTo: rutaSolicitada,
+  });
 
   return NextResponse.redirect(new URL(`/?${searchParams.toString()}`, request.url));
 }
