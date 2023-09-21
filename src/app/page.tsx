@@ -2,6 +2,7 @@ import { ButtonImage } from '@/components/button-image';
 import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
 import insemp from '@/img/Inscribeem.png';
+import { adsUrl } from '@/servicios/environment';
 
 interface HomeProps {
   searchParams: {
@@ -10,6 +11,7 @@ interface HomeProps {
 }
 
 export default function Home({ searchParams }: HomeProps) {
+  const _adsUrl: string = adsUrl();
   return (
     <div className="bgads">
       <div className="row">
@@ -30,7 +32,11 @@ export default function Home({ searchParams }: HomeProps) {
         </IfContainer>
 
         <div className="col-12 col-md-6">
-          <ButtonImage url="/adscripcion" text="Inscribe Entidad Empleadora" img={insemp.src} />
+          <ButtonImage
+            url={`${_adsUrl}/adscripcion`}
+            text="Inscribe Entidad Empleadora"
+            img={insemp.src}
+          />
         </div>
         <div className="col-12 col-md-6">
           {/* <ButtonImage url='/tramitacion' text='Ingreso al portal' img={redcross.src} /> */}
