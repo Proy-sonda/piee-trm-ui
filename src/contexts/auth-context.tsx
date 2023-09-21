@@ -1,81 +1,26 @@
 'use client';
 
+import { UserData } from '@/modelos/user-data';
 import { desloguearUsuario, loguearUsuario, obtenerUserData, renovarToken } from '@/servicios/auth';
 import { thresholdAlertaExpiraSesion } from '@/servicios/environment';
 import { useRouter } from 'next/navigation';
-import { createContext, useEffect, useState } from 'react';
+import { ReactNode, createContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { ChildrenApp, UserData, UsuarioLogin } from './modelos/types';
 
 type AuthContextType = {
-  rutusuario: string;
-  clave: string;
-  error: string;
-  datosusuario: {
-    exp: number;
-    iat: number;
-    user: {
-      apellidos: string;
-      email: string;
-      nombres: string;
-      rol: {
-        idrol: number;
-        rol: string;
-      };
-      rutusuario: string;
-    };
-  };
-  login: (usuario: UsuarioLogin) => Promise<void>;
+  datosUsuario?: UserData;
+  login: (rut: string, clave: string) => Promise<void>;
   logout: () => Promise<void>;
-  CompletarUsuario: (DataUsuario: UserData) => void;
 };
 
 export const AuthContext = createContext<AuthContextType>({
-  rutusuario: '',
-  clave: '',
-  error: '',
-  datosusuario: {
-    exp: 0,
-    iat: 0,
-    user: {
-      apellidos: '',
-      email: '',
-      nombres: '',
-      rol: {
-        idrol: 0,
-        rol: '',
-      },
-      rutusuario: '',
-    },
-  },
+  datosUsuario: undefined,
   login: async () => {},
   logout: async () => {},
-  CompletarUsuario: () => {},
 });
 
-export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
-  const datosUsuarioPorDefecto = {
-    exp: 0,
-    iat: 0,
-    user: {
-      apellidos: '',
-      email: '',
-      nombres: '',
-      rol: {
-        idrol: 0,
-        rol: '',
-      },
-      rutusuario: '',
-    },
-  };
-
-  const [usuario, setusuario] = useState({
-    rutusuario: '',
-    clave: '',
-    error: '',
-  });
-
-  const [datosUsuario, setDatosUsuario] = useState(datosUsuarioPorDefecto);
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [datosUsuario, setDatosUsuario] = useState<UserData | undefined>(undefined);
 
   const [mostrarAlertaExpiraSesion, setMostrarAlertaExpiraSesion] = useState(false);
 
@@ -88,7 +33,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
       return;
     }
 
-    DatosUser(userData);
+    setDatosUsuario(userData);
 
     setMostrarAlertaExpiraSesion(true);
   }, []);
@@ -144,7 +89,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
 
               activarAlertaDeExpiracionDeSesion();
             } catch (error) {
-              logout();
+              await logout();
 
               await Swal.fire({
                 icon: 'error',
@@ -155,7 +100,7 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
                 showCancelButton: true,
               });
 
-              DatosUser(datosUsuarioPorDefecto);
+              setDatosUsuario(undefined);
 
               router.push('/');
             }
@@ -181,14 +126,10 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
     };
   }, [mostrarAlertaExpiraSesion]);
 
-  const login = async (usuario: UsuarioLogin) => {
-    if (usuario.rutusuario == '') {
-      return setusuario({ ...usuario, error: 'El usuario no puede estar Vació' });
-    }
+  const login = async (rut: string, clave: string) => {
+    const datosUsuario = await loguearUsuario(rut, clave);
 
-    const datosUsuario = await loguearUsuario(usuario);
-
-    DatosUser(datosUsuario);
+    setDatosUsuario(datosUsuario);
 
     setMostrarAlertaExpiraSesion(true);
   };
@@ -199,29 +140,18 @@ export const AuthProvider: React.FC<ChildrenApp> = ({ children }) => {
     } catch (error) {
       console.error('ERROR EN LOGOUT: ', error);
     } finally {
-      DatosUser(datosUsuarioPorDefecto);
+      setDatosUsuario(undefined);
 
       setMostrarAlertaExpiraSesion(false);
     }
   };
 
-  const DatosUser = (DataUsuario: UserData) => {
-    setDatosUsuario(DataUsuario);
-
-    if (!DataUsuario.user.rutusuario) {
-      return;
-    }
-
-    return setDatosUsuario(DataUsuario);
-  };
-
   return (
     <AuthContext.Provider
       value={{
-        ...usuario,
-        datosusuario: datosUsuario,
+        // ...usuario,
+        datosUsuario,
         login,
-        CompletarUsuario: DatosUser,
         logout,
       }}>
       {children}

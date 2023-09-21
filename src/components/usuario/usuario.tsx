@@ -6,7 +6,7 @@ import { FormEvent, useContext } from 'react';
 import Swal from 'sweetalert2';
 
 const Usuario: React.FC = () => {
-  const { datosusuario, logout } = useContext(AuthContext);
+  const { datosUsuario, logout } = useContext(AuthContext);
 
   const router = useRouter();
 
@@ -22,18 +22,6 @@ const Usuario: React.FC = () => {
 
       Swal.fire({ html: 'Error al desloguear', timer: 2000 });
     }
-
-    // try {
-    //   await desloguearUsuario();
-
-    //   resetearUsuario();
-
-    //   router.push('/');
-    // } catch (error) {
-    //   console.error('ERROR EN LOGOUT: ', error);
-
-    //   Swal.fire({ html: 'Error al desloguear', timer: 2000 });
-    // }
   };
 
   return (
@@ -41,7 +29,7 @@ const Usuario: React.FC = () => {
       id="navbarText"
       style={{
         marginRight: '25px',
-        display: datosusuario.exp == 0 ? 'none' : '',
+        display: !datosUsuario ? 'none' : '',
       }}>
       <div
         className="nav navbar-nav navbar-right hidden-xs text-light d-sm-none d-md-block"
@@ -64,7 +52,7 @@ const Usuario: React.FC = () => {
                     role="button"
                     data-bs-toggle="dropdown"
                     aria-expanded="true">
-                    {datosusuario.user.email}
+                    {datosUsuario?.user.email ?? ''}
                   </a>
                   <ul className="dropdown-menu">
                     <li>

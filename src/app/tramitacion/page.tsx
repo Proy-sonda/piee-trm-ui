@@ -1,18 +1,15 @@
 'use client';
 
 import Position from '@/components/stage/position';
-import { AuthContext } from '@/contexts';
 import { useForm } from '@/hooks/use-form';
 import { Empleador } from '@/modelos/empleador';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { Table, Tbody, Th, Thead, Tr } from 'react-super-responsive-table';
 import styles from './tramitacion.module.css';
 
 const TramitacionPage = () => {
-  const { CompletarUsuario } = useContext(AuthContext);
-
   const [entidadEmp, setEntidadEmp] = useState<Empleador[]>([]);
   const [UnidadRRHH, setUnidadRRHH] = useState<Unidadrhh[]>([]);
   const [eempleador, seteempleador] = useState();

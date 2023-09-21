@@ -1,4 +1,4 @@
-import { UserData } from '@/contexts/modelos/types';
+import { UserData } from '@/modelos/user-data';
 import jwtDecode from 'jwt-decode';
 import { obtenerToken } from '.';
 

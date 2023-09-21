@@ -1,4 +1,4 @@
-import { UserData } from '@/contexts/modelos/types';
+import { UserData } from '@/modelos/user-data';
 import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 import jwt_decode from 'jwt-decode';
@@ -23,8 +23,7 @@ export const renovarToken = async (): Promise<string> => {
   );
 
   const tokenDecodificado = jwt_decode(token.substring('Bearer '.length)) as UserData;
-  const ahoraEnSegundos = Math.round(Date.now() / 1000);
-  const maxAge = tokenDecodificado.exp - ahoraEnSegundos;
+  const maxAge = tokenDecodificado.exp - tokenDecodificado.iat;
 
   setCookie(null, 'token', token, { maxAge, path: '/' });
 

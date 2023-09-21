@@ -3,6 +3,11 @@ import { runFetchConThrow } from '@/servicios/fetch';
 import { destroyCookie } from 'nookies';
 import { obtenerToken } from './obtener-token';
 
+/**
+ * **NO USAR DIRECTAMENTE. USAR LA QUE VIENE EN EL AuthContext**
+ *
+ * Elimina cookie con el token de autenticacion
+ */
 export const desloguearUsuario = async () => {
   try {
     await runFetchConThrow<void>(`${apiUrl()}/auth/logout`, {

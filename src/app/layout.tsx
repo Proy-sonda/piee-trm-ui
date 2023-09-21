@@ -80,8 +80,6 @@ export default function RootLayout(
                           </div>
                         </div>
                       </div>
-
-                      {/* <SessionTimer /> */}
                     </nav>
                   </header>
                 </div>
