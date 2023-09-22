@@ -2,7 +2,6 @@
 
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
-import { LoginComponent } from '@/components/login/login-component';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
@@ -10,7 +9,6 @@ import { EmpleadorContext } from '@/contexts/empleador-context';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
-import { estaLogueado } from '@/servicios/auth';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
@@ -112,10 +110,6 @@ const EmpleadoresPage = () => {
 
     setEmpleadoresFiltrados(filtrados);
   };
-
-  if (!estaLogueado()) {
-    return <LoginComponent buttonText="Ingresar" />;
-  }
 
   return (
     <div className="bgads">

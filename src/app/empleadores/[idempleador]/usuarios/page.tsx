@@ -6,7 +6,6 @@ import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
@@ -51,11 +50,6 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
       busqquedaUsuarios();
     }
   }, [empleadores]);
-
-  if (!estaLogueado) {
-    router.push('/login');
-    return null;
-  }
 
   return (
     <div className="bgads">

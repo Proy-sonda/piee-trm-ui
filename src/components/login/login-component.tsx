@@ -17,17 +17,13 @@ import ModalCambiarClaveTemporal from './modal-cambiar-clave-temporal';
 import ModalClaveEnviada from './modal-clave-enviada';
 import ModalRecuperarClave from './modal-recuperar-clave';
 
-interface LoginComponentProps {
-  buttonText?: string;
-}
-
 interface FormularioLogin {
   rut: string;
   clave: string;
 }
 
 // TODO: Eliminar props cuando se terminen las rutas dinamicas
-export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'Ingresar' }) => {
+export const LoginComponent: React.FC<{}> = () => {
   const [verClave, setVerClave] = useState(false);
 
   const [showModalCambiarClave, setShowModalCambiarClave] = useState(false);
