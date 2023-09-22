@@ -21,18 +21,28 @@ const TablaTrabajadores: React.FC<props> = ({
     datos: trabajadores,
     tamanoPagina: 5,
   });
+  const options: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false, // Para usar formato de 24 horas
+  };
   return (
     <>
       <Table className="table table-striped">
         <Thead className="align-middle text-center">
           <Tr>
             <Th>Run</Th>
+            <Th>Fecha Afiliación</Th>
             <Th>Acciones</Th>
           </Tr>
         </Thead>
         <Tbody className="align-middle text-center">
           {trabajadoresPaginados.length > 0 ? (
-            trabajadoresPaginados.map(({ ruttrabajador, idtrabajador }) => (
+            trabajadoresPaginados.map(({ ruttrabajador, idtrabajador, fechaafiliacion }) => (
               <Tr key={ruttrabajador}>
                 <Td>
                   <Link
@@ -41,6 +51,7 @@ const TablaTrabajadores: React.FC<props> = ({
                     {ruttrabajador}
                   </Link>
                 </Td>
+                <Td>{new Date(fechaafiliacion).toLocaleDateString('es-CL', options)}</Td>
                 <Td>
                   <button
                     className="btn btn-sm btn-primary"
