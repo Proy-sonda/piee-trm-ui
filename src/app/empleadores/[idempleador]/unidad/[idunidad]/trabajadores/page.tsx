@@ -209,7 +209,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         confirmButtonColor: 'var(--color-blue)',
       });
 
-    let errorEncontrado = csvData.find((rut: string) => !validateRut(formatRut(rut, false)));
+    let errorEncontrado = csvData.find(
+      (rut: string) =>
+        !validateRut(formatRut(rut, false)) ||
+        Number(formatRut(rut, false).split('-')[0]) > 50000000,
+    );
     setCsvData(csvData.filter((rut: string) => !validateRut(formatRut(rut, false)) === true));
 
     if (errorEncontrado?.trim() != '' && errorEncontrado != undefined) {
@@ -259,6 +263,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           if (rutconerror.length > 0) setarrerror(true);
         },
       });
+      refrescarComponente();
     } else {
       Swal.fire({
         icon: 'info',
@@ -269,8 +274,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         },
       });
     }
-
-    refrescarComponente();
   };
 
   return (
@@ -333,7 +336,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                           value: true,
                           message: 'Este campo es obligatorio',
                         },
-                        onChange: (event) => {
+                        onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                          if (Number(event.target.value.split('-')[0]) > 50000000)
+                            return seterror({ ...error, run: true });
                           const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
                           let rut = event.target.value as string;
 
@@ -345,7 +350,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
                           setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
                         },
-                        onBlur: (event) => {
+                        onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                          if (Number(event.target.value.split('-')[0]) > 50000000)
+                            return seterror({ ...error, run: true });
                           const rut = event.target.value as string;
 
                           seterror({ ...error, run: !validateRut(formatRut(rut)) });
@@ -382,7 +389,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 <a
                   className={styles['span-link']}
                   download="formato.csv"
-                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3CjI0Njk3ODk5LTkK">
+                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
                   siguiente formato
                 </a>
               </sub>
@@ -391,7 +398,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                   <input
                     type="file"
                     accept=".csv"
-                    className={error.file ? 'form-control is-invalid' : 'form-control'}
+                    className={
+                      error.file
+                        ? 'form-control form-control-sm is-invalid'
+                        : 'form-control form-control-sm'
+                    }
                     {...register('file', {
                       onChange: (event: ChangeEvent<HTMLInputElement>) => {
                         if (event.target.files?.length == 0) return setValue('file', null);
@@ -447,31 +458,28 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       Cargar
                     </button>
                     <button
-                      className="btn btn-danger"
                       disabled={
-                        getValues('file')?.length === 0 || !getValues('file') ? true : false
+                        getValues('file')?.length === 0 || getValues('file') === null ? true : false
                       }
-                      onClick={async (event) => {
-                        event.preventDefault();
-                        if (getValues('file')?.length === 0) return;
+                      className="btn btn-primary"
+                      onClick={async () => {
+                        if (!getValues('file')) return;
                         const resp = await Swal.fire({
                           icon: 'question',
-                          html: `¿Desea eliminar el archivo <b>${
-                            getValues('file')![0].name
-                          }</b> cargado?`,
-                          confirmButtonColor: 'var(--color-blue)',
+                          html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name}</b>?`,
                           confirmButtonText: 'Sí',
+                          confirmButtonColor: 'var(--color-blue)',
                           showDenyButton: true,
+                          denyButtonText: 'No',
+                          showCancelButton: false,
                           denyButtonColor: 'var(--bs-danger)',
                         });
-                        if (resp.isDenied || resp.isDismissed) return;
-                        seterror({
-                          ...error,
-                          file: false,
-                        });
-                        setValue('file', null);
+                        if (resp.isConfirmed) {
+                          setValue('file', null);
+                          refrescarComponente();
+                        }
                       }}>
-                      Borrar todo
+                      Limpiar
                     </button>
                   </div>
                 </div>
@@ -480,8 +488,19 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           </div>
 
           <div className="row mt-5">
-            <div className="col-md-12 text-center">
-              <h5>Trabajadores</h5>
+            <div className="col-md-12">
+              <div className="row">
+                <h5 className="text-center">Trabajadores</h5>
+                <span
+                  className="text-end"
+                  style={{
+                    display: datosPagina!?.trabajadores.length > 1 ? 'block' : 'none',
+                  }}>
+                  <button className="btn btn-danger btn-sm animate animate__fadeIn">
+                    Borrar todo
+                  </button>
+                </span>
+              </div>
 
               <hr />
               <IfContainer show={pendiente || loading}>

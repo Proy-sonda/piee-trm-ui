@@ -10,6 +10,15 @@ interface props {
   handleDeleteTrabajador: (idtrabajador: number, ruttrabajador: string) => void;
   idunidad: number;
 }
+const options: Intl.DateTimeFormatOptions = {
+  year: 'numeric',
+  month: 'numeric',
+  day: 'numeric',
+  hour: 'numeric',
+  minute: 'numeric',
+  second: 'numeric',
+  hour12: false, // Para usar formato de 24 horas
+};
 
 const TablaTrabajadores: React.FC<props> = ({
   trabajadores,
@@ -21,15 +30,7 @@ const TablaTrabajadores: React.FC<props> = ({
     datos: trabajadores,
     tamanoPagina: 5,
   });
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: false, // Para usar formato de 24 horas
-  };
+
   return (
     <>
       <Table className="table table-striped">
