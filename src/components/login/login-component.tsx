@@ -103,7 +103,6 @@ export const LoginComponent: React.FC<{}> = () => {
             className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
             minLength={9}
             maxLength={10}
-            required
             {...register('rut', {
               required: 'El RUN es obligatorio',
               validate: {
