@@ -6,8 +6,6 @@ import { Empleador } from '@/modelos/empleador';
 import { Unidadrhh } from '@/modelos/tramitacion';
 import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
 import { useState } from 'react';
-import { Table, Tbody, Th, Thead, Tr } from 'react-super-responsive-table';
-import styles from './tramitacion.module.css';
 
 const TramitacionPage = () => {
   const [entidadEmp, setEntidadEmp] = useState<Empleador[]>([]);
@@ -58,7 +56,18 @@ const TramitacionPage = () => {
     <div className="bgads">
       <Position position={1} />
 
-      <div className="ms-5 me-5">
+      <div className="fluid-container px-3 px-lg-5">
+        <div className="text-center">
+          <h2 className="my-3">Sitio en construcción</h2>
+          <img
+            src="/sitio_en_construccion.png"
+            alt="Sitio en construccion"
+            style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
+          />
+        </div>
+      </div>
+
+      {/* <div className="ms-5 me-5">
         <div className="row">
           <div className="col-md-8 jumbotron">
             <h5>Filtro para Licencias pendientes de Tramitar</h5>
@@ -236,7 +245,7 @@ const TramitacionPage = () => {
             </Table>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
