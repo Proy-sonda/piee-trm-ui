@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import IfContainer from '../if-container';
 
 interface FormularioCambiarClaveTransitoria {
   claveTransitoria: string;
@@ -27,7 +28,14 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
   const [verNuevaClave, setVerNuevaClave] = useState(false);
   const [verConfirmaClave, setVerConfirmaClave] = useState(false);
 
-  const { register, handleSubmit, reset } = useForm<FormularioCambiarClaveTransitoria>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    getValues,
+    setError,
+    formState: { errors },
+  } = useForm<FormularioCambiarClaveTransitoria>({
     mode: 'onBlur',
   });
 
@@ -43,28 +51,6 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
     claveNueva,
     confirmaClave,
   }) => {
-    if (!claveTransitoria || claveTransitoria.trim() === '') {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Debe ingresar clave transitoria',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-
-    if (claveNueva != confirmaClave) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Las contraseñas deben coincidir',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-
     try {
       await cambiarClave({
         rutUsuario,
@@ -122,15 +108,15 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
             <label className="form-label" htmlFor="transitoria">
               Contraseña transitoria
             </label>
-            <div className="input-group mb-3">
-              {/* TODO: Validar el "required" usando react-hook-form, no validacion del HTML */}
+            <div className="input-group mb-3 position-relative">
               <input
                 id="transitoria"
                 type={verClaveTemporal ? 'text' : 'password'}
-                className="form-control"
+                className={`form-control ${errors.claveTransitoria ? 'is-invalid' : ''}`}
                 autoComplete="new-custom-value"
-                {...register('claveTransitoria')}
-                required
+                {...register('claveTransitoria', {
+                  required: 'La contraseña transitoria es obligatoria',
+                })}
               />
               <button
                 className="btn btn-primary"
@@ -141,20 +127,23 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
                 onClick={() => setVerClaveTemporal((x) => !x)}>
                 <i className={`bi ${verClaveTemporal ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
               </button>
+              <IfContainer show={errors.claveTransitoria}>
+                <div className="invalid-tooltip">{errors.claveTransitoria?.message}</div>
+              </IfContainer>
             </div>
 
             <label className="form-label" htmlFor="claveNueva">
               Contraseña Nueva
             </label>
-            <div className="input-group mb-3">
-              {/* TODO: Validar el "required" usando react-hook-form, no validacion del HTML */}
+            <div className="input-group mb-3 position-relative">
               <input
                 id="claveNueva"
                 type={verNuevaClave ? 'text' : 'password'}
-                className="form-control"
+                className={`form-control ${errors.claveNueva ? 'is-invalid' : ''}`}
                 autoComplete="new-custom-value"
-                {...register('claveNueva')}
-                required
+                {...register('claveNueva', {
+                  required: 'La contraseña nueva es obligatoria',
+                })}
               />
               <button
                 className="btn btn-primary"
@@ -165,20 +154,29 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
                 onClick={() => setVerNuevaClave((x) => !x)}>
                 <i className={`bi ${verNuevaClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
               </button>
+              <IfContainer show={errors.claveNueva}>
+                <div className="invalid-tooltip">{errors.claveNueva?.message}</div>
+              </IfContainer>
             </div>
 
             <label className="form-label" htmlFor="confirmaClaveNueva">
               Repetir Contraseña
             </label>
-            <div className="input-group mb-3">
-              {/* TODO: Validar el "required" usando react-hook-form, no validacion del HTML */}
+            <div className="input-group mb-3 position-relative">
               <input
                 id="confirmaClaveNueva"
                 type={verConfirmaClave ? 'text' : 'password'}
-                className="form-control"
+                className={`form-control ${errors.confirmaClave ? 'is-invalid' : ''}`}
                 autoComplete="new-custom-value"
-                {...register('confirmaClave')}
-                required
+                {...register('confirmaClave', {
+                  required: 'Debe repetir la contraseña',
+                  validate: (confirmaClave) => {
+                    const claveNueva = getValues('claveNueva');
+                    if (claveNueva !== confirmaClave) {
+                      return 'Las contraseñas no coinciden';
+                    }
+                  },
+                })}
               />
               <button
                 className="btn btn-primary"
@@ -189,6 +187,9 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
                 onClick={() => setVerConfirmaClave((x) => !x)}>
                 <i className={`bi ${verConfirmaClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
               </button>
+              <IfContainer show={errors.confirmaClave}>
+                <div className="invalid-tooltip">{errors.confirmaClave?.message}</div>
+              </IfContainer>
             </div>
           </Modal.Body>
           <Modal.Footer>

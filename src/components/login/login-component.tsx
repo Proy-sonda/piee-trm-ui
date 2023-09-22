@@ -12,6 +12,7 @@ import { useContext, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
+import IfContainer from '../if-container';
 import styles from './login.module.css';
 import ModalCambiarClaveTemporal from './modal-cambiar-clave-temporal';
 import ModalClaveEnviada from './modal-clave-enviada';
@@ -22,7 +23,6 @@ interface FormularioLogin {
   clave: string;
 }
 
-// TODO: Eliminar props cuando se terminen las rutas dinamicas
 export const LoginComponent: React.FC<{}> = () => {
   const [verClave, setVerClave] = useState(false);
 
@@ -36,19 +36,19 @@ export const LoginComponent: React.FC<{}> = () => {
 
   const { login } = useContext(AuthContext);
 
-  const { register, handleSubmit, watch, setValue } = useForm<FormularioLogin>();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<FormularioLogin>({
+    mode: 'onBlur',
+  });
 
   const rutUsuario = watch('rut');
 
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
-    if (!rut || !clave) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        html: 'Debe completar los campos',
-      });
-    }
-
     try {
       await login(rut, clave);
 
@@ -88,22 +88,27 @@ export const LoginComponent: React.FC<{}> = () => {
   return (
     <>
       <form onSubmit={handleSubmit(handleLoginUsuario)} className={styles.formlogin}>
-        <label>
+        <label style={{ fontWeight: 'bold' }}>
           Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
         </label>
         <br />
 
-        <div className="mb-3 mt-3">
-          {/* TODO: Validar con react-hook-form, no con validacion del HTML */}
-          <label htmlFor="rutUsuario">RUN Persona Usuaria:</label>
+        <div className="mb-3 mt-3 position-relative">
+          <label className="form-label" htmlFor="rutUsuario">
+            RUN Persona Usuaria:
+          </label>
           <input
             id="rutUsuario"
             type="text"
-            className="form-control"
+            className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
             minLength={9}
             maxLength={10}
             required
             {...register('rut', {
+              required: 'El RUN es obligatorio',
+              validate: {
+                esRut: (rut) => (validateRut(rut) ? undefined : 'El RUN es inválido'),
+              },
               onChange: (event: any) => {
                 const regex = /[^0-9kK\-]/g; // solo números, guiones y la letra K
                 let rut = event.target.value as string;
@@ -122,18 +127,27 @@ export const LoginComponent: React.FC<{}> = () => {
               },
             })}
           />
+          <IfContainer show={errors.rut}>
+            <div className="invalid-tooltip">{errors.rut?.message}</div>
+          </IfContainer>
         </div>
-        <div className="mb-3">
-          <label htmlFor="password">Clave de acceso:</label>
-          {/* TODO: Validar con react-hook-form, no con validacion del HTML */}
+
+        <div className="mb-3 position-relative">
+          <label className="form-label" htmlFor="password">
+            Clave de acceso:
+          </label>
           <div className="input-group mb-3">
             <input
               id="password"
               type={verClave ? 'text' : 'password'}
-              className="form-control"
-              required
-              {...register('clave')}
+              className={`form-control ${errors.clave ? 'is-invalid' : ''}`}
+              {...register('clave', {
+                required: 'La clave es obligatoria',
+              })}
             />
+            <IfContainer show={errors.clave}>
+              <div className="invalid-tooltip">{errors.clave?.message}</div>
+            </IfContainer>
             <button
               className="btn btn-primary"
               tabIndex={-1}
@@ -145,6 +159,7 @@ export const LoginComponent: React.FC<{}> = () => {
             </button>
           </div>
         </div>
+
         <div className={'mt-2 ' + styles.btnlogin}>
           <label
             style={{

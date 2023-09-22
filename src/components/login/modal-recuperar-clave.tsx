@@ -5,6 +5,7 @@ import { Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
+import IfContainer from '../if-container';
 
 interface FormularioRecuperarClave {
   rut: string;
@@ -34,26 +35,6 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
   const resetearFormulario = () => reset();
 
   const enviarClaveTemporal: SubmitHandler<FormularioRecuperarClave> = async ({ rut }) => {
-    if (!rut || rut.trim() === '') {
-      return Swal.fire({
-        html: 'El campo RUT no puede estar vació',
-        icon: 'error',
-        timer: 2000,
-        showConfirmButton: false,
-      });
-    }
-
-    if (!validateRut(rut)) {
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'El RUT ingresado no es válido',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    }
-
     try {
       await recuperarClave(rut);
 
@@ -95,12 +76,18 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
           <Modal.Body>
             <p>Escriba su RUT para solicitar una nueva clave de acceso</p>
             <div className="row">
-              <div className="col-md-12">
+              <div className="col-md-12 position-relative">
                 <input
                   type="text"
-                  className="form-control"
+                  className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
                   autoComplete="new-custom-value"
+                  minLength={9}
+                  maxLength={10}
                   {...register('rut', {
+                    required: 'El RUN es obligatorio',
+                    validate: {
+                      esRut: (rut) => (validateRut(rut) ? undefined : 'El RUN es inválido'),
+                    },
                     onChange: (event: any) => {
                       const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
                       let rut = event.target.value as string;
@@ -119,6 +106,9 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
                     },
                   })}
                 />
+                <IfContainer show={errors.rut}>
+                  <div className="invalid-tooltip">{errors.rut?.message}</div>
+                </IfContainer>
               </div>
             </div>
           </Modal.Body>
