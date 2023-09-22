@@ -9,24 +9,29 @@ import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
-import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
-import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
-import TablaUsuarios from './(componentes)/tabla-usuarios';
-import { buscarUsuarios } from './(servicios)/buscar-usuarios';
+import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
+import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-por-id';
+import ModalCrearUsuario from '../../usuarios/(componentes)/modal-crear-usuario';
+import ModalEditarUsuario from '../../usuarios/(componentes)/modal-editar-usuario';
+import TablaUsuarios from '../../usuarios/(componentes)/tabla-usuarios';
+import { UsuarioEntidadEmpleadora } from '../../usuarios/(modelos)/usuario-entidad-empleadora';
+import { buscarUsuarios } from '../../usuarios/(servicios)/buscar-usuarios';
 
 interface UsuariosPageProps {
-  searchParams: {
-    id: string;
-    rut: string;
-    razon: string;
+  params: {
+    slug: {
+      id: number;
+    };
   };
 }
 
-const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
+const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
   const router = useRouter();
 
-  const { id, rut, razon } = searchParams;
+  const id = Number(params.slug);
+  const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
+
+  const [razon, setrazon] = useState('');
 
   const [refresh, refrescarComponente] = useRefrescarPagina();
 
@@ -34,11 +39,18 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
 
-  const [err, [usuarios], pendiente] = useMergeFetchArray([buscarUsuarios(rut)], [refresh]);
+  const [err, [empleadores], pendiente] = useMergeFetchArray([buscarEmpleadorPorId(id)], [refresh]);
 
   useEffect(() => {
-    window.history.pushState(null, '', '/empleadores/usuarios');
-  }, []);
+    if (empleadores != undefined) {
+      setrazon(empleadores.razonsocial);
+      const busqquedaUsuarios = async () => {
+        const [usuarioBusqueda] = await buscarUsuarios(empleadores.rutempleador);
+        setusuarios(await usuarioBusqueda());
+      };
+      busqquedaUsuarios();
+    }
+  }, [empleadores]);
 
   if (!estaLogueado) {
     router.push('/login');
@@ -51,7 +63,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ searchParams }) => {
 
       <div className="container">
         <div className="row">
-          <NavegacionEntidadEmpleadora rut={rut} razon={razon} id={id} />
+          <NavegacionEntidadEmpleadora id={id} />
         </div>
 
         <Titulo url="">

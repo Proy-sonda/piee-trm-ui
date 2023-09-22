@@ -13,30 +13,32 @@ import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm as useFormRH } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/lib/isEmail';
-import NavegacionEntidadEmpleadora from '../(componentes)/navegacion-entidad-empleadora';
-import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
-import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
-import { buscarComunas } from '../(servicios)/buscar-comunas';
-import { buscarRegiones } from '../(servicios)/buscar-regiones';
-import { buscarSistemasDeRemuneracion } from '../(servicios)/buscar-sistemas-de-remuneracion';
-import { buscarTamanosEmpresa } from '../(servicios)/buscar-tamanos-empresa';
-import { buscarTiposDeEmpleadores } from '../(servicios)/buscar-tipo-de-empleadores';
-import { CamposFormularioEmpleador } from './(modelos)/campos-formulario-empleador';
-import { actualizarEmpleador } from './(servicios)/actualizar-empleador';
-import { buscarEmpleadorPorId } from './(servicios)/buscar-empleador-por-id';
+import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
+import { buscarActividadesLaborales } from '../../(servicios)/buscar-actividades-laborales';
+import { buscarCajasDeCompensacion } from '../../(servicios)/buscar-cajas-de-compensacion';
+import { buscarComunas } from '../../(servicios)/buscar-comunas';
+import { buscarRegiones } from '../../(servicios)/buscar-regiones';
+import { buscarSistemasDeRemuneracion } from '../../(servicios)/buscar-sistemas-de-remuneracion';
+import { buscarTamanosEmpresa } from '../../(servicios)/buscar-tamanos-empresa';
+import { buscarTiposDeEmpleadores } from '../../(servicios)/buscar-tipo-de-empleadores';
+import { CamposFormularioEmpleador } from '../../datos/(modelos)/campos-formulario-empleador';
+import { actualizarEmpleador } from '../../datos/(servicios)/actualizar-empleador';
+import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-por-id';
 
 interface DatosEmpleadoresPageProps {
-  searchParams: {
-    rut: string;
-    razon: string;
-    id: string;
+  params: {
+    slug: {
+      id: number;
+    };
   };
 }
 
-const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParams }) => {
+const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) => {
+  console.log(params);
   const router = useRouter();
+  const id: number = Number(params.slug);
 
-  const { rut, id, razon } = searchParams;
+  const [rut, setrut] = useState('');
 
   const [refresh, refrescarPagina] = useRefrescarPagina();
 
@@ -57,7 +59,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
   ]);
 
   const [errorEmpleador, [empleador], cargandoEmpleador] = useMergeFetchArray(
-    [buscarEmpleadorPorId(parseInt(id, 10))],
+    [buscarEmpleadorPorId(id)],
     [refresh],
   );
 
@@ -73,11 +75,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
   });
 
   const regionSeleccionada = watch('regionId');
-
-  // Eliminar query params de la URL
-  useEffect(() => {
-    window.history.pushState(null, '', '/empleadores/datos');
-  });
 
   // Parchar fomulario
   useEffect(() => {
@@ -209,11 +206,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ searchParam
 
         <div className="container pb-4">
           <div className="row">
-            <NavegacionEntidadEmpleadora
-              rut={rut}
-              razon={empleador?.razonsocial ?? razon}
-              id={id}
-            />
+            <NavegacionEntidadEmpleadora id={id} />
           </div>
 
           <IfContainer show={cargandoCombos || cargandoEmpleador || spinnerCargar}>

@@ -14,7 +14,7 @@ import { buscarComunas } from '../../(servicios)/buscar-comunas';
 import { buscarRegiones } from '../../(servicios)/buscar-regiones';
 
 interface ModalEditarUnidadProps {
-  idEmpleador: string;
+  idEmpleador: number;
   idUnidad: string;
   onUnidadRRHHEditada: () => void;
   onCerrarModal: () => void;
@@ -104,7 +104,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
         telefono: data.telefono,
         email: data.email,
         emailConfirma: data.emailConfirma,
-        empleadorId: parseInt(idEmpleador, 10),
+        empleadorId: idEmpleador,
         unidadId: parseInt(idUnidad, 10),
       });
 

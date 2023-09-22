@@ -12,18 +12,16 @@ import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
 
 interface TablaUnidadesProps {
   unidades: Unidadrhh[];
-  razon: string;
-  rut: string;
+  idempleador: number;
   onEditarUnidad: (unidad: Unidadrhh) => void;
   onUnidadEliminada: (unidad: Unidadrhh) => void;
 }
 
 const TablaUnidades = ({
   unidades,
-  razon,
-  rut,
   onEditarUnidad,
   onUnidadEliminada,
+  idempleador,
 }: TablaUnidadesProps) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
@@ -77,11 +75,11 @@ const TablaUnidades = ({
   };
 
   const linkTrabajadores = (unidad: Unidadrhh) => {
-    return `/empleadores/unidad/trabajadores?idunidad=${unidad.idunidad}&razon=${razon}&rutempleador=${rut}`;
+    return `/empleadores/${idempleador}/unidad/${unidad.idunidad}/trabajadores/`;
   };
 
   const linkUsuarios = (unidad: Unidadrhh) => {
-    return `/empleadores/unidad/usuarios?unidad=${unidad.unidad}&id=${unidad.idunidad}&razon=${razon}&rut=${rut}`;
+    return `/empleadores/${idempleador}/unidad/${unidad.idunidad}/usuarios`;
   };
 
   const editarUnidadInterno = (unidad: Unidadrhh) => {

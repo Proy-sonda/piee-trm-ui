@@ -5,26 +5,20 @@ import { LinkNavegacionEntidadEmpleadora } from '../../(modelos)/link-navegacion
 import styles from './styles.module.css';
 
 interface NavegacionEntidadEmpleadoraProps {
-  id: string;
-  rut: string;
-  razon: string;
+  id: number;
 }
 
-const NavegacionEntidadEmpleadora: React.FC<NavegacionEntidadEmpleadoraProps> = ({
-  id,
-  rut,
-  razon,
-}) => {
+const NavegacionEntidadEmpleadora: React.FC<NavegacionEntidadEmpleadoraProps> = ({ id }) => {
   const links: LinkNavegacionEntidadEmpleadora[] = [
     {
       titulo: 'Datos Entidad Empleadora',
-      href: `/empleadores/datos?rut=${rut}&razon=${razon}&id=${id}`,
+      href: `/empleadores/${id}/datos`,
     },
-    { titulo: 'Unidad de RRHH', href: `/empleadores/unidad?rut=${rut}&razon=${razon}&id=${id}` },
-    { titulo: 'Usuarios', href: `/empleadores/usuarios?rut=${rut}&razon=${razon}&id=${id}` },
+    { titulo: 'Unidad de RRHH', href: `/empleadores/${id}/unidad` },
+    { titulo: 'Usuarios', href: `/empleadores/${id}/usuarios` },
   ];
 
-  const pathname = usePathname();
+  let pathname = usePathname();
 
   const getClassName = (
     link: LinkNavegacionEntidadEmpleadora,
@@ -48,6 +42,7 @@ const NavegacionEntidadEmpleadora: React.FC<NavegacionEntidadEmpleadoraProps> = 
     }
 
     // Ver si link esta activo
+
     listaDeClases.push(link.href.startsWith(pathname) ? styles['active'] : '');
 
     return listaDeClases.join(' ');
