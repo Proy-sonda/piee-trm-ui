@@ -11,7 +11,7 @@ const LicenciasTramitadasPage: React.FC<LicenciasTramitadasPageProps> = ({}) => 
 
         <div className="fluid-container px-3 px-lg-5">
           <div className="text-center">
-            <h2 className="my-3">Sitio en construcción</h2>
+            <h2 className="my-3">Sección en Construcción</h2>
             <img
               src="/sitio_en_construccion.png"
               alt="Sitio en construccion"

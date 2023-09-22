@@ -1,14 +1,9 @@
 'use client';
 
 import Position from '@/components/stage/position';
-import { useForm } from '@/hooks/use-form';
-import { Empleador } from '@/modelos/empleador';
-import { Unidadrhh } from '@/modelos/tramitacion';
-import { cargaUnidadrrhh } from '@/servicios/carga-unidad-rrhh';
-import { useState } from 'react';
 
 const TramitacionPage = () => {
-  const [entidadEmp, setEntidadEmp] = useState<Empleador[]>([]);
+  /*   const [entidadEmp, setEntidadEmp] = useState<Empleador[]>([]);
   const [UnidadRRHH, setUnidadRRHH] = useState<Unidadrhh[]>([]);
   const [eempleador, seteempleador] = useState();
 
@@ -19,7 +14,7 @@ const TramitacionPage = () => {
     fhasta: '',
     entidadempleador: '',
     urrhh: '',
-  });
+  }); */
 
   /* TODO: Usar los hooks para obtener la entidad empleadora y no usar cookies en esta parte
   let cookie = parseCookies();
@@ -40,7 +35,7 @@ const TramitacionPage = () => {
     EntidadEmpleadora();
   }, [token]);  */
 
-  const onChangeEmp = (event: any) => {
+  /*   const onChangeEmp = (event: any) => {
     let value = event.target.value;
     seteempleador(value);
     if (value == '') return;
@@ -50,7 +45,7 @@ const TramitacionPage = () => {
     };
 
     cargarUnidad();
-  };
+  }; */
 
   return (
     <div className="bgads">
@@ -58,7 +53,7 @@ const TramitacionPage = () => {
 
       <div className="fluid-container px-3 px-lg-5">
         <div className="text-center">
-          <h2 className="my-3">Sitio en construcción</h2>
+          <h2 className="my-3">Sección en Construcción</h2>
           <img
             src="/sitio_en_construccion.png"
             alt="Sitio en construccion"
