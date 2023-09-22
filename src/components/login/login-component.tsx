@@ -1,7 +1,6 @@
 'use client';
 
 import { AuthContext } from '@/contexts';
-import { useForm } from '@/hooks/use-form';
 import {
   AutenticacionTransitoriaError,
   LoginPasswordInvalidoError,
@@ -9,22 +8,30 @@ import {
   UsuarioNoExisteError,
 } from '@/servicios/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FormEvent, useContext, useState } from 'react';
+import { useContext, useState } from 'react';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 import styles from './login.module.css';
 import ModalCambiarClaveTemporal from './modal-cambiar-clave-temporal';
 import ModalClaveEnviada from './modal-clave-enviada';
 import ModalRecuperarClave from './modal-recuperar-clave';
 
-type LoginComponentProps = {
+interface LoginComponentProps {
   buttonText?: string;
-};
+}
 
+interface FormularioLogin {
+  rut: string;
+  clave: string;
+}
+
+// TODO: Eliminar props cuando se terminen las rutas dinamicas
 export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'Ingresar' }) => {
+  const [verClave, setVerClave] = useState(false);
+
   const [showModalCambiarClave, setShowModalCambiarClave] = useState(false);
-
   const [showModalRecuperarClave, setShowModalRecuperarClave] = useState(false);
-
   const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
 
   const router = useRouter();
@@ -33,31 +40,21 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
 
   const { login } = useContext(AuthContext);
 
-  const { rutusuario, clave, onInputChange, onInputValidRut } = useForm({
-    claveanterior: '',
-    clavenuevauno: '',
-    clavenuevados: '',
-    rutusuario: '',
-    clave: '',
-    rutrecu: '',
-  });
+  const { register, handleSubmit, watch, setValue } = useForm<FormularioLogin>();
 
-  const input: any = {
-    clave: false,
-    claveanterior: false,
-    clavenuevauno: false,
-    clavenuevados: false,
-  };
+  const rutUsuario = watch('rut');
 
-  const handleLoginUsuario = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!rutusuario || !clave) {
-      return Swal.fire('Error', 'Debe completar los campos', 'error');
+  const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
+    if (!rut || !clave) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        html: 'Debe completar los campos',
+      });
     }
 
     try {
-      await login(rutusuario, clave);
+      await login(rut, clave);
 
       return Swal.fire({
         html: 'Sesión iniciada correctamente',
@@ -77,8 +74,6 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
       ) {
         messageError = 'Contraseña invalida';
       } else if (error instanceof AutenticacionTransitoriaError) {
-        // setShow('show');
-        // setDisplay('block');
         setShowModalCambiarClave(true);
       } else {
         messageError = 'Ocurrió un problema en el sistema';
@@ -94,62 +89,63 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
     }
   };
 
-  const [visibleInput, setvisibleInput] = useState(input);
-
-  const verClave = (e: FormEvent<HTMLButtonElement>, textbox: string) => {
-    e.preventDefault();
-
-    setvisibleInput({
-      ...visibleInput,
-      [textbox]: !visibleInput[textbox],
-    });
-  };
-
   return (
     <>
-      <form onSubmit={handleLoginUsuario} className={styles.formlogin}>
+      <form onSubmit={handleSubmit(handleLoginUsuario)} className={styles.formlogin}>
         <label>
           Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
         </label>
         <br />
 
         <div className="mb-3 mt-3">
-          <label htmlFor="username">RUN Persona Usuaria:</label>
+          {/* TODO: Validar con react-hook-form, no con validacion del HTML */}
+          <label htmlFor="rutUsuario">RUN Persona Usuaria:</label>
           <input
+            id="rutUsuario"
             type="text"
-            name="rutusuario"
             className="form-control"
-            value={rutusuario}
-            onChange={onInputValidRut}
             minLength={9}
             maxLength={10}
             required
+            {...register('rut', {
+              onChange: (event: any) => {
+                const regex = /[^0-9kK\-]/g; // solo números, guiones y la letra K
+                let rut = event.target.value as string;
+
+                if (regex.test(rut)) {
+                  rut = rut.replaceAll(regex, '');
+                }
+
+                setValue('rut', rut.length > 2 ? formatRut(rut, false) : rut);
+              },
+              onBlur: (event) => {
+                const rut = event.target.value;
+                if (validateRut(rut)) {
+                  setValue('rut', formatRut(rut, false));
+                }
+              },
+            })}
           />
         </div>
         <div className="mb-3">
           <label htmlFor="password">Clave de acceso:</label>
+          {/* TODO: Validar con react-hook-form, no con validacion del HTML */}
           <div className="input-group mb-3">
             <input
-              type={visibleInput.clave ? 'text' : 'password'}
+              id="password"
+              type={verClave ? 'text' : 'password'}
               className="form-control"
-              name="clave"
-              aria-describedby="button-addon2"
-              value={clave}
-              onChange={onInputChange}
               required
+              {...register('clave')}
             />
             <button
               className="btn btn-primary"
               tabIndex={-1}
               type="button"
               id="button-addon2"
-              title={visibleInput.clave ? 'Ocultar clave' : 'Ver clave'}
-              onClick={(e) => verClave(e, 'clave')}>
-              {visibleInput.clave ? (
-                <i className="bi bi-eye-slash-fill"></i>
-              ) : (
-                <i className="bi bi-eye-fill"></i>
-              )}
+              title={verClave ? 'Ocultar clave' : 'Ver clave'}
+              onClick={() => setVerClave((x) => !x)}>
+              <i className={`bi ${verClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
             </button>
           </div>
         </div>
@@ -165,14 +161,14 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
             Recuperar clave de acceso
           </label>{' '}
           &nbsp;
-          <button type="submit" className={'btn btn-primary'}>
+          <button type="submit" className="btn btn-primary">
             Ingresar
           </button>
         </div>
       </form>
 
       <ModalCambiarClaveTemporal
-        rutUsuario={rutusuario}
+        rutUsuario={rutUsuario}
         show={showModalCambiarClave}
         onCerrarModal={() => {
           setShowModalCambiarClave(false);
