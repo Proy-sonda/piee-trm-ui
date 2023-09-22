@@ -3,7 +3,7 @@ import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchArray, useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { useEffect, useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/lib/isEmail';
@@ -327,7 +327,19 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
 
                 <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="numero">
-                    Número (*)
+                    <span>Número (*)</span>
+                    <OverlayTrigger
+                      placement="top"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={(props) => (
+                        <Tooltip id="button-tooltip" {...props}>
+                          Ingresar "S/N" si no tiene número
+                        </Tooltip>
+                      )}>
+                      <i
+                        className="ms-2 text-primary bi bi-info-circle"
+                        style={{ fontSize: '16px' }}></i>
+                    </OverlayTrigger>
                   </label>
                   <input
                     id="numero"
@@ -340,20 +352,24 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                         value: true,
                       },
                       pattern: {
-                        value: /^\d{1,20}$/g,
-                        message: 'Debe contener solo dígitos',
+                        value: /^(\d{1,20}|[Ss]\/[Nn])$/g,
+                        message: 'Debe contener solo dígitos o S/N',
                       },
                       maxLength: {
                         value: 20,
                         message: 'No puede tener más de 20 dígitos',
                       },
-                      onChange: (event) => {
-                        const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
+                      onChange: (event: any) => {
+                        const regex = /[^0-9SsnN\/]/g;
                         const valor = event.target.value as string;
 
                         if (regex.test(valor)) {
-                          setValue('numero', valor.replaceAll(regex, ''));
+                          const valorSoloDigitos = valor.replaceAll(regex, '');
+                          setValue('numero', valorSoloDigitos);
                         }
+                      },
+                      onBlur: (event: any) => {
+                        setValue('numero', (event.target.value as string).toUpperCase());
                       },
                     })}
                   />

@@ -10,6 +10,7 @@ import { estaLogueado } from '@/servicios/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { SubmitHandler, useForm as useFormRH } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/lib/isEmail';
@@ -168,19 +169,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
 
       if (typeof valor === 'string' && valor === '') {
         return mensaje ?? 'Este campo es obligatorio';
-      }
-    };
-  };
-
-  const permitirSoloNumeros = (campo: keyof CamposFormularioEmpleador) => {
-    return (event: any) => {
-      /** Hace match con cualquier caracter que no sea un numero */
-      const regex = /[^0-9]/g;
-      const valor = event.target.value as string;
-
-      if (regex.test(valor)) {
-        const valorSoloDigitos = valor.replaceAll(regex, '');
-        setValue(campo, valorSoloDigitos);
       }
     };
   };
@@ -524,7 +512,19 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
 
                 <div className="col-12 col-md-6 col-lg-4 position-relative">
                   <label htmlFor="numero" className="form-label">
-                    Número (*)
+                    <span>Número (*)</span>
+                    <OverlayTrigger
+                      placement="top"
+                      delay={{ show: 250, hide: 400 }}
+                      overlay={(props) => (
+                        <Tooltip id="button-tooltip" {...props}>
+                          Ingresar "S/N" si no tiene número
+                        </Tooltip>
+                      )}>
+                      <i
+                        className="ms-2 text-primary bi bi-info-circle"
+                        style={{ fontSize: '16px' }}></i>
+                    </OverlayTrigger>
                   </label>
                   <input
                     id="numero"
@@ -537,14 +537,25 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
                         value: true,
                       },
                       pattern: {
-                        value: /^\d{1,20}$/g,
-                        message: 'Debe contener solo dígitos',
+                        value: /^(\d{1,20}|[Ss]\/[Nn])$/g,
+                        message: 'Debe contener solo dígitos o S/N',
                       },
                       maxLength: {
                         value: 20,
                         message: 'No puede tener más de 20 dígitos',
                       },
-                      onChange: permitirSoloNumeros('numero'),
+                      onChange: (event: any) => {
+                        const regex = /[^0-9SsnN\/]/g;
+                        const valor = event.target.value as string;
+
+                        if (regex.test(valor)) {
+                          const valorSoloDigitos = valor.replaceAll(regex, '');
+                          setValue('numero', valorSoloDigitos);
+                        }
+                      },
+                      onBlur: (event: any) => {
+                        setValue('numero', (event.target.value as string).toUpperCase());
+                      },
                     })}
                   />
                   <IfContainer show={!!errors.numero}>

@@ -97,7 +97,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
         icon: 'success',
         timer: 2000,
         showConfirmButton: false,
-        didClose: () => router.push(searchParams.get('redirectTo') ?? '/tramitacion'),
+        didClose: () => router.push(searchParams.get('redirectTo') ?? '/empleadores'),
       });
     } catch (error) {
       let messageError = '';
