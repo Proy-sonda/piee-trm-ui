@@ -256,24 +256,24 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
 
     if (cuentaGrabados > 0) {
+      setspinnerCargar(false);
       Swal.fire({
         icon: 'success',
         html: `Se han grabado ${cuentaGrabados} trabajadores con éxito`,
         showConfirmButton: false,
         timer: 2000,
         didClose: () => {
-          setspinnerCargar(false);
           if (rutconerror.length > 0) setarrerror(true);
         },
       });
       refrescarComponente();
     } else {
+      setspinnerCargar(false);
       Swal.fire({
         icon: 'info',
         html: 'No se ha añadido ningún trabajador',
         confirmButtonColor: 'var(--color-blue)',
         didClose: () => {
-          setspinnerCargar(false);
           if (rutconerror.length > 0) setarrerror(true);
         },
       });
