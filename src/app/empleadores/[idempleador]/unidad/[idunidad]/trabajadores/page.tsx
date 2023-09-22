@@ -263,6 +263,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           if (rutconerror.length > 0) setarrerror(true);
         },
       });
+      refrescarComponente();
     } else {
       Swal.fire({
         icon: 'info',
@@ -273,8 +274,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         },
       });
     }
-
-    refrescarComponente();
   };
 
   return (
@@ -363,9 +362,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       })}
                     />
                     <IfContainer show={error.run}>
-                      <div className="invalid-tooltip">
-                        Debe ingresar un RUT valido y menores a 50 millones
-                      </div>
+                      <div className="invalid-tooltip">Debe ingresar un RUT valido</div>
                     </IfContainer>
                   </div>
                   <div
@@ -460,6 +457,30 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       onClick={handleClickNomina}>
                       Cargar
                     </button>
+                    <button
+                      disabled={
+                        getValues('file')?.length === 0 || getValues('file') === null ? true : false
+                      }
+                      className="btn btn-primary"
+                      onClick={async () => {
+                        if (!getValues('file')) return;
+                        const resp = await Swal.fire({
+                          icon: 'question',
+                          html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name}</b>?`,
+                          confirmButtonText: 'Sí',
+                          confirmButtonColor: 'var(--color-blue)',
+                          showDenyButton: true,
+                          denyButtonText: 'No',
+                          showCancelButton: false,
+                          denyButtonColor: 'var(--bs-danger)',
+                        });
+                        if (resp.isConfirmed) {
+                          setValue('file', null);
+                          refrescarComponente();
+                        }
+                      }}>
+                      Limpiar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -470,8 +491,14 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             <div className="col-md-12">
               <div className="row">
                 <h5 className="text-center">Trabajadores</h5>
-                <span className="text-end">
-                  <button className="btn btn-danger btn-sm">Borrar todo</button>
+                <span
+                  className="text-end"
+                  style={{
+                    display: datosPagina!?.trabajadores.length > 1 ? 'block' : 'none',
+                  }}>
+                  <button className="btn btn-danger btn-sm animate animate__fadeIn">
+                    Borrar todo
+                  </button>
                 </span>
               </div>
 
