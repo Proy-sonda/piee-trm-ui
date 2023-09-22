@@ -1,4 +1,4 @@
-import { UserData, UsuarioLogin } from '@/contexts/modelos/types';
+import { UserData } from '@/modelos/user-data';
 import { apiUrl } from '@/servicios/environment';
 import { HttpError, runFetchConThrow } from '@/servicios/fetch';
 import jwt_decode from 'jwt-decode';
@@ -12,7 +12,12 @@ export class AutenticacionTransitoriaError extends Error {}
 
 export class UsuarioNoExisteError extends Error {}
 
-export const loguearUsuario = async (usuario: UsuarioLogin): Promise<UserData> => {
+/**
+ * **NO USAR DIRECTAMENTE. USAR LA QUE VIENE EN EL AuthContext**
+ *
+ * Setea cookie con el token de autenticacion
+ */
+export const loguearUsuario = async (rut: string, clave: string): Promise<UserData> => {
   try {
     const token = await runFetchConThrow<string>(
       `${apiUrl()}/auth/login`,
@@ -21,7 +26,10 @@ export const loguearUsuario = async (usuario: UsuarioLogin): Promise<UserData> =
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(usuario),
+        body: JSON.stringify({
+          rutusuario: rut,
+          clave: clave,
+        }),
       },
       {
         bodyAs: 'text',
@@ -29,8 +37,7 @@ export const loguearUsuario = async (usuario: UsuarioLogin): Promise<UserData> =
     );
 
     const tokenDecodificado = jwt_decode(token.substring('Bearer '.length)) as UserData;
-    const ahoraEnSegundos = Math.round(Date.now() / 1000);
-    const maxAge = tokenDecodificado.exp - ahoraEnSegundos;
+    const maxAge = tokenDecodificado.exp - tokenDecodificado.iat;
 
     setCookie(null, 'token', token, { maxAge, path: '/' });
 

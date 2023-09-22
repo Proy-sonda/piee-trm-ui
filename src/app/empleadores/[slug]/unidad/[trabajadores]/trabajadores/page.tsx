@@ -316,8 +316,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               <form onSubmit={handleAddTrabajador}>
                 <div className="row mt-2">
                   <div className="col-md-8 position-relative">
-                    <label htmlFor="run">RUN</label>
+                    <label className="form-label" htmlFor="run">
+                      RUN
+                    </label>
                     <input
+                      id="run"
                       type="text"
                       className={error.run ? 'form-control is-invalid' : 'form-control'}
                       minLength={4}
@@ -328,35 +331,23 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                           message: 'Este campo es obligatorio',
                         },
                         onChange: (event) => {
-                          if (!validateRut(formatRut(event.target.value))) {
-                            seterror({
-                              ...error,
-                              run: true,
-                            });
-                            setValue('run', formatRut(event.target.value, false));
-                          } else {
-                            seterror({
-                              ...error,
-                              run: false,
-                            });
-                            setValue('run', formatRut(event.target.value, false));
-                          }
-                        },
+                          const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
+                          let rut = event.target.value as string;
 
-                        onBlur: (event) => {
-                          if (!validateRut(formatRut(event.target.value))) {
-                            seterror({
-                              ...error,
-                              run: true,
-                            });
-                            setValue('run', formatRut(event.target.value, false));
-                          } else {
-                            seterror({
-                              ...error,
-                              run: false,
-                            });
-                            setValue('run', formatRut(event.target.value, false));
+                          if (regex.test(rut)) {
+                            rut = rut.replaceAll(regex, '');
                           }
+
+                          seterror({ ...error, run: !validateRut(formatRut(rut)) });
+
+                          setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
+                        },
+                        onBlur: (event) => {
+                          const rut = event.target.value as string;
+
+                          seterror({ ...error, run: !validateRut(formatRut(rut)) });
+
+                          setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
                         },
                       })}
                     />
@@ -370,7 +361,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       alignSelf: 'end',
                     }}>
                     <div className="d-grid gap-2 d-md-flex">
-                      <button type="submit" className="btn btn-success btn-sm">
+                      <button type="submit" className="btn btn-success">
                         Agregar
                       </button>
                     </div>
@@ -448,12 +439,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       disabled={
                         getValues('file')?.length === 0 || !getValues('file') ? true : false
                       }
-                      className="btn btn-success btn-sm"
+                      className="btn btn-success"
                       onClick={handleClickNomina}>
                       Cargar
                     </button>
                     <button
-                      className="btn btn-danger btn-sm"
+                      className="btn btn-danger"
                       disabled={
                         getValues('file')?.length === 0 || !getValues('file') ? true : false
                       }

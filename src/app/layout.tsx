@@ -1,4 +1,5 @@
 'use client';
+
 import Usuario from '@/components/usuario/usuario';
 import { AuthProvider, InscribeProvider, StepProvider } from '@/contexts';
 import { EmpleadorProvider } from '@/contexts/empleador-context';
@@ -10,6 +11,7 @@ import Link from 'next/link';
 import './globals.css';
 import styles from './layout.module.css';
 import svg from './logo-fonasa.svg';
+
 export default function RootLayout(
   {
     children,
@@ -78,8 +80,6 @@ export default function RootLayout(
                           </div>
                         </div>
                       </div>
-
-                      {/* <SessionTimer /> */}
                     </nav>
                   </header>
                 </div>
