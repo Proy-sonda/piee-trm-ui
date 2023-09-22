@@ -17,8 +17,10 @@ export const desloguearUsuario = async () => {
       },
     });
   } catch (error) {
-    return;
+    // Nada que hacer aca
   } finally {
-    destroyCookie(null, 'token');
+    destroyCookie({}, 'token', {
+      path: '/',
+    });
   }
 };

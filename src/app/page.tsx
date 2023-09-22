@@ -7,7 +7,7 @@ import insemp from '@/img/Inscribeem.png';
 import { estaLogueado } from '@/servicios/auth';
 import { adsUrl } from '@/servicios/environment';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 interface HomePageProps {
   searchParams: {
@@ -20,10 +20,11 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
 
   const router = useRouter();
 
-  if (estaLogueado() && !searchParams.redirectTo) {
-    router.push('/empleadores');
-    return null;
-  }
+  useEffect(() => {
+    if (estaLogueado() && !searchParams.redirectTo) {
+      router.push('/empleadores');
+    }
+  }, []);
 
   return (
     <div className="bgads">
