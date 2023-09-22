@@ -74,7 +74,7 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
         </Modal.Header>
         <form onSubmit={handleSubmit(enviarClaveTemporal)}>
           <Modal.Body>
-            <p>Escriba su RUT para solicitar una nueva clave de acceso</p>
+            <p>Escriba su RUN para solicitar una nueva clave de acceso</p>
             <div className="row">
               <div className="col-md-12 position-relative">
                 <input
