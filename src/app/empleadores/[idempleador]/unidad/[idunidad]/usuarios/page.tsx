@@ -1,6 +1,6 @@
 'use client';
 import { buscarUnidadPorId } from '@/app/empleadores/[idempleador]/unidad/(servicios)/buscar-unidad-por-id';
-import { UsuarioEntidadEmpleadora } from '@/app/empleadores/usuarios/(modelos)/usuario-entidad-empleadora';
+import { UsuarioEntidadEmpleadora } from '@/app/empleadores/[idempleador]/usuarios/(modelos)/usuario-entidad-empleadora';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -8,8 +8,8 @@ import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { buscarUsuarios } from '../../../../usuarios/(servicios)/buscar-usuarios';
 import { buscarEmpleadorPorId } from '../../../datos/(servicios)/buscar-empleador-por-id';
+import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
 import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
 import { asociarUnidad } from './(servicios)/asociar-unidad';

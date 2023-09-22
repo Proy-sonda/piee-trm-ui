@@ -10,12 +10,12 @@ import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
-import ModalCrearUsuario from '../../usuarios/(componentes)/modal-crear-usuario';
-import ModalEditarUsuario from '../../usuarios/(componentes)/modal-editar-usuario';
-import TablaUsuarios from '../../usuarios/(componentes)/tabla-usuarios';
-import { UsuarioEntidadEmpleadora } from '../../usuarios/(modelos)/usuario-entidad-empleadora';
-import { buscarUsuarios } from '../../usuarios/(servicios)/buscar-usuarios';
 import { buscarEmpleadorPorId } from '../datos/(servicios)/buscar-empleador-por-id';
+import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
+import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
+import TablaUsuarios from './(componentes)/tabla-usuarios';
+import { UsuarioEntidadEmpleadora } from './(modelos)/usuario-entidad-empleadora';
+import { buscarUsuarios } from './(servicios)/buscar-usuarios';
 
 interface UsuariosPageProps {
   params: {
