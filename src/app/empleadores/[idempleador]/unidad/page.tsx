@@ -7,7 +7,6 @@ import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Unidadrhh } from '@/modelos/tramitacion';
-import { estaLogueado } from '@/servicios/auth';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -65,11 +64,6 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params }) => {
       busquedaEmpleador();
     }
   }, [unidades]);
-
-  if (!estaLogueado()) {
-    router.push('/login');
-    return null;
-  }
 
   return (
     <div className="bgads">

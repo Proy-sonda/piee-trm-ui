@@ -6,7 +6,6 @@ import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import { estaLogueado } from '@/servicios/auth';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -180,11 +179,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
       setValue(campo, value.trim(), { shouldValidate: true });
     }
   };
-
-  if (!estaLogueado()) {
-    router.push('/login');
-    return null;
-  }
 
   return (
     <>

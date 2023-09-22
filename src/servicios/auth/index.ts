@@ -1,3 +1,4 @@
+export * from './cambiar-clave';
 export * from './es-token-valido';
 export * from './esta-logueado';
 export * from './logout';
