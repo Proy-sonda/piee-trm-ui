@@ -20,17 +20,7 @@ type LoginComponentProps = {
   buttonText?: string;
 };
 
-type changePass = {
-  rutusuario: string;
-  claveanterior: string;
-  clavenuevauno: string;
-  clavenuevados: string;
-};
-
 export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'Ingresar' }) => {
-  const [show, setShow] = useState('');
-  const [display, setDisplay] = useState('none');
-
   const [showModalCambiarClave, setShowModalCambiarClave] = useState(false);
 
   const [showModalRecuperarClave, setShowModalRecuperarClave] = useState(false);
@@ -41,23 +31,9 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
 
   const searchParams = useSearchParams();
 
-  const handleShowModalRecu = () => {
-    setShowModalRecuperarClave(true);
-  };
-
   const { login } = useContext(AuthContext);
 
-  const {
-    rutusuario,
-    clave,
-    claveanterior,
-    clavenuevauno,
-    clavenuevados,
-    rutrecu,
-    onInputChange,
-    onInputValidRut,
-    onResetForm,
-  } = useForm({
+  const { rutusuario, clave, onInputChange, onInputValidRut } = useForm({
     claveanterior: '',
     clavenuevauno: '',
     clavenuevados: '',
@@ -118,14 +94,6 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
     }
   };
 
-  const ChangeTemporal = async () => {};
-
-  const OncloseModal = () => {
-    setShow('');
-    setDisplay('none');
-    onResetForm();
-  };
-
   const [visibleInput, setvisibleInput] = useState(input);
 
   const verClave = (e: FormEvent<HTMLButtonElement>, textbox: string) => {
@@ -139,121 +107,6 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
 
   return (
     <>
-      {/* <div
-        className={`modal fade ${show}`}
-        style={{ display: display }}
-        id="modalclavetransitoria"
-        tabIndex={-1}
-        aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h1 className="modal-title fs-5" id="exampleModalLabel">
-                Clave Transitoria
-              </h1>
-              <button
-                type="button"
-                onClick={OncloseModal}
-                className="btn-close"
-                aria-label="Close"></button>
-            </div>
-            <div className="modal-body">
-              <h6>
-                Tu cuenta posee con una clave transitoria, completa el siguiente formulario para
-                activar tu cuenta.
-              </h6>
-              <br />
-              <label htmlFor="transitoria">Contraseña transitoria</label>
-              <div className="input-group mb-3">
-                <input
-                  type={visibleInput.claveanterior ? 'text' : 'password'}
-                  className="form-control"
-                  name="claveanterior"
-                  aria-describedby="button-addon2"
-                  value={claveanterior}
-                  onChange={onInputChange}
-                  required
-                />
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  tabIndex={-1}
-                  id="button-addon2"
-                  title={visibleInput.claveanterior ? 'Ocultar clave' : 'Ver clave'}
-                  onClick={(e) => verClave(e, 'claveanterior')}>
-                  {visibleInput.claveanterior ? (
-                    <i className="bi bi-eye-slash-fill"></i>
-                  ) : (
-                    <i className="bi bi-eye-fill"></i>
-                  )}
-                </button>
-              </div>
-
-              <label htmlFor="claveuno">Contraseña Nueva</label>
-              <div className="input-group mb-3">
-                <input
-                  type={visibleInput.clavenuevauno ? 'text' : 'password'}
-                  className="form-control"
-                  name="clavenuevauno"
-                  aria-describedby="button-addon2"
-                  value={clavenuevauno}
-                  onChange={onInputChange}
-                  required
-                />
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  tabIndex={-1}
-                  id="button-addon2"
-                  title={visibleInput.clavenuevauno ? 'Ocultar clave' : 'Ver clave'}
-                  onClick={(e) => verClave(e, 'clavenuevauno')}>
-                  {visibleInput.clavenuevauno ? (
-                    <i className="bi bi-eye-slash-fill"></i>
-                  ) : (
-                    <i className="bi bi-eye-fill"></i>
-                  )}
-                </button>
-              </div>
-
-              <label htmlFor="claveuno">Repetir Contraseña</label>
-              <div className="input-group mb-3">
-                <input
-                  type={visibleInput.clavenuevados ? 'text' : 'password'}
-                  className="form-control"
-                  name="clavenuevados"
-                  aria-describedby="button-addon2"
-                  value={clavenuevados}
-                  onChange={onInputChange}
-                  required
-                />
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  tabIndex={-1}
-                  id="button-addon2"
-                  title={visibleInput.clavenuevados ? 'Ocultar clave' : 'Ver clave'}
-                  onClick={(e) => verClave(e, 'clavenuevados')}>
-                  {visibleInput.clavenuevados ? (
-                    <i className="bi bi-eye-slash-fill"></i>
-                  ) : (
-                    <i className="bi bi-eye-fill"></i>
-                  )}
-                </button>
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={OncloseModal}>
-                Cerrar
-              </button>
-              <button type="button" className="btn btn-primary" onClick={ChangeTemporal}>
-                Actualizar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div> */}
-
       <form onSubmit={handleLoginUsuario} className={styles.formlogin}>
         <label>
           Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
@@ -308,7 +161,7 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
               color: 'blue',
               marginRight: '50px',
             }}
-            onClick={handleShowModalRecu}>
+            onClick={() => setShowModalRecuperarClave(true)}>
             Recuperar clave de acceso
           </label>{' '}
           &nbsp;
@@ -319,11 +172,14 @@ export const LoginComponent: React.FC<LoginComponentProps> = ({ buttonText = 'In
       </form>
 
       <ModalCambiarClaveTemporal
+        rutUsuario={rutusuario}
         show={showModalCambiarClave}
         onCerrarModal={() => {
           setShowModalCambiarClave(false);
         }}
-        onClaveCambiada={() => {}}
+        onClaveCambiada={() => {
+          setShowModalCambiarClave(false);
+        }}
       />
 
       <ModalRecuperarClave

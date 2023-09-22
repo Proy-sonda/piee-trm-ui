@@ -1,21 +1,25 @@
+import { ClaveTemporalInvalidaError, cambiarClave } from '@/servicios/auth';
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import Swal from 'sweetalert2';
 
 interface FormularioCambiarClaveTransitoria {
   claveTransitoria: string;
-  nuevaClave: string;
+  claveNueva: string;
   confirmaClave: string;
 }
 
 interface ModalCambiarClaveTemporalProps {
   show: boolean;
+  rutUsuario: string;
   onCerrarModal: () => void;
   onClaveCambiada: () => void;
 }
 
 const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
   show,
+  rutUsuario,
   onCerrarModal,
   onClaveCambiada,
 }) => {
@@ -23,85 +27,83 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
   const [verNuevaClave, setVerNuevaClave] = useState(false);
   const [verConfirmaClave, setVerConfirmaClave] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm<FormularioCambiarClaveTransitoria>({
+  const { register, handleSubmit, reset } = useForm<FormularioCambiarClaveTransitoria>({
     mode: 'onBlur',
   });
 
+  const resetearFormulario = () => reset();
+
   const handleCerrarModal = () => {
+    resetearFormulario();
     onCerrarModal();
   };
 
-  const cambiarClaveTransitoria: SubmitHandler<FormularioCambiarClaveTransitoria> = () => {
-    // if (!claveanterior) {
-    //   return Swal.fire({
-    //     icon: 'error',
-    //     title: 'Error',
-    //     text: 'Debe ingresar clave transitoria',
-    //     showConfirmButton: true,
-    //     confirmButtonText: 'OK',
-    //     confirmButtonColor: 'var(--color-blue)',
-    //   });
-    // }
-    // if (clavenuevauno != clavenuevados) {
-    //   return Swal.fire({
-    //     icon: 'error',
-    //     title: 'Error',
-    //     text: 'Las contraseñas deben coincidir',
-    //     showConfirmButton: true,
-    //     confirmButtonText: 'OK',
-    //     confirmButtonColor: 'var(--color-blue)',
-    //   });
-    // }
-    // let PostVal: changePass = {
-    //   rutusuario: rutusuario,
-    //   claveanterior: claveanterior,
-    //   clavenuevauno: clavenuevauno,
-    //   clavenuevados: clavenuevados,
-    // };
-    // const resp = await fetch(`${apiUrl()}/auth/change`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify(PostVal),
-    // });
-    // if (resp.ok) {
-    //   return Swal.fire({
-    //     html: 'Contraseña actualizada correctamente, vuelva a iniciar sesión',
-    //     icon: 'success',
-    //     timer: 2000,
-    //     showConfirmButton: false,
-    //     willClose: () => {
-    //       OncloseModal();
-    //       onResetForm();
-    //     },
-    //   });
-    // }
-    // const body = await resp.json();
-    // if (body.message === 'Login/Password invalida') {
-    //   return Swal.fire({
-    //     icon: 'error',
-    //     title: 'Error',
-    //     text: 'La clave temporal es inválida',
-    //     showConfirmButton: true,
-    //     confirmButtonText: 'OK',
-    //     confirmButtonColor: 'var(--color-blue)',
-    //   });
-    // }
-    // return Swal.fire({
-    //   icon: 'error',
-    //   title: 'Error',
-    //   text: 'Hubo un error al actualizar la contraseña',
-    //   showConfirmButton: true,
-    //   confirmButtonText: 'OK',
-    //   confirmButtonColor: 'var(--color-blue)',
-    // });
+  const cambiarClaveTransitoria: SubmitHandler<FormularioCambiarClaveTransitoria> = async ({
+    claveTransitoria,
+    claveNueva,
+    confirmaClave,
+  }) => {
+    if (!claveTransitoria || claveTransitoria.trim() === '') {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Debe ingresar clave transitoria',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+
+    if (claveNueva != confirmaClave) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Las contraseñas deben coincidir',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+
+    try {
+      await cambiarClave({
+        rutUsuario,
+        claveTransitoria,
+        claveNueva,
+        confirmaClaveNueva: confirmaClave,
+      });
+
+      Swal.fire({
+        html: 'Contraseña actualizada correctamente, vuelva a iniciar sesión',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+
+      resetearFormulario();
+
+      onClaveCambiada();
+    } catch (error) {
+      if (error instanceof ClaveTemporalInvalidaError) {
+        return Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'La clave temporal es inválida',
+          showConfirmButton: true,
+          confirmButtonText: 'OK',
+          confirmButtonColor: 'var(--color-blue)',
+        });
+      }
+
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Hubo un error al actualizar la contraseña',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
   };
 
   return (
@@ -117,16 +119,18 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
               activar tu cuenta.
             </h6>
             <br />
-            <label htmlFor="transitoria">Contraseña transitoria</label>
+            <label className="form-label" htmlFor="transitoria">
+              Contraseña transitoria
+            </label>
             <div className="input-group mb-3">
+              {/* TODO: Validar el "required" usando react-hook-form, no validacion del HTML */}
               <input
+                id="transitoria"
                 type={verClaveTemporal ? 'text' : 'password'}
                 className="form-control"
-                // name="claveanterior"
-                // aria-describedby="button-addon2"
-                // value={claveanterior}
-                // onChange={onInputChange}
-                // required
+                autoComplete="new-custom-value"
+                {...register('claveTransitoria')}
+                required
               />
               <button
                 className="btn btn-primary"
@@ -135,20 +139,22 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
                 id="button-addon2"
                 title={verClaveTemporal ? 'Ocultar clave' : 'Ver clave'}
                 onClick={() => setVerClaveTemporal((x) => !x)}>
-                <i className={'bi ' + verClaveTemporal ? 'bi-eye-slash-fill' : 'bi-eye-fill'}></i>
+                <i className={`bi ${verClaveTemporal ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
               </button>
             </div>
 
-            <label htmlFor="claveuno">Contraseña Nueva</label>
+            <label className="form-label" htmlFor="claveNueva">
+              Contraseña Nueva
+            </label>
             <div className="input-group mb-3">
+              {/* TODO: Validar el "required" usando react-hook-form, no validacion del HTML */}
               <input
+                id="claveNueva"
                 type={verNuevaClave ? 'text' : 'password'}
                 className="form-control"
-                // name="clavenuevauno"
-                // aria-describedby="button-addon2"
-                // value={clavenuevauno}
-                // onChange={onInputChange}
-                // required
+                autoComplete="new-custom-value"
+                {...register('claveNueva')}
+                required
               />
               <button
                 className="btn btn-primary"
@@ -157,20 +163,22 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
                 id="button-addon2"
                 title={verNuevaClave ? 'Ocultar clave' : 'Ver clave'}
                 onClick={() => setVerNuevaClave((x) => !x)}>
-                <i className={'bi ' + verNuevaClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}></i>
+                <i className={`bi ${verNuevaClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
               </button>
             </div>
 
-            <label htmlFor="claveuno">Repetir Contraseña</label>
+            <label className="form-label" htmlFor="confirmaClaveNueva">
+              Repetir Contraseña
+            </label>
             <div className="input-group mb-3">
+              {/* TODO: Validar el "required" usando react-hook-form, no validacion del HTML */}
               <input
+                id="confirmaClaveNueva"
                 type={verConfirmaClave ? 'text' : 'password'}
                 className="form-control"
-                // name="clavenuevados"
-                // aria-describedby="button-addon2"
-                // value={clavenuevados}
-                // onChange={onInputChange}
-                // required
+                autoComplete="new-custom-value"
+                {...register('confirmaClave')}
+                required
               />
               <button
                 className="btn btn-primary"
@@ -179,7 +187,7 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
                 id="button-addon2"
                 title={verConfirmaClave ? 'Ocultar clave' : 'Ver clave'}
                 onClick={() => setVerConfirmaClave((x) => !x)}>
-                <i className={'bi ' + verConfirmaClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}></i>
+                <i className={`bi ${verConfirmaClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
               </button>
             </div>
           </Modal.Body>
