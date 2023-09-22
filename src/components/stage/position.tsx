@@ -25,7 +25,7 @@ const Position: React.FC<MyAppProps> = ({ position }) => {
           </Link>
         </div>
         <div className="col-md-3">
-          <Link href={'/tramitacion/tramitadas'}>
+          <Link href={'/licencias-tramitadas'}>
             <label
               className={`mt-2 form-label ${position === 2 && styles.pactive} ${styles.linkpoint}`}>
               Licencias Tramitadas
@@ -33,7 +33,7 @@ const Position: React.FC<MyAppProps> = ({ position }) => {
           </Link>
         </div>
         <div className="col-md-3">
-          <Link href={'/tramitacion/consultas'}>
+          <Link href={'/consultas'}>
             <label
               className={`mt-2 form-label ${position === 3 && styles.pactive} ${styles.linkpoint}`}>
               Consultas

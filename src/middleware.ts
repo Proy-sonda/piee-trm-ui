@@ -2,7 +2,7 @@ import { esTokenValido } from '@/servicios/auth';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export const config = {
-  matcher: ['/empleadores/:path*', '/tramitacion'],
+  matcher: ['/empleadores/:path*', '/tramitacion', '/consultas', '/licencias-tramitadas'],
 };
 
 export async function middleware(request: NextRequest) {
