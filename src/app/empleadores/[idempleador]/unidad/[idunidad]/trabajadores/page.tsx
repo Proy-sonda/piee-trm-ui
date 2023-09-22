@@ -226,6 +226,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     let cuentaGrabados = 0;
 
+    setLoading(true);
+
     for (let index = 0; index < csvData.length; index++) {
       const element = csvData[index];
 
@@ -260,11 +262,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         showConfirmButton: false,
         timer: 2000,
         didClose: () => {
+          setLoading(false);
           if (rutconerror.length > 0) setarrerror(true);
         },
       });
       refrescarComponente();
     } else {
+      setLoading(false);
       Swal.fire({
         icon: 'info',
         html: 'No se ha añadido ningún trabajador',
