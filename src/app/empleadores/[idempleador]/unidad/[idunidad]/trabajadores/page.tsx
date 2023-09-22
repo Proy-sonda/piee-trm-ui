@@ -391,7 +391,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                   <input
                     type="file"
                     accept=".csv"
-                    className={error.file ? 'form-control is-invalid' : 'form-control'}
+                    className={
+                      error.file
+                        ? 'form-control form-control-sm is-invalid'
+                        : 'form-control form-control-sm'
+                    }
                     {...register('file', {
                       onChange: (event: ChangeEvent<HTMLInputElement>) => {
                         if (event.target.files?.length == 0) return setValue('file', null);
@@ -446,33 +450,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       onClick={handleClickNomina}>
                       Cargar
                     </button>
-                    <button
-                      className="btn btn-danger"
-                      disabled={
-                        getValues('file')?.length === 0 || !getValues('file') ? true : false
-                      }
-                      onClick={async (event) => {
-                        event.preventDefault();
-                        if (getValues('file')?.length === 0) return;
-                        const resp = await Swal.fire({
-                          icon: 'question',
-                          html: `¿Desea eliminar el archivo <b>${
-                            getValues('file')![0].name
-                          }</b> cargado?`,
-                          confirmButtonColor: 'var(--color-blue)',
-                          confirmButtonText: 'Sí',
-                          showDenyButton: true,
-                          denyButtonColor: 'var(--bs-danger)',
-                        });
-                        if (resp.isDenied || resp.isDismissed) return;
-                        seterror({
-                          ...error,
-                          file: false,
-                        });
-                        setValue('file', null);
-                      }}>
-                      Borrar todo
-                    </button>
                   </div>
                 </div>
               </div>
@@ -480,8 +457,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           </div>
 
           <div className="row mt-5">
-            <div className="col-md-12 text-center">
-              <h5>Trabajadores</h5>
+            <div className="col-md-12">
+              <div className="row">
+                <h5 className="text-center">Trabajadores</h5>
+                <span className="text-end">
+                  <button className="btn btn-danger btn-sm">Borrar todo</button>
+                </span>
+              </div>
 
               <hr />
               <IfContainer show={pendiente || loading}>
