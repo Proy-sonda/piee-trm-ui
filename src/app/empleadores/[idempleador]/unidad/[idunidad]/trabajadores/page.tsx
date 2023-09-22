@@ -79,7 +79,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         const [resp] = await buscarUnidadesDeEmpleador(datosPagina.empleador?.rutempleador || '');
         setunidadEmpleador(await resp());
         resp().then((value: UnidadEmpleador[]) => {
-          setunidad(value[0].unidad);
+          setunidad(value.find((value) => value.idunidad === Number(idunidad))?.unidad || '');
         });
       };
       busquedaUnidadEmpleador();
