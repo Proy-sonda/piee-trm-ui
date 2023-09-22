@@ -10,8 +10,8 @@ import isEmail from 'validator/lib/isEmail';
 import { FormularioEditarUnidadRRHH } from '../(modelos)/formulario-editar-unidad-rrhh';
 import { actualizarUnidad } from '../(servicios)/actualizar-unidad';
 import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
-import { buscarComunas } from '../../(servicios)/buscar-comunas';
-import { buscarRegiones } from '../../(servicios)/buscar-regiones';
+import { buscarComunas } from '../../../(servicios)/buscar-comunas';
+import { buscarRegiones } from '../../../(servicios)/buscar-regiones';
 
 interface ModalEditarUnidadProps {
   idEmpleador: number;

@@ -1,5 +1,5 @@
 'use client';
-import { buscarUnidadPorId } from '@/app/empleadores/unidad/(servicios)/buscar-unidad-por-id';
+import { buscarUnidadPorId } from '@/app/empleadores/[idempleador]/unidad/(servicios)/buscar-unidad-por-id';
 import { UsuarioEntidadEmpleadora } from '@/app/empleadores/usuarios/(modelos)/usuario-entidad-empleadora';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
@@ -8,14 +8,14 @@ import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { buscarEmpleadorPorId } from '../../../../datos/(servicios)/buscar-empleador-por-id';
-import { TableUsuariosAsociados } from '../../../../unidad/usuarios/(componentes)/table-usuarios-asociados';
-import { formUsrUnd } from '../../../../unidad/usuarios/(modelos)/formulario-usuario-unidad';
-import { asociarUnidad } from '../../../../unidad/usuarios/(servicios)/asociar-unidad';
-import { buscarUsuariosAsociado } from '../../../../unidad/usuarios/(servicios)/buscar-usuario-asociado';
-import { eliminarUsuarioAsociado } from '../../../../unidad/usuarios/(servicios)/eliminar-usuario-asociado';
-import styles from '../../../../unidad/usuarios/usuarios.module.css';
 import { buscarUsuarios } from '../../../../usuarios/(servicios)/buscar-usuarios';
+import { buscarEmpleadorPorId } from '../../../datos/(servicios)/buscar-empleador-por-id';
+import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
+import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
+import { asociarUnidad } from './(servicios)/asociar-unidad';
+import { buscarUsuariosAsociado } from './(servicios)/buscar-usuario-asociado';
+import { eliminarUsuarioAsociado } from './(servicios)/eliminar-usuario-asociado';
+import styles from './usuarios.module.css';
 interface iUsuarios {
   params: {
     idempleador: string;

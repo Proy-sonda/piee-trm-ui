@@ -21,9 +21,9 @@ import { buscarRegiones } from '../../(servicios)/buscar-regiones';
 import { buscarSistemasDeRemuneracion } from '../../(servicios)/buscar-sistemas-de-remuneracion';
 import { buscarTamanosEmpresa } from '../../(servicios)/buscar-tamanos-empresa';
 import { buscarTiposDeEmpleadores } from '../../(servicios)/buscar-tipo-de-empleadores';
-import { CamposFormularioEmpleador } from '../../datos/(modelos)/campos-formulario-empleador';
-import { actualizarEmpleador } from '../../datos/(servicios)/actualizar-empleador';
-import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-por-id';
+import { CamposFormularioEmpleador } from './(modelos)/campos-formulario-empleador';
+import { actualizarEmpleador } from './(servicios)/actualizar-empleador';
+import { buscarEmpleadorPorId } from './(servicios)/buscar-empleador-por-id';
 
 interface DatosEmpleadoresPageProps {
   params: {

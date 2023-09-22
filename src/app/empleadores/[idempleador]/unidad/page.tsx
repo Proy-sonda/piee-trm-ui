@@ -12,10 +12,10 @@ import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
-import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-por-id';
-import ModalEditarUnidad from '../../unidad/(componentes)/modal-editar-unidad';
-import ModalNuevaUnidad from '../../unidad/(componentes)/modal-nueva-unidad';
-import TablaUnidades from '../../unidad/(componentes)/tabla-unidades';
+import { buscarEmpleadorPorId } from '../datos/(servicios)/buscar-empleador-por-id';
+import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
+import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
+import TablaUnidades from './(componentes)/tabla-unidades';
 
 interface UnidadRRHHPageProps {
   params: {

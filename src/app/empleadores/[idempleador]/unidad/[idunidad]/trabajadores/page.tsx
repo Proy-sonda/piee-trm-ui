@@ -4,15 +4,18 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 
-import TablaTrabajadores from '@/app/empleadores/unidad/trabajadores/(componentes)/tabla-trabajadores';
-import { Trabajador, UnidadEmpleador } from '@/app/empleadores/unidad/trabajadores/(modelos)';
+import TablaTrabajadores from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
+import {
+  Trabajador,
+  UnidadEmpleador,
+} from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(modelos)';
 import {
   actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
   buscarUnidadesDeEmpleador,
   crearTrabajador,
   eliminarTrabajador,
-} from '@/app/empleadores/unidad/trabajadores/(servicios)';
+} from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(servicios)';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
@@ -22,8 +25,8 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
-import { buscarEmpleadorPorId } from '@/app/empleadores/datos/(servicios)/buscar-empleador-por-id';
-import styles from '../../../../unidad/trabajadores/trabajadores.module.css';
+import { buscarEmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(servicios)/buscar-empleador-por-id';
+import styles from './trabajadores.module.css';
 
 interface TrabajadoresPageProps {
   params: {
