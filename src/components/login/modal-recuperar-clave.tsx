@@ -31,6 +31,8 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
     mode: 'onBlur',
   });
 
+  const resetearFormulario = () => reset();
+
   const enviarClaveTemporal: SubmitHandler<FormularioRecuperarClave> = async ({ rut }) => {
     if (!rut || rut.trim() === '') {
       return Swal.fire({
@@ -55,7 +57,7 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
     try {
       await recuperarClave(rut);
 
-      reset();
+      resetearFormulario();
 
       onClaveEnviada();
     } catch (error) {
@@ -79,6 +81,7 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
   };
 
   const handleCerrarModal = () => {
+    resetearFormulario();
     onCerrarModal();
   };
 
