@@ -11,11 +11,11 @@ import { estaLogueado } from '@/servicios/auth';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import ModalEditarUnidad from '../(componentes)/modal-editar-unidad';
-import ModalNuevaUnidad from '../(componentes)/modal-nueva-unidad';
-import TablaUnidades from '../(componentes)/tabla-unidades';
 import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
 import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-por-id';
+import ModalEditarUnidad from '../../unidad/(componentes)/modal-editar-unidad';
+import ModalNuevaUnidad from '../../unidad/(componentes)/modal-nueva-unidad';
+import TablaUnidades from '../../unidad/(componentes)/tabla-unidades';
 
 interface UnidadRRHHPageProps {
   params: {
@@ -108,9 +108,8 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params }) => {
 
             <IfContainer show={!cargandoUnidades && erroresCargarUnidad.length === 0}>
               <TablaUnidades
-                rut={rut}
+                idempleador={id}
                 unidades={unidades ?? []}
-                razon={razon}
                 onEditarUnidad={({ idunidad }) => setIdunidad(idunidad.toString())}
                 onUnidadEliminada={() => refrescarPagina()}
               />

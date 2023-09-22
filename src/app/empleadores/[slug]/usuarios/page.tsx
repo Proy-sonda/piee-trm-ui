@@ -9,13 +9,13 @@ import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { estaLogueado } from '@/servicios/auth';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import ModalCrearUsuario from '../(componentes)/modal-crear-usuario';
-import ModalEditarUsuario from '../(componentes)/modal-editar-usuario';
-import TablaUsuarios from '../(componentes)/tabla-usuarios';
-import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
-import { buscarUsuarios } from '../(servicios)/buscar-usuarios';
 import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
 import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-por-id';
+import ModalCrearUsuario from '../../usuarios/(componentes)/modal-crear-usuario';
+import ModalEditarUsuario from '../../usuarios/(componentes)/modal-editar-usuario';
+import TablaUsuarios from '../../usuarios/(componentes)/tabla-usuarios';
+import { UsuarioEntidadEmpleadora } from '../../usuarios/(modelos)/usuario-entidad-empleadora';
+import { buscarUsuarios } from '../../usuarios/(servicios)/buscar-usuarios';
 
 interface UsuariosPageProps {
   params: {
@@ -30,7 +30,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
   const id = Number(params.slug);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
-  const [rut, setRut] = useState('');
+
   const [razon, setrazon] = useState('');
 
   const [refresh, refrescarComponente] = useRefrescarPagina();
@@ -43,7 +43,6 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
   useEffect(() => {
     if (empleadores != undefined) {
-      setRut(empleadores.rutempleador);
       setrazon(empleadores.razonsocial);
       const busqquedaUsuarios = async () => {
         const [usuarioBusqueda] = await buscarUsuarios(empleadores.rutempleador);

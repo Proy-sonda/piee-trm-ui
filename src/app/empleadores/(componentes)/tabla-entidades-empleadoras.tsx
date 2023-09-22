@@ -33,7 +33,7 @@ export default function TablaEntidadesEmpleadoras({
             empleadoresPaginados.map((empleador: Empleador) => (
               <Tr key={empleador.rutempleador} className="align-middle">
                 <Td>
-                  <Link href={`/empleadores/datos/${empleador.idempleador}`}>
+                  <Link href={`/empleadores/${empleador.idempleador}/datos`}>
                     {empleador.rutempleador}
                   </Link>
                 </Td>

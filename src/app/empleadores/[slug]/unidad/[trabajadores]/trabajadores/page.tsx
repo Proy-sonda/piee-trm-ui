@@ -4,6 +4,15 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 
+import TablaTrabajadores from '@/app/empleadores/unidad/trabajadores/(componentes)/tabla-trabajadores';
+import { Trabajador, UnidadEmpleador } from '@/app/empleadores/unidad/trabajadores/(modelos)';
+import {
+  actualizarTrabajador,
+  buscarTrabajadoresDeUnidad,
+  buscarUnidadesDeEmpleador,
+  crearTrabajador,
+  eliminarTrabajador,
+} from '@/app/empleadores/unidad/trabajadores/(servicios)';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
@@ -12,29 +21,23 @@ import { useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
-import TablaTrabajadores from './(componentes)/tabla-trabajadores';
-import { Trabajador } from './(modelos)/';
-import {
-  actualizarTrabajador,
-  buscarTrabajadoresDeUnidad,
-  buscarUnidadesDeEmpleador,
-  crearTrabajador,
-  eliminarTrabajador,
-} from './(servicios)/';
-import styles from './trabajadores.module.css';
+
+import { buscarEmpleadorPorId } from '@/app/empleadores/datos/(servicios)/buscar-empleador-por-id';
+import styles from '../../../../unidad/trabajadores/trabajadores.module.css';
 
 interface TrabajadoresPageProps {
-  searchParams: {
-    idunidad: number;
-    razon: string;
-    rutempleador: string;
+  params: {
+    slug: string;
+    trabajadores: string;
   };
 }
 
-const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => {
+const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [unidad, setunidad] = useState('');
   const [arrerror, setarrerror] = useState(false);
   const [rutconerror, setrutconerror] = useState<any[]>([]);
+  const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
+  const [razon, setRazon] = useState('');
   const [csvData, setCsvData] = useState<any>([]);
   let [loading, setLoading] = useState(false);
   const [error, seterror] = useState({
@@ -42,7 +45,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
     file: false,
     lecturarut: false,
   });
-  const { idunidad, razon, rutempleador } = searchParams;
+  const { slug: idempleador, trabajadores: idunidad } = params;
+
   const [editar, seteditar] = useState<Trabajador>({
     idtrabajador: 0,
     unidad: {
@@ -59,12 +63,23 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
       trabajadores: buscarTrabajadoresDeUnidad(Number(idunidad)),
-      unidadEmpleador: buscarUnidadesDeEmpleador(rutempleador),
+      empleador: buscarEmpleadorPorId(Number(idempleador)),
     },
     [refresh],
   );
 
-  useEffect(() => setunidad(datosPagina?.unidadEmpleador[0].unidad || ''), [datosPagina]);
+  useEffect(() => {
+    if (datosPagina?.empleador != undefined) {
+      const busquedaUnidadEmpleador = async () => {
+        const [resp] = await buscarUnidadesDeEmpleador(datosPagina.empleador?.rutempleador || '');
+        setunidadEmpleador(await resp());
+        resp().then((value: UnidadEmpleador[]) => {
+          setunidad(value[0].unidad);
+        });
+      };
+      busquedaUnidadEmpleador();
+    }
+  }, [datosPagina?.empleador]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 
@@ -485,7 +500,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                   <TablaTrabajadores
                     handleDeleteTrabajador={handleDeleteTrabajador}
                     handleEditTrabajador={handleEditTrabajador}
-                    idunidad={idunidad}
+                    idunidad={Number(idunidad)}
                     trabajadores={datosPagina?.trabajadores || []}
                   />
                 ) : (
@@ -535,8 +550,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ searchParams }) => 
                   value={editar?.unidad.idunidad}
                   onChange={handleChangeUnidad}>
                   <option value={''}>Seleccionar</option>
-                  {datosPagina?.unidadEmpleador.length || 0 > 0 ? (
-                    datosPagina?.unidadEmpleador.map(({ idunidad, unidad }) => (
+                  {unidadEmpleador.length || 0 > 0 ? (
+                    unidadEmpleador.map(({ idunidad, unidad }) => (
                       <option key={idunidad} value={idunidad}>
                         {unidad}
                       </option>

@@ -1,44 +1,71 @@
 'use client';
+import { buscarUnidadPorId } from '@/app/empleadores/unidad/(servicios)/buscar-unidad-por-id';
+import { UsuarioEntidadEmpleadora } from '@/app/empleadores/usuarios/(modelos)/usuario-entidad-empleadora';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { buscarUsuarios } from '../../usuarios/(servicios)/buscar-usuarios';
-import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
-import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
-import { asociarUnidad } from './(servicios)/asociar-unidad';
-import { buscarEmpleadorRut } from './(servicios)/buscar-empleador-rut';
-import { buscarUsuariosAsociado } from './(servicios)/buscar-usuario-asociado';
-import { eliminarUsuarioAsociado } from './(servicios)/eliminar-usuario-asociado';
-import styles from './usuarios.module.css';
+import { buscarEmpleadorPorId } from '../../../../datos/(servicios)/buscar-empleador-por-id';
+import { TableUsuariosAsociados } from '../../../../unidad/usuarios/(componentes)/table-usuarios-asociados';
+import { formUsrUnd } from '../../../../unidad/usuarios/(modelos)/formulario-usuario-unidad';
+import { asociarUnidad } from '../../../../unidad/usuarios/(servicios)/asociar-unidad';
+import { buscarEmpleadorRut } from '../../../../unidad/usuarios/(servicios)/buscar-empleador-rut';
+import { buscarUsuariosAsociado } from '../../../../unidad/usuarios/(servicios)/buscar-usuario-asociado';
+import { eliminarUsuarioAsociado } from '../../../../unidad/usuarios/(servicios)/eliminar-usuario-asociado';
+import styles from '../../../../unidad/usuarios/usuarios.module.css';
+import { buscarUsuarios } from '../../../../usuarios/(servicios)/buscar-usuarios';
 interface iUsuarios {
-  searchParams: {
-    unidad: string;
-    id: number;
-    razon: string;
-    rut: string;
+  params: {
+    slug: string;
+    trabajadores: string;
   };
 }
 
-const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
-  const { id, unidad, razon, rut } = searchParams;
+const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
+  const { slug: idempleador, trabajadores: idunidad } = params;
+  const [razon, setRazon] = useState('');
+  const [rut, setrut] = useState('');
+  const [unidad, setunidad] = useState('');
   const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
   const router = useRouter();
+
+  useEffect(() => {
+    const busquedaUnidad = async () => {
+      const [resp] = await buscarUnidadPorId(Number(idunidad));
+      setunidad((await resp()).unidad);
+    };
+    const busquedaEmpleador = async () => {
+      const [resp] = await buscarEmpleadorPorId(Number(idempleador));
+      setrut((await resp())?.rutempleador || '');
+      setRazon((await resp())?.razonsocial || '');
+    };
+    busquedaUnidad();
+    busquedaEmpleador();
+  }, []);
+
+  useEffect(() => {
+    const busquedaUsuarios = async () => {
+      const [resp] = await buscarUsuarios(rut);
+      setusuarios(await resp());
+    };
+    busquedaUsuarios();
+  }, [rut]);
+
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      usuarioAso: buscarUsuariosAsociado(Number(id)),
+      usuarioAso: buscarUsuariosAsociado(Number(idunidad)),
     },
     [refresh],
   );
 
-  const [error, usuarios, pending] = useMergeFetchObject(
+  const [error, prueba, pending] = useMergeFetchObject(
     {
-      usuarios: buscarUsuarios(rut),
       empleador: buscarEmpleadorRut(rut),
     },
     [refresh],
@@ -52,14 +79,10 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
   useEffect(() => {
     setformIni({
       ...formIni,
-      idempleador: usuarios?.empleador.idempleador,
+      idempleador: Number(idempleador),
     });
   }, [usuarios]);
 
-  useEffect(() => {
-    let state = window.history.state;
-    window.history.pushState(state, '', '/empleadores/unidad/usuarios');
-  }, []);
   const refrescarComponente = () => setRefresh(Math.random());
 
   const onHandleSubmit = async (event: FormEvent) => {
@@ -146,7 +169,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
     setformIni({
       ...formIni,
       idusuario: Number(event.currentTarget.value),
-      idunidad: Number(id),
+      idunidad: Number(idunidad),
     });
   };
 
@@ -181,8 +204,8 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
                   value={formIni?.idusuario}
                   name="idusuario">
                   <option value={''}>Seleccionar</option>
-                  {usuarios?.usuarios?.length || 0 > 0 ? (
-                    usuarios?.usuarios.map(({ idusuario, rutusuario, nombres }) => (
+                  {usuarios?.length || 0 > 0 ? (
+                    usuarios.map(({ idusuario, rutusuario, nombres }) => (
                       <option key={idusuario} value={idusuario} data-tokens={rutusuario}>
                         {rutusuario} / {nombres}
                       </option>
@@ -228,7 +251,7 @@ const UsuariosPageRrhh = ({ searchParams }: iUsuarios) => {
             <button
               className="btn btn-danger"
               onClick={() => {
-                router.push(`/empleadores/unidad?razon=${razon}&id=${id}&rut=${rut}`);
+                window.history.back();
               }}>
               Volver
             </button>

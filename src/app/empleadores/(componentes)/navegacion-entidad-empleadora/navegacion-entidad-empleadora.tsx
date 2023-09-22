@@ -12,10 +12,10 @@ const NavegacionEntidadEmpleadora: React.FC<NavegacionEntidadEmpleadoraProps> = 
   const links: LinkNavegacionEntidadEmpleadora[] = [
     {
       titulo: 'Datos Entidad Empleadora',
-      href: `/empleadores/datos/${id}`,
+      href: `/empleadores/${id}/datos`,
     },
-    { titulo: 'Unidad de RRHH', href: `/empleadores/unidad/${id}` },
-    { titulo: 'Usuarios', href: `/empleadores/usuarios/${id}` },
+    { titulo: 'Unidad de RRHH', href: `/empleadores/${id}/unidad` },
+    { titulo: 'Usuarios', href: `/empleadores/${id}/usuarios` },
   ];
 
   let pathname = usePathname();

@@ -13,9 +13,6 @@ import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm as useFormRH } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import isEmail from 'validator/lib/isEmail';
-import { CamposFormularioEmpleador } from '../(modelos)/campos-formulario-empleador';
-import { actualizarEmpleador } from '../(servicios)/actualizar-empleador';
-import { buscarEmpleadorPorId } from '../(servicios)/buscar-empleador-por-id';
 import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
 import { buscarActividadesLaborales } from '../../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../../(servicios)/buscar-cajas-de-compensacion';
@@ -24,6 +21,9 @@ import { buscarRegiones } from '../../(servicios)/buscar-regiones';
 import { buscarSistemasDeRemuneracion } from '../../(servicios)/buscar-sistemas-de-remuneracion';
 import { buscarTamanosEmpresa } from '../../(servicios)/buscar-tamanos-empresa';
 import { buscarTiposDeEmpleadores } from '../../(servicios)/buscar-tipo-de-empleadores';
+import { CamposFormularioEmpleador } from '../../datos/(modelos)/campos-formulario-empleador';
+import { actualizarEmpleador } from '../../datos/(servicios)/actualizar-empleador';
+import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-por-id';
 
 interface DatosEmpleadoresPageProps {
   params: {
@@ -34,6 +34,7 @@ interface DatosEmpleadoresPageProps {
 }
 
 const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) => {
+  console.log(params);
   const router = useRouter();
   const id: number = Number(params.slug);
 
