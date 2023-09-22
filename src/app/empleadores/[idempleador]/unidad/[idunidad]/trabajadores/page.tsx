@@ -209,7 +209,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         confirmButtonColor: 'var(--color-blue)',
       });
 
-    let errorEncontrado = csvData.find((rut: string) => !validateRut(formatRut(rut, false)));
+    let errorEncontrado = csvData.find(
+      (rut: string) =>
+        !validateRut(formatRut(rut, false)) ||
+        Number(formatRut(rut, false).split('-')[0]) > 50000000,
+    );
     setCsvData(csvData.filter((rut: string) => !validateRut(formatRut(rut, false)) === true));
 
     if (errorEncontrado?.trim() != '' && errorEncontrado != undefined) {
@@ -333,7 +337,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                           value: true,
                           message: 'Este campo es obligatorio',
                         },
-                        onChange: (event) => {
+                        onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                          if (Number(event.target.value.split('-')[0]) > 50000000)
+                            return seterror({ ...error, run: true });
                           const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
                           let rut = event.target.value as string;
 
@@ -345,7 +351,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
                           setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
                         },
-                        onBlur: (event) => {
+                        onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                          if (Number(event.target.value.split('-')[0]) > 50000000)
+                            return seterror({ ...error, run: true });
                           const rut = event.target.value as string;
 
                           seterror({ ...error, run: !validateRut(formatRut(rut)) });
@@ -355,7 +363,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       })}
                     />
                     <IfContainer show={error.run}>
-                      <div className="invalid-tooltip">Debe ingresar un RUT valido</div>
+                      <div className="invalid-tooltip">
+                        Debe ingresar un RUT valido y menores a 50 millones
+                      </div>
                     </IfContainer>
                   </div>
                   <div
@@ -382,7 +392,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 <a
                   className={styles['span-link']}
                   download="formato.csv"
-                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3CjI0Njk3ODk5LTkK">
+                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
                   siguiente formato
                 </a>
               </sub>
