@@ -6,34 +6,31 @@ import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { useRouter } from 'next/navigation';
 import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { buscarEmpleadorPorId } from '../../../../datos/(servicios)/buscar-empleador-por-id';
 import { TableUsuariosAsociados } from '../../../../unidad/usuarios/(componentes)/table-usuarios-asociados';
 import { formUsrUnd } from '../../../../unidad/usuarios/(modelos)/formulario-usuario-unidad';
 import { asociarUnidad } from '../../../../unidad/usuarios/(servicios)/asociar-unidad';
-import { buscarEmpleadorRut } from '../../../../unidad/usuarios/(servicios)/buscar-empleador-rut';
 import { buscarUsuariosAsociado } from '../../../../unidad/usuarios/(servicios)/buscar-usuario-asociado';
 import { eliminarUsuarioAsociado } from '../../../../unidad/usuarios/(servicios)/eliminar-usuario-asociado';
 import styles from '../../../../unidad/usuarios/usuarios.module.css';
 import { buscarUsuarios } from '../../../../usuarios/(servicios)/buscar-usuarios';
 interface iUsuarios {
   params: {
-    slug: string;
-    trabajadores: string;
+    idempleador: string;
+    idunidad: string;
   };
 }
 
 const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
-  const { slug: idempleador, trabajadores: idunidad } = params;
+  const { idempleador, idunidad } = params;
   const [razon, setRazon] = useState('');
   const [rut, setrut] = useState('');
   const [unidad, setunidad] = useState('');
   const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
-  const router = useRouter();
 
   useEffect(() => {
     const busquedaUnidad = async () => {
@@ -47,15 +44,17 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     };
     busquedaUnidad();
     busquedaEmpleador();
+    refrescarComponente();
   }, []);
 
   useEffect(() => {
     const busquedaUsuarios = async () => {
+      if (rut == '') return;
       const [resp] = await buscarUsuarios(rut);
       setusuarios(await resp());
     };
     busquedaUsuarios();
-  }, [rut]);
+  }, [refresh]);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
@@ -64,12 +63,6 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     [refresh],
   );
 
-  const [error, prueba, pending] = useMergeFetchObject(
-    {
-      empleador: buscarEmpleadorRut(rut),
-    },
-    [refresh],
-  );
   const [formIni, setformIni] = useState<formUsrUnd>({
     idempleador: 0,
     idunidad: 0,

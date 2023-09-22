@@ -27,8 +27,8 @@ import styles from '../../../../unidad/trabajadores/trabajadores.module.css';
 
 interface TrabajadoresPageProps {
   params: {
-    slug: string;
-    trabajadores: string;
+    idempleador: string;
+    idunidad: string;
   };
 }
 
@@ -45,7 +45,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     file: false,
     lecturarut: false,
   });
-  const { slug: idempleador, trabajadores: idunidad } = params;
+  const { idempleador, idunidad } = params;
 
   const [editar, seteditar] = useState<Trabajador>({
     idtrabajador: 0,
@@ -509,7 +509,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             }}>
             <div className="col-md-6"></div>
             <div className="col-md-6 text-end">
-              <button className="btn btn-danger" onClick={() => window.history.go(-2)}>
+              <button className="btn btn-danger" onClick={() => window.history.back()}>
                 Volver
               </button>
             </div>
@@ -560,7 +560,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             </button>{' '}
             &nbsp;
             <button type="submit" className="btn btn-primary" onClick={() => handleSubmitEdit()}>
-              Grabar <i className="bi bi-floppy"></i>
+              Grabar
             </button>
           </Modal.Footer>
         </Modal>

@@ -27,16 +27,15 @@ import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-p
 
 interface DatosEmpleadoresPageProps {
   params: {
-    slug: {
+    idempleador: {
       id: number;
     };
   };
 }
 
 const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) => {
-  console.log(params);
   const router = useRouter();
-  const id: number = Number(params.slug);
+  const id: number = Number(params.idempleador);
 
   const [rut, setrut] = useState('');
 
@@ -736,8 +735,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
               <div className="row mt-5">
                 <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
                   <button type="submit" className="btn btn-primary">
-                    Grabar &nbsp;
-                    <span className="bi bi-floppy"></span>
+                    Grabar
                   </button>
                   <Link className="btn btn-danger mt-2 mt-sm-0 me-0 me-sm-2" href={'/empleadores'}>
                     Volver
