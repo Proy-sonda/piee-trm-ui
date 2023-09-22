@@ -26,6 +26,7 @@ import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
 import { buscarEmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(servicios)/buscar-empleador-por-id';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import styles from './trabajadores.module.css';
 
 interface TrabajadoresPageProps {
@@ -38,6 +39,7 @@ interface TrabajadoresPageProps {
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [unidad, setunidad] = useState('');
   const [arrerror, setarrerror] = useState(false);
+  const [spinnerCargar, setspinnerCargar] = useState(false);
   const [rutconerror, setrutconerror] = useState<any[]>([]);
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
   const [razon, setRazon] = useState('');
@@ -162,7 +164,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     e.preventDefault();
 
     if (error.run) return;
-    setLoading(true);
 
     const crearTrabajadorAux = async () => {
       const data = await crearTrabajador({
@@ -225,6 +226,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
 
     let cuentaGrabados = 0;
+    setspinnerCargar(true);
 
     for (let index = 0; index < csvData.length; index++) {
       const element = csvData[index];
@@ -254,6 +256,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
 
     if (cuentaGrabados > 0) {
+      setspinnerCargar(false);
       Swal.fire({
         icon: 'success',
         html: `Se han grabado ${cuentaGrabados} trabajadores con éxito`,
@@ -265,6 +268,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       });
       refrescarComponente();
     } else {
+      setspinnerCargar(false);
       Swal.fire({
         icon: 'info',
         html: 'No se ha añadido ningún trabajador',
@@ -306,6 +310,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         </Modal.Body>
         <Modal.Footer></Modal.Footer>
       </Modal>
+      <IfContainer show={spinnerCargar}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
       <div className="bgads">
         <div className="me-5 ms-5 animate__animate animate__fadeIn">
           <div className="row mt-5">

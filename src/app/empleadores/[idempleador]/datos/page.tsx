@@ -512,7 +512,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
                       delay={{ show: 250, hide: 400 }}
                       overlay={(props) => (
                         <Tooltip id="button-tooltip" {...props}>
-                          Ingresar "S/N" si no tiene número
+                          {'Ingresar "S/N" si no tiene número'}
                         </Tooltip>
                       )}>
                       <i
