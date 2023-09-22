@@ -122,7 +122,6 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   };
 
   const handleDelete = async (idusuario: number) => {
-    console.log(idusuario);
     const respuesta = await Swal.fire({
       icon: 'question',
       title: 'Eliminar Usuario/a',

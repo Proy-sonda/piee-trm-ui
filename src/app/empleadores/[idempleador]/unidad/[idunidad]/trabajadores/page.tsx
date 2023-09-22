@@ -19,14 +19,13 @@ import {
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Modal, ProgressBar } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
 import { buscarEmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(servicios)/buscar-empleador-por-id';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import styles from './trabajadores.module.css';
 
 interface TrabajadoresPageProps {
@@ -39,11 +38,12 @@ interface TrabajadoresPageProps {
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [unidad, setunidad] = useState('');
   const [arrerror, setarrerror] = useState(false);
+  const [cuentagrabados, setcuentagrabados] = useState<number>(0);
   const [spinnerCargar, setspinnerCargar] = useState(false);
   const [rutconerror, setrutconerror] = useState<any[]>([]);
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
   const [razon, setRazon] = useState('');
-  const [csvData, setCsvData] = useState<any>([]);
+  const [csvData, setCsvData] = useState<any[]>([]);
   let [loading, setLoading] = useState(false);
   const [error, seterror] = useState({
     run: false,
@@ -225,8 +225,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       });
     }
 
-    let cuentaGrabados = 0;
     setspinnerCargar(true);
+    let recuento = 0;
 
     for (let index = 0; index < csvData.length; index++) {
       const element = csvData[index];
@@ -240,7 +240,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         });
 
         if (data.ok) {
-          cuentaGrabados++;
+          recuento = ++recuento;
+          setcuentagrabados((recuento / csvData.length) * 100);
         } else {
           setrutconerror([
             ...rutconerror,
@@ -255,15 +256,16 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       }
     }
 
-    if (cuentaGrabados > 0) {
+    if (recuento > 0) {
       setspinnerCargar(false);
       Swal.fire({
         icon: 'success',
-        html: `Se han grabado ${cuentaGrabados} trabajadores con éxito`,
+        html: `Se han grabado ${recuento} trabajadores con éxito`,
         showConfirmButton: false,
         timer: 2000,
         didClose: () => {
           if (rutconerror.length > 0) setarrerror(true);
+          setcuentagrabados(0);
         },
       });
       refrescarComponente();
@@ -275,6 +277,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         confirmButtonColor: 'var(--color-blue)',
         didClose: () => {
           if (rutconerror.length > 0) setarrerror(true);
+          setcuentagrabados(0);
         },
       });
     }
@@ -310,9 +313,17 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         </Modal.Body>
         <Modal.Footer></Modal.Footer>
       </Modal>
-      <IfContainer show={spinnerCargar}>
-        <SpinnerPantallaCompleta />
-      </IfContainer>
+      <div
+        className="progress_bar"
+        style={{
+          display: spinnerCargar ? 'block' : 'none',
+        }}>
+        <div className="progres">
+          <p>Cargando trabajadores...</p>
+          <ProgressBar animated now={cuentagrabados} label={`${cuentagrabados.toFixed(1)}%`} />
+        </div>
+      </div>
+
       <div className="bgads">
         <div className="me-5 ms-5 animate__animate animate__fadeIn">
           <div className="row mt-5">
