@@ -21,7 +21,7 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
   const router = useRouter();
 
   if (estaLogueado() && !searchParams.redirectTo) {
-    router.push('/tramitacion');
+    router.push('/empleadores');
     return null;
   }
 
