@@ -338,9 +338,10 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                             message: 'No puede tener más de 20 carcateres',
                           },
                           pattern: {
-                            value: /^[a-zA-Z0-9#]+$/g,
+                            value: /^[a-zA-Z0-9#\s]+$/g,
                             message: 'Solo debe tener números, letras o #',
                           },
+                          onBlur: () => trimInput('departamento'),
                         })}
                       />
                       <IfContainer show={!!errors.departamento}>
