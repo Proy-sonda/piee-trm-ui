@@ -27,8 +27,8 @@ import styles from '../../../../unidad/trabajadores/trabajadores.module.css';
 
 interface TrabajadoresPageProps {
   params: {
-    slug: string;
-    trabajadores: string;
+    idempleador: string;
+    idunidad: string;
   };
 }
 
@@ -45,7 +45,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     file: false,
     lecturarut: false,
   });
-  const { slug: idempleador, trabajadores: idunidad } = params;
+  const { idempleador, idunidad } = params;
 
   const [editar, seteditar] = useState<Trabajador>({
     idtrabajador: 0,

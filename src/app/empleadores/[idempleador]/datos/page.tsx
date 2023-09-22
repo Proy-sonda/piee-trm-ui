@@ -27,16 +27,15 @@ import { buscarEmpleadorPorId } from '../../datos/(servicios)/buscar-empleador-p
 
 interface DatosEmpleadoresPageProps {
   params: {
-    slug: {
+    idempleador: {
       id: number;
     };
   };
 }
 
 const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) => {
-  console.log(params);
   const router = useRouter();
-  const id: number = Number(params.slug);
+  const id: number = Number(params.idempleador);
 
   const [rut, setrut] = useState('');
 

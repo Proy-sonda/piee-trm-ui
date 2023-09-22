@@ -19,7 +19,7 @@ import TablaUnidades from '../../unidad/(componentes)/tabla-unidades';
 
 interface UnidadRRHHPageProps {
   params: {
-    slug: {
+    idempleador: {
       id: number;
     };
   };
@@ -28,7 +28,7 @@ interface UnidadRRHHPageProps {
 const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params }) => {
   const router = useRouter();
 
-  const id = Number(params.slug);
+  const id = Number(params.idempleador);
 
   const [rut, setrut] = useState('');
   const [unidades, setunidades] = useState<Unidadrhh[]>([]);

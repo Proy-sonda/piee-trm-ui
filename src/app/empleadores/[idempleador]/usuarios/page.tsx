@@ -19,7 +19,7 @@ import { buscarUsuarios } from '../../usuarios/(servicios)/buscar-usuarios';
 
 interface UsuariosPageProps {
   params: {
-    slug: {
+    idempleador: {
       id: number;
     };
   };
@@ -28,7 +28,7 @@ interface UsuariosPageProps {
 const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
   const router = useRouter();
 
-  const id = Number(params.slug);
+  const id = Number(params.idempleador);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
 
   const [razon, setrazon] = useState('');
