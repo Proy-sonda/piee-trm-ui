@@ -560,7 +560,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             </button>{' '}
             &nbsp;
             <button type="submit" className="btn btn-primary" onClick={() => handleSubmitEdit()}>
-              Grabar <i className="bi bi-floppy"></i>
+              Grabar
             </button>
           </Modal.Footer>
         </Modal>
