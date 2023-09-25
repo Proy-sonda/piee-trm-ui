@@ -32,8 +32,8 @@ const TablaUnidades = ({
 
   const eliminarUnidadDeRRHH = async (unidad: Unidadrhh) => {
     const { isConfirmed } = await Swal.fire({
-      icon: 'warning',
-      title: `¿Desea eliminar la unidad: ${unidad.unidad}?`,
+      icon: 'question',
+      html: `¿Desea eliminar la unidad: <b>${unidad.unidad}</b>?`,
       showConfirmButton: true,
       confirmButtonText: 'Sí',
       confirmButtonColor: 'var(--color-blue)',
@@ -102,19 +102,19 @@ const TablaUnidades = ({
         <SpinnerPantallaCompleta />
       </IfContainer>
 
-      <Table className="table table-hover">
-        <Thead className="text-center">
-          <Tr>
-            <Th>Código</Th>
-            <Th>Nombre</Th>
-            <Th>Teléfono</Th>
-            <Th>Correo electrónico</Th>
-            <Th></Th>
-          </Tr>
-        </Thead>
-        <Tbody className="text-center align-middle">
-          {unidadesPaginadas.length > 0 ? (
-            unidadesPaginadas.map((unidad) => (
+      {unidadesPaginadas.length > 0 ? (
+        <Table className="table table-hover">
+          <Thead className="text-center">
+            <Tr>
+              <Th>Código</Th>
+              <Th>Nombre</Th>
+              <Th>Teléfono</Th>
+              <Th>Correo electrónico</Th>
+              <Th></Th>
+            </Tr>
+          </Thead>
+          <Tbody className="text-center align-middle">
+            {unidadesPaginadas.map((unidad) => (
               <Tr key={unidad?.idunidad}>
                 <Td>{unidad?.identificador}</Td>
                 <Td>
@@ -168,19 +168,15 @@ const TablaUnidades = ({
                   </div>
                 </Td>
               </Tr>
-            ))
-          ) : (
-            <Tr>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td></Td>
-            </Tr>
-          )}
-        </Tbody>
-      </Table>
+            ))}
+          </Tbody>
+        </Table>
+      ) : (
+        <div className="text-center m-2">
+          <b>No se han encontrado unidades de RRHH asociadas a la entidad empleadora.</b>
+        </div>
+      )}
+
       <div className="mt-4 mb-2 d-flex flex-column flex-sm-row justify-content-sm-between">
         <Paginacion
           paginaActual={paginaActual}

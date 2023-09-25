@@ -185,7 +185,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
       <div className="bgads">
         <Position position={4} />
 
-        <div className="container pb-4">
+        <div className="pb-3 px-3 px-lg-5">
           <div className="row">
             <NavegacionEntidadEmpleadora id={id} />
           </div>
@@ -200,7 +200,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
 
           <IfContainer show={errorCombos.length === 0 && errorEmpleador.length === 0}>
             <Titulo url="">
-              Datos Entidad Empleadora - <b>{empleador?.razonsocial ?? 'Cargando...'}</b>
+              Entidad Empleadora - <b>{empleador?.razonsocial ?? 'Cargando...'}</b> / Datos Entidad
+              Empleadora
             </Titulo>
 
             <form onSubmit={handleSubmitRH(onGuardarCambios)}>

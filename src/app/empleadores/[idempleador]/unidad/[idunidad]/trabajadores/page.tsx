@@ -87,7 +87,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
   }, [datosPagina?.empleador]);
 
-  useEffect(() => settrabajadores(datosPagina?.trabajadores || []), [datosPagina?.trabajadores]);
+  useEffect(() => {
+    if (datosPagina?.trabajadores != undefined) {
+      settrabajadores(datosPagina!?.trabajadores);
+      setRazon(datosPagina!?.empleador!?.razonsocial);
+    }
+  }, [datosPagina?.trabajadores]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 
@@ -341,7 +346,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         <div className="me-5 ms-5 animate__animate animate__fadeIn">
           <div className="row mt-5">
             <Titulo url="">
-              Entidad Empleadora / Dirección y Unidades RRHH - {razon} / Trabajadores - {unidad}
+              Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b> {unidad} </b>/
+              Trabajadores
             </Titulo>
           </div>
 
