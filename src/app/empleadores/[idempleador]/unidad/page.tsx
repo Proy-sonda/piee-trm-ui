@@ -69,13 +69,13 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params }) => {
     <div className="bgads">
       <Position position={4} />
 
-      <div className="container pb-3 px-3 px-lg-5">
+      <div className="pb-3 px-3 px-lg-5">
         <div className="row">
           <NavegacionEntidadEmpleadora id={id} />
         </div>
 
         <Titulo url="">
-          Entidad Empleadora / Dirección y Unidades RRHH - <b>{razon.replaceAll('%20', ' ')}</b>
+          Entidad Empleadora - <b>{razon.replaceAll('%20', ' ')}</b> / Dirección y Unidades RRHH
         </Titulo>
 
         <div className="mt-2 d-flex justify-content-end">

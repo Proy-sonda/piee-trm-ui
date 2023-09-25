@@ -72,7 +72,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   const handleEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
     const { isConfirmed } = await Swal.fire({
       html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
-      icon: 'warning',
+      icon: 'question',
       showConfirmButton: true,
       confirmButtonText: 'SÍ',
       confirmButtonColor: 'var(--color-blue)',

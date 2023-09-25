@@ -55,13 +55,13 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
     <div className="bgads">
       <Position position={4} />
 
-      <div className="container">
+      <div className="pb-3 px-3 px-lg-5">
         <div className="row">
           <NavegacionEntidadEmpleadora id={id} />
         </div>
 
         <Titulo url="">
-          Entidad Empleadora / Usuarios <b>{razon}</b>
+          Entidad Empleadora - <b>{razon}</b> / Usuarios
         </Titulo>
 
         <div className="mt-2 row">

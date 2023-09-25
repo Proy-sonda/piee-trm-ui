@@ -173,21 +173,19 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       <div className="ms-5 me-5">
         <div className="row">
           <Titulo manual="Manual" url="">
-            <h5>
-              Empleadores / Dirección y Unidades RRHH - <b>{razon}</b> / Usuarios - <b>{unidad}</b>
-            </h5>
+            Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b>{unidad}</b> /
+            Usuarios
           </Titulo>
         </div>
         <div className="row mt-3">
           <h5>Cargar Usuarios</h5>
-          <sub className={styles['sub-title']}>Agregar Usuario</sub>
+          <sub className={styles['sub-title']}>Agregar RUN Usuario</sub>
         </div>
 
         <form className="row mt-3" onSubmit={onHandleSubmit}>
           <div className="col-md-8 col-sm-12 col-xl-6">
             <div className="row">
               <div className="col-md-6">
-                <label>RUN</label>
                 <select
                   className="form-select js-example-basic-single"
                   data-live-search="true"
