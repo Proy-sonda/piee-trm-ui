@@ -1,54 +1,51 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import styles from './position.module.css';
 
-type MyAppProps = {
+type PositionProps = {
+  /**
+   * @deprecated
+   * Ya no es necesario, se puede borrar sin problema
+   */
   position: number;
 };
 
-const Position: React.FC<MyAppProps> = ({ position }) => {
+type Tab = {
+  href: string;
+  titulo: string;
+};
+
+const Position: React.FC<PositionProps> = ({}) => {
+  const tabs = [
+    { href: '/tramitacion', titulo: 'Bandeja de Tramitación' },
+    { href: '/licencias-tramitadas', titulo: 'Licencias Tramitadas' },
+    { href: '/consultas', titulo: 'Consultas' },
+    { href: '/empleadores', titulo: 'Entidades Empleadoras' },
+  ];
+
+  const pathname = usePathname();
+
+  const esTabActiva = (tab: Tab) => {
+    return pathname.startsWith(tab.href);
+  };
+
   return (
-    <div className="container-fluid">
-      <div
-        className="row text-center"
-        style={{
-          backgroundColor: 'white',
-          marginLeft: '0.5px',
-          marginRight: '0.5px',
-          padding: '5px',
-        }}>
-        <div className={`col-md-3`}>
-          <Link href={'/tramitacion'}>
-            <label
-              className={`mt-2 form-label ${position === 1 && styles.pactive} ${styles.linkpoint}`}>
-              Bandeja de Tramitación
-            </label>
-          </Link>
-        </div>
-        <div className="col-md-3">
-          <Link href={'/licencias-tramitadas'}>
-            <label
-              className={`mt-2 form-label ${position === 2 && styles.pactive} ${styles.linkpoint}`}>
-              Licencias Tramitadas
-            </label>
-          </Link>
-        </div>
-        <div className="col-md-3">
-          <Link href={'/consultas'}>
-            <label
-              className={`mt-2 form-label ${position === 3 && styles.pactive} ${styles.linkpoint}`}>
-              Consultas
-            </label>
-          </Link>
-        </div>
-        <div className="col-md-3">
-          <Link href={'/empleadores'}>
-            <label
-              className={`mt-2 form-label ${position === 4 && styles.pactive} ${styles.linkpoint}`}>
-              Entidades Empleadoras
-            </label>
-          </Link>
-        </div>
-        <hr />
+    <div className="container-fluid mb-5">
+      <div className="bg-white border-bottom border-1 row text-center">
+        {tabs.map((tab) => (
+          <div className={`py-2 col-12 col-md-3 ${esTabActiva(tab) && styles['tab-activa']}`}>
+            <Link href={tab.href}>
+              <label
+                className={`mt-2 form-label cursor-pointer ${
+                  esTabActiva(tab) && styles['tab-activa-texto']
+                }`}>
+                {tab.titulo}
+              </label>
+            </Link>
+          </div>
+        ))}
       </div>
     </div>
   );

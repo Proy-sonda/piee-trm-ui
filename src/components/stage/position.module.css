@@ -1,10 +1,19 @@
-.pactive {
+.tab-activa {
+  border-bottom: none;
+}
+
+.tab-activa-texto {
   font-weight: bold;
   color: var(--color-blue) !important;
   border-bottom: 2px solid red;
-  width: 200px;
 }
 
-.linkpoint {
-  cursor: pointer;
+@media only screen and (min-width: 768px) {
+  .tab-activa {
+    border-bottom: 2px solid red;
+  }
+
+  .tab-activa-texto {
+    border-bottom: none;
+  }
 }
