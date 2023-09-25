@@ -2,12 +2,15 @@
 
 import { AuthContext } from '@/contexts';
 import { useRouter } from 'next/navigation';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import IfContainer from '../if-container';
+import ModalEditarCuentaUsuario from './modal-editar-cuenta-usuario';
 
 const Usuario: React.FC = () => {
+  const [showModalEditarCuenta, setShowModalEditarCuenta] = useState(false);
+
   const { datosUsuario, logout } = useContext(AuthContext);
 
   const router = useRouter();
@@ -73,11 +76,21 @@ const Usuario: React.FC = () => {
               </div>
             </Dropdown.Item>
             <Dropdown.Divider />
+            <Dropdown.Item onClick={() => setShowModalEditarCuenta(true)}>
+              <small>Editar Cuenta</small>
+            </Dropdown.Item>
+            <Dropdown.Divider />
             <Dropdown.Item onClick={handleLogout}>
               <small>Cerrar Sesión</small>
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+
+        <ModalEditarCuentaUsuario
+          show={showModalEditarCuenta}
+          onCerrar={() => setShowModalEditarCuenta(false)}
+          onUsuarioEditado={() => setShowModalEditarCuenta(false)}
+        />
       </IfContainer>
     </>
   );
