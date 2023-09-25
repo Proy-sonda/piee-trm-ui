@@ -286,11 +286,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     setspinnerCargar(true);
     let recuento = 0;
     settextProgress('Cargando Trabajadores...');
-    let errRecuento = 0;
 
     for (let index = 0; index < csvData.length; index++) {
       const element = csvData[index];
-
+      recuento = ++recuento;
       if (element.trim() != '') {
         const data = await crearTrabajador({
           ruttrabajador: formatRut(element, false),
@@ -299,10 +298,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           },
         });
         if (data.ok) {
-          recuento = ++recuento;
           setcuentagrabados((recuento / csvData.length) * 100);
         } else {
-          errRecuento = ++errRecuento;
         }
       }
     }
@@ -315,13 +312,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         showConfirmButton: false,
         timer: 2000,
         didClose: () => {
-          if (errRecuento > 0) {
-            Swal.fire({
-              icon: 'info',
-              html: `Se encuentran <b>${errRecuento} trabajadores</b> ya registrados`,
-              confirmButtonColor: 'var(--color-blue)',
-            });
-          }
           setcuentagrabados(0);
           settextProgress('');
           setValue('file', null);
@@ -358,14 +348,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="row mt-2">
             <div className="col-md-6 col-xs-12">
               <h5>Cargar Trabajadores</h5>
-              <sub style={{ color: 'blue' }}>Agregar Persona Trabajadora</sub>
+              <sub style={{ color: 'blue' }}>Agregar RUN persona Trabajadora</sub>
+
               <br />
               <form onSubmit={handleAddTrabajador}>
                 <div className="row mt-2">
                   <div className="col-md-8 position-relative">
-                    <label className="form-label" htmlFor="run">
-                      RUN
-                    </label>
                     <input
                       id="run"
                       type="text"
@@ -378,6 +366,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                           message: 'Este campo es obligatorio',
                         },
                         onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                          if (event.target.value.trim() == '') {
+                            return seterror({ ...error, run: false });
+                          }
                           if (Number(event.target.value.split('-')[0]) > 50000000)
                             return seterror({ ...error, run: true });
                           const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
@@ -392,6 +383,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                           setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
                         },
                         onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                          if (event.target.value.trim() == '') {
+                            return seterror({ ...error, run: false });
+                          }
                           if (Number(event.target.value.split('-')[0]) > 50000000)
                             return seterror({ ...error, run: true });
                           const rut = event.target.value as string;
@@ -439,11 +433,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                   <input
                     type="file"
                     accept=".csv"
-                    className={
-                      error.file
-                        ? 'form-control form-control-sm is-invalid'
-                        : 'form-control form-control-sm'
-                    }
+                    className={error.file ? 'form-control is-invalid' : 'form-control'}
                     {...register('file', {
                       onChange: (event: ChangeEvent<HTMLInputElement>) => {
                         if (event.target.files?.length == 0) return setValue('file', null);
