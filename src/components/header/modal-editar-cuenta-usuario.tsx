@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { AuthContext } from '@/contexts';
+import React, { useContext, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
@@ -33,6 +34,8 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
 
   // TODO: Cargar datos del usuario
 
+  const { datosUsuario } = useContext(AuthContext);
+
   const {
     register,
     handleSubmit,
@@ -43,6 +46,19 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
   } = useForm<FormularioEditarCuenta>({
     mode: 'onBlur',
   });
+
+  // Parchar datos del usuario
+  useEffect(() => {
+    if (!datosUsuario) {
+      return;
+    }
+
+    setValue('rut', datosUsuario.user.rutusuario);
+    setValue('nombres', datosUsuario.user.nombres);
+    setValue('apellidos', datosUsuario.user.apellidos);
+    setValue('email', datosUsuario.user.email);
+    setValue('emailConfirma', datosUsuario.user.email);
+  }, [datosUsuario]);
 
   const handleCerrarModal = () => {
     onCerrar();
