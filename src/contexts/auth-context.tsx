@@ -9,12 +9,14 @@ import { ReactNode, createContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
 type AuthContextType = {
+  estaLogueado: boolean;
   datosUsuario?: UserData;
   login: (rut: string, clave: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType>({
+  estaLogueado: false,
   datosUsuario: undefined,
   login: async () => {},
   logout: async () => {},
@@ -22,6 +24,8 @@ export const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const { fullPath } = useUrl();
+
+  const [estaLogueado, setEstaLogueado] = useState(false);
 
   const [datosUsuario, setDatosUsuario] = useState<UserData | undefined>(undefined);
 
@@ -39,6 +43,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setDatosUsuario(userData);
 
     setMostrarAlertaExpiraSesion(true);
+
+    setEstaLogueado(true);
   }, []);
 
   // Alerta de expiracion de sesion
@@ -146,6 +152,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setDatosUsuario(datosUsuario);
 
     setMostrarAlertaExpiraSesion(true);
+
+    setEstaLogueado(true);
   };
 
   const logout = async () => {
@@ -157,13 +165,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setDatosUsuario(undefined);
 
       setMostrarAlertaExpiraSesion(false);
+
+      setEstaLogueado(false);
     }
   };
 
   return (
     <AuthContext.Provider
       value={{
-        // ...usuario,
+        estaLogueado,
         datosUsuario,
         login,
         logout,

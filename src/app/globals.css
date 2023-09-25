@@ -16,48 +16,6 @@ main {
   margin-top: 2%;
 }
 
-/* HEADER */
-nav.navbar-dark {
-  /* background-color: #001c41 !important; */
-  background-image: url('../img/header.png') !important;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
-.spanheader {
-  margin-left: auto;
-  color: white;
-  font-size: 23px;
-}
-
-.spanheader p.text-center {
-  font-weight: bold;
-}
-
-.logo-fonasa {
-  width: 100px;
-}
-
-/* Bootstrap medium */
-@media only screen and (min-width: 768px) {
-  .logo-fonasa {
-    width: 140px;
-  }
-
-  nav.navbar-dark {
-    height: 160px;
-  }
-}
-
-/* Bootstrap large */
-@media only screen and (min-width: 992px) {
-  /* nav.navbar-dark {
-    background-size: cover;
-  } */
-}
-
-/* END HEADER */
-
 label {
   font-size: 14px;
 }

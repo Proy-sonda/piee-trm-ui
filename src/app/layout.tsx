@@ -1,15 +1,13 @@
 'use client';
 
-import Usuario from '@/components/usuario/usuario';
+import AppHeader from '@/components/header/header';
 import { AuthProvider, InscribeProvider, StepProvider } from '@/contexts';
 import { EmpleadorProvider } from '@/contexts/empleador-context';
 import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Head from 'next/head';
-import Link from 'next/link';
 import './globals.css';
-import svg from './logo-fonasa.svg';
 
 export default function RootLayout(
   {
@@ -33,28 +31,7 @@ export default function RootLayout(
                 <link rel="icon" href="/favicon.ico" />
               </Head>
               <body>
-                <header>
-                  <nav className="py-3 navbar navbar-expand-lg navbar-dark bg-dark">
-                    <div className="container-lg">
-                      <div className="w-100 d-flex align-items-center justify-content-between">
-                        <Link href="/">
-                          <img src={svg.src} alt="Fonasa" className="logo-fonasa img-fluid" />
-                        </Link>
-
-                        <div className="spanheader d-none d-md-inline-block flex-grow-1 text-center">
-                          <p>Portal Integrado para Entidades Empleadoras (PIEE) de </p>
-                          <p className="m-0">Tramitación de Licencias Médicas</p>
-                        </div>
-
-                        <Usuario />
-                      </div>
-
-                      <div className="w-100 pt-4 d-block d-md-none text-center">
-                        <p className="m-0 spanheader">Portal Tramitación</p>
-                      </div>
-                    </div>
-                  </nav>
-                </header>
+                <AppHeader />
 
                 <main>{children}</main>
 
