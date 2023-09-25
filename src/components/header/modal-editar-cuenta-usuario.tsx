@@ -123,10 +123,10 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
 
         <form onSubmit={handleSubmit(editarCuentaUsuario)}>
           <Modal.Body>
-            <div className="row mt-2 g-3 align-items-baseline">
+            <div className="row g-3 align-items-baseline">
               <div className="col-12 col-lg-6 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="rut">
-                  RUN (*)
+                  RUN
                 </label>
                 <input
                   id="rut"
@@ -137,6 +137,8 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
                   {...register('rut')}
                 />
               </div>
+
+              <div className="col-lg-6 col-xl-9 position-relative d-none d-lg-block"></div>
 
               <div className="col-12 col-lg-6 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="nombres">
