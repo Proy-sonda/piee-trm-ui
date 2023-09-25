@@ -1,3 +1,7 @@
+.texto-inactivo {
+  color: black;
+}
+
 .tab-activa {
   border-bottom: none;
 }
