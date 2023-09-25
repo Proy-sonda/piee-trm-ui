@@ -7,6 +7,7 @@ import Titulo from '@/components/titulo/titulo';
 import TablaTrabajadores from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
 import {
   Trabajador,
+  Trabajadores,
   UnidadEmpleador,
 } from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(modelos)';
 import {
@@ -19,13 +20,14 @@ import {
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
-import { Modal, ProgressBar } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
 import { buscarEmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(servicios)/buscar-empleador-por-id';
+import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
 
 interface TrabajadoresPageProps {
@@ -39,9 +41,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [unidad, setunidad] = useState('');
   const [arrerror, setarrerror] = useState(false);
   const [cuentagrabados, setcuentagrabados] = useState<number>(0);
+  const [textProgress, settextProgress] = useState('');
   const [spinnerCargar, setspinnerCargar] = useState(false);
   const [rutconerror, setrutconerror] = useState<any[]>([]);
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
+  const [trabajadores, settrabajadores] = useState<Trabajadores[]>([]);
   const [razon, setRazon] = useState('');
   const [csvData, setCsvData] = useState<any[]>([]);
   let [loading, setLoading] = useState(false);
@@ -85,6 +89,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       busquedaUnidadEmpleador();
     }
   }, [datosPagina?.empleador]);
+
+  useEffect(() => settrabajadores(datosPagina?.trabajadores || []), [datosPagina?.trabajadores]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 
@@ -160,9 +166,62 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     ActualizaTrabajador();
   };
 
+  const handleDeleteAll = async (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const resp = await Swal.fire({
+      icon: 'question',
+      html: `¿Desea eliminar todos los trabajadores de la unidad "<b>${unidad}</b>"?`,
+      confirmButtonColor: 'var(--color-blue)',
+      confirmButtonText: 'Sí',
+      showDenyButton: true,
+      denyButtonText: 'No',
+      denyButtonColor: 'var(--bs-danger)',
+    });
+
+    if (resp.isDenied) return;
+
+    setspinnerCargar(true);
+    let recuento = 0;
+    settextProgress('Eliminando Trabajadores...');
+
+    for (let index = 0; index < datosPagina!?.trabajadores.length; index++) {
+      const element = datosPagina?.trabajadores[index];
+      const resp = await eliminarTrabajador(element!?.idtrabajador);
+      if (resp.ok) {
+        recuento = ++recuento;
+        setcuentagrabados((recuento / datosPagina!?.trabajadores.length) * 100);
+      }
+    }
+
+    setspinnerCargar(false);
+    if (recuento > 0) {
+      Swal.fire({
+        icon: 'success',
+        html: `Se han eliminado un total de <b>${recuento}</b> trabajadores`,
+        showConfirmButton: false,
+        timer: 2000,
+        didClose: () => {
+          setcuentagrabados(0);
+          settextProgress('');
+          refrescarComponente();
+        },
+      });
+    } else {
+      Swal.fire({
+        icon: 'error',
+        html: `No se han eliminado los trabajadores`,
+        confirmButtonColor: 'var(--color-blue)',
+        didClose: () => {
+          setcuentagrabados(0);
+          settextProgress('');
+          refrescarComponente();
+        },
+      });
+    }
+  };
+
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
-
     if (error.run) return;
 
     const crearTrabajadorAux = async () => {
@@ -201,6 +260,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const handleClickNomina = async (event: FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
+
     if (!getValues('file') || getValues('file')?.length === 0) return;
     if (csvData.length == 0 || csvData == undefined) return;
     if (error.file)
@@ -227,6 +287,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     setspinnerCargar(true);
     let recuento = 0;
+    settextProgress('Cargando Trabajadores...');
 
     for (let index = 0; index < csvData.length; index++) {
       const element = csvData[index];
@@ -266,6 +327,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         didClose: () => {
           if (rutconerror.length > 0) setarrerror(true);
           setcuentagrabados(0);
+          settextProgress('');
         },
       });
       refrescarComponente();
@@ -275,11 +337,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         icon: 'info',
         html: 'No se ha añadido ningún trabajador',
         confirmButtonColor: 'var(--color-blue)',
-        didClose: () => {
-          if (rutconerror.length > 0) setarrerror(true);
-          setcuentagrabados(0);
-        },
+        didClose: () => rutconerror.length > 0 && setarrerror(true),
       });
+      settextProgress('');
     }
   };
 
@@ -313,16 +373,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         </Modal.Body>
         <Modal.Footer></Modal.Footer>
       </Modal>
-      <div
-        className="progress_bar"
-        style={{
-          display: spinnerCargar ? 'block' : 'none',
-        }}>
-        <div className="progres">
-          <p>Cargando trabajadores...</p>
-          <ProgressBar animated now={cuentagrabados} label={`${cuentagrabados.toFixed(1)}%`} />
-        </div>
-      </div>
+
+      <ProgressBarCustom show={spinnerCargar} text={textProgress} count={cuentagrabados} />
 
       <div className="bgads">
         <div className="me-5 ms-5 animate__animate animate__fadeIn">
@@ -510,11 +562,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               <div className="row">
                 <h5 className="text-center">Trabajadores</h5>
                 <span
-                  className="text-end"
+                  className="text-end animate animate__fadeIn"
                   style={{
                     display: datosPagina!?.trabajadores.length > 1 ? 'block' : 'none',
                   }}>
-                  <button className="btn btn-danger btn-sm animate animate__fadeIn">
+                  <button className="btn btn-danger btn-sm" onClick={handleDeleteAll}>
                     Borrar todo
                   </button>
                 </span>
@@ -527,13 +579,38 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 </div>
               </IfContainer>
               <IfContainer show={!pendiente || !loading}>
-                {datosPagina?.trabajadores?.length || 0 > 0 ? (
-                  <TablaTrabajadores
-                    handleDeleteTrabajador={handleDeleteTrabajador}
-                    handleEditTrabajador={handleEditTrabajador}
-                    idunidad={Number(idunidad)}
-                    trabajadores={datosPagina?.trabajadores || []}
-                  />
+                <div
+                  className="row"
+                  style={{ display: datosPagina?.trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
+                  <div className="col-md-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="...Búsqueda por Run"
+                      onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                        e.preventDefault();
+                        settrabajadores(
+                          datosPagina?.trabajadores.filter((trabajador) =>
+                            trabajador.ruttrabajador.includes(e.target.value),
+                          ) ||
+                            datosPagina?.trabajadores.filter((trabajador) =>
+                              trabajador.fechaafiliacion.toString().includes(e.target.value),
+                            ) ||
+                            [],
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+                {trabajadores.length || 0 > 0 ? (
+                  <>
+                    <TablaTrabajadores
+                      handleDeleteTrabajador={handleDeleteTrabajador}
+                      handleEditTrabajador={handleEditTrabajador}
+                      idunidad={Number(idunidad)}
+                      trabajadores={trabajadores || []}
+                    />
+                  </>
                 ) : (
                   <div className="text-center">
                     <b>No se han encontrado trabajadores</b>
