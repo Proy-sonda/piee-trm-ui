@@ -34,8 +34,10 @@ const Position: React.FC<PositionProps> = ({}) => {
   return (
     <div className="container-fluid mb-5">
       <div className="bg-white border-bottom border-1 row text-center">
-        {tabs.map((tab) => (
-          <div className={`py-2 col-12 col-md-3 ${esTabActiva(tab) && styles['tab-activa']}`}>
+        {tabs.map((tab, index) => (
+          <div
+            key={index}
+            className={`py-2 col-12 col-md-3 ${esTabActiva(tab) && styles['tab-activa']}`}>
             <Link href={tab.href}>
               <label
                 className={`mt-2 form-label cursor-pointer ${styles['texto-inactivo']} ${
