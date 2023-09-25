@@ -315,7 +315,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         showConfirmButton: false,
         timer: 2000,
         didClose: () => {
-          if (recuento > 0) {
+          if (errRecuento > 0) {
             Swal.fire({
               icon: 'info',
               html: `Se encuentran <b>${errRecuento} trabajadores</b> ya registrados`,
