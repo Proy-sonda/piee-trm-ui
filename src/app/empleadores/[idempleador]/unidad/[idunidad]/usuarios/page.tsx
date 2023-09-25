@@ -54,7 +54,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       setusuarios(await resp());
     };
     busquedaUsuarios();
-  }, [refresh]);
+  }, [rut]);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
