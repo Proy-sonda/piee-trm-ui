@@ -32,7 +32,7 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
   const [verConfirmaClave, setVerConfirmaClave] = useState(false);
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
-  const { datosUsuario } = useContext(AuthContext);
+  const { datosUsuario, actualizarCuenta } = useContext(AuthContext);
 
   const {
     register,
@@ -56,6 +56,8 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
     setValue('apellidos', datosUsuario.user.apellidos);
     setValue('email', datosUsuario.user.email);
     setValue('emailConfirma', datosUsuario.user.email);
+    setValue('claveNueva', '');
+    setValue('confirmaClave', '');
   }, [datosUsuario]);
 
   const handleCerrarModal = () => {
@@ -63,17 +65,18 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
   };
 
   const editarCuentaUsuario: SubmitHandler<FormularioEditarCuenta> = async (data) => {
-    console.table(data);
-
-    // TODO: Validar que si se incluyen las contraseñas estas coincidan
-
-    onUsuarioEditado();
-
     try {
       setMostrarSpinner(true);
 
-      // TODO: Llamar servicio para actualizar usuario
-      await new Promise((r) => setTimeout(r, 1500));
+      await actualizarCuenta({
+        idUsuario: 92,
+        nombres: data.nombres,
+        apellidos: data.apellidos,
+        email: data.email,
+        emailConfirma: data.emailConfirma,
+        claveNueva: data.claveNueva !== '' ? data.claveNueva : undefined,
+        claveConfirma: data.confirmaClave !== '' ? data.confirmaClave : undefined,
+      });
 
       setMostrarSpinner(false);
 
@@ -84,8 +87,6 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
         confirmButtonColor: 'var(--color-blue)',
         confirmButtonText: 'OK',
       });
-
-      // TODO: Refrescar usuario aqui
 
       onUsuarioEditado();
     } catch (error) {

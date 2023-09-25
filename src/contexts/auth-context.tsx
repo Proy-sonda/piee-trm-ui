@@ -1,8 +1,10 @@
 'use client';
 
 import { useUrl } from '@/hooks/use-url';
+import { ActualizarCuentaRequest } from '@/modelos/actualizar-cuenta-request';
 import { UserData } from '@/modelos/user-data';
 import { desloguearUsuario, loguearUsuario, obtenerUserData, renovarToken } from '@/servicios/auth';
+import { actualizarCuentaDeUsuario } from '@/servicios/auth/actualizar-cuenta-de-usuario';
 import { thresholdAlertaExpiraSesion } from '@/servicios/environment';
 import { useRouter } from 'next/navigation';
 import { ReactNode, createContext, useEffect, useState } from 'react';
@@ -13,6 +15,7 @@ type AuthContextType = {
   datosUsuario?: UserData;
   login: (rut: string, clave: string) => Promise<void>;
   logout: () => Promise<void>;
+  actualizarCuenta: (datos: ActualizarCuentaRequest) => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType>({
@@ -20,6 +23,7 @@ export const AuthContext = createContext<AuthContextType>({
   datosUsuario: undefined,
   login: async () => {},
   logout: async () => {},
+  actualizarCuenta: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -40,11 +44,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
-    setDatosUsuario(userData);
-
-    setMostrarAlertaExpiraSesion(true);
-
-    setEstaLogueado(true);
+    onLoginExistoso(userData);
   }, []);
 
   // Alerta de expiracion de sesion
@@ -149,7 +149,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (rut: string, clave: string) => {
     const datosUsuario = await loguearUsuario(rut, clave);
 
-    setDatosUsuario(datosUsuario);
+    onLoginExistoso(datosUsuario);
+  };
+
+  const onLoginExistoso = (datos: UserData) => {
+    setDatosUsuario(datos);
 
     setMostrarAlertaExpiraSesion(true);
 
@@ -170,6 +174,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const actualizarCuenta = async (datos: ActualizarCuentaRequest) => {
+    await actualizarCuentaDeUsuario(datos);
+
+    // TODO: Recargar usuario y cuenta aqui
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -177,6 +187,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         datosUsuario,
         login,
         logout,
+        actualizarCuenta,
       }}>
       {children}
     </AuthContext.Provider>
