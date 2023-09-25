@@ -11,45 +11,55 @@ body {
   margin-left: 2%;
   margin-right: 2%;
 }
-.spanheader {
-  margin-left: auto;
-  color: white;
-  left: 30%;
-  /* position: absolute; */
-  font-size: 23px;
-}
-.spanheader p.text-center {
-  font-weight: bold;
+
+main {
+  margin-top: 2%;
 }
 
-@media only screen and (min-width: 1200px) {
-  nav.navbar-dark {
-    /* background-color: #001c41 !important; */
-    background-image: url('../img/header.png') !important ;
-    background-size: cover;
-    background-repeat: no-repeat !important;
-    /* background-position: center right !important; */
-    /* width: 1940px; */
-  }
-  .spanheader {
-    position: absolute !important;
-    text-align: center;
-  }
-}
-
-label {
-  font-size: 14px;
-}
-
+/* HEADER */
 nav.navbar-dark {
   /* background-color: #001c41 !important; */
   background-image: url('../img/header.png') !important;
   background-repeat: no-repeat;
-  height: 160px;
+  background-size: cover;
 }
 
-main {
-  margin-top: 2%;
+.spanheader {
+  margin-left: auto;
+  color: white;
+  font-size: 23px;
+}
+
+.spanheader p.text-center {
+  font-weight: bold;
+}
+
+.logo-fonasa {
+  width: 100px;
+}
+
+/* Bootstrap medium */
+@media only screen and (min-width: 768px) {
+  .logo-fonasa {
+    width: 140px;
+  }
+
+  nav.navbar-dark {
+    height: 160px;
+  }
+}
+
+/* Bootstrap large */
+@media only screen and (min-width: 992px) {
+  /* nav.navbar-dark {
+    background-size: cover;
+  } */
+}
+
+/* END HEADER */
+
+label {
+  font-size: 14px;
 }
 
 .gobCLBold {
@@ -83,10 +93,6 @@ a {
 }
 a:hover {
   text-decoration: none;
-}
-
-.logo-fonasa {
-  width: 180px;
 }
 
 footer {

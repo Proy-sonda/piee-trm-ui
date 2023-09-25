@@ -9,7 +9,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import Head from 'next/head';
 import Link from 'next/link';
 import './globals.css';
-import styles from './layout.module.css';
 import svg from './logo-fonasa.svg';
 
 export default function RootLayout(
@@ -34,55 +33,28 @@ export default function RootLayout(
                 <link rel="icon" href="/favicon.ico" />
               </Head>
               <body>
-                <div id="root" className="d-flex flex-column h-100">
-                  <header className="sticky-top">
-                    <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-                      <div className="container">
-                        <div className="d-flex">
-                          <Link className="navbar-brand" href="/">
-                            <img
-                              src={svg.src}
-                              alt="Fonasa"
-                              className="logo-fonasa img-fluid d-none d-md-inline-block"
-                            />
-                          </Link>
+                <header>
+                  <nav className="py-3 navbar navbar-expand-lg navbar-dark bg-dark">
+                    <div className="container-lg">
+                      <div className="w-100 d-flex align-items-center justify-content-between">
+                        <Link href="/">
+                          <img src={svg.src} alt="Fonasa" className="logo-fonasa img-fluid" />
+                        </Link>
 
-                          <span className="spanheader d-none d-md-inline-block">
-                            <p>Portal Integrado para Entidades Empleadoras (PIEE) de </p>
-                            <p className="text-center">Tramitación de Licencias Médicas</p>
-                          </span>
-
-                          <div className="d-block d-md-none">
-                            <span className={`text-center`}>
-                              <img
-                                src={svg.src}
-                                alt="Fonasa"
-                                className="logo-fonasa img-fluid"
-                                style={{
-                                  width: '60px',
-                                  position: 'absolute',
-                                  left: '2%',
-                                }}
-                              />
-                            </span>
-                            <p className={`spanheader text-center ${styles['title-layout']}`}>
-                              Portal Tramitación
-                            </p>
-                          </div>
-
-                          <div
-                            className="d-none d-md-block"
-                            style={{
-                              position: 'absolute',
-                              right: '0%',
-                            }}>
-                            <Usuario />
-                          </div>
+                        <div className="spanheader d-none d-md-inline-block flex-grow-1 text-center">
+                          <p>Portal Integrado para Entidades Empleadoras (PIEE) de </p>
+                          <p className="m-0">Tramitación de Licencias Médicas</p>
                         </div>
+
+                        <Usuario />
                       </div>
-                    </nav>
-                  </header>
-                </div>
+
+                      <div className="w-100 pt-4 d-block d-md-none text-center">
+                        <p className="m-0 spanheader">Portal Tramitación</p>
+                      </div>
+                    </div>
+                  </nav>
+                </header>
 
                 <main>{children}</main>
 

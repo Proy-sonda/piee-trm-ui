@@ -2,17 +2,17 @@
 
 import { AuthContext } from '@/contexts';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useContext } from 'react';
+import { useContext } from 'react';
+import { Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Swal from 'sweetalert2';
+import IfContainer from '../if-container';
 
 const Usuario: React.FC = () => {
   const { datosUsuario, logout } = useContext(AuthContext);
 
   const router = useRouter();
 
-  const handleLogout = async (e: FormEvent) => {
-    e.preventDefault();
-
+  const handleLogout = async () => {
     try {
       await logout();
 
@@ -24,64 +24,68 @@ const Usuario: React.FC = () => {
     }
   };
 
+  const calcularInicialesNombreUsuario = () => {
+    if (!datosUsuario) {
+      return '';
+    }
+
+    const nombreUsuario = datosUsuario.user.nombres.trim();
+    const apellidosUsuario = datosUsuario.user.apellidos.trim();
+
+    const inicialNombre = nombreUsuario === '' ? '' : nombreUsuario[0].toUpperCase();
+    const inicialApellido = apellidosUsuario === '' ? '' : apellidosUsuario[0].toUpperCase();
+
+    return inicialNombre + inicialApellido;
+  };
+
   return (
-    <div
-      id="navbarText"
-      style={{
-        marginRight: '25px',
-        display: !datosUsuario ? 'none' : '',
-      }}>
-      <div
-        className="nav navbar-nav navbar-right hidden-xs text-light d-sm-none d-md-block"
-        style={{ fontSize: '14px' }}>
-        <span className="pull-left user-top">
-          <div className="mT10 ng-binding ng-scope">
-            <span
-              className="fw-semibold"
-              style={{
-                whiteSpace: 'nowrap',
-              }}>
-              Te damos la bienvenida
-              <div
+    <>
+      <IfContainer show={datosUsuario}>
+        <Dropdown>
+          <OverlayTrigger
+            placement="left"
+            delay={{ show: 250, hide: 100 }}
+            overlay={(props) => (
+              <Tooltip id="button-tooltip" {...props}>
+                {datosUsuario?.user.nombres + ' ' + datosUsuario?.user.apellidos}
+              </Tooltip>
+            )}>
+            <Dropdown.Toggle
+              variant="danger"
+              style={{ backgroundColor: 'transparent' }}
+              className="p-2 border-0">
+              <span
+                className="me-1 d-inline-flex align-items-center justify-content-center border border-white border-1 rounded-circle"
                 style={{
-                  whiteSpace: 'nowrap',
+                  backgroundColor: '#0063aeff',
+                  width: '40px',
+                  height: '40px',
+                  fontSize: '18px',
                 }}>
-                <li className="nav-item dropdown">
-                  <a
-                    className="nav-link dropdown-toggle"
-                    role="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="true">
-                    {datosUsuario?.user.email ?? ''}
-                  </a>
-                  <ul className="dropdown-menu">
-                    <li>
-                      <a
-                        className="dropdown-item"
-                        href="#"
-                        data-bs-toggle="modal"
-                        data-bs-target="#Editacc">
-                        Editar Cuenta
-                      </a>
-                    </li>
-                  </ul>
-                </li>
+                {calcularInicialesNombreUsuario()}
+              </span>
+            </Dropdown.Toggle>
+          </OverlayTrigger>
+
+          <Dropdown.Menu>
+            <Dropdown.Item className="dropdown-item-text">
+              <div>
+                <small>
+                  <b>{datosUsuario?.user.nombres + ' ' + datosUsuario?.user.apellidos}</b>
+                </small>
               </div>
-            </span>
-          </div>
-          <div>
-            <a
-              className="link-light"
-              onClick={handleLogout}
-              style={{
-                cursor: 'pointer',
-              }}>
-              Cerrar Sesión
-            </a>
-          </div>
-        </span>
-      </div>
-    </div>
+              <div>
+                <small>{datosUsuario?.user.email}</small>
+              </div>
+            </Dropdown.Item>
+            <Dropdown.Divider />
+            <Dropdown.Item onClick={handleLogout}>
+              <small>Cerrar Sesión</small>
+            </Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+      </IfContainer>
+    </>
   );
 };
 
