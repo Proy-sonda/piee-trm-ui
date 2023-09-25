@@ -7,6 +7,7 @@ import Titulo from '@/components/titulo/titulo';
 import TablaTrabajadores from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
 import {
   Trabajador,
+  Trabajadores,
   UnidadEmpleador,
 } from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(modelos)';
 import {
@@ -42,6 +43,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [spinnerCargar, setspinnerCargar] = useState(false);
   const [rutconerror, setrutconerror] = useState<any[]>([]);
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
+  const [trabajadores, settrabajadores] = useState<Trabajadores[]>([]);
   const [razon, setRazon] = useState('');
   const [csvData, setCsvData] = useState<any[]>([]);
   let [loading, setLoading] = useState(false);
@@ -85,6 +87,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       busquedaUnidadEmpleador();
     }
   }, [datosPagina?.empleador]);
+
+  useEffect(() => settrabajadores(datosPagina?.trabajadores || []), [datosPagina?.trabajadores]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 
@@ -275,10 +279,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         icon: 'info',
         html: 'No se ha añadido ningún trabajador',
         confirmButtonColor: 'var(--color-blue)',
-        didClose: () => {
-          if (rutconerror.length > 0) setarrerror(true);
-          setcuentagrabados(0);
-        },
+        didClose: () => rutconerror.length > 0 && setarrerror(true),
       });
     }
   };
@@ -527,13 +528,38 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 </div>
               </IfContainer>
               <IfContainer show={!pendiente || !loading}>
-                {datosPagina?.trabajadores?.length || 0 > 0 ? (
-                  <TablaTrabajadores
-                    handleDeleteTrabajador={handleDeleteTrabajador}
-                    handleEditTrabajador={handleEditTrabajador}
-                    idunidad={Number(idunidad)}
-                    trabajadores={datosPagina?.trabajadores || []}
-                  />
+                <div
+                  className="row"
+                  style={{ display: datosPagina?.trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
+                  <div className="col-md-3">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="...Búsqueda por Run"
+                      onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                        e.preventDefault();
+                        settrabajadores(
+                          datosPagina?.trabajadores.filter((trabajador) =>
+                            trabajador.ruttrabajador.includes(e.target.value),
+                          ) ||
+                            datosPagina?.trabajadores.filter((trabajador) =>
+                              trabajador.fechaafiliacion.toString().includes(e.target.value),
+                            ) ||
+                            [],
+                        );
+                      }}
+                    />
+                  </div>
+                </div>
+                {trabajadores.length || 0 > 0 ? (
+                  <>
+                    <TablaTrabajadores
+                      handleDeleteTrabajador={handleDeleteTrabajador}
+                      handleEditTrabajador={handleEditTrabajador}
+                      idunidad={Number(idunidad)}
+                      trabajadores={trabajadores || []}
+                    />
+                  </>
                 ) : (
                   <div className="text-center">
                     <b>No se han encontrado trabajadores</b>
