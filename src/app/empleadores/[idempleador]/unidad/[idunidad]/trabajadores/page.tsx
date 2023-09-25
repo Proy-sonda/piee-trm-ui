@@ -22,7 +22,6 @@ import 'animate.css';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
@@ -39,11 +38,9 @@ interface TrabajadoresPageProps {
 
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [unidad, setunidad] = useState('');
-  const [arrerror, setarrerror] = useState(false);
   const [cuentagrabados, setcuentagrabados] = useState<number>(0);
   const [textProgress, settextProgress] = useState('');
   const [spinnerCargar, setspinnerCargar] = useState(false);
-  const [rutconerror, setrutconerror] = useState<any[]>([]);
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
   const [trabajadores, settrabajadores] = useState<Trabajadores[]>([]);
   const [razon, setRazon] = useState('');
@@ -241,6 +238,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         });
         refrescarComponente();
         setLoading(false);
+        setValue('run', '');
       } else {
         setLoading(false);
         let msgError: string | boolean = await data.text();
@@ -262,7 +260,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     event.preventDefault();
 
     if (!getValues('file') || getValues('file')?.length === 0) return;
-    if (csvData.length == 0 || csvData == undefined) return;
+    // if (csvData.length == 0 || csvData == undefined) return;
     if (error.file)
       return Swal.fire({
         icon: 'error',
@@ -288,6 +286,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     setspinnerCargar(true);
     let recuento = 0;
     settextProgress('Cargando Trabajadores...');
+    let errRecuento = 0;
 
     for (let index = 0; index < csvData.length; index++) {
       const element = csvData[index];
@@ -299,20 +298,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             idunidad: Number(idunidad),
           },
         });
-
         if (data.ok) {
           recuento = ++recuento;
           setcuentagrabados((recuento / csvData.length) * 100);
         } else {
-          setrutconerror([
-            ...rutconerror,
-            {
-              rut: element,
-              error: (await data.text()).includes('trabajador ya existe')
-                ? 'Trabajador ya existe'
-                : 'Formato de rut',
-            },
-          ]);
+          errRecuento = ++errRecuento;
         }
       }
     }
@@ -321,13 +311,20 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       setspinnerCargar(false);
       Swal.fire({
         icon: 'success',
-        html: `Se han grabado ${recuento} trabajadores con éxito`,
+        html: `Se han grabado <b>${recuento} trabajadores</b> con éxito`,
         showConfirmButton: false,
         timer: 2000,
         didClose: () => {
-          if (rutconerror.length > 0) setarrerror(true);
+          if (recuento > 0) {
+            Swal.fire({
+              icon: 'info',
+              html: `Se encuentran <b>${errRecuento} trabajadores</b> ya registrados`,
+              confirmButtonColor: 'var(--color-blue)',
+            });
+          }
           setcuentagrabados(0);
           settextProgress('');
+          setValue('file', null);
         },
       });
       refrescarComponente();
@@ -335,9 +332,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       setspinnerCargar(false);
       Swal.fire({
         icon: 'info',
-        html: 'No se ha añadido ningún trabajador',
+        html: 'Los trabajadores ya se encuentran registrados',
         confirmButtonColor: 'var(--color-blue)',
-        didClose: () => rutconerror.length > 0 && setarrerror(true),
+        didClose: () => {
+          settextProgress('');
+          setValue('file', null);
+        },
       });
       settextProgress('');
     }
@@ -345,35 +345,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   return (
     <>
-      <Modal
-        show={arrerror}
-        onHide={() => {
-          setarrerror(false);
-        }}>
-        <Modal.Header closeButton>
-          <Modal.Title>Rut con errores</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Table className="table table-hover text-center">
-            <Thead>
-              <Tr>
-                <Th>RUT</Th>
-                <Th>ERROR</Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              {rutconerror.map((value: any) => (
-                <Tr key={value.rut}>
-                  <Td>{value.rut}</Td>
-                  <Td>{value.error}</Td>
-                </Tr>
-              ))}
-            </Tbody>
-          </Table>
-        </Modal.Body>
-        <Modal.Footer></Modal.Footer>
-      </Modal>
-
       <ProgressBarCustom show={spinnerCargar} text={textProgress} count={cuentagrabados} />
 
       <div className="bgads">
@@ -591,10 +562,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                         e.preventDefault();
                         settrabajadores(
                           datosPagina?.trabajadores.filter((trabajador) =>
-                            trabajador.ruttrabajador.includes(e.target.value),
+                            trabajador.ruttrabajador.includes(e.target.value.toUpperCase()),
                           ) ||
                             datosPagina?.trabajadores.filter((trabajador) =>
-                              trabajador.fechaafiliacion.toString().includes(e.target.value),
+                              trabajador.fechaafiliacion
+                                .toString()
+                                .includes(e.target.value.toUpperCase()),
                             ) ||
                             [],
                         );
