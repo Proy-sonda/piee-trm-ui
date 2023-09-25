@@ -3,7 +3,7 @@
 import { AuthContext } from '@/contexts';
 import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
-import { Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Dropdown } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import IfContainer from '../if-container';
 
@@ -42,30 +42,24 @@ const Usuario: React.FC = () => {
     <>
       <IfContainer show={datosUsuario}>
         <Dropdown>
-          <OverlayTrigger
-            placement="left"
-            delay={{ show: 250, hide: 100 }}
-            overlay={(props) => (
-              <Tooltip id="button-tooltip" {...props}>
-                {datosUsuario?.user.nombres + ' ' + datosUsuario?.user.apellidos}
-              </Tooltip>
-            )}>
-            <Dropdown.Toggle
-              variant="danger"
-              style={{ backgroundColor: 'transparent' }}
-              className="p-2 border-0">
-              <span
-                className="me-1 d-inline-flex align-items-center justify-content-center border border-white border-1 rounded-circle"
-                style={{
-                  backgroundColor: '#0063aeff',
-                  width: '40px',
-                  height: '40px',
-                  fontSize: '18px',
-                }}>
-                {calcularInicialesNombreUsuario()}
-              </span>
-            </Dropdown.Toggle>
-          </OverlayTrigger>
+          <Dropdown.Toggle
+            variant="danger"
+            style={{ backgroundColor: 'transparent' }}
+            className="p-2 border-0">
+            <span className="d-none d-lg-inline-block me-2">
+              {datosUsuario?.user.nombres + ' ' + datosUsuario?.user.apellidos}
+            </span>
+            <span
+              className="me-1 d-inline-flex align-items-center justify-content-center border border-white border-1 rounded-circle d-lg-none"
+              style={{
+                backgroundColor: '#0063aeff',
+                width: '40px',
+                height: '40px',
+                fontSize: '17px',
+              }}>
+              {calcularInicialesNombreUsuario()}
+            </span>
+          </Dropdown.Toggle>
 
           <Dropdown.Menu>
             <Dropdown.Item className="dropdown-item-text">

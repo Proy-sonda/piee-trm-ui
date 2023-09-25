@@ -9,6 +9,8 @@ import Usuario from './usuario';
 interface AppHeaderProps {}
 
 const AppHeader: React.FC<AppHeaderProps> = ({}) => {
+  const nombreCorto = 'Portal Tramitación';
+
   const { estaLogueado } = useContext(AuthContext);
 
   return (
@@ -27,18 +29,24 @@ const AppHeader: React.FC<AppHeaderProps> = ({}) => {
               <p className="m-0">Tramitación de Licencias Médicas</p>
             </div>
 
+            <IfContainer show={estaLogueado}>
+              <div className="d-block d-none d-sm-inline-block d-md-none text-center">
+                <p className={'m-0 ' + styles['spanheader']}>{nombreCorto}</p>
+              </div>
+            </IfContainer>
+
             <Usuario />
 
             <IfContainer show={!estaLogueado}>
               <div className="w-100 ms-4 d-block d-md-none text-left">
-                <p className={'m-0 ' + styles['spanheader']}>Portal Tramitación</p>
+                <p className={'m-0 ' + styles['spanheader']}>{nombreCorto}</p>
               </div>
             </IfContainer>
           </div>
 
           <IfContainer show={estaLogueado}>
-            <div className="w-100 pt-4 d-block d-md-none text-center">
-              <p className={'m-0 ' + styles['spanheader']}>Portal Tramitación</p>
+            <div className="w-100 pt-4 d-block d-sm-none text-center">
+              <p className={'m-0 ' + styles['spanheader']}>{nombreCorto}</p>
             </div>
           </IfContainer>
         </div>
