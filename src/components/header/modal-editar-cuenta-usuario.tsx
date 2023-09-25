@@ -32,8 +32,6 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
   const [verConfirmaClave, setVerConfirmaClave] = useState(false);
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
-  // TODO: Cargar datos del usuario
-
   const { datosUsuario } = useContext(AuthContext);
 
   const {
@@ -125,8 +123,6 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
 
         <form onSubmit={handleSubmit(editarCuentaUsuario)}>
           <Modal.Body>
-            {/* TODO: Agregar spinner mientras carga los datos del usuario y error */}
-
             <div className="row mt-2 g-3 align-items-baseline">
               <div className="col-12 col-lg-6 col-xl-3 position-relative">
                 <label className="form-label" htmlFor="rut">
@@ -271,7 +267,7 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
                 <label className="form-label" htmlFor="claveNueva">
                   Contraseña Nueva
                 </label>
-                <div className="input-group mb-3 position-relative">
+                <div className="input-group position-relative">
                   <input
                     id="claveNueva"
                     type={verNuevaClave ? 'text' : 'password'}
@@ -298,7 +294,7 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
                 <label className="form-label" htmlFor="confirmaClaveNueva">
                   Repetir Contraseña
                 </label>
-                <div className="input-group mb-3 position-relative">
+                <div className="input-group position-relative">
                   <input
                     id="confirmaClaveNueva"
                     type={verConfirmaClave ? 'text' : 'password'}
@@ -307,6 +303,11 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
                     {...register('confirmaClave', {
                       validate: (confirmaClave) => {
                         const claveNueva = getValues('claveNueva');
+
+                        if (claveNueva === '' && confirmaClave === '') {
+                          return;
+                        }
+
                         if (claveNueva !== confirmaClave) {
                           return 'Las contraseñas no coinciden';
                         }
@@ -334,13 +335,13 @@ const ModalEditarCuentaUsuario: React.FC<ModalEditarCuentaUsuarioProps> = ({
           </Modal.Body>
 
           <Modal.Footer>
-            <div className="w-100 d-flex flex-column flex-md-row flex-md-row-reverse">
+            <div className="w-100 d-flex flex-column flex-sm-row flex-sm-row-reverse">
               <button type="submit" className="btn btn-primary">
                 Grabar
               </button>
               <button
                 type="button"
-                className="btn btn-danger mt-2 mt-md-0 me-0 me-md-2"
+                className="btn btn-danger mt-2 mt-sm-0 me-0 me-sm-2"
                 onClick={handleCerrarModal}>
                 Volver
               </button>
