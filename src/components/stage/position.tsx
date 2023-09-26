@@ -37,7 +37,7 @@ const Position: React.FC<PositionProps> = ({}) => {
         {tabs.map((tab, index) => (
           <div
             key={index}
-            className={`py-2 col-12 col-md-3 ${esTabActiva(tab) && styles['tab-activa']}`}>
+            className={`py-1 col-12 col-md-3 ${esTabActiva(tab) && styles['tab-activa']}`}>
             <Link href={tab.href}>
               <label
                 className={`mt-2 form-label cursor-pointer ${styles['texto-inactivo']} ${
