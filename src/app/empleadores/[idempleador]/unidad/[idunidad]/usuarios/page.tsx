@@ -6,12 +6,13 @@ import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import React, { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { buscarEmpleadorPorId } from '../../../datos/(servicios)/buscar-empleador-por-id';
 import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
 import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
+import { UsuarioEmpleador } from './(modelos)/usuario-asociado';
 import { asociarUnidad } from './(servicios)/asociar-unidad';
 import { buscarUsuariosAsociado } from './(servicios)/buscar-usuario-asociado';
 import { eliminarUsuarioAsociado } from './(servicios)/eliminar-usuario-asociado';
@@ -31,6 +32,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
+  const [usuariosAsociados, setusuariosAsociados] = useState<UsuarioEmpleador[]>([]);
 
   useEffect(() => {
     const busquedaUnidad = async () => {
@@ -62,6 +64,23 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     },
     [refresh],
   );
+
+  useEffect(() => {
+    if (datosPagina?.usuarioAso == undefined) return;
+    setusuariosAsociados(datosPagina!?.usuarioAso);
+  }, [datosPagina?.usuarioAso]);
+
+  useEffect(() => {
+    setusuarios(
+      usuarios.filter(
+        (usuario) =>
+          usuario.idusuario !==
+          usuariosAsociados.find(
+            (usuarioAsociado) => usuarioAsociado.usuario.idusuario == usuario.idusuario,
+          )?.usuario.idusuario,
+      ),
+    );
+  }, [usuariosAsociados]);
 
   const [formIni, setformIni] = useState<formUsrUnd>({
     idempleador: 0,
@@ -154,6 +173,9 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         icon: 'error',
         html: 'Error en eliminación, verifique los datos correctamente',
       });
+    } finally {
+      refrescarComponente();
+      window.location.href = document.referrer;
     }
   };
 
@@ -196,9 +218,19 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                   <option value={''}>Seleccionar</option>
                   {usuarios?.length || 0 > 0 ? (
                     usuarios.map(({ idusuario, rutusuario, nombres }) => (
-                      <option key={idusuario} value={idusuario} data-tokens={rutusuario}>
-                        {rutusuario} / {nombres}
-                      </option>
+                      <Fragment key={idusuario}>
+                        {datosPagina?.usuarioAso.find(
+                          (useraso) => useraso.usuario.idusuario === idusuario,
+                        ) ? (
+                          <Fragment key={Math.random()}></Fragment>
+                        ) : (
+                          <>
+                            <option key={Math.random()} value={idusuario} data-tokens={rutusuario}>
+                              {rutusuario} / {nombres}
+                            </option>
+                          </>
+                        )}
+                      </Fragment>
                     ))
                   ) : (
                     <></>
@@ -217,10 +249,6 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         <div className="row mt-3 text-center">
           <h5>Usuarios</h5>
           <div className="col-md-12 col-sm-12 col-xl-12">
-            <IfContainer show={!pendiente && err.length > 0}>
-              <h4 className="mt-4 mb-5 text-center">Error al buscar usuarios</h4>
-            </IfContainer>
-
             <IfContainer show={pendiente}>
               <div className="mb-5">
                 <LoadingSpinner titulo="Cargando usuarios..." />
@@ -228,8 +256,24 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
             </IfContainer>
 
             <IfContainer show={!pendiente && err.length === 0}>
+              <div className="row mb-2">
+                <div className="col-md-4">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="...Buscar por RUN"
+                    onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                      setusuariosAsociados(
+                        datosPagina?.usuarioAso.filter(({ usuario }) =>
+                          usuario.rutusuario.includes(e.target.value),
+                        ) || [],
+                      );
+                    }}
+                  />
+                </div>
+              </div>
               <TableUsuariosAsociados
-                usuarioAsociado={datosPagina?.usuarioAso ?? []}
+                usuarioAsociado={usuariosAsociados ?? []}
                 handleDelete={handleDelete}
               />
             </IfContainer>
