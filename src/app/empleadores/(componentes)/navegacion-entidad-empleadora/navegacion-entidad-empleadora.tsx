@@ -50,7 +50,7 @@ const NavegacionEntidadEmpleadora: React.FC<NavegacionEntidadEmpleadoraProps> = 
 
   return (
     <>
-      <div className="mt-1 mt-md-3">
+      <div>
         <div className="d-flex flex-column d-md-none">
           {links.map((link, index) => (
             <Link

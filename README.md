@@ -12,6 +12,9 @@
   - [Estructura por pantalla](#estructura-por-pantalla)
   - [¿Como refactorizar?](#como-refactorizar)
 - [Convenciones de código](#convenciones-de-código)
+  - [Nombres de archivos](#nombres-de-archivos)
+  - [Nombres de variables y funciones](#nombres-de-variables-y-funciones)
+  - [¿Donde poner estilos?](#donde-poner-estilos)
 - [TODO: Scripts](#todo-scripts)
 - [TODO: Branches](#todo-branches)
 
@@ -103,7 +106,7 @@ En caso de querer utilizar codigo en carpetas hermanas, por ejemplo, si `/path_1
 
 ## Convenciones de código
 
-**Nombres de archivos**:
+### Nombres de archivos
 
 - Todo en minúscula, separado por un guión (`-`) cuando tiene más de una palabra.
 - No usar abreviaciones en las palabras individuales, a menos que sea algo de conocimiento general como RRHH para recursos humanos.
@@ -116,7 +119,7 @@ En caso de querer utilizar codigo en carpetas hermanas, por ejemplo, si `/path_1
 | `trabajador.ts`                | `itrabajador.ts`       |
 | `tabla-licencias-vencidas.tsx` | `TablaLicVen.tsx`      |
 
-**Nombres de variables y funciones**:
+### Nombres de variables y funciones
 
 - Usar camel case con la primera letra en minúscula.
 - No usar abreviaciones en las palabras individuales, a menos que sea algo de conocimiento general como RRHH para recursos humanos.
@@ -127,6 +130,13 @@ En caso de querer utilizar codigo en carpetas hermanas, por ejemplo, si `/path_1
 | `buscarEmpleadorPorId`  | `buscarEmpId`           |
 | `actividadesLaborales`  | `actLab`                |
 | `sistemaDeRemuneracion` | `sistemaderemuneracion` |
+
+### ¿Donde poner estilos?
+
+Hay 2 opciones para poner los estilos
+
+1. En un archivo `X.module.css` si los estilos aplican a un solo componente especifico.
+2. En el archivo `src\app\globals.css` **_SOLO SI_** aplica para 2 o más componentes.
 
 ## TODO: Scripts
 

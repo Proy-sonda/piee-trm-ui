@@ -1,5 +1,6 @@
 'use client';
 
+import AppFooter from '@/components/footer/footer';
 import AppHeader from '@/components/header/header';
 import { AuthProvider, InscribeProvider, StepProvider } from '@/contexts';
 import { EmpleadorProvider } from '@/contexts/empleador-context';
@@ -35,25 +36,7 @@ export default function RootLayout(
 
                 <main>{children}</main>
 
-                <footer>
-                  <div className="footer-background">
-                    <div className="footer-top"></div>
-                    <div className="row" style={{ height: '125px' }}>
-                      <div className="col-12">
-                        <div className="footer-content">
-                          <div className="contact">
-                            <p>Para soporte comunicarse a:</p>
-                            <span>Teléfono:</span>&nbsp;<a href="tel:+56227149554">+56227149554</a>{' '}
-                            - <span>Email:</span>{' '}
-                            <a href="mailto:soportempleador@fonasa.gov.cl">
-                              soportempleador@fonasa.gov.cl
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </footer>
+                <AppFooter />
               </body>
 
               <script
