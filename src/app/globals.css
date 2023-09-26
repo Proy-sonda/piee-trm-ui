@@ -6,10 +6,8 @@
 body {
   background: #e6e6e6 !important;
   color: #5f5f5f !important;
-  padding-left: 2%;
-  padding-right: 2%;
-  margin-left: 2%;
-  margin-right: 2%;
+  padding: 0 2%;
+  margin: 0 2%;
 }
 
 main {
@@ -20,96 +18,12 @@ label {
   font-size: 14px;
 }
 
-.gobCLBold {
-  font-weight: bold;
-}
-
-.gobimg {
-  width: 45%;
-  border-radius: 50%;
-  margin: 4px;
-}
-
-.pgobcl {
-  align-self: center;
-  align-content: center;
-}
-
-.gobrad {
-  width: 85%;
-  /* margin-left: 4%; */
-  /* border: 2px solid #ebf5ff; */
-  /* background-color: #001c41 !important; */
-  border-radius: 15px;
-  font-weight: bold;
-  /* padding: 4px; */
-}
-
 a {
   text-decoration: none;
-  /* color: rgb(14, 11, 11) !important; */
 }
+
 a:hover {
   text-decoration: none;
-}
-
-footer {
-  padding-top: 30px;
-  position: relative;
-  bottom: 0%;
-}
-
-.footer-content {
-  padding: 30px 15px 40px 15px;
-  font-size: 12px;
-  color: black;
-}
-
-.footer-content .contact {
-  font-size: 16px;
-  text-align: center;
-}
-.footer-content .contact span {
-  font-weight: bold;
-}
-.footer-content .contact a {
-  color: #225f9d !important;
-}
-
-.footer-background {
-  /* background-image: url(../img/fondo_footer.png); */
-  background-position: 30px bottom;
-  background-repeat: no-repeat;
-  background-color: white;
-}
-
-.footer-top {
-  border-bottom: 2px solid #1069b3;
-  margin-left: 0px;
-  margin-right: 0px;
-}
-
-.footer-top:after {
-  content: '';
-  display: block;
-  border-bottom: 2px solid #e23c4b;
-  margin-bottom: -2px;
-  max-width: 50%;
-}
-
-.footer-title {
-  color: #5f5f5f;
-  color: var(--color-darkgrey);
-}
-
-.footer-text {
-  color: #9b9b9b;
-  color: var(--color-grey);
-}
-
-.disabledbutton {
-  pointer-events: none;
-  /* opacity: 0.4; */
 }
 
 table {
@@ -119,27 +33,32 @@ table {
 table tbody tr td div a {
   font-size: 14px !important;
 }
+
 table tbody tr td div button {
   font-size: 14px !important;
-}
-
-.col-md-3 a label {
-  color: black;
 }
 
 .btn-primary {
   background-color: var(--color-blue) !important;
 }
 
-.font-sm {
+/* ELIMINABLE */
+/* .font-sm {
   font-size: 11.5px !important;
-}
+} */
 
-a {
-  text-decoration: none !important;
-}
+/* ELIMINABLE */
+/* .disabledbutton {
+  pointer-events: none;
+} */
 
-.spannum {
+/* ELIMINABLE */
+/* .col-md-3 a label {
+  color: red;
+} */
+
+/* ELIMINABLE */
+/* .spannum {
   border-radius: 50%;
   width: 50px;
   height: 50px;
@@ -150,60 +69,53 @@ a {
   margin-top: 14px;
   margin-bottom: 14px;
   display: inline-block;
-}
+} */
 
 .bgads {
   background-color: white;
-  /* padding-left: 10px; */
   box-shadow: 100px;
+  margin-bottom: 10px;
+  /* padding-left: 10px; */
   /* margin-right: 5%; */
   /* padding-right: 10px; */
-  margin-bottom: 10px;
   /* height: 400px; */
 }
 
-.spantext {
+/* ELIMINABLE */
+/* .spantext {
   margin-left: 20px;
   margin-bottom: 30px;
   color: var(--color-blue);
   font-size: 24px;
-}
+} */
 
-.btngob {
+/* ELIMINABLE */
+/* .btngob {
   border: 1px solid var(--color-blue);
   background-color: var(--color-blue);
   color: white;
   width: 100%;
   height: 100%;
   border-radius: 2%;
-}
+} */
 
-.parr {
+/* ELIMINABLE */
+/* .parr {
   text-align: justify !important;
-}
+} */
 
-.spinner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(
-    223,
-    217,
-    217,
-    0.5
-  ); /* Fondo semi-transparente para difuminar el contenido */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
+/* ELIMINABLE */
+/* .blur {
+  filter: blur(5px);
+} */
 
-.blur {
-  filter: blur(5px); /* Aplica un desenfoque de 5px al elemento principal de la página */
+/********************************* UTILIDADES *********************************/
+.cursor-pointer {
+  cursor: pointer !important;
 }
+/******************************* END UTILIDADES *******************************/
 
+/************************ react-super-responsive-table ************************/
 /* inspired by: https://css-tricks.com/responsive-data-tables/ */
 .responsiveTable {
   width: 100%;
@@ -264,11 +176,7 @@ a {
     font-weight: 600;
   }
 }
-
-/* Utilidades */
-.cursor-pointer {
-  cursor: pointer !important;
-}
+/********************** END react-super-responsive-table **********************/
 
 .progress_bar {
   position: fixed;
@@ -286,10 +194,9 @@ a {
   justify-content: center;
   align-items: center;
   z-index: 9999;
-  
 }
 
-.progress_bar .progres{
+.progress_bar .progres {
   background-color: white;
   padding: 2%;
   border-radius: 2px 2px 2px 2px;
@@ -298,13 +205,10 @@ a {
   left: 40%;
   z-index: 5000000;
   width: 25%;
-  
 }
 
 .progress_bar p {
   font-weight: bold;
   text-align: center;
   padding-top: 2%;
-  
 }
-
