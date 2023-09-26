@@ -15,7 +15,8 @@ export const ProgressBarCustom: React.FC<props> = ({ show, text, count }) => {
           display: show ? 'block' : 'none',
         }}>
         <div className="progres">
-          <p>{text}</p>
+          <p className="d-none d-sm-block">{text}</p>
+          <p className="d-block d-sm-none">Cargando</p>
           <ProgressBar animated now={count} label={`${count.toFixed(1)}%`} />
         </div>
       </div>

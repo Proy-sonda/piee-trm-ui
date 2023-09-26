@@ -352,13 +352,14 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           </div>
 
           <div className="row mt-2">
-            <div className="col-md-6 col-xs-12">
+            <div className="col-md-5 col-xs-12">
               <h5>Cargar Trabajadores</h5>
               <sub style={{ color: 'blue' }}>Agregar RUN persona Trabajadora</sub>
-
               <br />
+              <br />
+
               <form onSubmit={handleAddTrabajador}>
-                <div className="row mt-2">
+                <div className="row mt-1">
                   <div className="col-md-8 position-relative">
                     <input
                       id="run"
@@ -406,6 +407,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       <div className="invalid-tooltip">Debe ingresar un RUT valido</div>
                     </IfContainer>
                   </div>
+                  <div className="d-block d-sm-none d-md-none d-xs-block">
+                    <div className="col-md-12">
+                      <br />
+                    </div>
+                  </div>
                   <div
                     className="col-md-4"
                     style={{
@@ -420,13 +426,17 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 </div>
               </form>
             </div>
-            <br />
+            <div className="d-block d-sm-none d-md-none">
+              <div className="col-md-12">
+                <br />
+              </div>
+            </div>
 
-            <div className="col-md-6 col-xs-12">
+            <div className="col-md-7 col-xs-12">
               <h5>Cargar Nómina</h5>
-              <sub>
-                Para poder cargar trabajadores de la unidad <b>{unidad}</b>, solo tiene que
-                seleccionar un archivo (formato CSV) según el{' '}
+              <sub className="d-inline d-sm-none d-xl-inline">
+                Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo tiene
+                que seleccionar un archivo (formato CSV) según el{' '}
                 <a
                   className={styles['span-link']}
                   download="formato.csv"
@@ -434,7 +444,16 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                   siguiente formato
                 </a>
               </sub>
-              <div className="row mt-3">
+              <sub className="d-none d-sm-inline d-xl-none">
+                Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
+                <a
+                  className={styles['span-link']}
+                  download="formato.csv"
+                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                  siguiente formato
+                </a>
+              </sub>
+              <div className="row mt-4">
                 <div className="col-md-6 position-relative">
                   <input
                     type="file"
@@ -483,7 +502,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                     <div className="invalid-tooltip">Debe ingresar un archivo con formato .csv</div>
                   </IfContainer>
                 </div>
-
+                <div className="d-block d-sm-none d-md-none">
+                  <div className="col-md-12">
+                    <br />
+                  </div>
+                </div>
                 <div className="col-md-6 col-xs-6">
                   <div className="d-grid gap-2 d-md-flex">
                     <button
