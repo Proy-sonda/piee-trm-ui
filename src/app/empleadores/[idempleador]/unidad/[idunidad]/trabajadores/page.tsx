@@ -570,7 +570,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               </IfContainer>
               <IfContainer show={!pendiente || !loading}>
                 <div
-                  className="row"
+                  className="row mb-2"
                   style={{ display: datosPagina?.trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
                   <div className="col-md-3">
                     <input
@@ -597,6 +597,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 {trabajadores.length || 0 > 0 ? (
                   <>
                     <TablaTrabajadores
+                      unidad={unidad}
                       handleDeleteTrabajador={handleDeleteTrabajador}
                       handleEditTrabajador={handleEditTrabajador}
                       idunidad={Number(idunidad)}
