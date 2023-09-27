@@ -14,7 +14,7 @@ const Titulo: React.FC<TituloProps> = ({ children, url }) => {
       <div className={`my-4 ${styles.stagepue}`}>
         <div className="pb-2 border-bottom d-flex align-items-center justify-content-between flex-wrap">
           <div>{children}</div>
-          <div className="d-none d-sm-block">
+          <div className="d-none d-sm-block d-md-none">
             <Link href={url} target="_blank">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +28,7 @@ const Titulo: React.FC<TituloProps> = ({ children, url }) => {
               </svg>
             </Link>
           </div>
-          <div className="d-block d-sm-none ms-auto">
+          <div className="d-block d-sm-none d-md-block ms-auto">
             <Link href={url} target="_blank">
               <svg
                 xmlns="http://www.w3.org/2000/svg"

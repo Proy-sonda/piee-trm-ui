@@ -352,7 +352,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           </div>
 
           <div className="row mt-2">
-            <div className="col-md-5 col-xs-12">
+            <div className="col-md-12 col-xs-12 col-lg-5">
               <h5>Cargar Trabajadores</h5>
               <sub style={{ color: 'blue' }}>Agregar RUN persona Trabajadora</sub>
               <br />
@@ -432,7 +432,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               </div>
             </div>
 
-            <div className="col-md-7 col-xs-12">
+            <div className="d-none d-md-inline d-lg-none col-md-12">
+              <div className="col-md-12">
+                <br />
+              </div>
+            </div>
+
+            <div className="col-md-12 col-xs-12 col-lg-7">
               <h5>Cargar Nómina</h5>
               <sub className="d-inline d-sm-none d-xl-inline">
                 Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo tiene
