@@ -26,6 +26,7 @@ import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
 import { buscarEmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(servicios)/buscar-empleador-por-id';
+import exportFromJSON from 'export-from-json';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
 
@@ -290,7 +291,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     setspinnerCargar(true);
     let recuento = 0;
+    let recuentoError = 0;
     settextProgress('Cargando Trabajadores...');
+    let rutagregados: any[] = [];
 
     for (let index = 0; index < csvData.length; index++) {
       const element = csvData[index];
@@ -305,24 +308,47 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         if (data.ok) {
           setcuentagrabados((recuento / csvData.length) * 100);
         } else {
+          setcuentagrabados((recuento / csvData.length) * 100);
+          recuentoError = ++recuentoError;
+          rutagregados = [...rutagregados, element];
         }
       }
     }
 
-    if (recuento > 0) {
+    if (recuento - recuentoError > 0) {
       setspinnerCargar(false);
       Swal.fire({
         icon: 'success',
-        html: `Se han grabado <b>${recuento} trabajadores</b> con éxito`,
+        html: `Se ha grabado <b>${
+          recuento - recuentoError
+        } persona(s) trabajadora(s)</b> con éxito`,
         showConfirmButton: false,
         timer: 2000,
-        didClose: () => {
+        didClose: async () => {
           setcuentagrabados(0);
           settextProgress('');
           setValue('file', null);
+          if (!(recuentoError > 0)) return;
+          const resp = await Swal.fire({
+            icon: 'info',
+            html: `<p>Existen personas trabajadoras ya registradas en una unidad.</p>
+                  <b>¿Desea verificar los rut asociados a otra unidad?</b>`,
+            confirmButtonColor: 'var(--color-blue)',
+            confirmButtonText: 'Sí',
+            showDenyButton: true,
+            denyButtonText: 'No',
+            denyButtonColor: 'var(--bs-danger)',
+          });
+
+          if (resp.isDenied || resp.isDismissed) return;
+
+          exportFromJSON({
+            data: rutagregados.map((value) => ({ ['']: value })),
+            fileName: `rut-ya-con-unidad`,
+            exportType: 'csv',
+          });
         },
       });
-      refrescarComponente();
     } else {
       setspinnerCargar(false);
       Swal.fire({
