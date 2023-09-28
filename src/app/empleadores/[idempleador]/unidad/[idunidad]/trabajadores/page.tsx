@@ -86,14 +86,14 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       };
       busquedaUnidadEmpleador();
     }
-  }, [datosPagina?.empleador]);
+  }, [datosPagina?.empleador || refresh]);
 
   useEffect(() => {
     if (datosPagina?.trabajadores != undefined) {
       settrabajadores(datosPagina!?.trabajadores);
       setRazon(datosPagina!?.empleador!?.razonsocial);
     }
-  }, [datosPagina?.trabajadores]);
+  }, [datosPagina?.trabajadores || refresh]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 
@@ -325,6 +325,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         showConfirmButton: false,
         timer: 2000,
         didClose: async () => {
+          refrescarComponente();
           setcuentagrabados(0);
           settextProgress('');
           setValue('file', null);
@@ -350,6 +351,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         },
       });
     } else {
+      refrescarComponente();
       setspinnerCargar(false);
       Swal.fire({
         icon: 'info',
