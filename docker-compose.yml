@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_ADS_URL=${NEXT_PUBLIC_ADS_URL}
+        - NEXT_PUBLIC_THRESHOLD_ALERTA_EXPIRA_SESION_MS=${NEXT_PUBLIC_THRESHOLD_ALERTA_EXPIRA_SESION_MS}
+    ports:
+      - 3103:3005
