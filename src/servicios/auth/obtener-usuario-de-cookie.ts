@@ -2,7 +2,7 @@ import { UsuarioToken } from '@/modelos/usuario';
 import { obtenerToken } from '.';
 
 /**
- * Obtiene los datos del usuario del token o `null` si no hay token.
+ * Restaura al usuario del token guardado en la cookie o `null` si no hay token.
  *
  * **ADVERTENCIA**: Solo funciona en frontend.
  */
