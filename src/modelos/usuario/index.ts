@@ -1,2 +1,2 @@
 export * from './token-autenticacion';
-export * from './usuario';
+export * from './usuario-token';

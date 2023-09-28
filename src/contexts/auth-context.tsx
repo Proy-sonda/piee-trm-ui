@@ -1,8 +1,13 @@
 'use client';
 
 import { useUrl } from '@/hooks/use-url';
-import { UserData } from '@/modelos/user-data';
-import { desloguearUsuario, loguearUsuario, obtenerUserData, renovarToken } from '@/servicios/auth';
+import { UsuarioToken } from '@/modelos/usuario';
+import {
+  desloguearUsuario,
+  loguearUsuario,
+  obtenerUsuarioDeCookie,
+  renovarToken,
+} from '@/servicios/auth';
 import { thresholdAlertaExpiraSesion } from '@/servicios/environment';
 import { useRouter } from 'next/navigation';
 import { ReactNode, createContext, useEffect, useState } from 'react';
@@ -10,14 +15,14 @@ import Swal from 'sweetalert2';
 
 type AuthContextType = {
   estaLogueado: boolean;
-  datosUsuario?: UserData;
-  login: (rut: string, clave: string) => Promise<UserData>;
+  usuario?: UsuarioToken;
+  login: (rut: string, clave: string) => Promise<UsuarioToken>;
   logout: () => Promise<void>;
 };
 
 export const AuthContext = createContext<AuthContextType>({
   estaLogueado: false,
-  datosUsuario: undefined,
+  usuario: undefined,
   login: async () => ({}) as any,
   logout: async () => {},
 });
@@ -27,7 +32,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [estaLogueado, setEstaLogueado] = useState(false);
 
-  const [datosUsuario, setDatosUsuario] = useState<UserData | undefined>(undefined);
+  const [usuario, setUsuario] = useState<UsuarioToken | undefined>(undefined);
 
   const [mostrarAlertaExpiraSesion, setMostrarAlertaExpiraSesion] = useState(false);
 
@@ -35,37 +40,29 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Recargar usuario del token
   useEffect(() => {
-    const userData = obtenerUserData();
-    if (!userData) {
+    const usuario = obtenerUsuarioDeCookie();
+    if (!usuario) {
       return;
     }
 
-    setDatosUsuario(userData);
-
-    setMostrarAlertaExpiraSesion(true);
-
-    setEstaLogueado(true);
+    onLoginExitoso(usuario);
   }, []);
 
   // Alerta de expiracion de sesion
   useEffect(() => {
     let idTimeoutAlerta: NodeJS.Timeout | undefined;
     let idTimerTiempoRestante: NodeJS.Timer | undefined;
-    const datosUsuario = obtenerUserData();
+    const usuario = obtenerUsuarioDeCookie();
 
     const activarAlertaDeExpiracionDeSesion = () => {
       clearTimeout(idTimeoutAlerta);
 
-      if (!datosUsuario) {
+      if (!usuario) {
         return;
       }
 
-      /* Nota: El punto de referencia tiene que ser Date.now() y no datosUsuario.iat para que al
-       * ingresar por URL despues de creada la sesion muestre la alerta antes de que venza la
-       * sesion, es posible que muestre la alerta una vez que la sesion haya vencido y la cookie
-       * eliminada del navegador. */
-      const tokenExpiraEn = datosUsuario.exp * 1000 - Date.now();
-      const tiempoParaMostrarAlerta = tokenExpiraEn - thresholdAlertaExpiraSesion();
+      // prettier-ignore
+      const tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
       if (tiempoParaMostrarAlerta < 0) {
         logout(); // por si acaso
         const searchParams = new URLSearchParams({ redirectTo: fullPath });
@@ -105,7 +102,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
           if (isConfirmed) {
             try {
-              await renovarToken();
+              const usuarioRenovado = await renovarToken();
+
+              onLoginExitoso(usuarioRenovado);
 
               activarAlertaDeExpiracionDeSesion();
             } catch (error) {
@@ -120,7 +119,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
                 showCancelButton: true,
               });
 
-              setDatosUsuario(undefined);
+              setUsuario(undefined);
 
               router.push('/');
             }
@@ -147,15 +146,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [mostrarAlertaExpiraSesion]);
 
   const login = async (rut: string, clave: string) => {
-    const datosUsuario = await loguearUsuario(rut, clave);
+    const usuario = await loguearUsuario(rut, clave);
 
-    setDatosUsuario(datosUsuario);
+    onLoginExitoso(usuario);
 
-    setMostrarAlertaExpiraSesion(true);
-
-    setEstaLogueado(true);
-
-    return datosUsuario;
+    return usuario;
   };
 
   const logout = async () => {
@@ -164,7 +159,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } catch (error) {
       console.error('ERROR EN LOGOUT: ', error);
     } finally {
-      setDatosUsuario(undefined);
+      setUsuario(undefined);
 
       setMostrarAlertaExpiraSesion(false);
 
@@ -172,11 +167,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const onLoginExitoso = (nuevoUsuario: UsuarioToken) => {
+    setUsuario(nuevoUsuario);
+
+    setMostrarAlertaExpiraSesion(true);
+
+    setEstaLogueado(true);
+  };
+
   return (
     <AuthContext.Provider
       value={{
         estaLogueado,
-        datosUsuario,
+        usuario,
         login,
         logout,
       }}>

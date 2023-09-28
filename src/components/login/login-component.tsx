@@ -50,7 +50,7 @@ export const LoginComponent: React.FC<{}> = () => {
 
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
     try {
-      const datosUsuario = await login(rut, clave);
+      const usuario = await login(rut, clave);
 
       return Swal.fire({
         html: 'Sesión iniciada correctamente',
@@ -58,14 +58,11 @@ export const LoginComponent: React.FC<{}> = () => {
         timer: 2000,
         showConfirmButton: false,
         didClose: () => {
-          const rutaRedireccion =
-            datosUsuario.user.rol.idrol === 1 ? '/empleadores' : '/tramitacion';
+          const rutaRedireccion = usuario.tieneRol('admin') ? '/empleadores' : '/tramitacion';
 
           const redirectPath = searchParams.get('redirectTo');
           const redirectTo =
-            redirectPath &&
-            redirectPath.startsWith('/empleadores') &&
-            datosUsuario.user.rol.idrol !== 1
+            !redirectPath || (redirectPath.startsWith('/empleadores') && !usuario.tieneRol('admin'))
               ? null
               : redirectPath;
 
