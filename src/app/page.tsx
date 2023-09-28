@@ -22,7 +22,7 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
 
   useEffect(() => {
     if (estaLogueado() && !searchParams.redirectTo) {
-      router.push('/empleadores');
+      router.push('/tramitacion');
     }
   }, []);
 
