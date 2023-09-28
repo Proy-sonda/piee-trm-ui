@@ -382,7 +382,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="row mt-2">
             <div className="col-md-12 col-xs-12 col-lg-5">
               <h5>Cargar Personas Trabajadoras</h5>
-              <sub style={{ color: 'blue' }}>Agregar RUN persona Trabajadora</sub>
+              <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
               <br />
               <br />
 
