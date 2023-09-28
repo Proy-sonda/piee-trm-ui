@@ -1,4 +1,5 @@
 import { esTokenValido } from '@/servicios/auth';
+import jwt_decode from 'jwt-decode';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export const config = {
@@ -23,6 +24,16 @@ export async function middleware(request: NextRequest) {
 
   if (!tokenFueValidado) {
     return redirigirAlLogin(request);
+  }
+
+  // Verificar que tenga permisos
+  const tokenDecodificado = jwt_decode<any>(tokenCookie.value);
+
+  if (
+    tokenDecodificado.user.rol.idrol !== 1 &&
+    request.nextUrl.pathname.startsWith('/empleadores')
+  ) {
+    return NextResponse.rewrite(new URL(`/errores/403`, request.url));
   }
 
   // OK
