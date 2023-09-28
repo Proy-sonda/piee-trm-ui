@@ -50,14 +50,27 @@ export const LoginComponent: React.FC<{}> = () => {
 
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
     try {
-      await login(rut, clave);
+      const datosUsuario = await login(rut, clave);
 
       return Swal.fire({
         html: 'Sesión iniciada correctamente',
         icon: 'success',
         timer: 2000,
         showConfirmButton: false,
-        didClose: () => router.push(searchParams.get('redirectTo') ?? '/empleadores'),
+        didClose: () => {
+          const rutaRedireccion =
+            datosUsuario.user.rol.idrol === 1 ? '/empleadores' : '/tramitacion';
+
+          const redirectPath = searchParams.get('redirectTo');
+          const redirectTo =
+            redirectPath &&
+            redirectPath.startsWith('/empleadores') &&
+            datosUsuario.user.rol.idrol !== 1
+              ? null
+              : redirectPath;
+
+          router.push(redirectTo ?? rutaRedireccion);
+        },
       });
     } catch (error) {
       let messageError = '';
