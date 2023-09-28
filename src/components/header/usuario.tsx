@@ -8,7 +8,7 @@ import Swal from 'sweetalert2';
 import IfContainer from '../if-container';
 
 const Usuario: React.FC = () => {
-  const { datosUsuario, logout } = useContext(AuthContext);
+  const { usuario, logout } = useContext(AuthContext);
 
   const router = useRouter();
 
@@ -24,31 +24,15 @@ const Usuario: React.FC = () => {
     }
   };
 
-  const calcularInicialesNombreUsuario = () => {
-    if (!datosUsuario) {
-      return '';
-    }
-
-    const nombreUsuario = datosUsuario.user.nombres.trim();
-    const apellidosUsuario = datosUsuario.user.apellidos.trim();
-
-    const inicialNombre = nombreUsuario === '' ? '' : nombreUsuario[0].toUpperCase();
-    const inicialApellido = apellidosUsuario === '' ? '' : apellidosUsuario[0].toUpperCase();
-
-    return inicialNombre + inicialApellido;
-  };
-
   return (
     <>
-      <IfContainer show={datosUsuario}>
+      <IfContainer show={usuario}>
         <Dropdown>
           <Dropdown.Toggle
             variant="danger"
             style={{ backgroundColor: 'transparent' }}
             className="p-2 border-0">
-            <span className="d-none d-lg-inline-block me-2">
-              {datosUsuario?.user.nombres + ' ' + datosUsuario?.user.apellidos}
-            </span>
+            <span className="d-none d-lg-inline-block me-2">{usuario?.nombreCompleto() ?? ''}</span>
             <span
               className="me-1 d-inline-flex align-items-center justify-content-center border border-white border-1 rounded-circle d-lg-none"
               style={{
@@ -57,7 +41,7 @@ const Usuario: React.FC = () => {
                 height: '40px',
                 fontSize: '17px',
               }}>
-              {calcularInicialesNombreUsuario()}
+              {usuario?.iniciales() ?? ''}
             </span>
           </Dropdown.Toggle>
 
@@ -65,11 +49,11 @@ const Usuario: React.FC = () => {
             <Dropdown.Item className="dropdown-item-text">
               <div>
                 <small>
-                  <b>{datosUsuario?.user.nombres + ' ' + datosUsuario?.user.apellidos}</b>
+                  <b>{usuario?.nombreCompleto() ?? ''}</b>
                 </small>
               </div>
               <div>
-                <small>{datosUsuario?.user.email}</small>
+                <small>{usuario?.email ?? ''}</small>
               </div>
             </Dropdown.Item>
             <Dropdown.Divider />

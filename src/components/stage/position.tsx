@@ -11,7 +11,7 @@ type PositionProps = {
    * @deprecated
    * Ya no es necesario, se puede borrar sin problema
    */
-  position: number;
+  position?: number;
 };
 
 type Tab = {
@@ -22,7 +22,7 @@ type Tab = {
 const Position: React.FC<PositionProps> = ({}) => {
   const [tabs, setTabs] = useState<Tab[]>([]);
 
-  const { datosUsuario } = useContext(AuthContext);
+  const { usuario } = useContext(AuthContext);
 
   const pathname = usePathname();
 
@@ -33,12 +33,12 @@ const Position: React.FC<PositionProps> = ({}) => {
       { href: '/consultas', titulo: 'Consultas' },
     ];
 
-    if (datosUsuario && datosUsuario.user.rol.idrol === 1) {
+    if (usuario && usuario.tieneRol('admin')) {
       tabsUsuario.push({ href: '/empleadores', titulo: 'Entidades Empleadoras' });
     }
 
     setTabs(tabsUsuario);
-  }, [datosUsuario]);
+  }, [usuario]);
 
   const esTabActiva = (tab: Tab) => {
     return pathname.startsWith(tab.href);

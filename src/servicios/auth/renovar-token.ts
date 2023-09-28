@@ -1,14 +1,13 @@
-import { UserData } from '@/modelos/user-data';
+import { UsuarioToken } from '@/modelos/usuario';
 import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import jwt_decode from 'jwt-decode';
 import { setCookie } from 'nookies';
 import { obtenerToken } from './obtener-token';
 
 /**
- * Refresca el token de autenticacion y lo guarda
+ * Refresca el token de autenticacion y refresca la cookie con el token
  */
-export const renovarToken = async (): Promise<string> => {
+export const renovarToken = async (): Promise<UsuarioToken> => {
   const token = await runFetchConThrow<string>(
     `${apiUrl()}/auth/refresh`,
     {
@@ -22,10 +21,9 @@ export const renovarToken = async (): Promise<string> => {
     },
   );
 
-  const tokenDecodificado = jwt_decode(token.substring('Bearer '.length)) as UserData;
-  const maxAge = tokenDecodificado.exp - tokenDecodificado.iat;
+  const usuario = UsuarioToken.fromToken(token);
 
-  setCookie(null, 'token', token, { maxAge, path: '/' });
+  setCookie(null, 'token', token, { maxAge: usuario.vigenciaToken(), path: '/' });
 
-  return token;
+  return usuario;
 };

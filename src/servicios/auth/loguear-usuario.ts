@@ -1,7 +1,6 @@
-import { UserData } from '@/modelos/user-data';
+import { UsuarioToken } from '@/modelos/usuario';
 import { apiUrl } from '@/servicios/environment';
 import { HttpError, runFetchConThrow } from '@/servicios/fetch';
-import jwt_decode from 'jwt-decode';
 import { setCookie } from 'nookies';
 
 export class RutInvalidoError extends Error {}
@@ -17,7 +16,7 @@ export class UsuarioNoExisteError extends Error {}
  *
  * Setea cookie con el token de autenticacion
  */
-export const loguearUsuario = async (rut: string, clave: string): Promise<UserData> => {
+export const loguearUsuario = async (rut: string, clave: string): Promise<UsuarioToken> => {
   try {
     const token = await runFetchConThrow<string>(
       `${apiUrl()}/auth/login`,
@@ -36,12 +35,14 @@ export const loguearUsuario = async (rut: string, clave: string): Promise<UserDa
       },
     );
 
-    const tokenDecodificado = jwt_decode(token.substring('Bearer '.length)) as UserData;
-    const maxAge = tokenDecodificado.exp - tokenDecodificado.iat;
+    const usuario = UsuarioToken.fromToken(token);
 
-    setCookie(null, 'token', token, { maxAge, path: '/' });
+    setCookie(null, 'token', token, {
+      maxAge: usuario.vigenciaToken(),
+      path: '/',
+    });
 
-    return tokenDecodificado;
+    return usuario;
   } catch (error) {
     if (error instanceof HttpError) {
       if (error.status === 400 && error.body.message.includes('rutusuario|invalido')) {

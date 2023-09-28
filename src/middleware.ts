@@ -1,3 +1,4 @@
+import { UsuarioToken } from '@/modelos/usuario';
 import { esTokenValido } from '@/servicios/auth';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -23,6 +24,13 @@ export async function middleware(request: NextRequest) {
 
   if (!tokenFueValidado) {
     return redirigirAlLogin(request);
+  }
+
+  // Verificar que tenga permisos
+  const usuario = UsuarioToken.fromToken(tokenCookie.value);
+
+  if (!usuario.tieneRol('admin') && request.nextUrl.pathname.startsWith('/empleadores')) {
+    return NextResponse.rewrite(new URL(`/errores/403`, request.url));
   }
 
   // OK

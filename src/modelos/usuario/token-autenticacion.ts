@@ -1,5 +1,4 @@
-/** El token de autenticacion decodificado */
-export type UserData = {
+export type TokenAutenticacion = {
   exp: number;
   iat: number;
   user: {

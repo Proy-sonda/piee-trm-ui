@@ -4,5 +4,5 @@ export * from './esta-logueado';
 export * from './logout';
 export * from './loguear-usuario';
 export * from './obtener-token';
-export * from './obtener-user-data';
+export * from './obtener-usuario-de-cookie';
 export * from './renovar-token';
