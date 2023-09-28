@@ -1,3 +1,4 @@
+import { TokenAutenticacion, Usuario } from '@/modelos/usuario';
 import { esTokenValido } from '@/servicios/auth';
 import jwt_decode from 'jwt-decode';
 import { NextResponse, type NextRequest } from 'next/server';
@@ -27,12 +28,10 @@ export async function middleware(request: NextRequest) {
   }
 
   // Verificar que tenga permisos
-  const tokenDecodificado = jwt_decode<any>(tokenCookie.value);
+  const tokenDecodificado = jwt_decode<TokenAutenticacion>(tokenCookie.value);
+  const usuario = Usuario.fromToken(tokenDecodificado);
 
-  if (
-    tokenDecodificado.user.rol.idrol !== 1 &&
-    request.nextUrl.pathname.startsWith('/empleadores')
-  ) {
+  if (!usuario.tieneRol('admin') && request.nextUrl.pathname.startsWith('/empleadores')) {
     return NextResponse.rewrite(new URL(`/errores/403`, request.url));
   }
 
