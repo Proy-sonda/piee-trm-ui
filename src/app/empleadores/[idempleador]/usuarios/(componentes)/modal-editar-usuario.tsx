@@ -66,7 +66,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
     const usuarioEditar = datosModal?.usuarioEditar;
     if (!usuarioEditar) {
-      throw new Error('No se encuentra el usuario para editar');
+      throw new Error('No se encuentra la persona usuaria para editar');
     }
 
     try {
@@ -88,7 +88,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
       setMostrarSpinner(false);
 
       await Swal.fire({
-        title: 'Usuario actualizado con éxito',
+        title: 'Persona Usuaria actualizado con éxito',
         icon: 'success',
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
@@ -100,7 +100,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
       console.error({ error });
 
       if (error instanceof HttpError) {
-        if (error.body.message === 'Usuario ya existe') {
+        if (error.body.message === 'Persona Usuaria ya existe') {
           return Swal.fire({
             title: 'El usuario ya existe',
             icon: 'error',
@@ -112,7 +112,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
       }
 
       return Swal.fire({
-        title: 'Error al actualizar usuario',
+        title: 'Error al actualizar persona usuaria',
         text: 'Se ha producido un error desconocido',
         icon: 'error',
         showConfirmButton: true,
@@ -156,7 +156,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
       <Modal backdrop="static" size="xl" centered scrollable show>
         <Modal.Header closeButton onClick={handleCerrarModal}>
-          <Modal.Title>Editar Usuario</Modal.Title>
+          <Modal.Title>Editar Persona Usuaria</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>

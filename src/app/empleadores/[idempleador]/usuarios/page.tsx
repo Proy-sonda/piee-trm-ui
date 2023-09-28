@@ -61,7 +61,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
         </div>
 
         <Titulo url="">
-          Entidad Empleadora - <b>{razon}</b> / Usuarios
+          Entidad Empleadora - <b>{razon}</b> / Personas Usuarias
         </Titulo>
 
         <div className="mt-2 row">
@@ -77,7 +77,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
         <div className="row mt-3">
           <div className="col-md-12">
             <IfContainer show={!pendiente && err.length > 0}>
-              <h4 className="mt-4 mb-5 text-center">Error al buscar usuarios</h4>
+              <h4 className="mt-4 mb-5 text-center">Error al buscar personas usuarias</h4>
             </IfContainer>
 
             <IfContainer show={pendiente}>

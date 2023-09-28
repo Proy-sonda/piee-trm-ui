@@ -375,13 +375,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="row mt-5">
             <Titulo url="">
               Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b> {unidad} </b>/
-              Trabajadores
+              Personas Trabajadoras
             </Titulo>
           </div>
 
           <div className="row mt-2">
             <div className="col-md-12 col-xs-12 col-lg-5">
-              <h5>Cargar Trabajadores</h5>
+              <h5>Cargar Personas Trabajadoras</h5>
               <sub style={{ color: 'blue' }}>Agregar RUN persona Trabajadora</sub>
               <br />
               <br />
@@ -584,7 +584,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="row mt-5">
             <div className="col-md-12">
               <div className="row">
-                <h5 className="text-center">Trabajadores</h5>
+                <h5 className="text-center">Personas Trabajadoras</h5>
                 <span
                   className="text-end animate animate__fadeIn"
                   style={{
@@ -599,7 +599,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               <hr />
               <IfContainer show={pendiente || loading}>
                 <div className="mb-5">
-                  <LoadingSpinner titulo="Cargando trabajadores..." />
+                  <LoadingSpinner titulo="Cargando personas trabajadoras..." />
                 </div>
               </IfContainer>
               <IfContainer show={!pendiente || !loading}>
@@ -640,7 +640,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                   </>
                 ) : (
                   <div className="text-center">
-                    <b>No se han encontrado trabajadores</b>
+                    <b>No se han encontrado personas trabajadoras</b>
                   </div>
                 )}
               </IfContainer>

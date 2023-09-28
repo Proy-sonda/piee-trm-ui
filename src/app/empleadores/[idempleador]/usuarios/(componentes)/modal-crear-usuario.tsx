@@ -72,7 +72,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
       });
 
       Swal.fire({
-        title: 'Usuario creado con éxito',
+        title: 'Persona Usuaria creado con éxito',
         icon: 'success',
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
@@ -86,10 +86,10 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
       console.error({ error });
 
       if (error instanceof HttpError) {
-        if (error.body.message === 'Rut Usuario ya existe') {
+        if (error.body.message === 'Rut Persona Usuaria ya existe') {
           return Swal.fire({
             title: 'Error',
-            text: 'El RUT del usuario ya existe',
+            text: 'El RUT de la perosna usuaria ya existe',
             icon: 'error',
             showConfirmButton: true,
             confirmButtonColor: 'var(--color-blue)',
@@ -143,7 +143,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
 
       <Modal backdrop="static" size="xl" centered={true} scrollable={true} show={true}>
         <Modal.Header closeButton onClick={handleCerrarInterno}>
-          <Modal.Title>Agregar Nuevo Usuario</Modal.Title>
+          <Modal.Title>Agregar Nueva Persona Usuaria</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -160,7 +160,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
               <div className="row mb-4 g-3 align-items-baseline">
                 <div className="col-12 col-lg-6 col-xl-3 position-relative">
                   <label className="form-label" htmlFor="rut">
-                    RUT (*)
+                    RUN (*)
                   </label>
                   <input
                     id="rut"
@@ -169,7 +169,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                     className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
                     {...register('rut', {
                       required: {
-                        message: 'El RUT es obligatorio',
+                        message: 'El RUN es obligatorio',
                         value: true,
                       },
                       validate: {

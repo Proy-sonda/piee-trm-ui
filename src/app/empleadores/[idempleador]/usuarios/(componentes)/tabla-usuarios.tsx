@@ -101,7 +101,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
       console.error({ error });
 
       await Swal.fire({
-        title: 'Error al eliminar usuario',
+        title: 'Error al eliminar persona usuaria',
         icon: 'error',
         showConfirmButton: true,
         confirmButtonColor: 'var(--color-blue)',
@@ -136,7 +136,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               <Td>
                 <span
                   className="text-primary cursor-pointer"
-                  title="Editar usuario"
+                  title="Editar persona usuaria"
                   onClick={() => handleEditarUsuario(usuario.idusuario)}>
                   {usuario.rutusuario}
                 </span>
@@ -162,7 +162,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                   </button>
                   <button
                     className="btn text-primary"
-                    title="Eliminar usuario"
+                    title="Eliminar persona usuaria"
                     onClick={() => handleEliminarUsuario(usuario)}>
                     <i className="bi bi-trash3"></i>
                   </button>
@@ -177,10 +177,10 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 <div className="d-lg-none">
                   <DropdownButton title="Acciones" size="sm" variant="success">
                     <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                      Editar usuario
+                      Editar persona usuaria
                     </Dropdown.Item>
                     <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
-                      Eliminar usuario
+                      Eliminar persona usuaria
                     </Dropdown.Item>
                     <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
                       Restablecer clave

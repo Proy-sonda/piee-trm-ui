@@ -196,12 +196,12 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         <div className="row">
           <Titulo manual="Manual" url="">
             Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b>{unidad}</b> /
-            Usuarios
+            Personas Usuarias
           </Titulo>
         </div>
         <div className="row mt-3">
-          <h5>Cargar Usuarios</h5>
-          <sub className={styles['sub-title']}>Agregar RUN Usuario</sub>
+          <h5>Cargar Personas Usuarias</h5>
+          <sub className={styles['sub-title']}>Agregar RUN Persona Usuaria</sub>
         </div>
 
         <form className="row mt-3" onSubmit={onHandleSubmit}>
@@ -247,11 +247,11 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         </form>
 
         <div className="row mt-3 text-center">
-          <h5>Usuarios</h5>
+          <h5>Personas Usuarias</h5>
           <div className="col-md-12 col-sm-12 col-xl-12">
             <IfContainer show={pendiente}>
               <div className="mb-5">
-                <LoadingSpinner titulo="Cargando usuarios..." />
+                <LoadingSpinner titulo="Cargando personas usuarias..." />
               </div>
             </IfContainer>
 
