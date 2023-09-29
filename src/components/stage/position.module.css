@@ -1,0 +1,23 @@
+.texto-inactivo {
+  color: black;
+}
+
+.tab-activa {
+  border-bottom: none;
+}
+
+.tab-activa-texto {
+  font-weight: bold;
+  color: var(--color-blue) !important;
+  border-bottom: 2px solid red;
+}
+
+@media only screen and (min-width: 768px) {
+  .tab-activa {
+    border-bottom: 2px solid red;
+  }
+
+  .tab-activa-texto {
+    border-bottom: none;
+  }
+}

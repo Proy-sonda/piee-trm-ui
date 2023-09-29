@@ -1,0 +1,24 @@
+.gobCLBold {
+  font-weight: bold;
+}
+
+.gobimg {
+  width: 45%;
+  border-radius: 50%;
+  margin: 4px;
+}
+
+.pgobcl {
+  align-self: center;
+  align-content: center;
+}
+
+.gobrad {
+  width: 85%;
+  /* margin-left: 4%; */
+  /* border: 2px solid #ebf5ff; */
+  /* background-color: #001c41 !important; */
+  border-radius: 15px;
+  font-weight: bold;
+  /* padding: 4px; */
+}
