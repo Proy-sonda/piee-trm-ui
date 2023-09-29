@@ -8,7 +8,7 @@ import {
   UsuarioNoExisteError,
 } from '@/servicios/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
@@ -34,7 +34,7 @@ export const LoginComponent: React.FC<{}> = () => {
 
   const searchParams = useSearchParams();
 
-  const { login } = useContext(AuthContext);
+  const { usuario, login } = useContext(AuthContext);
 
   const {
     register,
@@ -48,26 +48,46 @@ export const LoginComponent: React.FC<{}> = () => {
 
   const rutUsuario = watch('rut');
 
+  // Redirigir al usuario si esta logueado
+  useEffect(() => {
+    console.log('Redirigiendo desde useEffect ahora');
+
+    if (!usuario) {
+      return;
+    }
+
+    const rutaRedireccion = usuario.tieneRol('admin') ? '/empleadores' : '/tramitacion';
+
+    const redirectPath = searchParams.get('redirectTo');
+    const redirectTo =
+      !redirectPath || (redirectPath.startsWith('/empleadores') && !usuario.tieneRol('admin'))
+        ? null
+        : redirectPath;
+
+    router.push(redirectTo ?? rutaRedireccion);
+  }, [usuario]);
+
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
     try {
-      const usuario = await login(rut, clave);
+      await login(rut, clave);
 
-      return Swal.fire({
+      Swal.fire({
         html: 'Sesión iniciada correctamente',
         icon: 'success',
         timer: 2000,
         showConfirmButton: false,
-        didClose: () => {
-          const rutaRedireccion = usuario.tieneRol('admin') ? '/empleadores' : '/tramitacion';
+        // TODO: Borrar esto
+        // didClose: () => {
+        //   const rutaRedireccion = usuario.tieneRol('admin') ? '/empleadores' : '/tramitacion';
 
-          const redirectPath = searchParams.get('redirectTo');
-          const redirectTo =
-            !redirectPath || (redirectPath.startsWith('/empleadores') && !usuario.tieneRol('admin'))
-              ? null
-              : redirectPath;
+        //   const redirectPath = searchParams.get('redirectTo');
+        //   const redirectTo =
+        //     !redirectPath || (redirectPath.startsWith('/empleadores') && !usuario.tieneRol('admin'))
+        //       ? null
+        //       : redirectPath;
 
-          router.push(redirectTo ?? rutaRedireccion);
-        },
+        //   router.push(redirectTo ?? rutaRedireccion);
+        // },
       });
     } catch (error) {
       let messageError = '';

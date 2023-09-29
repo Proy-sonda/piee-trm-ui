@@ -1,4 +1,4 @@
-'use client';
+// 'use client';
 
 import { ButtonImage } from '@/components/button-image';
 import IfContainer from '@/components/if-container';
@@ -16,6 +16,7 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
   const _adsUrl: string = adsUrl();
 
+  // TODO: Eliminar
   // const router = useRouter();
 
   // useEffect(() => {
