@@ -1,13 +1,11 @@
-'use client';
+// 'use client';
 
 import { ButtonImage } from '@/components/button-image';
 import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
 import insemp from '@/img/Inscribeem.png';
-import { estaLogueado } from '@/servicios/auth';
 import { adsUrl } from '@/servicios/environment';
-import { useRouter } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React from 'react';
 
 interface HomePageProps {
   searchParams: {
@@ -18,13 +16,14 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
   const _adsUrl: string = adsUrl();
 
-  const router = useRouter();
+  // TODO: Eliminar
+  // const router = useRouter();
 
-  useEffect(() => {
-    if (estaLogueado() && !searchParams.redirectTo) {
-      router.push('/tramitacion');
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (estaLogueado() && !searchParams.redirectTo) {
+  //     router.push('/tramitacion');
+  //   }
+  // }, []);
 
   return (
     <div className="bgads">
