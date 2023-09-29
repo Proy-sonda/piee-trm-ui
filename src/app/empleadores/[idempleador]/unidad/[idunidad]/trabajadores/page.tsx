@@ -154,7 +154,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       const data = await actualizarTrabajador(editar);
       if (data.ok) {
         Swal.fire({
-          html: 'Trabajador modificado con éxito',
+          html: 'Persona Trabajadora modificada con éxito',
           icon: 'success',
           timer: 2000,
           showConfirmButton: false,
@@ -185,7 +185,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     setspinnerCargar(true);
     let recuento = 0;
-    settextProgress('Eliminando Trabajadores...');
+    settextProgress('Eliminando Personas Trabajadoras...');
 
     for (let index = 0; index < datosPagina!?.trabajadores.length; index++) {
       const element = datosPagina?.trabajadores[index];
@@ -200,7 +200,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     if (recuento > 0) {
       Swal.fire({
         icon: 'success',
-        html: `Se han eliminado un total de <b>${recuento}</b> trabajadores`,
+        html: `Se han eliminado un total de <b>${recuento}</b> personas trabajadoras`,
         showConfirmButton: false,
         timer: 2000,
         didClose: () => {
@@ -212,7 +212,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     } else {
       Swal.fire({
         icon: 'error',
-        html: `No se han eliminado los trabajadores`,
+        html: `No se han eliminado las personas trabajadoras`,
         confirmButtonColor: 'var(--color-blue)',
         didClose: () => {
           setcuentagrabados(0);
@@ -248,13 +248,15 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       } else {
         setLoading(false);
         let msgError: string | boolean = await data.text();
-        if (msgError.includes('trabajador ya existe')) msgError = '<p>Trabajador ya existe</p>';
+        if (msgError.includes('trabajador ya existe en el empleador'))
+          msgError = '<p>Persona trabajadora ya existe</p>';
         if (msgError.includes('verificador invalido'))
           msgError = '<p>Código verificador invalido</p>';
 
         Swal.fire({
           html: 'Existe un problema al momento de grabar ' + (msgError ? msgError : data.text()),
           icon: 'error',
+          confirmButtonColor: 'var(--color-blue)',
         });
       }
     };
@@ -284,7 +286,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     if (errorEncontrado?.trim() != '' && errorEncontrado != undefined) {
       return Swal.fire({
         icon: 'error',
-        html: `Existe un error en el formato del RUT <b>${errorEncontrado}</b> <br/> Verifique el documento`,
+        html: `Existe un error en el formato del RUN <b>${errorEncontrado}</b> <br/> Verifique el documento`,
         confirmButtonColor: 'var(--color-blue)',
       });
     }
@@ -292,7 +294,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     setspinnerCargar(true);
     let recuento = 0;
     let recuentoError = 0;
-    settextProgress('Cargando Trabajadores...');
+    settextProgress('Cargando Personas Trabajadoras...');
     let rutagregados: any[] = [];
 
     for (let index = 0; index < csvData.length; index++) {
@@ -333,7 +335,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           const resp = await Swal.fire({
             icon: 'info',
             html: `<p>Existen personas trabajadoras ya registradas en una unidad.</p>
-                  <b>¿Desea verificar los rut asociados a otra unidad?</b>`,
+                  <b>¿Desea verificar los RUN ya asociados a otra unidad?</b>`,
             confirmButtonColor: 'var(--color-blue)',
             confirmButtonText: 'Sí',
             showDenyButton: true,
@@ -345,7 +347,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
           exportFromJSON({
             data: rutagregados.map((value) => ({ ['']: value })),
-            fileName: `rut-ya-con-unidad`,
+            fileName: `run-ya-con-unidad`,
             exportType: 'csv',
           });
         },
@@ -355,7 +357,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       setspinnerCargar(false);
       Swal.fire({
         icon: 'info',
-        html: 'Los trabajadores ya se encuentran registrados',
+        html: 'Las personas trabajadoras ya se encuentran registrados',
         confirmButtonColor: 'var(--color-blue)',
         didClose: () => {
           settextProgress('');
@@ -432,7 +434,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       })}
                     />
                     <IfContainer show={error.run}>
-                      <div className="invalid-tooltip">Debe ingresar un RUT valido</div>
+                      <div className="invalid-tooltip">Debe ingresar un RUN valido</div>
                     </IfContainer>
                   </div>
                   <div className="d-block d-sm-none d-md-none d-xs-block">
