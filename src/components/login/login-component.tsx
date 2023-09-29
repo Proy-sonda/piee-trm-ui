@@ -64,6 +64,8 @@ export const LoginComponent: React.FC<{}> = () => {
         ? null
         : redirectPath;
 
+    console.log(`Mandando usuario a : [${redirectTo ?? rutaRedireccion}]`);
+
     router.push(redirectTo ?? rutaRedireccion);
   }, [usuario]);
 
