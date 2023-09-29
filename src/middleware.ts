@@ -13,12 +13,16 @@ export async function middleware(request: NextRequest) {
   if (!tokenCookie) {
     return redirigirAlLogin(request);
   }
-
+  console.log(tokenCookie);
+  
   // Verificar que token sea valido
   let tokenFueValidado = false;
   try {
     tokenFueValidado = await esTokenValido(tokenCookie.value);
+    console.log(tokenFueValidado);
+    console.log("OK");
   } catch (error) {
+    console.log("NO");
     tokenFueValidado = false;
   }
 

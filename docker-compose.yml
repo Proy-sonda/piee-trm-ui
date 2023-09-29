@@ -2,6 +2,7 @@ version: '3'
 
 services:
   frontend:
+    container_name: piie-trm-ui
     build:
       context: .
       dockerfile: Dockerfile
