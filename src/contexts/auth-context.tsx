@@ -4,7 +4,9 @@ import { useUrl } from '@/hooks/use-url';
 import { UsuarioToken } from '@/modelos/usuario';
 import {
   desloguearUsuario,
+  esTokenValido,
   loguearUsuario,
+  obtenerToken,
   obtenerUsuarioDeCookie,
   renovarToken,
 } from '@/servicios/auth';
@@ -45,7 +47,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       return;
     }
 
-    onLoginExitoso(usuario);
+    (async () => {
+      try {
+        const tokenValido = await esTokenValido(obtenerToken());
+
+        if (!tokenValido) {
+          throw new Error('Token invalido');
+        }
+
+        onLoginExitoso(usuario);
+      } catch (error) {
+        logout();
+
+        router.push('/');
+      }
+    })();
   }, []);
 
   // Alerta de expiracion de sesion
