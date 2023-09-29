@@ -7,7 +7,7 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  const tokenCookie = request.cookies.get('token');
+  /*const tokenCookie = request.cookies.get('token');
 
   // Verificar que hay cookie
   if (!tokenCookie) {
@@ -39,6 +39,7 @@ export async function middleware(request: NextRequest) {
 
   // OK
   return NextResponse.next();
+  */
 }
 
 function redirigirAlLogin(request: NextRequest) {
