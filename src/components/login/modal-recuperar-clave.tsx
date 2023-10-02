@@ -2,10 +2,9 @@ import { recuperarClave } from '@/servicios/auth/recuperar-clave';
 import { HttpError } from '@/servicios/fetch';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { formatRut, validateRut } from 'rutlib';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
-import IfContainer from '../if-container';
+import { InputRut } from '../form';
 
 interface FormularioRecuperarClave {
   rut: string;
@@ -22,17 +21,9 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
   onClaveEnviada,
   onCerrarModal,
 }) => {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    formState: { errors },
-  } = useForm<FormularioRecuperarClave>({
-    mode: 'onBlur',
-  });
+  const formulario = useForm<FormularioRecuperarClave>({ mode: 'onBlur' });
 
-  const resetearFormulario = () => reset();
+  const resetearFormulario = () => formulario.reset();
 
   const enviarClaveTemporal: SubmitHandler<FormularioRecuperarClave> = async ({ rut }) => {
     try {
@@ -72,55 +63,25 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
         <Modal.Header closeButton>
           <Modal.Title>Recuperar Clave de acceso</Modal.Title>
         </Modal.Header>
-        <form onSubmit={handleSubmit(enviarClaveTemporal)}>
-          <Modal.Body>
-            <p>Escriba su RUN para solicitar una nueva clave de acceso</p>
-            <div className="row">
-              <div className="col-md-12 position-relative">
-                <input
-                  type="text"
-                  className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
-                  autoComplete="new-custom-value"
-                  minLength={9}
-                  maxLength={10}
-                  {...register('rut', {
-                    required: 'El RUN es obligatorio',
-                    validate: {
-                      esRut: (rut) => (validateRut(rut) ? undefined : 'El RUN es inválido'),
-                    },
-                    onChange: (event: any) => {
-                      const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
-                      let rut = event.target.value as string;
-
-                      if (regex.test(rut)) {
-                        rut = rut.replaceAll(regex, '');
-                      }
-
-                      setValue('rut', rut.length > 2 ? formatRut(rut, false) : rut);
-                    },
-                    onBlur: (event) => {
-                      const rut = event.target.value;
-                      if (validateRut(rut)) {
-                        setValue('rut', formatRut(rut, false));
-                      }
-                    },
-                  })}
-                />
-                <IfContainer show={errors.rut}>
-                  <div className="invalid-tooltip">{errors.rut?.message}</div>
-                </IfContainer>
+        <FormProvider {...formulario}>
+          <form onSubmit={formulario.handleSubmit(enviarClaveTemporal)}>
+            <Modal.Body>
+              <p>Escriba su RUN para solicitar una nueva clave de acceso</p>
+              <div className="row">
+                <InputRut omitirLabel name="rut" tipo="run" className="col-md-12" />
               </div>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button type="button" className="btn btn-secondary" onClick={handleCerrarModal}>
-              Cerrar
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Recuperar Clave
-            </button>
-          </Modal.Footer>
-        </form>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <button type="button" className="btn btn-secondary" onClick={handleCerrarModal}>
+                Cerrar
+              </button>
+              <button type="submit" className="btn btn-primary">
+                Recuperar Clave
+              </button>
+            </Modal.Footer>
+          </form>
+        </FormProvider>
       </Modal>
     </>
   );
