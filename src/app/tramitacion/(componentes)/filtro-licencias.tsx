@@ -32,33 +32,31 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ onFiltrarLicencias })
     <>
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
-          <div className="row mt-3">
-            <InputFolio opcional name="folio" label="Folio" className="col-md-3" />
+          <div className="row g-3 align-items-baseline">
+            <InputFolio opcional name="folio" label="Folio" className="col-12 col-md-6 col-lg-3" />
 
             <InputRut
               opcional
               name="runPersonaTrabajadora"
               label="RUN Persona Trabajadora"
               tipo="run"
-              className="col-md-3"
+              className="col-12 col-md-6 col-lg-3"
             />
 
             <InputFecha
               opcional
               name="fechaDesde"
-              label="Fecha emisión Desde"
-              className="col-md-3"
+              label="Fecha Emisión Desde"
+              className="col-12 col-md-6 col-lg-3"
             />
 
             <InputFecha
               opcional
               name="fechaHasta"
-              label="Fecha emisión Hasta"
-              className="col-md-3"
+              label="Fecha Emisión Hasta"
+              className="col-12 col-md-6 col-lg-3"
             />
-          </div>
 
-          <div className="row mt-3 align-items-baseline">
             <ComboSimple
               opcional
               name="rutEntidadEmpleadora"
@@ -67,7 +65,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ onFiltrarLicencias })
               idElemento="rutempleador"
               descripcion="razonsocial"
               tipoValor="string"
-              className="col-md-3"
+              className="col-12 col-md-6 col-lg-3"
             />
 
             <ComboSimple
@@ -77,11 +75,13 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ onFiltrarLicencias })
               datos={unidadesRRHH}
               idElemento="idunidad"
               descripcion="unidad"
-              className="col-md-3"
+              className="col-12 col-md-6 col-lg-3"
             />
+          </div>
 
-            <div className="col-md-3">
-              <button type="submit" className="btn btn-primary">
+          <div className="mt-4 row">
+            <div className="d-flex">
+              <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-sm-grow-0">
                 Filtrar
               </button>
             </div>

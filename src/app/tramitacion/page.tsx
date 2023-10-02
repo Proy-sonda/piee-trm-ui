@@ -11,7 +11,7 @@ const TramitacionPage = () => {
     <div className="bgads">
       <Position />
 
-      <div className="ms-5 me-5">
+      <div className="mx-3 mx-lg-5">
         <div className="row">
           <div style={{ marginTop: '-50px' }}>
             <Titulo url="">
@@ -24,7 +24,7 @@ const TramitacionPage = () => {
           </div>
         </div>
 
-        <div className="pb-4 border-bottom border-1">
+        <div className="pt-3 pb-4 border-bottom border-1">
           <FiltroLicencias
             onFiltrarLicencias={(data) => {
               console.table(data);
