@@ -39,8 +39,6 @@ export const LoginComponent: React.FC<{}> = () => {
 
   // Redirigir al usuario si esta logueado
   useEffect(() => {
-    console.log('Redirigiendo desde useEffect ahora');
-
     if (!usuario) {
       return;
     }
@@ -52,8 +50,6 @@ export const LoginComponent: React.FC<{}> = () => {
       !redirectPath || (redirectPath.startsWith('/empleadores') && !usuario.tieneRol('admin'))
         ? null
         : redirectPath;
-
-    console.log(`Mandando usuario a : [${redirectTo ?? rutaRedireccion}]`);
 
     router.push(redirectTo ?? rutaRedireccion);
   }, [usuario]);
@@ -67,18 +63,6 @@ export const LoginComponent: React.FC<{}> = () => {
         icon: 'success',
         timer: 2000,
         showConfirmButton: false,
-        // TODO: Borrar esto
-        // didClose: () => {
-        //   const rutaRedireccion = usuario.tieneRol('admin') ? '/empleadores' : '/tramitacion';
-
-        //   const redirectPath = searchParams.get('redirectTo');
-        //   const redirectTo =
-        //     !redirectPath || (redirectPath.startsWith('/empleadores') && !usuario.tieneRol('admin'))
-        //       ? null
-        //       : redirectPath;
-
-        //   router.push(redirectTo ?? rutaRedireccion);
-        // },
       });
     } catch (error) {
       let messageError = '';

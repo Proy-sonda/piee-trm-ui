@@ -60,7 +60,7 @@ export const InputRut: React.FC<InputRutProps> = ({
           autoComplete="new-custom-value"
           isInvalid={!!errors[name]}
           disabled={deshabilitado}
-          {...register('rut', {
+          {...register(name, {
             required: `El ${tipoInput()} es obligatorio`,
             validate: {
               esRut: (rut) => {
@@ -81,12 +81,12 @@ export const InputRut: React.FC<InputRutProps> = ({
                 rut = rut.substring(0, 10);
               }
 
-              setValue('rut', rut.length > 2 ? formatRut(rut, false) : rut);
+              setValue(name, rut.length > 2 ? formatRut(rut, false) : rut);
             },
             onBlur: (event) => {
               const rut = event.target.value;
               if (validateRut(rut)) {
-                setValue('rut', formatRut(rut, false));
+                setValue(name, formatRut(rut, false));
               }
             },
           })}
