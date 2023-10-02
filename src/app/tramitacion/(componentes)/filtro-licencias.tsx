@@ -1,6 +1,6 @@
 import { ComboSimple, InputRut } from '@/components/form';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
-import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
+import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -9,15 +9,14 @@ import { InputFecha } from './input-fecha';
 import { InputFolio } from './input-folio';
 
 interface FiltroLicenciasProps {
+  empleadores: Empleador[];
   onFiltrarLicencias: (formulario: FormularioFiltrarLicencias) => void | Promise<void>;
 }
 
-const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ onFiltrarLicencias }) => {
+const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltrarLicencias }) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
 
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
-
-  const [, empleadores] = useFetch(buscarEmpleadores(''));
 
   const [, unidadesRRHH] = useFetch(
     rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),

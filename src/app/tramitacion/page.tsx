@@ -2,11 +2,17 @@
 
 import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
-import { Table, Tbody, Th, Thead, Tr } from 'react-super-responsive-table';
+import { useFetch } from '@/hooks/use-merge-fetch';
+import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
 import FiltroLicencias from './(componentes)/filtro-licencias';
+import TablaLicenciasTramitar from './(componentes)/tabla-licencias-tramitar';
+import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para-tramitar';
 import styles from './page.module.css';
 
 const TramitacionPage = () => {
+  const [_, licenciasParaTramitar] = useFetch(buscarLicenciasParaTramitar());
+  const [, empleadores] = useFetch(buscarEmpleadores(''));
+
   return (
     <div className="bgads">
       <Position />
@@ -26,6 +32,7 @@ const TramitacionPage = () => {
 
         <div className="pt-3 pb-4 border-bottom border-1">
           <FiltroLicencias
+            empleadores={empleadores ?? []}
             onFiltrarLicencias={(data) => {
               console.table(data);
             }}
@@ -35,6 +42,7 @@ const TramitacionPage = () => {
         <div className="mt-4 row text-center">
           <h5>BANDEJA DE TRAMITACIÓN</h5>
         </div>
+
         <br />
         <div className="row text-end">
           <div className="col-md-12">
@@ -61,21 +69,10 @@ const TramitacionPage = () => {
 
         <div className="row mt-3">
           <div className="col-md-12">
-            <Table className="table table-hover table-striped">
-              <Thead>
-                <Tr className={`text-center ${styles['text-tr']}`}>
-                  <Th>FOLIO</Th>
-                  <Th>ESTADO</Th>
-                  <Th>ENTIDAD EMPLEADORA</Th>
-                  <Th>PERSONA TRABAJADORA</Th>
-                  <Th>DESCRIPCIÓN</Th>
-                  <Th></Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr></Tr>
-              </Tbody>
-            </Table>
+            <TablaLicenciasTramitar
+              empleadores={empleadores ?? []}
+              licencias={licenciasParaTramitar}
+            />
           </div>
         </div>
       </div>
