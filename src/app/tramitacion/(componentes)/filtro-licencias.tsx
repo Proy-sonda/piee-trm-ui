@@ -1,16 +1,18 @@
-import { ComboSimple, InputRut } from '@/components/form';
+import { ComboSimple } from '@/components/form';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { DatosFiltroLicencias } from '../(modelos)/datos-filtro-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
 import { InputFecha } from './input-fecha';
 import { InputFolio } from './input-folio';
+import { InputRunPersonaTrabajadora } from './input-run-persona-trabajadora';
 
 interface FiltroLicenciasProps {
   empleadores: Empleador[];
-  onFiltrarLicencias: (formulario: FormularioFiltrarLicencias) => void | Promise<void>;
+  onFiltrarLicencias: (formulario: DatosFiltroLicencias) => void | Promise<void>;
 }
 
 const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltrarLicencias }) => {
@@ -24,7 +26,16 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
   );
 
   const filtrarLicencias: SubmitHandler<FormularioFiltrarLicencias> = async (data) => {
-    onFiltrarLicencias(data);
+    onFiltrarLicencias({
+      folio: data.folio.trim() === '' ? undefined : data.folio,
+      fechaDesde: data.fechaDesde === '' ? undefined : data.fechaDesde,
+      fechaHasta: data.fechaHasta === '' ? undefined : data.fechaDesde,
+      idUnidadRRHH: Number.isNaN(data.idUnidadRRHH) ? undefined : data.idUnidadRRHH,
+      rutEntidadEmpleadora:
+        data.rutEntidadEmpleadora === '' ? undefined : data.rutEntidadEmpleadora,
+      runPersonaTrabajadora:
+        data.runPersonaTrabajadora === '' ? undefined : data.runPersonaTrabajadora,
+    });
   };
 
   return (
@@ -34,11 +45,10 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
           <div className="row g-3 align-items-baseline">
             <InputFolio opcional name="folio" label="Folio" className="col-12 col-md-6 col-lg-3" />
 
-            <InputRut
+            <InputRunPersonaTrabajadora
               opcional
               name="runPersonaTrabajadora"
               label="RUN Persona Trabajadora"
-              tipo="run"
               className="col-12 col-md-6 col-lg-3"
             />
 

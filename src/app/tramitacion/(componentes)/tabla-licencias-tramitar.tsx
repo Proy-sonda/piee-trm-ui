@@ -91,7 +91,6 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <div className="mb-1 small">En proceso de Tramitación por Operador</div>
                 </td>
                 <td>
-                  {/* TODO: No carga el empleador */}
                   <div className="mb-1 small">{nombreEmpleador(licencia) ?? ''}</div>
                   <div className="mb-1 small">{licencia.rutempleador}</div>
                   <div className="mb-1 small">{licencia.codigounidadrrhh}</div>
