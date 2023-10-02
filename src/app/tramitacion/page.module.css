@@ -5,6 +5,7 @@
 .btnbottom {
   align-self: self-end;
 }
+
 .circlered {
   background-color: red;
   height: 25px;
@@ -28,6 +29,7 @@
   border-radius: 50%;
   display: inline-block;
 }
+
 .filtrocolor {
   display: inline-flex;
   margin-left: 2%;
@@ -40,6 +42,7 @@
   cursor: pointer;
   border-radius: 6px 6px 6px 6px;
 }
+
 .filtrocolor:hover {
   background-color: var(--color-blue);
 }

@@ -1,200 +1,38 @@
 'use client';
 
 import Position from '@/components/stage/position';
+import Titulo from '@/components/titulo/titulo';
+import { Table, Tbody, Th, Thead, Tr } from 'react-super-responsive-table';
+import FiltroLicencias from './(componentes)/filtro-licencias';
+import styles from './page.module.css';
 
 const TramitacionPage = () => {
-  /*   const [entidadEmp, setEntidadEmp] = useState<Empleador[]>([]);
-  const [UnidadRRHH, setUnidadRRHH] = useState<Unidadrhh[]>([]);
-  const [eempleador, seteempleador] = useState();
-
-  const { folio, run, fdesde, fhasta, onInputChange, onInputValidRut } = useForm({
-    folio: '',
-    run: '',
-    fdesde: '',
-    fhasta: '',
-    entidadempleador: '',
-    urrhh: '',
-  }); */
-
-  /* TODO: Usar los hooks para obtener la entidad empleadora y no usar cookies en esta parte
-  let cookie = parseCookies();
-  let token = '';
-  token = cookie.token;
-
-  useEffect(() => {
-    let data: any = jwt_decode(token);
-
-    CompletarUsuario(data);
-
-    const EntidadEmpleadora = async () => {
-      let resp: Empleador[] = await ComboEntidadEmpleador();
-
-      setEntidadEmp(resp);
-    };
-
-    EntidadEmpleadora();
-  }, [token]);  */
-
-  /*   const onChangeEmp = (event: any) => {
-    let value = event.target.value;
-    seteempleador(value);
-    if (value == '') return;
-    const cargarUnidad = async () => {
-      const resp: Unidadrhh[] = await cargaUnidadrrhh(value);
-      setUnidadRRHH(resp);
-    };
-
-    cargarUnidad();
-  }; */
-
   return (
     <div className="bgads">
-      <Position position={1} />
+      <Position />
 
-      <div className="fluid-container px-3 px-lg-5">
-        <div className="text-center">
-          <h2 className="my-3">Sección en Construcción</h2>
-          <img
-            src="/sitio_en_construccion.png"
-            alt="Sitio en construccion"
-            style={{ width: '100%', maxWidth: '500px', height: 'auto' }}
-          />
-        </div>
-      </div>
-
-      {/* <div className="ms-5 me-5">
+      <div className="ms-5 me-5">
         <div className="row">
-          <div className="col-md-8 jumbotron">
-            <h5>Filtro para Licencias pendientes de Tramitar</h5>
+          <div style={{ marginTop: '-50px' }}>
+            <Titulo url="">
+              <h5>Filtro para Licencias pendientes de Tramitar</h5>
+            </Titulo>
             <p>
               En esta pantalla se muestran todas las licencias médicas que usted tiene pendiente de
               tramitación.
             </p>
           </div>
-          <div className="col-md-4">
-            <label className="float-end" style={{ cursor: 'pointer', color: 'blue' }}>
-              Manual
-            </label>
-            <br />
-          </div>
         </div>
 
-        <div className="row mt-3">
-          <div className="col-md-3">
-            <label className="form-label">
-              <b>Folio</b>
-            </label>
-            <input
-              type="text"
-              name="folio"
-              className="form-control"
-              value={folio}
-              onInput={onInputChange}
-            />
-            <small id="rutHelp" className="form-text text-muted" style={{ fontSize: '10px' }}>
-              Debe incluir el dígito verificador sin guion
-            </small>
-          </div>
-          <div className="col-md-3">
-            <label className="form-label">
-              <b>RUN Persona Trabajadora</b>
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              name="run"
-              value={run}
-              maxLength={11}
-              onInput={onInputValidRut}
-            />
-          </div>
-
-          <div className="col-md-3">
-            <label>
-              <b>Fecha emisión Desde</b>
-            </label>
-            <input
-              type="date"
-              className="form-control"
-              name="fdesde"
-              value={fdesde}
-              onInput={onInputChange}
-            />
-            <small
-              id="rutHelp"
-              className="form-text text-muted"
-              style={{ fontSize: '10px' }}></small>
-          </div>
-          <div className="col-md-3">
-            <label>
-              <b>Fecha emisión Hasta</b>
-            </label>
-            <input
-              type="date"
-              className="form-control"
-              name="fhasta"
-              value={fhasta}
-              onInput={onInputChange}
-            />
-            <small
-              id="rutHelp"
-              className="form-text text-muted"
-              style={{ fontSize: '10px' }}></small>
-          </div>
+        <div className="pb-4 border-bottom border-1">
+          <FiltroLicencias
+            onFiltrarLicencias={(data) => {
+              console.table(data);
+            }}
+          />
         </div>
 
-        <div className="row mt-3">
-          <div className="col-md-3">
-            <label>
-              <b>Entidad Empleadora</b>
-            </label>
-            <select
-              className="form-select"
-              name="entidademp"
-              value={eempleador}
-              onChange={onChangeEmp}>
-              <option value={''}>Seleccionar</option>
-              {entidadEmp.length > 0 ? (
-                entidadEmp.map((value) => (
-                  <option key={value.rutempleador} value={value.rutempleador}>
-                    {value.razonsocial}
-                  </option>
-                ))
-              ) : (
-                <></>
-              )}
-            </select>
-          </div>
-          <div className="col-md-3">
-            <div style={{ display: UnidadRRHH.length > 0 ? '' : 'none' }}>
-              <label>
-                <b>Unidad RRHH</b>
-              </label>
-              <select className="form-select">
-                <option value={''}>Seleccionar</option>
-                {UnidadRRHH.length > 0 ? (
-                  UnidadRRHH.map((value) => (
-                    <option key={value.idunidad} value={value.idunidad}>
-                      {value.unidad}
-                    </option>
-                  ))
-                ) : (
-                  <></>
-                )}
-              </select>
-            </div>
-          </div>
-
-          <div className={'col-md-2 ' + styles.btnbottom}>
-            <div className="d-grid">
-              <button className="btn btn-primary">Filtrar</button>
-            </div>
-          </div>
-        </div>
-
-        <hr />
-
-        <div className="row text-center">
+        <div className="mt-4 row text-center">
           <h5>BANDEJA DE TRAMITACIÓN</h5>
         </div>
         <br />
@@ -240,7 +78,7 @@ const TramitacionPage = () => {
             </Table>
           </div>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };
