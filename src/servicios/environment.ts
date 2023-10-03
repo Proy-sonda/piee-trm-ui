@@ -13,3 +13,7 @@ export const adsUrl = () => {
 export const thresholdAlertaExpiraSesion = () => {
   return parseInt(process.env.NEXT_PUBLIC_THRESHOLD_ALERTA_EXPIRA_SESION_MS!, 10);
 };
+
+export const urlBackendTramitacion = () => {
+  return process.env.NEXT_PUBLIC_URL_BACKEND_TRAMITACION!;
+};
