@@ -1,3 +1,4 @@
+import { useWindowSize } from '@/hooks/use-window-size';
 import React from 'react';
 import ReactPaginate from 'react-paginate';
 
@@ -14,11 +15,14 @@ const Paginacion: React.FC<PaginacionProps> = ({
   tamano,
   onCambioPagina,
 }) => {
+  const [ancho] = useWindowSize();
+
   return (
     <ReactPaginate
       breakLabel="..."
-      previousLabel="Anterior"
-      nextLabel="Siguiente"
+      previousLabel={ancho < 576 ? '«' : 'Anterior'}
+      nextLabel={ancho < 576 ? '»' : 'Siguiente'}
+      pageRangeDisplayed={1}
       onPageChange={(x) => onCambioPagina(x.selected)}
       pageCount={numeroDePaginas}
       renderOnZeroPageCount={null}

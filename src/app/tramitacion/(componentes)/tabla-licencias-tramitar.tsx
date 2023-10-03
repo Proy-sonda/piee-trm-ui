@@ -4,7 +4,7 @@ import { Empleador } from '@/modelos/empleador';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import React from 'react';
-import { Stack } from 'react-bootstrap';
+import { Stack, Table } from 'react-bootstrap';
 import { EstadoLicencia } from '../(modelos)/estado-licencia';
 import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
 import { Operador } from '../(modelos)/operador';
@@ -46,7 +46,8 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   return (
     <>
       <div className="table-responsive">
-        <table className="table table-hover table-striped">
+        <Table striped hover responsive>
+          {/* <Table striped hover  className="table table-hover table-striped"> */}
           <thead>
             <tr className={`text-center ${styles['text-tr']}`}>
               <th>FOLIO</th>
@@ -68,30 +69,34 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   </div>
                 </td>
                 <td>
-                  <div className="mb-1 small">Estado {licencia.estadolicencia}</div>
-                  <div className="mb-1 small">{estadoLicencia(licencia)}</div>
+                  <div className="mb-1 small text-nowrap">Estado {licencia.estadolicencia}</div>
+                  <div className="mb-1 small text-nowrap">{estadoLicencia(licencia)}</div>
                   {/* TODO: Falta hacer los calculos de esta parte */}
-                  <div className="mb-1 small">Plazo tramitación vencido</div>
-                  <div className="mb-1 small">En proceso de Tramitación por Operador</div>
+                  <div className="mb-1 small text-nowrap">Plazo tramitación vencido</div>
+                  <div className="mb-1 small text-nowrap">
+                    En proceso de Tramitación por Operador
+                  </div>
                 </td>
                 <td>
-                  <div className="mb-1 small">{nombreEmpleador(licencia)}</div>
-                  <div className="mb-1 small">{licencia.rutempleador}</div>
-                  <div className="mb-1 small">{licencia.codigounidadrrhh}</div>
+                  <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
+                  <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
+                  <div className="mb-1 small text-nowrap">{licencia.codigounidadrrhh}</div>
                 </td>
                 <td>
-                  <div className="mb-1 small">
+                  <div className="mb-1 small text-nowrap">
                     {`${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`}
                   </div>
-                  <div className="mb-1 small">RUN: {licencia.runtrabajador}</div>
+                  <div className="mb-1 small text-nowrap">RUN: {licencia.runtrabajador}</div>
                 </td>
                 <td>
                   {/* Formatear fechas */}
-                  <div className="mb-1 small">Reposo Total: {licencia.diasreposo} día(s)</div>
-                  <div className="mb-1 small">
+                  <div className="mb-1 small text-nowrap">
+                    Reposo Total: {licencia.diasreposo} día(s)
+                  </div>
+                  <div className="mb-1 small text-nowrap">
                     Inicio Reposo: {format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy')}
                   </div>
-                  <div className="mb-1 small">
+                  <div className="mb-1 small text-nowrap">
                     Fecha de Emisión: {format(new Date(licencia.fechaemision), 'dd-MM-yyyy')}
                   </div>
                   {/* TODO: Ver que va en lugar de esto: Enfermedad o Accidente no del trabajo  */}
@@ -116,7 +121,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
               </tr>
             ))}
           </tbody>
-        </table>
+        </Table>
       </div>
       <div className="mt-4 mb-2">
         <Paginacion
