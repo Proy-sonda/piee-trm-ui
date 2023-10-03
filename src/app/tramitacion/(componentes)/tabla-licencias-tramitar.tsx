@@ -1,6 +1,7 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
+import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import Link from 'next/link';
 import React from 'react';
@@ -24,11 +25,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
 
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
-    return empleadores.find((e) => coincideParcialmente(licencia.rutempleador, e.rutempleador))?.nombrefantasia ?? '';
-  };
-
-  const coincideParcialmente = (str1: string, str2?: string) => {
-    return str1.toUpperCase().includes((str2 ?? '').toUpperCase());
+    return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.nombrefantasia ?? '';
   };
 
   return (

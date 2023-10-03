@@ -3,19 +3,27 @@ import { InputFecha } from '@/components/form/input-fecha';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
+import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
+import { endOfDay, startOfDay } from 'date-fns';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { DatosFiltroLicencias } from '../(modelos)/datos-filtro-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
+import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
 import { InputFolio } from './input-folio';
 import { InputRunPersonaTrabajadora } from './input-run-persona-trabajadora';
 
 interface FiltroLicenciasProps {
+  licenciasParaTramitar: LicenciaTramitar[];
   empleadores: Empleador[];
   onFiltrarLicencias: (formulario: DatosFiltroLicencias) => void | Promise<void>;
 }
 
-const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltrarLicencias }) => {
+const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
+  licenciasParaTramitar,
+  empleadores,
+  onFiltrarLicencias,
+}) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
 
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
@@ -28,8 +36,8 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
   const filtrarLicencias: SubmitHandler<FormularioFiltrarLicencias> = async (data) => {
     onFiltrarLicencias({
       folio: data.folio.trim() === '' ? undefined : data.folio,
-      fechaDesde: data.fechaDesde === '' ? undefined : data.fechaDesde,
-      fechaHasta: data.fechaHasta === '' ? undefined : data.fechaDesde,
+      fechaDesde: esFechaInvalida(data.fechaDesde) ? undefined : startOfDay(data.fechaDesde),
+      fechaHasta: esFechaInvalida(data.fechaHasta) ? undefined : endOfDay(data.fechaHasta),
       idUnidadRRHH: Number.isNaN(data.idUnidadRRHH) ? undefined : data.idUnidadRRHH,
       rutEntidadEmpleadora:
         data.rutEntidadEmpleadora === '' ? undefined : data.rutEntidadEmpleadora,
@@ -55,6 +63,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
             <InputFecha
               opcional
               name="fechaDesde"
+              noPosteriorA="fechaHasta"
               label="Fecha Emisión Desde"
               className="col-12 col-md-6 col-lg-3"
             />
@@ -62,6 +71,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
             <InputFecha
               opcional
               name="fechaHasta"
+              noAnteriorA="fechaDesde"
               label="Fecha Emisión Hasta"
               className="col-12 col-md-6 col-lg-3"
             />
