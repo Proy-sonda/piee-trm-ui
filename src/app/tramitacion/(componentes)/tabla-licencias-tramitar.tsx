@@ -94,15 +94,15 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     <Link
                       className="btn btn-sm btn-success"
                       href={`/tramitacion/${licencia.foliolicencia}/c1`}>
-                      <small>TRAMITAR</small>
+                      <small className="text-nowrap">TRAMITAR</small>
                     </Link>
                     <button className="btn btn-sm btn-primary">
-                      <small>VER PDF</small>
+                      <small className="text-nowrap">VER PDF</small>
                     </button>
                     <Link
                       className="btn btn-sm btn-danger"
                       href={`/tramitacion/${licencia.foliolicencia}/no-tramitar`}>
-                      <small> NO RECEPCIONAR</small>
+                      <small className="text-nowrap"> NO RECEPCIONAR</small>
                     </Link>
                   </Stack>
                 </td>
