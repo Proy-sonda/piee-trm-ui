@@ -1,5 +1,4 @@
-import { ComboSimple } from '@/components/form';
-import { InputFecha } from '@/components/form/input-fecha';
+import { ComboSimple, InputFecha, InputRutBusqueda } from '@/components/form';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
@@ -9,21 +8,13 @@ import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { DatosFiltroLicencias } from '../(modelos)/datos-filtro-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
-import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
-import { InputFolio } from './input-folio';
-import { InputRunPersonaTrabajadora } from './input-run-persona-trabajadora';
 
 interface FiltroLicenciasProps {
-  licenciasParaTramitar: LicenciaTramitar[];
   empleadores: Empleador[];
   onFiltrarLicencias: (formulario: DatosFiltroLicencias) => void | Promise<void>;
 }
 
-const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
-  licenciasParaTramitar,
-  empleadores,
-  onFiltrarLicencias,
-}) => {
+const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltrarLicencias }) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
 
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
@@ -51,9 +42,14 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
           <div className="row g-3 align-items-baseline">
-            <InputFolio opcional name="folio" label="Folio" className="col-12 col-md-6 col-lg-3" />
+            <InputRutBusqueda
+              opcional
+              name="folio"
+              label="Folio"
+              className="col-12 col-md-6 col-lg-3"
+            />
 
-            <InputRunPersonaTrabajadora
+            <InputRutBusqueda
               opcional
               name="runPersonaTrabajadora"
               label="RUN Persona Trabajadora"

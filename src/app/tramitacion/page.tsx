@@ -56,7 +56,7 @@ const TramitacionPage = () => {
         });
       }
 
-      return coincideFolio && coincideRun && enRangoFechas;
+      return (coincideFolio || coincideRun) && enRangoFechas;
     };
   };
 
@@ -92,7 +92,6 @@ const TramitacionPage = () => {
 
           <div className="pt-3 pb-4 border-bottom border-1">
             <FiltroLicencias
-              licenciasParaTramitar={datosBandeja?.licenciasParaTramitar ?? []}
               empleadores={datosBandeja?.empleadores ?? []}
               onFiltrarLicencias={filtrarLicencias}
             />
