@@ -15,6 +15,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import 'animate.css';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Cabecera from '../(componentes)/cabecera';
@@ -52,6 +53,7 @@ const step = [
 
 const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   const formulario = useForm<formularioApp>({ mode: 'onSubmit' });
+  const router = useRouter();
   const [fadeinOut, setfadeinOut] = useState('');
   const [otros, setotros] = useState<Boolean>(false);
   const [refrescar, refrescarPagina] = useRefrescarPagina();
@@ -207,7 +209,14 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   <button className="btn btn-success">Guardar</button>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-primary">Siguiente</button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push(`/tramitacion/${foliotramitacion}/c2`);
+                    }}>
+                    Siguiente
+                  </button>
                 </div>
               </div>
             </form>
