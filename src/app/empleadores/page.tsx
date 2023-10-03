@@ -9,12 +9,12 @@ import { EmpleadorContext } from '@/contexts/empleador-context';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
+import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
 import { useContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
-import { buscarEmpleadores } from './(servicios)/buscar-empleadores';
 import { desadscribirEmpleador } from './(servicios)/desadscribir-empleador';
 
 const EmpleadoresPage = () => {
