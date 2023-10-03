@@ -1,31 +1,27 @@
-import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import Link from 'next/link';
 import React from 'react';
 import { Stack } from 'react-bootstrap';
+import { EstadoLicencia } from '../(modelos)/estado-licencia';
 import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
-import { buscarEstadosLicencia } from '../(servicios)/buscar-estado-licencia';
-import { buscarOperadores } from '../(servicios)/buscar-operadores';
+import { Operador } from '../(modelos)/operador';
 import styles from '../page.module.css';
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];
   licencias?: LicenciaTramitar[];
+  operadores?: Operador[];
+  estadosLicencias?: EstadoLicencia[];
 }
 
 const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   empleadores,
   licencias,
+  operadores,
+  estadosLicencias,
 }) => {
-  const [, datosTabla, cargando] = useMergeFetchObject({
-    operadores: buscarOperadores(),
-    estadosLicencia: buscarEstadosLicencia(),
-  });
-
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: licencias,
     tamanoPagina: 5,
@@ -38,7 +34,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
 
   const nombreOperador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
-    return  (datosTabla?.operadores ?? []).find((o) => o.idoperador === licencia.codigooperador)?.operador ?? '';
+    return  (operadores ?? []).find((o) => o.idoperador === licencia.codigooperador)?.operador ?? '';
   };
 
   const formatearFecha = (fechaStr: string) => {
@@ -53,15 +49,11 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
 
   const estadoLicencia = (licencia: LicenciaTramitar) => {
     // prettier-ignore
-    return (datosTabla?.estadosLicencia ?? []).find((e) => e.idestadolicencia === licencia.estadolicencia)?.estadolicencia ?? ''
+    return (estadosLicencias ?? []).find((e) => e.idestadolicencia === licencia.estadolicencia)?.estadolicencia ?? ''
   };
 
   return (
     <>
-      <IfContainer show={cargando}>
-        <SpinnerPantallaCompleta />
-      </IfContainer>
-
       <div className="table-responsive">
         <table className="table table-hover table-striped">
           <thead>
@@ -91,7 +83,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <div className="mb-1 small">En proceso de Tramitación por Operador</div>
                 </td>
                 <td>
-                  <div className="mb-1 small">{nombreEmpleador(licencia) ?? ''}</div>
+                  <div className="mb-1 small">{nombreEmpleador(licencia)}</div>
                   <div className="mb-1 small">{licencia.rutempleador}</div>
                   <div className="mb-1 small">{licencia.codigounidadrrhh}</div>
                 </td>
