@@ -6,22 +6,20 @@ import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
+import { strIncluye } from '@/utilidades/str-incluye';
+import { isWithinInterval } from 'date-fns';
 import { useEffect, useState } from 'react';
 import FiltroLicencias from './(componentes)/filtro-licencias';
 import SemaforoLicencias, { EstadoLicenciaFiltrar } from './(componentes)/semaforo-licencias';
 import TablaLicenciasTramitar from './(componentes)/tabla-licencias-tramitar';
 import { DatosFiltroLicencias, hayFiltros } from './(modelos)/datos-filtro-licencias';
 import { LicenciaTramitar } from './(modelos)/licencia-tramitar';
-import { buscarEstadosLicencia } from './(servicios)/buscar-estado-licencia';
 import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para-tramitar';
-import { buscarOperadores } from './(servicios)/buscar-operadores';
 
 const TramitacionPage = () => {
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
     licenciasParaTramitar: buscarLicenciasParaTramitar(),
     empleadores: buscarEmpleadores(''),
-    operadores: buscarOperadores(),
-    estadosLicencia: buscarEstadosLicencia(),
   });
 
   const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitar[]>([]);
@@ -40,20 +38,26 @@ const TramitacionPage = () => {
     }
 
     const licenciasParaFiltrar = datosBandeja?.licenciasParaTramitar ?? [];
-
-    if (filtros.folio !== undefined) {
-      const licencias = licenciasParaFiltrar.filter((lic) =>
-        coincideParcialmente(lic.foliolicencia, filtros.folio),
-      );
-      setLicenciasFiltradas(licencias);
-      return;
-    }
-
-    // TODO: Filtrar por otros campos
+    const licenciasFiltradas = licenciasParaFiltrar.filter(filtrarCon(filtros));
+    setLicenciasFiltradas(licenciasFiltradas);
   };
 
-  const coincideParcialmente = (str1: string, str2?: string) => {
-    return str1.toUpperCase().includes((str2 ?? '').toUpperCase());
+  const filtrarCon = (filtros: DatosFiltroLicencias) => {
+    return (licencia: LicenciaTramitar) => {
+      const coincideFolio = strIncluye(licencia.foliolicencia, filtros.folio);
+
+      const coincideRun = strIncluye(licencia.runtrabajador, filtros.runPersonaTrabajadora);
+
+      let enRangoFechas = true;
+      if (filtros.fechaDesde && filtros.fechaHasta) {
+        enRangoFechas = isWithinInterval(new Date(licencia.fechaemision), {
+          start: filtros.fechaDesde,
+          end: filtros.fechaHasta,
+        });
+      }
+
+      return (coincideFolio || coincideRun) && enRangoFechas;
+    };
   };
 
   const filtrarPorEstado = (estado: EstadoLicenciaFiltrar) => {
@@ -104,8 +108,6 @@ const TramitacionPage = () => {
           <div className="row mt-3">
             <div className="col-md-12">
               <TablaLicenciasTramitar
-                estadosLicencias={datosBandeja?.estadosLicencia}
-                operadores={datosBandeja?.operadores}
                 empleadores={datosBandeja?.empleadores ?? []}
                 licencias={licenciasFiltradas}
               />
