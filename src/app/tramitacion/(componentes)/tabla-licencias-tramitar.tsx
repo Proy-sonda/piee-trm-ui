@@ -5,23 +5,17 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import React from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import { EstadoLicencia } from '../(modelos)/estado-licencia';
 import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
-import { Operador } from '../(modelos)/operador';
 import styles from './tabla-licencias-tramitar.module.css';
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];
   licencias?: LicenciaTramitar[];
-  operadores?: Operador[];
-  estadosLicencias?: EstadoLicencia[];
 }
 
 const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
-  empleadores,
   licencias,
-  operadores,
-  estadosLicencias,
+  empleadores,
 }) => {
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: licencias,
@@ -30,17 +24,11 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
 
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
-    return empleadores.find((e) => e.rutempleador === licencia.rutempleador.substring(2))?.nombrefantasia ?? '';
+    return empleadores.find((e) => coincideParcialmente(licencia.rutempleador, e.rutempleador))?.nombrefantasia ?? '';
   };
 
-  const nombreOperador = (licencia: LicenciaTramitar) => {
-    // prettier-ignore
-    return  (operadores ?? []).find((o) => o.idoperador === licencia.codigooperador)?.operador ?? '';
-  };
-
-  const estadoLicencia = (licencia: LicenciaTramitar) => {
-    // prettier-ignore
-    return (estadosLicencias ?? []).find((e) => e.idestadolicencia === licencia.estadolicencia)?.estadolicencia ?? ''
+  const coincideParcialmente = (str1: string, str2?: string) => {
+    return str1.toUpperCase().includes((str2 ?? '').toUpperCase());
   };
 
   return (
@@ -64,13 +52,16 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 <td>
                   {/* TODO: Cambiar el color del circulo de acuerdo al estado */}
                   <div className={`mb-2 ${styles.circlered}`}></div>
-                  <div className="small mb-1 text-nowrap">
-                    {nombreOperador(licencia)} {licencia.foliolicencia}
-                  </div>
+                  <div className="small mb-1 text-nowrap">{licencia.operador.operador}</div>
+                  <div className="small mb-1 mx-3 text-nowrap">{licencia.foliolicencia}</div>
                 </td>
                 <td>
-                  <div className="mb-1 small text-nowrap">Estado {licencia.estadolicencia}</div>
-                  <div className="mb-1 small text-nowrap">{estadoLicencia(licencia)}</div>
+                  <div className="mb-1 small text-nowrap">
+                    Estado {licencia.estadolicencia.idestadolicencia}
+                  </div>
+                  <div className="mb-1 small text-nowrap">
+                    {licencia.estadolicencia.estadolicencia}
+                  </div>
                   {/* TODO: Falta hacer los calculos de esta parte */}
                   <div className="mb-1 small text-nowrap">Plazo tramitación vencido</div>
                   <div className="mb-1 small text-nowrap">
@@ -80,7 +71,6 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 <td>
                   <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
                   <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
-                  <div className="mb-1 small text-nowrap">{licencia.codigounidadrrhh}</div>
                 </td>
                 <td>
                   <div className="mb-1 small text-nowrap">
@@ -89,17 +79,18 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <div className="mb-1 small text-nowrap">RUN: {licencia.runtrabajador}</div>
                 </td>
                 <td>
-                  {/* Formatear fechas */}
-                  <div className="mb-1 small text-nowrap">
-                    Reposo Total: {licencia.diasreposo} día(s)
+                  <div className="mb-1 small text-start text-nowrap">
+                    {licencia.tiporesposo.tiporeposo}: {licencia.diasreposo} día(s)
                   </div>
-                  <div className="mb-1 small text-nowrap">
-                    Inicio Reposo: {format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy')}
+                  <div className="mb-1 small text-start text-nowrap">
+                    INICIO REPOSO: {format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy')}
                   </div>
-                  <div className="mb-1 small text-nowrap">
-                    Fecha de Emisión: {format(new Date(licencia.fechaemision), 'dd-MM-yyyy')}
+                  <div className="mb-1 small text-start text-nowrap">
+                    FECHA DE EMISIÓN: {format(new Date(licencia.fechaemision), 'dd-MM-yyyy')}
                   </div>
-                  {/* TODO: Ver que va en lugar de esto: Enfermedad o Accidente no del trabajo  */}
+                  <div className="mb-1 small text-start text-nowrap">
+                    {licencia.tipolicencia.tipolicencia}
+                  </div>
                 </td>
                 <td>
                   <Stack gap={2}>
