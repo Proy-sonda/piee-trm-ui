@@ -1,8 +1,8 @@
 export interface DatosFiltroLicencias {
   folio?: string;
   runPersonaTrabajadora?: string;
-  fechaDesde?: string;
-  fechaHasta?: string;
+  fechaDesde?: Date;
+  fechaHasta?: Date;
   rutEntidadEmpleadora?: string;
   idUnidadRRHH?: number;
 }
