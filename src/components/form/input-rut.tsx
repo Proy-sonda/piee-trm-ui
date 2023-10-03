@@ -19,6 +19,8 @@ interface InputRutProps extends Omit<BaseProps, 'label'> {
   deshabilitado?: boolean;
 
   omitirSignoObligatorio?: boolean;
+
+  opcional?: boolean;
 }
 
 export const InputRut: React.FC<InputRutProps> = ({
@@ -28,6 +30,7 @@ export const InputRut: React.FC<InputRutProps> = ({
   omitirLabel,
   tipo,
   deshabilitado,
+  opcional,
   omitirSignoObligatorio,
 }) => {
   const idInput = useRandomId('rut');
@@ -45,7 +48,7 @@ export const InputRut: React.FC<InputRutProps> = ({
       return '';
     }
 
-    return omitirSignoObligatorio ? `${label}` : `${label} (*)`;
+    return omitirSignoObligatorio || opcional ? `${label}` : `${label} (*)`;
   };
 
   return (
@@ -61,9 +64,16 @@ export const InputRut: React.FC<InputRutProps> = ({
           isInvalid={!!errors[name]}
           disabled={deshabilitado}
           {...register(name, {
-            required: `El ${tipoInput()} es obligatorio`,
+            required: {
+              value: !opcional,
+              message: `El ${tipoInput()} es obligatorio`,
+            },
             validate: {
               esRut: (rut) => {
+                if (opcional && rut === '') {
+                  return;
+                }
+
                 if (!validateRut(rut)) {
                   return `El ${tipoInput()} es inválido`;
                 }

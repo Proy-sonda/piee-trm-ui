@@ -29,7 +29,10 @@ interface formularioApp {
   nombreentidadpagadorasubsidio: string;
 }
 
+
 const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
+
+
   const [fadeinOut, setfadeinOut] = useState('');
   const router = useRouter();
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({

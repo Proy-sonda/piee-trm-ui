@@ -24,8 +24,14 @@ interface ComboSimpleProps<T> extends BaseProps {
    * (default: `number`).
    * */
   tipoValor?: 'number' | 'string';
+
+  opcional?: boolean;
 }
 
+/**
+ * El valor en caso de ser opcional es un string vacío cuando el combo es tipo `string` o `isNan`
+ * cuando es un combo tipo `number`.
+ */
 export const ComboSimple = <T extends Record<string, any>>({
   name,
   label,
@@ -35,6 +41,7 @@ export const ComboSimple = <T extends Record<string, any>>({
   descripcion,
   textoOpcionPorDefecto,
   tipoValor,
+  opcional,
 }: ComboSimpleProps<T>) => {
   const idInput = useRandomId('combo');
 
@@ -46,7 +53,7 @@ export const ComboSimple = <T extends Record<string, any>>({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label} (*)`}</Form.Label>
+        <Form.Label>{`${label}${!opcional ? ' (*)' : ''}`}</Form.Label>
 
         <Form.Select
           autoComplete="new-custom-value"
@@ -61,6 +68,10 @@ export const ComboSimple = <T extends Record<string, any>>({
             },
             validate: {
               comboObligatorio: (valor: number | string) => {
+                if (opcional) {
+                  return;
+                }
+
                 if (Number.isNaN(valor)) {
                   return 'Este campo es obligatorio';
                 }
