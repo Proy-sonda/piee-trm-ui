@@ -1,6 +1,7 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
+import { format } from 'date-fns';
 import Link from 'next/link';
 import React from 'react';
 import { Stack } from 'react-bootstrap';
@@ -35,16 +36,6 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const nombreOperador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return  (operadores ?? []).find((o) => o.idoperador === licencia.codigooperador)?.operador ?? '';
-  };
-
-  const formatearFecha = (fechaStr: string) => {
-    const fecha = new Date(fechaStr);
-
-    const dia = fecha.getDate() < 10 ? `0${fecha.getDate()}` : fecha.getDate();
-    const mes = fecha.getMonth() + 1 < 10 ? `0${fecha.getMonth() + 1}` : fecha.getMonth() + 1;
-    const ano = fecha.getFullYear();
-
-    return `${dia}-${mes}-${ano}`;
   };
 
   const estadoLicencia = (licencia: LicenciaTramitar) => {
@@ -96,10 +87,10 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   {/* Formatear fechas */}
                   <div className="mb-1 small">Reposo Total: {licencia.diasreposo} día(s)</div>
                   <div className="mb-1 small">
-                    Inicio Reposo: {formatearFecha(licencia.fechainicioreposo)}
+                    Inicio Reposo: {format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy')}
                   </div>
                   <div className="mb-1 small">
-                    Fecha de Emisión: {formatearFecha(licencia.fechaemision)}
+                    Fecha de Emisión: {format(new Date(licencia.fechaemision), 'dd-MM-yyyy')}
                   </div>
                   {/* TODO: Ver que va en lugar de esto: Enfermedad o Accidente no del trabajo  */}
                 </td>
