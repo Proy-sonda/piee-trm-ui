@@ -1,4 +1,5 @@
 import { ComboSimple } from '@/components/form';
+import { InputFecha } from '@/components/form/input-fecha';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
@@ -6,7 +7,6 @@ import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { DatosFiltroLicencias } from '../(modelos)/datos-filtro-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
-import { InputFecha } from './input-fecha';
 import { InputFolio } from './input-folio';
 import { InputRunPersonaTrabajadora } from './input-run-persona-trabajadora';
 
