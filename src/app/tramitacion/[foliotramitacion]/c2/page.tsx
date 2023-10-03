@@ -4,6 +4,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Cabecera from '../(componentes)/cabecera';
@@ -28,10 +29,9 @@ interface formularioApp {
   nombreentidadpagadorasubsidio: string;
 }
 
-
 const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
-
   const [fadeinOut, setfadeinOut] = useState('');
+  const router = useRouter();
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     REGIMEN: buscarRegimen(),
     PREVISIONAL: buscarInstitucionPrevisional(),
@@ -193,7 +193,14 @@ const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   <button className="btn btn-success">Guardar</button>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-primary">Siguiente</button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      router.push(`/tramitacion/${foliotramitacion}/c3`);
+                    }}>
+                    Siguiente
+                  </button>
                 </div>
               </div>
             </form>
