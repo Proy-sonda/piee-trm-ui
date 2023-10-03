@@ -8,7 +8,9 @@ interface myprops {
   };
 }
 
+
 const C3Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
+
   const step = [
     { label: 'Entidad Empleadora/Independiente', num: 1, active: false, url: '/adscripcion' },
     { label: 'Previsión persona trabajadora', num: 2, active: false, url: '/adscripcion/pasodos' },
