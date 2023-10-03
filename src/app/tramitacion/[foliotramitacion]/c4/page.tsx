@@ -1,4 +1,3 @@
-
 'use client';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Cabecera from '../(componentes)/cabecera';
@@ -128,6 +127,6 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
       </div>
     </div>
   );
-
+};
 
 export default C4Page;
