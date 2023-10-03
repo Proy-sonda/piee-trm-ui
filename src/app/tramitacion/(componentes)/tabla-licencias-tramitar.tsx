@@ -60,7 +60,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
           </thead>
           <tbody>
             {licenciasPaginadas.map((licencia) => (
-              <tr className="text-center align-middle">
+              <tr key={licencia.foliolicencia} className="text-center align-middle">
                 <td>
                   {/* TODO: Cambiar el color del circulo de acuerdo al estado */}
                   <div className={`mb-2 ${styles.circlered}`}></div>
