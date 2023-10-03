@@ -63,13 +63,14 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 <td>
                   {/* TODO: Cambiar el color del circulo de acuerdo al estado */}
                   <div className={`mb-2 ${styles.circlered}`}></div>
-                  <div className="small mb-1">{nombreOperador(licencia)}</div>
-                  <div className="small">{licencia.foliolicencia}</div>
+                  <div className="small mb-1 text-nowrap">
+                    {nombreOperador(licencia)} {licencia.foliolicencia}
+                  </div>
                 </td>
                 <td>
                   <div className="mb-1 small">Estado {licencia.estadolicencia}</div>
                   <div className="mb-1 small">{estadoLicencia(licencia)}</div>
-                  {/* TODO: Ver a que corresponde esto */}
+                  {/* TODO: Falta hacer los calculos de esta parte */}
                   <div className="mb-1 small">Plazo tramitación vencido</div>
                   <div className="mb-1 small">En proceso de Tramitación por Operador</div>
                 </td>
