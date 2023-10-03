@@ -4,6 +4,7 @@ export interface LicenciaTramitar {
   rutempleador: string;
   codigounidadrrhh: string;
   runtrabajador: string;
+  nombres: string;
   apellidopaterno: string;
   apellidomaterno: string;
   tiporesposo: number;

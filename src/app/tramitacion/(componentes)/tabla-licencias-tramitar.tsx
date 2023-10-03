@@ -79,8 +79,9 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <div className="mb-1 small">{licencia.codigounidadrrhh}</div>
                 </td>
                 <td>
-                  {/* TODO: Falta nombre de la persona trabajadora */}
-                  <div className="mb-1 small">{`${licencia.apellidopaterno} ${licencia.apellidomaterno}`}</div>
+                  <div className="mb-1 small">
+                    {`${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`}
+                  </div>
                   <div className="mb-1 small">RUN: {licencia.runtrabajador}</div>
                 </td>
                 <td>
