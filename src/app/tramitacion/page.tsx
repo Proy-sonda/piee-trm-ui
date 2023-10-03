@@ -56,7 +56,12 @@ const TramitacionPage = () => {
         });
       }
 
-      return (coincideFolio || coincideRun) && enRangoFechas;
+      const coincideEntidadEmpleadora = strIncluye(
+        licencia.rutempleador,
+        filtros.rutEntidadEmpleadora,
+      );
+
+      return coincideFolio && coincideRun && enRangoFechas && coincideEntidadEmpleadora;
     };
   };
 
