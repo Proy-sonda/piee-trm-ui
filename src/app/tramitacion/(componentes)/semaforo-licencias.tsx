@@ -23,8 +23,9 @@ const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccion
   return (
     <>
       <div>
-        {semaforos.map((semaforo) => (
+        {semaforos.map((semaforo, index) => (
           <div
+            key={index}
             className={`text-start cursor-pointer ${styles.filtrocolor}`}
             onClick={() => onEstadoSeleccionado(semaforo.value)}>
             <span className={`me-1 ${styles.circle} ${styles[semaforo.color]}`}></span>
