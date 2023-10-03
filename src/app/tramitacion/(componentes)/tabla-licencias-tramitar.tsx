@@ -8,7 +8,7 @@ import { Stack } from 'react-bootstrap';
 import { EstadoLicencia } from '../(modelos)/estado-licencia';
 import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
 import { Operador } from '../(modelos)/operador';
-import styles from '../page.module.css';
+import styles from './tabla-licencias-tramitar.module.css';
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];

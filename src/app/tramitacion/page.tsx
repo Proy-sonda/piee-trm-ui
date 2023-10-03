@@ -8,13 +8,13 @@ import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
 import { useEffect, useState } from 'react';
 import FiltroLicencias from './(componentes)/filtro-licencias';
+import SemaforoLicencias, { EstadoLicenciaFiltrar } from './(componentes)/semaforo-licencias';
 import TablaLicenciasTramitar from './(componentes)/tabla-licencias-tramitar';
 import { DatosFiltroLicencias, hayFiltros } from './(modelos)/datos-filtro-licencias';
 import { LicenciaTramitar } from './(modelos)/licencia-tramitar';
 import { buscarEstadosLicencia } from './(servicios)/buscar-estado-licencia';
 import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para-tramitar';
 import { buscarOperadores } from './(servicios)/buscar-operadores';
-import styles from './page.module.css';
 
 const TramitacionPage = () => {
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
@@ -56,6 +56,10 @@ const TramitacionPage = () => {
     return str1.toUpperCase().includes((str2 ?? '').toUpperCase());
   };
 
+  const filtrarPorEstado = (estado: EstadoLicenciaFiltrar) => {
+    console.log('Estado seleccionado: ', estado);
+  };
+
   return (
     <div className="bgads">
       <Position />
@@ -94,26 +98,7 @@ const TramitacionPage = () => {
           </div>
 
           <div className="row text-end">
-            <div className="col-md-12">
-              <div className={`text-start ${styles.filtrocolor}`}>
-                <span
-                  style={{ height: '25px', marginLeft: '4px', cursor: 'pointer' }}
-                  className={`${styles.circlegreen}`}></span>
-                &nbsp;<label style={{ cursor: 'pointer' }}>Por Tramitar</label>
-              </div>
-              <div className={`text-start ${styles.filtrocolor}`}>
-                <span
-                  style={{ height: '25px', marginLeft: '4px', cursor: 'pointer' }}
-                  className={`${styles.circleyellow}`}></span>
-                &nbsp;<label style={{ cursor: 'pointer' }}>Por Vencer</label>
-              </div>
-              <div className={`text-start ${styles.filtrocolor}`}>
-                <span
-                  style={{ height: '25px', marginLeft: '4px', cursor: 'pointer' }}
-                  className={`${styles.circlered}`}></span>
-                &nbsp;<label style={{ cursor: 'pointer' }}>Vencido</label>
-              </div>
-            </div>
+            <SemaforoLicencias onEstadoSeleccionado={filtrarPorEstado} />
           </div>
 
           <div className="row mt-3">
