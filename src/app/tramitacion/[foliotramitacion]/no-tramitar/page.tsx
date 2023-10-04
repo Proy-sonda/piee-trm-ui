@@ -1,11 +1,13 @@
 'use client';
 
+import { InputArchivo, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import Titulo from '@/components/titulo/titulo';
 import Link from 'next/link';
 import React, { useEffect } from 'react';
 import { Col, Container, Form, FormGroup, Row } from 'react-bootstrap';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import InputOtroMotivoDeRechazo from './(componentes)/input-descripcion-motivo-rechazo';
 
 interface NoRecepcionarLicenciaPageProps {
   params: {
@@ -19,31 +21,23 @@ type FormularioNoTramitarLicencia = {
     | 'relacion-laboral-terminada'
     | 'permiso-sin-goce-de-sueldo'
     | 'otro';
-  descripcionOtroMotivo: string;
+  otroMotivoDeRechazo: string;
   documentoEvidencia?: File;
 };
 
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliotramitacion },
 }) => {
-  const errorTipoMotivoObligatorio = 'Debe seleccionar el motivo para no tramitar';
-
-  const {
-    register,
-    handleSubmit,
-    watch,
-    clearErrors,
-    formState: { errors },
-  } = useForm<FormularioNoTramitarLicencia>({
+  const formulario = useForm<FormularioNoTramitarLicencia>({
     mode: 'onBlur',
     defaultValues: {
-      descripcionOtroMotivo: '',
+      otroMotivoDeRechazo: '',
       documentoEvidencia: undefined,
       motivoRechazo: undefined,
     },
   });
 
-  const motivoRechazo = watch('motivoRechazo');
+  const motivoRechazo = formulario.watch('motivoRechazo');
 
   const noTramitarLicencia: SubmitHandler<FormularioNoTramitarLicencia> = async (datos) => {
     console.log('TRAMITANDO LICENCIA');
@@ -53,11 +47,11 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   // Elimina errores cuando el motivo de rechazo cambia
   useEffect(() => {
     if (motivoRechazo !== 'relacion-laboral-terminada') {
-      clearErrors('documentoEvidencia');
+      formulario.clearErrors('documentoEvidencia');
     }
 
     if (motivoRechazo !== 'otro') {
-      clearErrors('descripcionOtroMotivo');
+      formulario.clearErrors('otroMotivoDeRechazo');
     }
   }, [motivoRechazo]);
 
@@ -100,126 +94,81 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
             </IfContainer>
           </Row>
 
-          <Form onSubmit={handleSubmit(noTramitarLicencia)}>
-            <Row>
-              <Col md={8}>
-                <FormGroup controlId="asdfasdf">
-                  <Form.Check
-                    id="flexRadioDefault1"
-                    type="radio"
-                    isInvalid={!!errors['motivoRechazo']}
-                    label="Inexistencia de Relación Laboral"
-                    value="inexistencia-relacion-laboral"
-                    {...register('motivoRechazo', { required: errorTipoMotivoObligatorio })}
+          <FormProvider {...formulario}>
+            <Form onSubmit={formulario.handleSubmit(noTramitarLicencia)}>
+              <Row>
+                <Col md={8}>
+                  <InputRadioButtons
+                    name="motivoRechazo"
+                    errores={{ obligatorio: 'Debe seleccionar el motivo para no tramitar' }}
+                    opciones={[
+                      {
+                        label: 'Inexistencia de Relación Laboral',
+                        value: 'inexistencia-relacion-laboral',
+                      },
+                      {
+                        label: 'Relación Laboral Terminada',
+                        value: 'relacion-laboral-terminada',
+                      },
+                      {
+                        label: 'Persona Trabajadora con permiso sin goce de sueldo',
+                        value: 'permiso-sin-goce-de-sueldo',
+                      },
+                      {
+                        label: 'Otras Razones',
+                        value: 'otro',
+                      },
+                    ]}
                   />
+                </Col>
 
-                  <Form.Check
-                    id="flexRadioDefault2"
-                    type="radio"
-                    isInvalid={!!errors['motivoRechazo']}
-                    label="Relación Laboral Terminada"
-                    value="relacion-laboral-terminada"
-                    {...register('motivoRechazo', { required: errorTipoMotivoObligatorio })}
-                  />
-
-                  <Form.Check
-                    id="flexRadioDefault3"
-                    type="radio"
-                    isInvalid={!!errors['motivoRechazo']}
-                    label="Persona Trabajadora con permiso sin goce de sueldo"
-                    value="permiso-sin-goce-de-sueldo"
-                    {...register('motivoRechazo', { required: errorTipoMotivoObligatorio })}
-                  />
-
-                  <Form.Check
-                    id="flexRadioDefault4"
-                    type="radio"
-                    isInvalid={!!errors['motivoRechazo']}
-                    label="Otras Razones"
-                    value="otro"
-                    {...register('motivoRechazo', { required: errorTipoMotivoObligatorio })}
-                  />
-
-                  <IfContainer show={!!errors['motivoRechazo']}>
-                    <div className="mt-2 small text-danger">
-                      * {errors['motivoRechazo']?.message}
-                    </div>
-                  </IfContainer>
-                </FormGroup>
-              </Col>
-
-              <Col md={4}>
-                <FormGroup controlId="entidadPagaSubsidio">
-                  <Form.Label>Entidad que debe pagar subsidio o Mantener remuneración:</Form.Label>
-                  <Form.Control type="text" disabled value={'Valor de prueba'} />
-                </FormGroup>
-              </Col>
-            </Row>
-
-            <IfContainer show={motivoRechazo === 'otro'}>
-              <Row className="mt-3">
-                <Col md={6}>
-                  <FormGroup className="position-relative" controlId="motivoREchazo">
+                <Col md={4}>
+                  <FormGroup controlId="entidadPagaSubsidio">
                     <Form.Label>
-                      Por favor indique el motivo por el cual no se tramitará esta licencia:
+                      Entidad que debe pagar subsidio o Mantener remuneración:
                     </Form.Label>
-                    <Form.Control
-                      type="text"
-                      autoComplete="new-custom-value"
-                      isInvalid={!!errors['descripcionOtroMotivo']}
-                      {...register('descripcionOtroMotivo', {
-                        required: {
-                          value: motivoRechazo === 'otro',
-                          message: 'Debe especificar el motivo de rechazo',
-                        },
-                      })}
-                    />
-                    <Form.Control.Feedback type="invalid" tooltip>
-                      {errors['descripcionOtroMotivo']?.message?.toString()}
-                    </Form.Control.Feedback>
+                    <Form.Control type="text" disabled value={'Valor de prueba'} />
                   </FormGroup>
                 </Col>
               </Row>
-            </IfContainer>
 
-            <Row className="mt-3">
-              <Col md={5}>
-                <FormGroup controlId="archivoEvidencia" className="positon-relative">
-                  <Form.Label>
-                    Adjuntar Documento {motivoRechazo === 'relacion-laboral-terminada' ? '(*)' : ''}
-                  </Form.Label>
-                  <Form.Control
-                    type="file"
-                    isInvalid={!!errors['documentoEvidencia']}
-                    {...register('documentoEvidencia', {
-                      required: {
-                        value: motivoRechazo === 'relacion-laboral-terminada',
-                        message: 'Debe adjuntar evidencia',
-                      },
-                    })}
+              <IfContainer show={motivoRechazo === 'otro'}>
+                <Row className="mt-3">
+                  <Col md={6}>
+                    <InputOtroMotivoDeRechazo
+                      opcional={motivoRechazo !== 'otro'}
+                      name="otroMotivoDeRechazo"
+                      label="Por favor indique el motivo por el cual no se tramitará esta licencia:"
+                    />
+                  </Col>
+                </Row>
+              </IfContainer>
+
+              <Row className="mt-3">
+                <Col md={5}>
+                  <InputArchivo
+                    opcional={motivoRechazo !== 'relacion-laboral-terminada'}
+                    name="documentoEvidencia"
+                    label="Adjuntar Documento"
                   />
+                </Col>
+              </Row>
 
-                  <Form.Control.Feedback type="invalid" tooltip>
-                    {errors['documentoEvidencia']?.message?.toString()}
-                  </Form.Control.Feedback>
-                </FormGroup>
-              </Col>
-            </Row>
-
-            <Row className="mt-4">
-              <div className="d-flex align-items-center">
-                <Link
-                  href={'/tramitacion'}
-                  className="btn btn-danger me-2"
-                  title="Página Bandeja de Tramitación">
-                  Volver
-                </Link>
-                <button type="submit" className="btn btn-primary">
-                  Aceptar
-                </button>
-              </div>
-            </Row>
-          </Form>
+              <Row className="mt-4">
+                <div className="d-flex align-items-center">
+                  <Link
+                    href={'/tramitacion'}
+                    className="btn btn-danger me-2"
+                    title="Página Bandeja de Tramitación">
+                    Volver
+                  </Link>
+                  <button type="submit" className="btn btn-primary">
+                    Aceptar
+                  </button>
+                </div>
+              </Row>
+            </Form>
+          </FormProvider>
         </Container>
       </div>
     </>

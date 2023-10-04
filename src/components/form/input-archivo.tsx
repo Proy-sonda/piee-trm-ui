@@ -1,0 +1,41 @@
+import { useRandomId } from '@/hooks/use-random-id';
+import React from 'react';
+import { Form, FormGroup } from 'react-bootstrap';
+import { useFormContext } from 'react-hook-form';
+import { BaseProps } from '.';
+
+interface InputArchivoProps extends BaseProps {
+  opcional?: boolean;
+}
+
+export const InputArchivo: React.FC<InputArchivoProps> = ({ name, label, className, opcional }) => {
+  const idInput = useRandomId('archivo');
+
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+
+  return (
+    <>
+      <FormGroup controlId={idInput} className={`${className ?? ''} positon-relative`}>
+        <Form.Label>{`${label}${!opcional ? ' (*)' : ''}`}</Form.Label>
+
+        <Form.Control
+          type="file"
+          isInvalid={!!errors[name]}
+          {...register(name, {
+            required: {
+              value: !opcional,
+              message: 'Debe adjuntar evidencia',
+            },
+          })}
+        />
+
+        <Form.Control.Feedback type="invalid" tooltip>
+          {errors[name]?.message?.toString()}
+        </Form.Control.Feedback>
+      </FormGroup>
+    </>
+  );
+};
