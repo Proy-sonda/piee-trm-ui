@@ -19,7 +19,7 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({ name, label, classNa
 
   return (
     <>
-      <FormGroup controlId={idInput} className={`${className ?? ''} positon-relative`}>
+      <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
         <Form.Label>{`${label}${!opcional ? ' (*)' : ''}`}</Form.Label>
 
         <Form.Control

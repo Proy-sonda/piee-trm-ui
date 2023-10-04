@@ -7,7 +7,7 @@ import Link from 'next/link';
 import React, { useEffect } from 'react';
 import { Col, Container, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { InputOtroMotivoDeRechazo } from './(componentes)/input-descripcion-motivo-rechazo';
+import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar-licencia';
 
 interface NoRecepcionarLicenciaPageProps {
