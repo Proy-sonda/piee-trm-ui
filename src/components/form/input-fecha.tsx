@@ -13,8 +13,7 @@ interface InputFechaProps extends BaseProps {
    * Propiedad `name` del `InputFecha` tal que la fecha de este input no sea anterior que el input
    * indicado.
    *
-   * Si los valores no coindiden, el error se muestra en el input que define la propiedad
-   * `noAnteriorA`.
+   * > IMPORTANTE: Si se incluye un valor para `noAnteriorA`, este input se vuelve obligatorio.
    *
    * @example
    *  ```typescriptreact
@@ -30,13 +29,12 @@ interface InputFechaProps extends BaseProps {
    * Propiedad `name` del `InputFecha` tal que la fecha de este input no sea posterior a la del
    * input indicado.
    *
-   * Si los valores no coindiden, el error se muestra en el input que define la propiedad
-   * `noPosteriorA`.
+   * > IMPORTANTE: Si se incluye un valor para `noPosteriorA`, este input se vuelve obligatorio.
    *
    * @example
    *  ```typescriptreact
    *  // Se valida que la fecha de este input no sea posterior al del input "hasta"
-   *  <InputFecha name="desde" noPosteriorA="desde" />
+   *  <InputFecha name="desde" noPosteriorA="hasta" />
    *
    *  <InputFecha name="hasta"  />
    *  ```
@@ -62,7 +60,6 @@ export const InputFecha: React.FC<InputFechaProps> = ({
   const {
     register,
     formState: { errors },
-    getValues,
   } = useFormContext();
 
   return (
@@ -98,32 +95,66 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   return 'No puede ser posterior a hoy';
                 }
               },
-              noAnteriorADesde: (fecha: Date) => {
-                if (noAnteriorA === name) {
-                  throw new Error("No se puede validar 'fechaDesde' contra si mismo");
-                }
-
-                if (!noAnteriorA) {
-                  return;
-                }
-
-                const desde: Date = getValues(noAnteriorA);
-                if (!esFechaInvalida(desde) && isBefore(fecha, desde)) {
-                  return 'No puede ser anterior a desde';
-                }
-              },
-              noPosteriorAHasta: (fecha: Date) => {
+              obligatorioSiHayFechaHasta: (fecha: Date, otrosCampos: Record<string, any>) => {
+                // Este input es de "tipo desde"
                 if (noPosteriorA === name) {
-                  throw new Error("No se puede validar 'fechaHasta' contra si mismo");
+                  throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
                 }
 
                 if (!noPosteriorA) {
                   return;
                 }
 
-                const hasta: Date = getValues(noPosteriorA);
+                const hasta: Date = otrosCampos[noPosteriorA];
+
+                if (esFechaInvalida(fecha) && !esFechaInvalida(hasta)) {
+                  return 'Debe incluir la fecha desde';
+                }
+              },
+              noPosteriorAHasta: (fecha: Date, otrosCampos: Record<string, any>) => {
+                // Este input es de "tipo desde"
+                if (noPosteriorA === name) {
+                  throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
+                }
+
+                if (!noPosteriorA) {
+                  return;
+                }
+
+                const hasta: Date = otrosCampos[noPosteriorA];
                 if (!esFechaInvalida(hasta) && isAfter(fecha, hasta)) {
                   return 'No puede ser posterior a hasta';
+                }
+              },
+              obligatorioSiHayFechaDesde: (fecha: Date, otrosCampos: Record<string, any>) => {
+                // Este input es de "tipo hasta"
+                if (noAnteriorA === name) {
+                  throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
+                }
+
+                if (!noAnteriorA) {
+                  return;
+                }
+
+                const desde: Date = otrosCampos[noAnteriorA];
+
+                if (esFechaInvalida(fecha) && !esFechaInvalida(desde)) {
+                  return 'Debe incluir la fecha hasta';
+                }
+              },
+              noAnteriorADesde: (fecha: Date, otrosCampos: Record<string, any>) => {
+                // Este input es de "tipo hasta"
+                if (noAnteriorA === name) {
+                  throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
+                }
+
+                if (!noAnteriorA) {
+                  return;
+                }
+
+                const desde: Date = otrosCampos[noAnteriorA];
+                if (!esFechaInvalida(desde) && isBefore(fecha, desde)) {
+                  return 'No puede ser anterior a desde';
                 }
               },
             },
