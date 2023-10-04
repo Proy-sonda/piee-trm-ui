@@ -10,9 +10,9 @@ import { strIncluye } from '@/utilidades/str-incluye';
 import { isWithinInterval } from 'date-fns';
 import { useEffect, useState } from 'react';
 import FiltroLicencias from './(componentes)/filtro-licencias';
-import SemaforoLicencias, { EstadoLicenciaFiltrar } from './(componentes)/semaforo-licencias';
+import SemaforoLicencias, { FiltroEstadoLicencia } from './(componentes)/semaforo-licencias';
 import TablaLicenciasTramitar from './(componentes)/tabla-licencias-tramitar';
-import { DatosFiltroLicencias, hayFiltros } from './(modelos)/datos-filtro-licencias';
+import { FiltroBusquedaLicencias, hayFiltros } from './(modelos)/filtro-busqueda-licencias';
 import { LicenciaTramitar } from './(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para-tramitar';
 
@@ -23,6 +23,8 @@ const TramitacionPage = () => {
   });
 
   const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitar[]>([]);
+  const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltroBusquedaLicencias>({});
+  const [filtroEstado, setFiltroEstado] = useState<FiltroEstadoLicencia>('todos');
 
   // Actualizar listado de licencias
   useEffect(() => {
@@ -31,19 +33,21 @@ const TramitacionPage = () => {
     }
   }, [datosBandeja]);
 
-  const filtrarLicencias = (filtros: DatosFiltroLicencias) => {
-    if (!hayFiltros(filtros)) {
-      setLicenciasFiltradas(datosBandeja?.licenciasParaTramitar ?? []);
-      return;
-    }
-
+  // Filtrar licencias
+  useEffect(() => {
     const licenciasParaFiltrar = datosBandeja?.licenciasParaTramitar ?? [];
-    const licenciasFiltradas = licenciasParaFiltrar.filter(filtrarCon(filtros));
-    setLicenciasFiltradas(licenciasFiltradas);
-  };
 
-  const filtrarCon = (filtros: DatosFiltroLicencias) => {
+    setLicenciasFiltradas(
+      licenciasParaFiltrar.filter(licenciaCumple(filtrosBusqueda, filtroEstado)),
+    );
+  }, [filtrosBusqueda, filtroEstado]);
+
+  const licenciaCumple = (filtros: FiltroBusquedaLicencias, filtroEstado: FiltroEstadoLicencia) => {
     return (licencia: LicenciaTramitar) => {
+      if (!hayFiltros(filtros)) {
+        return true;
+      }
+
       const coincideFolio = strIncluye(licencia.foliolicencia, filtros.folio);
 
       const coincideRun = strIncluye(licencia.runtrabajador, filtros.runPersonaTrabajadora);
@@ -56,12 +60,13 @@ const TramitacionPage = () => {
         });
       }
 
-      return (coincideFolio || coincideRun) && enRangoFechas;
-    };
-  };
+      const coincideEntidadEmpleadora = strIncluye(
+        licencia.rutempleador,
+        filtros.rutEntidadEmpleadora,
+      );
 
-  const filtrarPorEstado = (estado: EstadoLicenciaFiltrar) => {
-    console.log('Estado seleccionado: ', estado);
+      return coincideFolio && coincideRun && enRangoFechas && coincideEntidadEmpleadora;
+    };
   };
 
   return (
@@ -93,7 +98,7 @@ const TramitacionPage = () => {
           <div className="pt-3 pb-4 border-bottom border-1">
             <FiltroLicencias
               empleadores={datosBandeja?.empleadores ?? []}
-              onFiltrarLicencias={filtrarLicencias}
+              onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
             />
           </div>
 
@@ -102,7 +107,7 @@ const TramitacionPage = () => {
           </div>
 
           <div className="row text-end">
-            <SemaforoLicencias onEstadoSeleccionado={filtrarPorEstado} />
+            <SemaforoLicencias onEstadoSeleccionado={(x) => setFiltroEstado(x)} />
           </div>
 
           <div className="row mt-3">
