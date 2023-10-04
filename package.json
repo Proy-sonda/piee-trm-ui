@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start -p 3005",
     "lint": "next lint",
+    "start-pm2": "pm2 restart ui-pie-trm",
+    "build-and-start": "yarn build && yarn start-pm2",
     "format:check": "prettier --check src",
     "format:fix": "prettier --write src"
   },
