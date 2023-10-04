@@ -1,5 +1,5 @@
 'use client';
-import { ComboSimple } from '@/components/form';
+import { ComboSimple, InputFecha } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
@@ -29,10 +29,7 @@ interface formularioApp {
   nombreentidadpagadorasubsidio: string;
 }
 
-
 const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
-
-
   const [fadeinOut, setfadeinOut] = useState('');
   const router = useRouter();
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
@@ -164,12 +161,14 @@ const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   </div>
                 </div>
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <label className="mb-2">Fecha Afiliación Entidad Previsional</label>
-                  <input type="date" className="form-control" name="fechaafilacionprevisional" />
+                  <InputFecha
+                    name="fechaafilacionprevisional"
+                    label="Fecha Afiliación Entidad Previsional"
+                    opcional
+                  />
                 </div>
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <label className="mb-2">Fecha Contrato de trabajo (*)</label>
-                  <input type="date" className="form-control" name="fechacontratotrabajo" />
+                  <InputFecha name="fechacontratotrabajo" label="Fecha Contrato de trabajo" />
                 </div>
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
                   <ComboSimple
