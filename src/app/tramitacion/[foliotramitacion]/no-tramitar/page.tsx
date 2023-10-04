@@ -43,11 +43,11 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   return (
     <>
-      <div className="px-3 px-lg-5 pb-4 bgads">
+      <div className="px-2 px-lg-5 pb-4 bgads">
         <Container fluid>
           <Row>
             <Titulo url="">
-              <h5>Tramitación / No Recepcionar</h5>
+              <h5 className="m-0 p-0">Tramitación / No Recepcionar</h5>
             </Titulo>
           </Row>
 
@@ -140,17 +140,17 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 </Col>
               </Row>
 
-              <Row className="mt-4">
-                <div className="d-flex align-items-center">
-                  <Link
-                    href={'/tramitacion'}
-                    className="btn btn-danger me-2"
-                    title="Página Bandeja de Tramitación">
-                    Volver
-                  </Link>
+              <Row className="mt-5">
+                <div className="d-flex flex-column flex-sm-row-reverse justify-content-sm-end">
                   <button type="submit" className="btn btn-primary">
                     Aceptar
                   </button>
+                  <Link
+                    href={'/tramitacion'}
+                    className="btn btn-danger mt-2 mt-sm-0 me-sm-2"
+                    title="Página Bandeja de Tramitación">
+                    Volver
+                  </Link>
                 </div>
               </Row>
             </Form>
