@@ -187,7 +187,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                 </div>
 
                 <IfContainer show={otros}>
-                  <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mt-2">
+                  <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mt-2 position-relative">
                     <input
                       type="text"
                       className={`form-control ${
@@ -201,10 +201,12 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                         },
                       })}
                     />
+                    <IfContainer show={!!formulario.formState.errors.otro}>
+                      <div className="invalid-tooltip">
+                        {formulario.formState.errors.otro?.message}
+                      </div>
+                    </IfContainer>
                   </div>
-                </IfContainer>
-                <IfContainer show={!!formulario.formState.errors.otro}>
-                  <div className="invalid-tooltip">{formulario.formState.errors.otro?.message}</div>
                 </IfContainer>
               </div>
               <div className="row">
