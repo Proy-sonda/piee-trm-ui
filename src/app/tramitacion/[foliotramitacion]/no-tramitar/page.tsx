@@ -7,23 +7,14 @@ import Link from 'next/link';
 import React, { useEffect } from 'react';
 import { Col, Container, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import InputOtroMotivoDeRechazo from './(componentes)/input-descripcion-motivo-rechazo';
+import { InputOtroMotivoDeRechazo } from './(componentes)/input-descripcion-motivo-rechazo';
+import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar-licencia';
 
 interface NoRecepcionarLicenciaPageProps {
   params: {
     foliotramitacion: string;
   };
 }
-
-type FormularioNoTramitarLicencia = {
-  motivoRechazo:
-    | 'inexistencia-relacion-laboral'
-    | 'relacion-laboral-terminada'
-    | 'permiso-sin-goce-de-sueldo'
-    | 'otro';
-  otroMotivoDeRechazo: string;
-  documentoEvidencia?: File;
-};
 
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliotramitacion },
@@ -32,7 +23,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     mode: 'onBlur',
     defaultValues: {
       otroMotivoDeRechazo: '',
-      documentoEvidencia: undefined,
+      documentoAdjunto: undefined,
       motivoRechazo: undefined,
     },
   });
@@ -47,7 +38,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   // Elimina errores cuando el motivo de rechazo cambia
   useEffect(() => {
     if (motivoRechazo !== 'relacion-laboral-terminada') {
-      formulario.clearErrors('documentoEvidencia');
+      formulario.clearErrors('documentoAdjunto');
     }
 
     if (motivoRechazo !== 'otro') {
@@ -148,7 +139,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 <Col md={5}>
                   <InputArchivo
                     opcional={motivoRechazo !== 'relacion-laboral-terminada'}
-                    name="documentoEvidencia"
+                    name="documentoAdjunto"
                     label="Adjuntar Documento"
                   />
                 </Col>

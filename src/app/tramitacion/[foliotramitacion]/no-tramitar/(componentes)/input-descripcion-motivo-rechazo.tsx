@@ -8,7 +8,7 @@ interface InputOtroMotivoDeRechazoProps extends BaseProps {
   opcional?: boolean;
 }
 
-const InputOtroMotivoDeRechazo: React.FC<InputOtroMotivoDeRechazoProps> = ({
+export const InputOtroMotivoDeRechazo: React.FC<InputOtroMotivoDeRechazoProps> = ({
   name,
   label,
   className,
@@ -43,5 +43,3 @@ const InputOtroMotivoDeRechazo: React.FC<InputOtroMotivoDeRechazoProps> = ({
     </>
   );
 };
-
-export default InputOtroMotivoDeRechazo;
