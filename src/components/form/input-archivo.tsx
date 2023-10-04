@@ -8,6 +8,7 @@ interface InputArchivoProps extends BaseProps {
   opcional?: boolean;
 }
 
+/** El valor del input va a ser un arreglo de objetos {@link File} */
 export const InputArchivo: React.FC<InputArchivoProps> = ({ name, label, className, opcional }) => {
   const idInput = useRandomId('archivo');
 

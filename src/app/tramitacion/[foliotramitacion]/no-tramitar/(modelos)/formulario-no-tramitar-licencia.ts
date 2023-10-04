@@ -5,5 +5,5 @@ export interface FormularioNoTramitarLicencia {
     | 'permiso-sin-goce-de-sueldo'
     | 'otro';
   otroMotivoDeRechazo: string;
-  documentoAdjunto?: File;
+  documentoAdjunto: File[];
 }

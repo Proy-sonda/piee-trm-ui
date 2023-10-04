@@ -21,11 +21,6 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 }) => {
   const formulario = useForm<FormularioNoTramitarLicencia>({
     mode: 'onBlur',
-    defaultValues: {
-      otroMotivoDeRechazo: '',
-      documentoAdjunto: undefined,
-      motivoRechazo: undefined,
-    },
   });
 
   const motivoRechazo = formulario.watch('motivoRechazo');
