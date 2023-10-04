@@ -6,12 +6,12 @@ import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, startOfDay } from 'date-fns';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { DatosFiltroLicencias } from '../(modelos)/datos-filtro-licencias';
+import { FiltroBusquedaLicencias } from '../(modelos)/filtro-busqueda-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
 
 interface FiltroLicenciasProps {
   empleadores: Empleador[];
-  onFiltrarLicencias: (formulario: DatosFiltroLicencias) => void | Promise<void>;
+  onFiltrarLicencias: (formulario: FiltroBusquedaLicencias) => void | Promise<void>;
 }
 
 const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltrarLicencias }) => {

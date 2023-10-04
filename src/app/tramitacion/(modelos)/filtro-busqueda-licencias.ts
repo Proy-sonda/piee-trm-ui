@@ -1,4 +1,4 @@
-export interface DatosFiltroLicencias {
+export interface FiltroBusquedaLicencias {
   folio?: string;
   runPersonaTrabajadora?: string;
   fechaDesde?: Date;
@@ -7,7 +7,7 @@ export interface DatosFiltroLicencias {
   idUnidadRRHH?: number;
 }
 
-export const hayFiltros = (filtros: DatosFiltroLicencias) => {
+export const hayFiltros = (filtros: FiltroBusquedaLicencias) => {
   return (
     filtros.folio !== undefined ||
     filtros.runPersonaTrabajadora !== undefined ||

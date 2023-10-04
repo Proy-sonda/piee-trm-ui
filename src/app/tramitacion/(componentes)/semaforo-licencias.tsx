@@ -1,16 +1,16 @@
 import React from 'react';
 import styles from './semaforo-licencias.module.css';
 
-export type EstadoLicenciaFiltrar = 'por-tramitar' | 'por-vencer' | 'vencido';
+export type FiltroEstadoLicencia = 'todos' | 'por-tramitar' | 'por-vencer' | 'vencido';
 
 type Semaforo = {
   color: string;
   label: string;
-  value: EstadoLicenciaFiltrar;
+  value: FiltroEstadoLicencia;
 };
 
 interface SemaforoLicenciasProps {
-  onEstadoSeleccionado: (estado: EstadoLicenciaFiltrar) => void | Promise<void>;
+  onEstadoSeleccionado: (estado: FiltroEstadoLicencia) => void | Promise<void>;
 }
 
 const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccionado }) => {
