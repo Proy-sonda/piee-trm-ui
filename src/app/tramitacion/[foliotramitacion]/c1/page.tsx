@@ -20,10 +20,11 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Cabecera from '../(componentes)/cabecera';
-import { buscarComunas } from '../../(servicios)/buscar-comunas';
-import { buscarOcupacion } from '../../(servicios)/buscar-ocupacion';
-import { buscarRegiones } from '../../(servicios)/buscar-regiones';
-import { buscarCalle } from '../../(servicios)/tipo-calle';
+import { buscarComunas } from '../(servicios)/buscar-comunas';
+import { buscarOcupacion } from '../(servicios)/buscar-ocupacion';
+import { buscarRegiones } from '../(servicios)/buscar-regiones';
+import { buscarCalle } from '../(servicios)/tipo-calle';
+import { buscarLicenciasParaTramitar } from '../../(servicios)/buscar-licencias-para-tramitar';
 
 interface myprops {
   params: {
@@ -56,6 +57,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   const formulario = useForm<formularioApp>({ mode: 'onBlur' });
   const router = useRouter();
   const [fadeinOut, setfadeinOut] = useState('');
+  const [runEmpleador, setrunEmpleador] = useState<string>('');
   const [otros, setotros] = useState<Boolean>(false);
   const [refrescar, refrescarPagina] = useRefrescarPagina();
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
@@ -65,6 +67,21 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     CALLE: buscarCalle(),
     OCUPACION: buscarOcupacion(),
   });
+  const [errorCargaData, data, cargandoData] = useMergeFetchObject(
+    {
+      LMETRM: buscarLicenciasParaTramitar(),
+    },
+    [refrescar],
+  );
+
+  useEffect(() => {
+    if (data!?.LMETRM == undefined) return;
+    formulario.setValue(
+      'run',
+      data!?.LMETRM.find(({ foliolicencia }) => foliolicencia == foliotramitacion)!?.rutempleador,
+    );
+  }, [data?.LMETRM]);
+
   useEffect(
     () => (!cargandoCombos ? setfadeinOut('animate__animated animate__fadeOut') : setfadeinOut('')),
     [cargandoCombos],
@@ -77,6 +94,10 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
           foliotramitacion={foliotramitacion}
           step={step}
           title="Identificación de la Entidad Empleadora o Persona Trabajadora Independiente"
+          rutEmpleador={(run) => {
+            console.log(run);
+            setrunEmpleador(run);
+          }}
         />
 
         <IfContainer show={cargandoCombos}>
@@ -94,7 +115,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
             <form className="animate__animated animate__fadeIn">
               <div className="row">
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <InputRut name="run" label="Run Entidad Empleadora" tipo="run" />
+                  <InputRut name="run" label="Rut Entidad Empleadora" tipo="run" deshabilitado />
                 </div>
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
                   <InputRazonSocial name="razon" label="Razón Social Entidad Empleadora" />

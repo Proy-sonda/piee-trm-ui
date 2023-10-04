@@ -12,9 +12,11 @@ import { useEffect, useState } from 'react';
 import FiltroLicencias from './(componentes)/filtro-licencias';
 import SemaforoLicencias, { FiltroEstadoLicencia } from './(componentes)/semaforo-licencias';
 import TablaLicenciasTramitar from './(componentes)/tabla-licencias-tramitar';
+
+import { buscarLicenciasParaTramitar } from '../tramitacion/(servicios)/buscar-licencias-para-tramitar';
+
 import { FiltroBusquedaLicencias, hayFiltros } from './(modelos)/filtro-busqueda-licencias';
 import { LicenciaTramitar } from './(modelos)/licencia-tramitar';
-import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para-tramitar';
 
 const TramitacionPage = () => {
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({

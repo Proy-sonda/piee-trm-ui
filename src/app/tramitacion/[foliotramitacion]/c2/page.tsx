@@ -8,9 +8,9 @@ import { useRouter } from 'next/navigation';
 import { ChangeEvent, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import Cabecera from '../(componentes)/cabecera';
-import { buscarCalidadTrabajador } from '../../(servicios)/buscar-calidad-trabajador';
-import { buscarInstitucionPrevisional } from '../../(servicios)/buscar-institucion-previsional';
-import { buscarRegimen } from '../../(servicios)/buscar-regimen';
+import { buscarCalidadTrabajador } from '../(servicios)/buscar-calidad-trabajador';
+import { buscarInstitucionPrevisional } from '../(servicios)/buscar-institucion-previsional';
+import { buscarRegimen } from '../(servicios)/buscar-regimen';
 
 interface myprops {
   params: {

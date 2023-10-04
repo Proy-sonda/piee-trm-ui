@@ -1,10 +1,10 @@
 import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
-import { Region } from '../(modelos)/region';
+import { ActividadLaboral } from '../(modelo)/actividad-laboral';
 
-export const buscarRegiones = () => {
-  return runFetchAbortable<Region[]>(`${urlBackendTramitacion()}/Region/all`, {
+export const buscarActividadesLaborales = () => {
+  return runFetchAbortable<ActividadLaboral[]>(`${urlBackendTramitacion()}/actividadlaboral/all`, {
     headers: {
       Authorization: obtenerToken(),
       'Content-type': 'application/json',
