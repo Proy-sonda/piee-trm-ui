@@ -5,6 +5,7 @@ import {
   ComboSimple,
   InputBlockDepartamento,
   InputCalle,
+  InputFecha,
   InputNumero,
   InputRut,
   InputTelefono,
@@ -52,7 +53,7 @@ const step = [
 ];
 
 const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
-  const formulario = useForm<formularioApp>({ mode: 'onSubmit' });
+  const formulario = useForm<formularioApp>({ mode: 'onBlur' });
   const router = useRouter();
   const [fadeinOut, setfadeinOut] = useState('');
   const [otros, setotros] = useState<Boolean>(false);
@@ -102,10 +103,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   <InputTelefono name="telefono" label="Teléfono" />
                 </div>
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <label htmlFor="fecharecepcionlme" className="mb-2">
-                    Fecha Recepción LME
-                  </label>
-                  <input id="fecharecepcionlme" name="fecharecepcionlme" className="form-control" />
+                  <InputFecha label="Fecha Recepción LME" name="fecharecepcionlme" opcional />
                 </div>
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
                   <label className="mb-2">Región (*)</label>
@@ -172,6 +170,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                     name="ocupacion"
                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                       Number(e.target.value) == 19 ? setotros(true) : setotros(false);
+                      formulario.clearErrors('otro');
                       formulario.setValue('ocupacion', e.target.value);
                     }}>
                     <option value={''}>Seleccionar</option>
@@ -187,16 +186,26 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   </select>
                 </div>
 
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mt-2">
-                  <input
-                    style={{
-                      display: otros ? 'block' : 'none',
-                    }}
-                    type="text"
-                    className="form-control"
-                    placeholder="Otro..."
-                  />
-                </div>
+                <IfContainer show={otros}>
+                  <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mt-2">
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        formulario.formState.errors.otro ? 'is-invalid' : ''
+                      }`}
+                      placeholder="Otro..."
+                      {...formulario.register('otro', {
+                        required: {
+                          message: 'El campo otro es obligatorio',
+                          value: otros ? true : false,
+                        },
+                      })}
+                    />
+                  </div>
+                </IfContainer>
+                <IfContainer show={!!formulario.formState.errors.otro}>
+                  <div className="invalid-tooltip">{formulario.formState.errors.otro?.message}</div>
+                </IfContainer>
               </div>
               <div className="row">
                 <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
