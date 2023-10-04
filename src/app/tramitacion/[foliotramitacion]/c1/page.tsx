@@ -201,6 +201,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                         },
                       })}
                     />
+
                     <IfContainer show={!!formulario.formState.errors.otro}>
                       <div className="invalid-tooltip">
                         {formulario.formState.errors.otro?.message}
