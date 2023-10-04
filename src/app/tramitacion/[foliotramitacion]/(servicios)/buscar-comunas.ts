@@ -1,10 +1,10 @@
 import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
-import { regimen } from '../(modelos)/regimen';
+import { Comuna } from '../(modelo)/comuna';
 
-export const buscarRegimen = () => {
-  return runFetchAbortable<regimen[]>(`${urlBackendTramitacion()}/regimenprevisional/all`, {
+export const buscarComunas = () => {
+  return runFetchAbortable<Comuna[]>(`${urlBackendTramitacion()}/comuna/all/region`, {
     headers: {
       Authorization: obtenerToken(),
       'Content-type': 'application/json',

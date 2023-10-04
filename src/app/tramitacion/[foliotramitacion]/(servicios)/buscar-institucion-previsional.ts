@@ -1,11 +1,11 @@
 import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
-import { calidadTrabajador } from '../(modelos)/calidad-trabajador';
+import { institucionPrevisional } from '../(modelo)/institucion-previsional';
 
-export const buscarCalidadTrabajador = () => {
-  return runFetchAbortable<calidadTrabajador[]>(
-    `${urlBackendTramitacion()}/calidadtrabajador/all`,
+export const buscarInstitucionPrevisional = () => {
+  return runFetchAbortable<institucionPrevisional[]>(
+    `${urlBackendTramitacion()}/entidadprevisional/all`,
     {
       headers: {
         Authorization: obtenerToken(),
