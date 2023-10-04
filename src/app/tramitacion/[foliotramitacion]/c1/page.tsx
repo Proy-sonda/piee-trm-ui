@@ -170,6 +170,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                     name="ocupacion"
                     onChange={(e: ChangeEvent<HTMLSelectElement>) => {
                       Number(e.target.value) == 19 ? setotros(true) : setotros(false);
+                      formulario.clearErrors('otro');
                       formulario.setValue('ocupacion', e.target.value);
                     }}>
                     <option value={''}>Seleccionar</option>
