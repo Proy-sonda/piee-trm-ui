@@ -6,7 +6,12 @@ import { BaseProps } from './base-props';
 
 interface InputRazonSocialProps extends BaseProps {}
 
-const InputRazonSocial: React.FC<InputRazonSocialProps> = ({ name, label, className }) => {
+const InputRazonSocial: React.FC<InputRazonSocialProps> = ({
+  name,
+  label,
+  className,
+  deshabilitado,
+}) => {
   const idInput = useRandomId('razonSocial');
 
   const {
@@ -23,6 +28,7 @@ const InputRazonSocial: React.FC<InputRazonSocialProps> = ({ name, label, classN
           type="text"
           autoComplete="new-custom-value"
           isInvalid={!!errors[name]}
+          disabled={deshabilitado}
           {...register(name, {
             required: {
               value: true,

@@ -11,4 +11,5 @@ export interface BaseProps {
   name: string;
 
   className?: string;
+  deshabilitado?: boolean;
 }
