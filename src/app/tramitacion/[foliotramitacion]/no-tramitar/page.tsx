@@ -60,7 +60,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
             <h6 className="mb-3" style={{ color: 'var(--color-blue)' }}>
               Por favor indique el motivo por el cual no se tramitará esta licencia:
             </h6>
-            <p className="mb-2 small">
+            <p className="mb-3 small">
               Aquí deberá marcar la opción por la que rechaza la tramitación de la licencia medica
             </p>
             <IfContainer show={motivoRechazo === 'relacion-laboral-terminada'}>
@@ -75,7 +75,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
           <FormProvider {...formulario}>
             <Form onSubmit={formulario.handleSubmit(noTramitarLicencia)}>
               <Row>
-                <Col md={8}>
+                <Col xs={12} md={7} lg={8}>
                   <InputRadioButtons
                     name="motivoRechazo"
                     errores={{ obligatorio: 'Debe seleccionar el motivo para no tramitar' }}
@@ -98,37 +98,33 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                       },
                     ]}
                   />
+
+                  <div style={{ maxWidth: '430px' }}>
+                    <IfContainer show={motivoRechazo === 'otro'}>
+                      <InputOtroMotivoDeRechazo
+                        opcional={motivoRechazo !== 'otro'}
+                        name="otroMotivoDeRechazo"
+                        label="Por favor indique el motivo por el cual no se tramitará esta licencia:"
+                        className="mt-3"
+                      />
+                    </IfContainer>
+
+                    <InputArchivo
+                      opcional={motivoRechazo !== 'relacion-laboral-terminada'}
+                      name="documentoAdjunto"
+                      label="Adjuntar Documento"
+                      className="mt-3"
+                    />
+                  </div>
                 </Col>
 
-                <Col md={4}>
+                <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
                   <FormGroup controlId="entidadPagaSubsidio">
                     <Form.Label>
                       Entidad que debe pagar subsidio o Mantener remuneración:
                     </Form.Label>
                     <Form.Control type="text" disabled value={'Valor de prueba'} />
                   </FormGroup>
-                </Col>
-              </Row>
-
-              <IfContainer show={motivoRechazo === 'otro'}>
-                <Row className="mt-3">
-                  <Col md={6}>
-                    <InputOtroMotivoDeRechazo
-                      opcional={motivoRechazo !== 'otro'}
-                      name="otroMotivoDeRechazo"
-                      label="Por favor indique el motivo por el cual no se tramitará esta licencia:"
-                    />
-                  </Col>
-                </Row>
-              </IfContainer>
-
-              <Row className="mt-3">
-                <Col md={5}>
-                  <InputArchivo
-                    opcional={motivoRechazo !== 'relacion-laboral-terminada'}
-                    name="documentoAdjunto"
-                    label="Adjuntar Documento"
-                  />
                 </Col>
               </Row>
 
