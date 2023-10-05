@@ -65,12 +65,9 @@ export const InputRadioButtons: React.FC<InputRadioButtonsProps> = ({
               })}
             />
           ))}
-
-          <Form.Control.Feedback type="invalid" tooltip>
-            {errors[name]?.message?.toString()}
-          </Form.Control.Feedback>
         </FormGroup>
 
+        {/* Sirve para que se muestre el en los radio buttons */}
         <FormGroup className="mt-1 position-relative">
           <Form.Control type="hidden" isInvalid={!!errors[name]} />
 
