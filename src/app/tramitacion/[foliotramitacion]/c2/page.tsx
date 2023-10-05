@@ -65,33 +65,33 @@ const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
           <FormProvider {...formulario}>
             <form className="animate__animated animate__fadeIn">
               <div className="row">
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <ComboSimple
-                    label="Régimen Previsional"
-                    descripcion="regimenprevisional"
-                    idElemento="idregimenprevisional"
-                    name="regimen"
-                    datos={combos?.REGIMEN}
-                  />
-                </div>
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <ComboSimple
-                    label="Institución Previsional"
-                    descripcion="entidadprevisional"
-                    idElemento="identidadprevisional"
-                    name="previsional"
-                    datos={combos?.PREVISIONAL}
-                  />
-                </div>
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <ComboSimple
-                    label="Calidad Persona Trabajadora"
-                    descripcion="calidadtrabajador"
-                    idElemento="idcalidadtrabajador"
-                    name="calidad"
-                    datos={combos?.CALIDADTRABAJADOR}
-                  />
-                </div>
+                <ComboSimple
+                  label="Régimen Previsional"
+                  descripcion="regimenprevisional"
+                  idElemento="idregimenprevisional"
+                  name="regimen"
+                  datos={combos?.REGIMEN}
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <ComboSimple
+                  label="Institución Previsional"
+                  descripcion="entidadprevisional"
+                  idElemento="identidadprevisional"
+                  name="previsional"
+                  datos={combos?.PREVISIONAL}
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <ComboSimple
+                  label="Calidad Persona Trabajadora"
+                  descripcion="calidadtrabajador"
+                  idElemento="idcalidadtrabajador"
+                  name="calidad"
+                  datos={combos?.CALIDADTRABAJADOR}
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
                   <label className="mb-2">Persona Pertenece a AFC (*)</label>
                   <br />
@@ -160,25 +160,29 @@ const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                     </label>
                   </div>
                 </div>
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <InputFecha
-                    name="fechaafilacionprevisional"
-                    label="Fecha Afiliación Entidad Previsional"
-                    opcional
-                  />
-                </div>
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <InputFecha name="fechacontratotrabajo" label="Fecha Contrato de trabajo" />
-                </div>
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <ComboSimple
-                    idElemento=""
-                    descripcion=""
-                    label="Entidad Pagadora Subsidio o Mantener remuneración"
-                    datos={[]}
-                    name="entidadremuneradora"
-                  />
-                </div>
+
+                <InputFecha
+                  name="fechaafilacionprevisional"
+                  label="Fecha Afiliación Entidad Previsional"
+                  opcional
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <InputFecha
+                  name="fechacontratotrabajo"
+                  label="Fecha Contrato de trabajo"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <ComboSimple
+                  idElemento=""
+                  descripcion=""
+                  label="Entidad Pagadora Subsidio o Mantener remuneración"
+                  datos={[]}
+                  name="entidadremuneradora"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
                   <label className="mb-2">Nombre Entidad Pagadora Subsidio</label>
                   <input className="form-control" name="nombreentidadpagadorasubsidio" />
