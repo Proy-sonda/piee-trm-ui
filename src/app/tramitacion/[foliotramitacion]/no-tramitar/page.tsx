@@ -7,6 +7,7 @@ import Link from 'next/link';
 import React, { useEffect } from 'react';
 import { Col, Container, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import InformacionLicencia from '../(componentes)/informacion-licencia';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar-licencia';
 
@@ -52,16 +53,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
           </Row>
 
           <Row>
-            <Col>
-              {/* TODO: Reemplazar por el componente cabecera?. Habria que refactorizar la cabecera para no incluir el stepper  */}
-              <p className="small">
-                Licencia otorgada el día <b>29/05/2023</b> en plataforma operador <b>MEDIPASS</b>{' '}
-                con Folio <b>{foliotramitacion}</b> por <b>ENFERMEDAD O ACCIDENTE COMUN</b>, a la
-                persona trabajadora <b>11179371-9 MARISOL VIVIANA SOTO GARCÉS</b> estableciendo{' '}
-                <b>Reposo Total</b> por <b>30 días(s)</b> desde <b>29/05/2022</b> al{' '}
-                <b>28/06/2022</b>
-              </p>
-            </Col>
+            <InformacionLicencia folioLicencia={foliotramitacion} />
           </Row>
 
           <Row className="mt-2">
