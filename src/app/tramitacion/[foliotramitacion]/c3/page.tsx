@@ -1,11 +1,14 @@
 'use client';
 import { ComboSimple } from '@/components/form';
+import IfContainer from '@/components/if-container';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Cabecera from '../(componentes)/cabecera';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
+import { LicenciaTramitar } from '../../(modelos)/licencia-tramitar';
 
 interface myprops {
   params: {
@@ -18,7 +21,10 @@ interface formularioApp {
 
 const C3Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   const router = useRouter();
+
   const formulario = useForm<formularioApp>({ mode: 'onBlur' });
+
+  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
   const step = [
     { label: 'Entidad Empleadora/Independiente', num: 1, active: false, url: '/adscripcion' },
@@ -30,14 +36,16 @@ const C3Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   const [errorData, combos, cargandoCombos] = useMergeFetchObject({
     TIPODOCUMENTO: BuscarTipoDocumento(),
   });
+
   return (
     <FormProvider {...formulario}>
       <div className="bgads">
-        <div className="ms-5 me-5">
+        <div className="mx-3 mx-lg-5 pb-4">
           <Cabecera
             foliotramitacion={foliotramitacion}
             step={step}
             title="Informe de Remuneraciones Rentas y/o Subsidios"
+            onLicenciaCargada={setLicencia}
           />
           <div className="row mt-2">
             <h6 className="text-center">RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD</h6>
@@ -95,46 +103,48 @@ const C3Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
               <input className="form-control" />
             </div>
           </div>
-          <div className="row mt-3">
-            <h6 className="text-center">
-              EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE
-            </h6>
-          </div>
-          <div className="row mt-2">
-            <Table className="table table-bordered">
-              <Thead>
-                <Tr className="align-middle text-center">
-                  <Th>Institución Previsional</Th>
-                  <Th>Periodo Renta </Th>
-                  <Th> N° Días</Th>
-                  <Th> Monto Imponible</Th>
-                  <Th>Registrar Desglose de haberes</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {/* // Aquí es donde se va a iterar los elementos en el caso de que sea tipo 3 son 6. */}
-                <Tr>
-                  <Td>{/* <ComboSimple descripcion="" name="" label="" idElemento="" /> */}</Td>
-                  <Td>
-                    <input className="form-control" />
-                  </Td>
-                  <Td>
-                    <input className="form-control" />
-                  </Td>
-                  <Td>
-                    <input className="form-control" />
-                  </Td>
-                  <Td>
-                    <div className="align-middle text-center">
-                      <button className="btn btn-primary">
-                        <i className="bi bi-bounding-box-circles"></i>
-                      </button>
-                    </div>
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </div>
+
+          <IfContainer show={licencia && licencia.tipolicencia.idtipolicencia === 3}>
+            <div className="row mt-3">
+              <h6 className="mb-3 text-center">
+                EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE
+              </h6>
+
+              <Table className="table table-bordered">
+                <Thead>
+                  <Tr className="align-middle text-center">
+                    <Th>Institución Previsional</Th>
+                    <Th>Periodo Renta </Th>
+                    <Th> N° Días</Th>
+                    <Th> Monto Imponible</Th>
+                    <Th>Registrar Desglose de haberes</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {/* // Aquí es donde se va a iterar los elementos en el caso de que sea tipo 3 son 6. */}
+                  <Tr>
+                    <Td>{/* <ComboSimple descripcion="" name="" label="" idElemento="" /> */}</Td>
+                    <Td>
+                      <input className="form-control" />
+                    </Td>
+                    <Td>
+                      <input className="form-control" />
+                    </Td>
+                    <Td>
+                      <input className="form-control" />
+                    </Td>
+                    <Td>
+                      <div className="align-middle text-center">
+                        <button className="btn btn-primary">
+                          <i className="bi bi-bounding-box-circles"></i>
+                        </button>
+                      </div>
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </div>
+          </IfContainer>
 
           <div className="row mt-3">
             <h5>Documentos Adjuntos</h5>
