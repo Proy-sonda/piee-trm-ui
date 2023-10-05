@@ -40,6 +40,8 @@ interface InputFechaProps extends BaseProps {
    *  ```
    */
   noPosteriorA?: string;
+
+  esEmision?: boolean;
 }
 
 /**
@@ -54,6 +56,7 @@ export const InputFecha: React.FC<InputFechaProps> = ({
   opcional,
   noAnteriorA,
   noPosteriorA,
+  esEmision,
 }) => {
   const idInput = useRandomId('fecha');
 
@@ -154,7 +157,9 @@ export const InputFecha: React.FC<InputFechaProps> = ({
 
                 const desde: Date = otrosCampos[noAnteriorA];
                 if (!esFechaInvalida(desde) && isBefore(fecha, desde)) {
-                  return 'No puede ser anterior a desde';
+                  return esEmision
+                    ? 'La fecha no puede ser menor a la emisión'
+                    : 'No puede ser anterior a desde';
                 }
               },
             },

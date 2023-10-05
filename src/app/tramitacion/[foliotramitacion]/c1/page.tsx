@@ -43,6 +43,7 @@ interface formularioApp {
   region: string;
   comuna: string;
   tipo: string;
+  fechaemision: string;
   calle: string;
   numero: string;
   departamento: string;
@@ -80,21 +81,23 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   });
 
   const [errorCargaData, licencia, cargandoData] = useMergeFetchObject(
-
     {
       LMETRM: buscarLicenciasParaTramitar(),
     },
     [refrescar],
   );
 
-
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
-  const fecha = formulario.watch('fecharecepcionlme');
+  const fechaEmitida = formulario.watch('fechaemision');
 
   const fechaActual = () => {
     let fechaHoy = new Date().toLocaleString('es-CL', options).split('-');
     return `${fechaHoy[2]}-${fechaHoy[1]}-${fechaHoy[0]}`;
+  };
+  const convertirFecha = (fecha: string) => {
+    let fechaFinal = fecha.split('-');
+    return `${fechaFinal[2]}-${fechaFinal[1]}-${fechaFinal[0]}`;
   };
 
   useEffect(() => {
@@ -113,6 +116,16 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     );
     setrunEmpleador(
       licencia.LMETRM.find(({ foliolicencia }) => foliolicencia == foliotramitacion)!?.rutempleador,
+    );
+
+    formulario.setValue(
+      'fechaemision',
+      convertirFecha(
+        new Date(
+          licencia.LMETRM.find(({ foliolicencia }) => foliolicencia === foliotramitacion)
+            ?.fechaemision || '',
+        ).toLocaleString('es-CL', options),
+      ),
     );
   }, [licencia?.LMETRM]);
 
@@ -138,7 +151,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     };
     busquedaEmpleador();
   }, [runEmpleador]);
-
 
   useEffect(
     () => (!cargandoCombos ? setfadeinOut('animate__animated animate__fadeOut') : setfadeinOut('')),
@@ -191,7 +203,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
               className="animate__animated animate__fadeIn"
               onSubmit={formulario.handleSubmit(onHandleSubmit)}>
               <div className="row">
-
                 <InputRut
                   name="run"
                   label="Rut Entidad Empleadora"
@@ -213,11 +224,20 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                 />
 
+                <div
+                  style={{
+                    display: 'none',
+                  }}>
+                  <InputFecha label="Fecha Emisión" name="fechaemision" />
+                </div>
+
                 <InputFecha
                   label="Fecha Recepción LME"
                   name="fecharecepcionlme"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                   opcional
+                  noAnteriorA="fechaemision"
+                  esEmision
                 />
 
                 <ComboSimple
