@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
 import { LicenciaTramitar } from '../../(modelos)/licencia-tramitar';
@@ -44,6 +45,31 @@ const C3Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   const pasarAPaso4: SubmitHandler<FormularioC3> = async (datos) => {
     console.log('Yendome a paso 4...');
     console.table(datos);
+
+    const { isConfirmed } = await Swal.fire({
+      html: `
+        <p>Antes de seguir, recuerde confirmar que debe ingresar Comprobante de Liquidación mensual para todos los periodos declarados:</p>
+          
+          <li>Enero 2023</li>
+          <li>Febrero 2023</li>
+          <li>Marzo 2023</li>
+          <li>Agosto 2022</li>
+          <li>Septiembre 2022</li>
+          <li>Octubre 2022</li>
+
+        <p class="mt-3 fw-bold">¿Está seguro que desea continuar, o desea volver a ingresar o revisar la documentación?</p>
+        `,
+      showConfirmButton: true,
+      confirmButtonText: 'Continuar',
+      confirmButtonColor: 'var(--color-blue)',
+      showCancelButton: true,
+      cancelButtonText: 'Volver',
+      cancelButtonColor: 'var(--bs-danger)',
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
 
     router.push(`/tramitacion/${foliotramitacion}/c4`);
   };
