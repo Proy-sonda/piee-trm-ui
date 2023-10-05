@@ -87,18 +87,22 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     [refrescar],
   );
 
+
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
   const fechaEmitida = formulario.watch('fechaemision');
+
 
   const fechaActual = () => {
     let fechaHoy = new Date().toLocaleString('es-CL', options).split('-');
     return `${fechaHoy[2]}-${fechaHoy[1]}-${fechaHoy[0]}`;
   };
+
   const convertirFecha = (fecha: string) => {
     let fechaFinal = fecha.split('-');
     return `${fechaFinal[2]}-${fechaFinal[1]}-${fechaFinal[0]}`;
   };
+
 
   useEffect(() => {
     if (licencia == undefined) return;
@@ -126,6 +130,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
             ?.fechaemision || '',
         ).toLocaleString('es-CL', options),
       ),
+
     );
   }, [licencia?.LMETRM]);
 
@@ -203,6 +208,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
               className="animate__animated animate__fadeIn"
               onSubmit={formulario.handleSubmit(onHandleSubmit)}>
               <div className="row">
+
                 <InputRut
                   name="run"
                   label="Rut Entidad Empleadora"
@@ -231,6 +237,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   <InputFecha label="Fecha Emisión" name="fechaemision" />
                 </div>
 
+
                 <InputFecha
                   label="Fecha Recepción LME"
                   name="fecharecepcionlme"
@@ -238,6 +245,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   opcional
                   noAnteriorA="fechaemision"
                   esEmision
+
                 />
 
                 <ComboSimple
