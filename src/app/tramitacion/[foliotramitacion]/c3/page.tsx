@@ -9,6 +9,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Cabecera from '../(componentes)/cabecera';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
 import { LicenciaTramitar } from '../../(modelos)/licencia-tramitar';
+import ModalDesgloseDeHaberes from './(componentes/modal-desglose-haberes';
 
 interface myprops {
   params: {
@@ -26,6 +27,8 @@ const C3Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
+  const [abrirModalDesglose, setAbrirModalDesglose] = useState(false);
+
   const step = [
     { label: 'Entidad Empleadora/Independiente', num: 1, active: false, url: '/adscripcion' },
     { label: 'Previsión persona trabajadora', num: 2, active: false, url: '/adscripcion/pasodos' },
@@ -39,6 +42,12 @@ const C3Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
 
   return (
     <FormProvider {...formulario}>
+      <ModalDesgloseDeHaberes
+        show={abrirModalDesglose}
+        onCerrar={() => setAbrirModalDesglose(false)}
+        onDesgloseGuardardo={() => setAbrirModalDesglose(false)}
+      />
+
       <div className="bgads">
         <div className="mx-3 mx-lg-5 pb-4">
           <Cabecera
@@ -76,7 +85,9 @@ const C3Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   </Td>
                   <Td>
                     <div className="align-middle text-center">
-                      <button className="btn btn-primary">
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => setAbrirModalDesglose(true)}>
                         <i className="bi bi-bounding-box-circles"></i>
                       </button>
                     </div>
