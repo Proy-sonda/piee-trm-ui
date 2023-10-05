@@ -1,11 +1,11 @@
 'use client';
 
-import { InputArchivo, InputRadioButtons } from '@/components/form';
+import { ComboSimple, InputArchivo, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import Titulo from '@/components/titulo/titulo';
 import Link from 'next/link';
 import React, { useEffect } from 'react';
-import { Col, Container, Form, FormGroup, Row } from 'react-bootstrap';
+import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import InformacionLicencia from '../(componentes)/informacion-licencia';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
@@ -119,12 +119,17 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 </Col>
 
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
-                  <FormGroup controlId="entidadPagaSubsidio">
-                    <Form.Label>
-                      Entidad que debe pagar subsidio o Mantener remuneración:
-                    </Form.Label>
-                    <Form.Control type="text" disabled value={'Valor de prueba'} />
-                  </FormGroup>
+                  <ComboSimple
+                    name="entidadPagadoraId"
+                    label="Entidad que debe pagar subsidio o Mantener remuneración"
+                    datos={[
+                      { id: '1', descripcion: 'Entidad 1' },
+                      { id: '2', descripcion: 'Entidad 2' },
+                      { id: '3', descripcion: 'Entidad 3' },
+                    ]}
+                    idElemento="id"
+                    descripcion="descripcion"
+                  />
                 </Col>
               </Row>
 

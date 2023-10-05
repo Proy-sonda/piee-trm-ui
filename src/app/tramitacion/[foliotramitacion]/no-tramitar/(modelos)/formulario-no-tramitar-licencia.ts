@@ -6,4 +6,5 @@ export interface FormularioNoTramitarLicencia {
     | 'otro';
   otroMotivoDeRechazo: string;
   documentoAdjunto: File[];
+  entidadPagadoraId: string;
 }
