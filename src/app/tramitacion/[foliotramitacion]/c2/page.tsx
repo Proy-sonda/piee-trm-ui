@@ -161,6 +161,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   </div>
                 </div>
 
+
                 <InputFecha
                   name="fechaafilacionprevisional"
                   label="Fecha Afiliación Entidad Previsional"
@@ -182,6 +183,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   name="entidadremuneradora"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                 />
+
 
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
                   <label className="mb-2">Nombre Entidad Pagadora Subsidio</label>

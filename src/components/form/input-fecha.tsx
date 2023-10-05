@@ -86,8 +86,8 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 }
               },
               despuesDe1920: (fecha: Date) => {
-                if (isBefore(fecha, new Date(1920, 0, 1))) {
-                  return 'Debe ser posterior al 01/01/1920';
+                if (isBefore(fecha, new Date(1920, 11, 31))) {
+                  return 'Debe ser mayor o igual al 31/12/1920';
                 }
               },
               noMayorQueHoy: (fecha: Date) => {

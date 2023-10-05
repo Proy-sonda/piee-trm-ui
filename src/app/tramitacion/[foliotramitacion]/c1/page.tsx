@@ -21,11 +21,13 @@ import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Cabecera from '../(componentes)/cabecera';
 import { buscarComunas } from '../(servicios)/buscar-comunas';
+
 import { buscarEmpleador } from '../(servicios)/buscar-empleador';
 import { buscarOcupacion } from '../(servicios)/buscar-ocupacion';
 import { buscarRegiones } from '../(servicios)/buscar-regiones';
 import { buscarCalle } from '../(servicios)/tipo-calle';
 import { LicenciaTramitar } from '../../(modelos)/licencia-tramitar';
+
 import { buscarLicenciasParaTramitar } from '../../(servicios)/buscar-licencias-para-tramitar';
 
 interface myprops {
@@ -76,12 +78,15 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     CALLE: buscarCalle(),
     OCUPACION: buscarOcupacion(),
   });
+
   const [errorCargaData, licencia, cargandoData] = useMergeFetchObject(
+
     {
       LMETRM: buscarLicenciasParaTramitar(),
     },
     [refrescar],
   );
+
 
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
@@ -134,6 +139,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     busquedaEmpleador();
   }, [runEmpleador]);
 
+
   useEffect(
     () => (!cargandoCombos ? setfadeinOut('animate__animated animate__fadeOut') : setfadeinOut('')),
     [cargandoCombos],
@@ -163,6 +169,10 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
           foliotramitacion={foliotramitacion}
           step={step}
           title="Identificación de la Entidad Empleadora o Persona Trabajadora Independiente"
+          rutEmpleador={(run) => {
+            console.log(run);
+            setrunEmpleador(run);
+          }}
         />
 
         <IfContainer show={cargandoCombos}>
@@ -181,6 +191,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
               className="animate__animated animate__fadeIn"
               onSubmit={formulario.handleSubmit(onHandleSubmit)}>
               <div className="row">
+
                 <InputRut
                   name="run"
                   label="Rut Entidad Empleadora"
@@ -274,6 +285,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
 
                 <IfContainer show={Number(ocupacionSeleccionada) == 19}>
                   <label className="mb-2"></label>
+
                   <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mt-2 position-relative">
                     <input
                       type="text"

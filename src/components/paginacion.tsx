@@ -18,27 +18,28 @@ const Paginacion: React.FC<PaginacionProps> = ({
   const [ancho] = useWindowSize();
 
   return (
-    <ReactPaginate
-      breakLabel="..."
-      previousLabel={ancho < 576 ? '«' : 'Anterior'}
-      nextLabel={ancho < 576 ? '»' : 'Siguiente'}
-      pageRangeDisplayed={1}
-      onPageChange={(x) => onCambioPagina(x.selected)}
-      pageCount={numeroDePaginas}
-      renderOnZeroPageCount={null}
-      containerClassName={
-        !tamano || tamano === 'md' ? 'pagination' : `pagination pagination-${tamano}`
-      }
-      forcePage={paginaActual}
-      activeClassName="active"
-      pageClassName="page-item"
-      pageLinkClassName="page-link"
-      previousClassName="page-item"
-      previousLinkClassName="page-link"
-      nextClassName="page-item"
-      nextLinkClassName="page-link"
-      disabledClassName="disabled"
-    />
+    <div className="overflow-auto">
+      <ReactPaginate
+        breakLabel="..."
+        previousLabel={ancho < 576 ? '«' : 'Anterior'}
+        nextLabel={ancho < 576 ? '»' : 'Siguiente'}
+        onPageChange={(x) => onCambioPagina(x.selected)}
+        pageCount={numeroDePaginas}
+        renderOnZeroPageCount={null}
+        containerClassName={
+          !tamano || tamano === 'md' ? 'pagination' : `pagination pagination-${tamano}`
+        }
+        forcePage={paginaActual}
+        activeClassName="active"
+        pageClassName="page-item"
+        pageLinkClassName="page-link"
+        previousClassName="page-item"
+        previousLinkClassName="page-link"
+        nextClassName="page-item"
+        nextLinkClassName="page-link"
+        disabledClassName="disabled"
+      />
+    </div>
   );
 };
 
