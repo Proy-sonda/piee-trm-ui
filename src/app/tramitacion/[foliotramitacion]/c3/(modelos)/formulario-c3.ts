@@ -1,3 +1,5 @@
+import { DesgloseDeHaberes } from './desglose-de-haberes';
+
 export interface FormularioC3 {
   tipoDocumento: string;
   remuneracionImponiblePrevisional: string;
@@ -12,4 +14,5 @@ interface Remuneracion {
   dias: string;
   montoImponible: number;
   montoImponibleDesahucio: number;
+  desgloseHaberes: DesgloseDeHaberes;
 }

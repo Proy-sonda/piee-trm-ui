@@ -1,35 +1,71 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, FormGroup, Modal, Table } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { DesgloseDeHaberes } from '../(modelos)/desglose-de-haberes';
+import { FormularioC3 } from '../(modelos)/formulario-c3';
 import { InputMonto } from './input-monto';
 
-interface ModalDesgloseDeHaberesProps {
+export interface DatosModalDesgloseHaberes {
   show: boolean;
   periodoRenta: string;
+  fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>;
+  indexInput: number;
+  desgloseInicial?: DesgloseDeHaberes;
+}
+
+interface ModalDesgloseDeHaberesProps {
+  datos: DatosModalDesgloseHaberes;
   onCerrar: () => void;
-  onDesgloseGuardardo: (desglose: DesgloseDeHaberes) => void;
+  onGuardarDesglose: (
+    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
+    indexInput: number,
+    desglose: DesgloseDeHaberes,
+  ) => void;
 }
 
 type FormularioDesgloseHaberes = DesgloseDeHaberes;
 
 const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
-  show,
-  periodoRenta,
+  datos,
   onCerrar,
-  onDesgloseGuardardo,
+  onGuardarDesglose,
 }) => {
   const formulario = useForm<FormularioDesgloseHaberes>({ mode: 'onBlur' });
 
+  useEffect(() => {
+    if (!datos.desgloseInicial) {
+      return;
+    }
+
+    formulario.setValue('sueldoBase', datos.desgloseInicial.sueldoBase);
+    formulario.setValue('gratificacion', datos.desgloseInicial.gratificacion);
+    formulario.setValue('horasExtras', datos.desgloseInicial.horasExtras);
+    formulario.setValue('aguinaldos', datos.desgloseInicial.aguinaldos);
+    formulario.setValue('bono1', datos.desgloseInicial.bono1);
+    formulario.setValue('bono2', datos.desgloseInicial.bono2);
+    formulario.setValue('bono3', datos.desgloseInicial.bono3);
+    formulario.setValue('bono4', datos.desgloseInicial.bono4);
+    formulario.setValue('bono5', datos.desgloseInicial.bono5);
+  }, [datos.desgloseInicial]);
+
+  const handleCerrarModal = () => {
+    formulario.reset();
+    onCerrar();
+  };
+
   const guardarDesglose: SubmitHandler<FormularioDesgloseHaberes> = async (desglose) => {
-    onDesgloseGuardardo(desglose);
+    formulario.reset();
+
+    onGuardarDesglose(datos.fieldArray, datos.indexInput, desglose);
   };
 
   return (
     <>
-      <Modal show={show} centered backdrop="static">
-        <Modal.Header closeButton onClick={onCerrar}>
-          <Modal.Title className="fs-5">Desglose de Haberes Periodo {periodoRenta}</Modal.Title>
+      <Modal show={datos.show} centered backdrop="static">
+        <Modal.Header closeButton onClick={handleCerrarModal}>
+          <Modal.Title className="fs-5">
+            Desglose de Haberes Periodo {datos.periodoRenta}
+          </Modal.Title>
         </Modal.Header>
 
         <FormProvider {...formulario}>
@@ -146,7 +182,7 @@ const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
                 <button
                   type="button"
                   className="btn btn-danger mt-2 mt-md-0 me-0 me-md-2"
-                  onClick={onCerrar}>
+                  onClick={handleCerrarModal}>
                   Volver
                 </button>
               </div>

@@ -14,11 +14,13 @@ import Cabecera from '../(componentes)/cabecera';
 import { buscarInstitucionPrevisional } from '../(servicios)/buscar-institucion-previsional';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
 import { LicenciaTramitar, esLicenciaMaternidad } from '../../(modelos)/licencia-tramitar';
+import { InputDesgloseDeHaberes } from './(componentes)/input-desglose-de-haberes';
 import { InputDias } from './(componentes)/input-dias';
 import { InputMonto } from './(componentes)/input-monto';
 import InputPeriodoRenta from './(componentes)/input-periodo-renta';
-import ModalDesgloseDeHaberes from './(componentes)/modal-desglose-haberes';
-import { DesgloseDeHaberes } from './(modelos)/desglose-de-haberes';
+import ModalDesgloseDeHaberes, {
+  DatosModalDesgloseHaberes,
+} from './(componentes)/modal-desglose-haberes';
 import { FormularioC3 } from './(modelos)/formulario-c3';
 
 interface C3PageProps {
@@ -44,9 +46,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
-  const [datosModalDesglose, setDatosModalDesglose] = useState({
+  const [datosModalDesglose, setDatosModalDesglose] = useState<DatosModalDesgloseHaberes>({
     show: false,
     periodoRenta: '',
+    fieldArray: 'remuneraciones',
+    indexInput: -1,
   });
 
   const formulario = useForm<FormularioC3>({
@@ -115,19 +119,26 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     // router.push(`/tramitacion/${foliotramitacion}/c4`);
   };
 
-  const adjuntarDesgloseDeHaberes = (desglose: DesgloseDeHaberes) => {
-    console.log('Desglose: ', desglose);
-    setDatosModalDesglose(() => ({ periodoRenta: '', show: false }));
+  const limpiarModalDesglose = () => {
+    setDatosModalDesglose({
+      periodoRenta: '',
+      show: false,
+      fieldArray: 'remuneraciones',
+      indexInput: -1,
+    });
   };
 
   return (
     <>
       {/* No meter este modal dentro del FormProvider para que no se mezclen los formularios */}
       <ModalDesgloseDeHaberes
-        show={datosModalDesglose.show}
-        periodoRenta={datosModalDesglose.periodoRenta}
-        onCerrar={() => setDatosModalDesglose(() => ({ periodoRenta: '', show: false }))}
-        onDesgloseGuardardo={adjuntarDesgloseDeHaberes}
+        datos={datosModalDesglose}
+        onCerrar={limpiarModalDesglose}
+        onGuardarDesglose={(fieldArray, index, desglose) => {
+          formulario.setValue(`${fieldArray}.${index}.desgloseHaberes`, desglose);
+          formulario.clearErrors(`${fieldArray}.${index}.desgloseHaberes`);
+          limpiarModalDesglose();
+        }}
       />
 
       <FormProvider {...formulario}>
@@ -225,15 +236,27 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                               type="button"
                               className="btn btn-primary"
                               onClick={() => {
-                                setDatosModalDesglose(() => ({
-                                  periodoRenta: formulario.getValues(
-                                    `remuneraciones.${index}.periodoRenta`,
-                                  ),
+                                setDatosModalDesglose({
+                                  // prettier-ignore
+                                  periodoRenta: formulario.getValues(`remuneraciones.${index}.periodoRenta`),
+                                  fieldArray: 'remuneraciones',
+                                  indexInput: index,
                                   show: true,
-                                }));
+                                  // prettier-ignore
+                                  desgloseInicial: formulario.getValues(`remuneraciones.${index}.desgloseHaberes`),
+                                });
                               }}>
                               <i className="bi bi-bounding-box-circles"></i>
                             </button>
+
+                            <InputDesgloseDeHaberes
+                              name={`remuneraciones.${index}.desgloseHaberes`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'desgloseHaberes',
+                                fieldArrayName: 'remuneraciones',
+                              }}
+                            />
                           </div>
                         </Td>
                       </Tr>
@@ -386,15 +409,28 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={() => {
-                                  setDatosModalDesglose(() => ({
-                                    periodoRenta: formulario.getValues(
-                                      `remuneracionesMaternidad.${index}.periodoRenta`,
-                                    ),
+                                  setDatosModalDesglose({
+                                    // prettier-ignore
+                                    periodoRenta: formulario.getValues(`remuneracionesMaternidad.${index}.periodoRenta`),
+                                    fieldArray: 'remuneracionesMaternidad',
+                                    indexInput: index,
                                     show: true,
-                                  }));
+                                    // prettier-ignore
+                                    desgloseInicial: formulario.getValues(`remuneracionesMaternidad.${index}.desgloseHaberes`),
+                                  });
                                 }}>
                                 <i className="bi bi-bounding-box-circles"></i>
                               </button>
+
+                              <InputDesgloseDeHaberes
+                                opcional={licencia && !esLicenciaMaternidad(licencia)}
+                                name={`remuneracionesMaternidad.${index}.desgloseHaberes`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'desgloseHaberes',
+                                  fieldArrayName: 'remuneracionesMaternidad',
+                                }}
+                              />
                             </div>
                           </Td>
                         </Tr>
