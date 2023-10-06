@@ -1,6 +1,6 @@
 'use client';
 
-import { ComboSimple, InputArchivo, InputRadioButtons } from '@/components/form';
+import { ComboSimple, InputArchivo, InputFecha, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import Titulo from '@/components/titulo/titulo';
 import Link from 'next/link';
@@ -35,6 +35,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   useEffect(() => {
     if (motivoRechazo !== 'relacion-laboral-terminada') {
       formulario.clearErrors('documentoAdjunto');
+      formulario.clearErrors('fechaTerminoRelacion');
     }
 
     if (motivoRechazo !== 'otro') {
@@ -81,16 +82,20 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                     errores={{ obligatorio: 'Debe seleccionar el motivo para no tramitar' }}
                     opciones={[
                       {
-                        label: 'Inexistencia de Relación Laboral',
+                        label: 'Inexistencia de relación laboral',
                         value: 'inexistencia-relacion-laboral',
                       },
                       {
-                        label: 'Relación Laboral Terminada',
+                        label: 'Relación laboral terminada',
                         value: 'relacion-laboral-terminada',
                       },
                       {
-                        label: 'Persona Trabajadora con permiso sin goce de sueldo',
+                        label: 'Persona trabajadora con permiso sin goce de sueldo',
                         value: 'permiso-sin-goce-de-sueldo',
+                      },
+                      {
+                        label: 'Persona trabajadora sector público con feriado legal',
+                        value: 'trabajador-publico-feriado-legal',
                       },
                       {
                         label: 'Otras Razones',
@@ -109,8 +114,17 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                       />
                     </IfContainer>
 
+                    <IfContainer show={motivoRechazo === 'relacion-laboral-terminada'}>
+                      <InputFecha
+                        name="fechaTerminoRelacion"
+                        label="Fecha de término de relación laboral"
+                        className="mt-3"
+                      />
+                    </IfContainer>
+
                     <InputArchivo
-                      opcional={motivoRechazo !== 'relacion-laboral-terminada'}
+                      // opcional={motivoRechazo !== 'relacion-laboral-terminada'} // TODO: Descomentar cuando subir archivos sea obligatorio
+                      opcional
                       name="documentoAdjunto"
                       label="Adjuntar Documento"
                       className="mt-3"
