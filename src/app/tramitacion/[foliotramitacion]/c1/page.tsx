@@ -101,6 +101,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   const ocupacionSeleccionada = formulario.watch('ocupacion');
   const fechaEmitida = formulario.watch('fechaemision');
 
+
   const fechaActual = () => {
     let fechaHoy = new Date().toLocaleString('es-CL', options).split('-');
     return `${fechaHoy[2]}-${fechaHoy[1]}-${fechaHoy[0]}`;
@@ -110,6 +111,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     let fechaFinal = fecha.split('-');
     return `${fechaFinal[2]}-${fechaFinal[1]}-${fechaFinal[0]}`;
   };
+
 
   useEffect(() => {
     if (licencia == undefined) return;
@@ -137,6 +139,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
             ?.fechaemision || '',
         ).toLocaleString('es-CL', options),
       ),
+
     );
   }, [licencia?.LMETRM]);
 
