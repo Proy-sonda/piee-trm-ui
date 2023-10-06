@@ -2,8 +2,11 @@
 import { ComboSimple, InputArchivo } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { capitalizar } from '@/utilidades';
+import { format, subMonths } from 'date-fns';
+import esLocale from 'date-fns/locale/es';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
@@ -59,6 +62,21 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     control: formulario.control,
     name: 'remuneracionesMaternidad',
   });
+
+  // Cargar los periodos de renta de la licencia
+  useEffect(() => {
+    if (!licencia) {
+      return;
+    }
+
+    const fechaReferencia = new Date(licencia.fechaemision);
+    for (let index = 0; index < remuneraciones.fields.length; index++) {
+      const mesRenta = subMonths(fechaReferencia, index + 1);
+      const mesString = capitalizar(format(mesRenta, 'MMMM yyyy', { locale: esLocale }));
+
+      formulario.setValue(`remuneraciones.${index}.periodoRenta`, mesString);
+    }
+  }, [licencia]);
 
   const pasarAPaso4: SubmitHandler<FormularioC3> = async (datos) => {
     console.log('Yendome a paso 4...');
