@@ -1,11 +1,13 @@
 import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { LicenciaCreate } from '../(modelo)/licencia-create';
+import { LicenciaC0 } from '../(modelos)/';
 
-export const crearLicencia = async (licencia: LicenciaCreate) => {
+export class ErrorCrearLicencia extends Error {}
+
+export const crearLicenciaZ0 = async (licencia: LicenciaC0) => {
   try {
-    await runFetchConThrow<void>(`${urlBackendTramitacion()}/licencia/create`, {
+    await runFetchConThrow<void>(`${urlBackendTramitacion()}/licencia/zona0/create`, {
       method: 'POST',
       headers: {
         Authorization: obtenerToken(),
@@ -13,5 +15,7 @@ export const crearLicencia = async (licencia: LicenciaCreate) => {
       },
       body: JSON.stringify(licencia),
     });
-  } catch (error) {}
+  } catch (error: any) {
+    throw new ErrorCrearLicencia();
+  }
 };

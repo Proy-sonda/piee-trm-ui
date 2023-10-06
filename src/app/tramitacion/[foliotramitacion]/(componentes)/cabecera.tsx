@@ -1,6 +1,4 @@
 'use client';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
 import { Stepper } from '@/components/stepper/stepper';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
@@ -8,6 +6,7 @@ import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { useEffect, useState } from 'react';
 import { LicenciaTramitar } from '../../(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '../../(servicios)/buscar-licencias-para-tramitar';
+import InformacionLicencia from './informacion-licencia';
 
 interface myprops {
   foliotramitacion: string;
@@ -53,28 +52,7 @@ const Cabecera: React.FC<myprops> = ({ foliotramitacion, step, title, rutEmplead
         <Titulo url="">Tramitación / Tramitar</Titulo>
       </div>
       <div className="row mt-2">
-        <IfContainer show={cargandoData}>
-          <LoadingSpinner titulo="Cargando información" />
-        </IfContainer>
-        <IfContainer show={!cargandoData}>
-          <div className="col-md-12 col-lg-12">
-            <p>
-              Licencia otorgada el día{' '}
-              <b>{new Date(datopaciente!?.fechaemision).toLocaleString('es-CL', options)}</b> en
-              plataforma operador <b>{datopaciente?.operador.operador}</b> con Folio{' '}
-              <b>{foliotramitacion}</b> por <b>{datopaciente?.tipolicencia.tipolicencia}</b>, a la
-              persona trabajadora{' '}
-              <b>
-                {datopaciente?.runtrabajador} {datopaciente?.nombres}{' '}
-                {datopaciente?.apellidopaterno} {datopaciente?.apellidomaterno}
-              </b>{' '}
-              estableciendo <b>{datopaciente?.tiporesposo.tiporeposo}</b> por{' '}
-              <b>{datopaciente?.diasreposo} días(s)</b> desde{' '}
-              <b>{new Date(datopaciente!?.fechainicioreposo).toLocaleString('es-CL', options)} </b>
-              al <b>{fechafin}</b>
-            </p>
-          </div>
-        </IfContainer>
+        <InformacionLicencia folioLicencia={foliotramitacion} />
       </div>
       <div className="row me-5">
         <div className="mt-3 mb-4 mx-0 mx-md-5">
