@@ -17,7 +17,7 @@ import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import 'animate.css';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Cabecera from '../(componentes)/cabecera';
 import { buscarComunas } from '../(servicios)/buscar-comunas';
@@ -28,7 +28,17 @@ import { buscarRegiones } from '../(servicios)/buscar-regiones';
 import { buscarCalle } from '../(servicios)/tipo-calle';
 import { LicenciaTramitar } from '../../(modelos)/licencia-tramitar';
 
+import format from 'date-fns/format';
+import Swal from 'sweetalert2';
 import { buscarLicenciasParaTramitar } from '../../(servicios)/buscar-licencias-para-tramitar';
+import { LicenciaC1 } from './(modelos)';
+import { LicenciaC0 } from './(modelos)/licencia-c0';
+import {
+  ErrorCrearLicencia,
+  ErrorCrearLicenciaC1,
+  crearLicenciaZ0,
+  crearLicenciaZ1,
+} from './(servicios)/';
 
 interface myprops {
   params: {
@@ -87,11 +97,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     [refrescar],
   );
 
-
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
   const fechaEmitida = formulario.watch('fechaemision');
-
 
   const fechaActual = () => {
     let fechaHoy = new Date().toLocaleString('es-CL', options).split('-');
@@ -102,7 +110,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     let fechaFinal = fecha.split('-');
     return `${fechaFinal[2]}-${fechaFinal[1]}-${fechaFinal[0]}`;
   };
-
 
   useEffect(() => {
     if (licencia == undefined) return;
@@ -130,7 +137,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
             ?.fechaemision || '',
         ).toLocaleString('es-CL', options),
       ),
-
     );
   }, [licencia?.LMETRM]);
 
@@ -179,6 +185,84 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     //   },
     // };
   };
+  const onHandleGuardar = async (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    let licencia: LicenciaC0 = {
+      estadolicencia: licenciaTramite!?.estadolicencia,
+      fechaemision: format(new Date(licenciaTramite!?.fechaemision), 'yyyy-MM-dd'),
+      fechainicioreposo: format(new Date(licenciaTramite!?.fechainicioreposo), 'yyy-MM-dd'),
+      estadotramitacion: {
+        idestadotramitacion: 1,
+        estadotramitacion: 'PENDIENTE',
+      },
+      foliolicencia: foliotramitacion,
+      motivodevolucion: licenciaTramite!?.motivodevolucion,
+      ndias: licenciaTramite!?.diasreposo,
+      operador: licenciaTramite!?.operador,
+      ruttrabajador: licenciaTramite!?.runtrabajador,
+      tipolicencia: licenciaTramite!?.tipolicencia,
+    };
+
+    let licenciac1: LicenciaC1 = {
+      actividadlaboral: {
+        idactividadlaboral: Number(formulario.getValues('actividadlaboral')),
+        actividadlaboral: '',
+      },
+      comuna: {
+        idcomuna: formulario.getValues('comuna'),
+        nombre: '',
+      },
+      depto: formulario.getValues('departamento'),
+      direccion: formulario.getValues('calle'),
+      fecharecepcion: format(new Date(formulario.getValues('fecharecepcionlme')), 'yyyy-MM-dd'),
+      foliolicencia: foliotramitacion,
+      glosaotraocupacion: formulario.getValues('otro') || '',
+      ocupacion: {
+        idocupacion: Number(formulario.getValues('ocupacion')),
+        ocupacion: '',
+      },
+      numero: formulario.getValues('numero'),
+      operador: licenciaTramite!?.operador,
+      rutempleador: formulario.getValues('run'),
+      telefono: formulario.getValues('telefono'),
+      tipocalle: {
+        idtipocalle: Number(formulario.getValues('tipo')),
+        tipocalle: '',
+      },
+    };
+
+    try {
+      await crearLicenciaZ0(licencia);
+      await crearLicenciaZ1(licenciac1);
+
+      return Swal.fire({
+        icon: 'success',
+        html: 'Se ha guardado con éxito',
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      if (error instanceof ErrorCrearLicencia) {
+        return Swal.fire({
+          icon: 'error',
+          title: 'Existe un problema al guardar los datos',
+          showConfirmButton: true,
+          confirmButtonColor: 'var(--color-blue)',
+          confirmButtonText: 'OK',
+        });
+      }
+
+      if (error instanceof ErrorCrearLicenciaC1) {
+        return Swal.fire({
+          icon: 'error',
+          title: 'Existe un problema al guardar los datos',
+          showConfirmButton: true,
+          confirmButtonColor: 'var(--color-blue)',
+          confirmButtonText: 'OK',
+        });
+      }
+    }
+  };
   return (
     <div className="bgads">
       <div className="me-5 ms-5">
@@ -208,7 +292,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
               className="animate__animated animate__fadeIn"
               onSubmit={formulario.handleSubmit(onHandleSubmit)}>
               <div className="row">
-
                 <InputRut
                   name="run"
                   label="Rut Entidad Empleadora"
@@ -237,7 +320,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   <InputFecha label="Fecha Emisión" name="fechaemision" />
                 </div>
 
-
                 <InputFecha
                   label="Fecha Recepción LME"
                   name="fecharecepcionlme"
@@ -245,7 +327,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   opcional
                   noAnteriorA="fechaemision"
                   esEmision
-
                 />
 
                 <ComboSimple
@@ -268,7 +349,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                 <ComboSimple
                   name="tipo"
                   label="Tipo"
-                  descripcion="idtipocalle"
+                  descripcion="tipocalle"
                   idElemento="idtipocalle"
                   datos={combos?.CALLE}
                   opcional
@@ -345,7 +426,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   </a>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-success">Guardar</button>
+                  <button className="btn btn-success" onClick={onHandleGuardar}>
+                    Guardar
+                  </button>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
                   <button className="btn btn-primary">Siguiente</button>
