@@ -59,3 +59,7 @@ interface Ccaf {
   idccaf: number;
   nombre: string;
 }
+
+export const esLicenciaMaternidad = (licencia: LicenciaTramitar) => {
+  return licencia.tipolicencia.idtipolicencia === 3;
+};

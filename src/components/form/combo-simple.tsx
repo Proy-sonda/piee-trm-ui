@@ -1,9 +1,12 @@
 import { useRandomId } from '@/hooks/use-random-id';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
+import IfContainer from '../if-container';
 import { BaseProps } from './base-props';
 
-interface ComboSimpleProps<T> extends BaseProps {
+interface ComboSimpleProps<T> extends Omit<BaseProps, 'label'> {
+  label?: string;
+
   /** Datos para rellenar el combo */
   datos?: T[];
 
@@ -26,6 +29,28 @@ interface ComboSimpleProps<T> extends BaseProps {
   tipoValor?: 'number' | 'string';
 
   opcional?: boolean;
+
+  /**
+   * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
+   *
+   * Si se incluye esta propiedad se obtienen desde el arreglo usado por `useFieldArray`, pero si
+   * no se incluye se van a tratar de obtener los errores desde la propiedad`formState.errors[name]`
+   * que devuelve `useFormContext`.
+   */
+  unirConFieldArray?: {
+    /**
+     * La propiedad `name` usada cuando se creo el field array con `useFieldArray`.
+     * */
+    fieldArrayName: string;
+
+    /** El indice del input. */
+    index: number;
+
+    /**
+     * Nombre de la propiedad de un elemento del field array.
+     */
+    campo: string;
+  };
 }
 
 /**
@@ -42,6 +67,7 @@ export const ComboSimple = <T extends Record<string, any>>({
   textoOpcionPorDefecto,
   tipoValor,
   opcional,
+  unirConFieldArray,
 }: ComboSimpleProps<T>) => {
   const idInput = useRandomId('combo');
 
@@ -50,14 +76,44 @@ export const ComboSimple = <T extends Record<string, any>>({
     formState: { errors },
   } = useFormContext();
 
+  const determinarLabel = () => {
+    if (label === undefined || label === null) {
+      return '';
+    }
+
+    return opcional ? `${label}` : `${label} (*)`;
+  };
+
+  const tieneError = () => {
+    if (!unirConFieldArray) {
+      return !!errors[name];
+    }
+
+    const { fieldArrayName, index, campo } = unirConFieldArray;
+
+    return !!(errors[fieldArrayName] as any)?.at?.(index)?.[campo];
+  };
+
+  const mensajeDeError = () => {
+    if (!unirConFieldArray) {
+      return errors[name]?.message?.toString();
+    }
+
+    const { fieldArrayName, index, campo } = unirConFieldArray;
+
+    return (errors[fieldArrayName] as any)?.at?.(index)?.[campo]?.message?.toString();
+  };
+
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label}${!opcional ? ' (*)' : ''}`}</Form.Label>
+        <IfContainer show={label !== undefined}>
+          <Form.Label>{determinarLabel()}</Form.Label>
+        </IfContainer>
 
         <Form.Select
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError()}
           {...register(name, {
             setValueAs: (value) => {
               if (!tipoValor || tipoValor === 'number') {
@@ -91,7 +147,7 @@ export const ComboSimple = <T extends Record<string, any>>({
         </Form.Select>
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeDeError()}
         </Form.Control.Feedback>
       </FormGroup>
     </>
