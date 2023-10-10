@@ -1,10 +1,12 @@
 'use client';
 import { InputFecha } from '@/components/form';
+import { useState } from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
+import ModalConfirmarTramitacion from './(componentes)/modal-confirmar-tramitacion';
 import { FormularioC4 } from './(modelos)/formulario-c4';
 interface myprops {
   params: {
@@ -18,6 +20,8 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     { label: 'Renta y/o subsidios', num: 3, active: false, url: '/adscripcion/pasodos' },
     { label: 'LME Anteriores', num: 4, active: true, url: '/adscripcion/pasodos' },
   ];
+
+  const [modalConfirmarTramitacion, setModalConfirmarTramitacion] = useState(false);
 
   const formulario = useForm<FormularioC4>({
     mode: 'onBlur',
@@ -35,11 +39,22 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   const informarLicencias = formulario.watch('informarLicencia');
 
   const tramitarLicencia: SubmitHandler<FormularioC4> = async (data) => {
-    console.log('TRAMITANDO LICENCIA:', data);
+    setModalConfirmarTramitacion(true);
+  };
+
+  const tramitarLaLicencia = () => {
+    console.log('TRAMITANDO LICENCIA:', formulario.getValues());
+    setModalConfirmarTramitacion(false);
   };
 
   return (
     <>
+      <ModalConfirmarTramitacion
+        show={modalConfirmarTramitacion}
+        onCerrar={() => setModalConfirmarTramitacion(false)}
+        onTramitacionConfirmada={tramitarLaLicencia}
+      />
+
       <div className="bgads">
         <div className="ms-5 me-5">
           <Cabecera
