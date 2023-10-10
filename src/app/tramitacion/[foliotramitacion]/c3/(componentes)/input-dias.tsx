@@ -68,7 +68,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
         <Form.Control
-          type="number"
+          type="text"
           inputMode="numeric"
           isInvalid={tieneError()}
           {...register(name, {
@@ -91,7 +91,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
 
               if (regex.test(montoImponible)) {
                 montoImponible = montoImponible.replaceAll(regex, '');
-                setValue(name, parseInt(montoImponible), { shouldValidate: true });
+                setValue(name, montoImponible, { shouldValidate: true });
               }
             },
           })}

@@ -80,7 +80,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
         <Form.Control
-          type="number"
+          type="text"
           inputMode="numeric"
           isInvalid={tieneError()}
           {...register(name, {
@@ -103,7 +103,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
 
               if (regex.test(montoImponible)) {
                 montoImponible = montoImponible.replaceAll(regex, '');
-                setValue(name, parseInt(montoImponible), { shouldValidate: true });
+                setValue(name, montoImponible, { shouldValidate: true });
               }
             },
           })}
