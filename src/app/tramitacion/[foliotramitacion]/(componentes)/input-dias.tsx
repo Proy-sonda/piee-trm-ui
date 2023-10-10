@@ -7,6 +7,14 @@ import { useFormContext } from 'react-hook-form';
 interface InputDiasProps extends Omit<BaseProps, 'label'> {
   opcional?: boolean;
 
+  /** Número mínimo de días (default: 0) */
+  minDias?: number;
+
+  /** Numero maximo de dias (default: `30`) */
+  maxDias?: number;
+
+  deshabilitado?: boolean;
+
   /**
    * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
    *
@@ -34,8 +42,14 @@ export const InputDias: React.FC<InputDiasProps> = ({
   name,
   className,
   opcional,
+  minDias,
+  maxDias,
+  deshabilitado,
   unirConFieldArray,
 }) => {
+  const minDiasFinal = minDias ?? 0;
+  const maxDiasFinal = maxDias ?? 30;
+
   const idInput = useRandomId('dias');
 
   const {
@@ -70,6 +84,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
         <Form.Control
           type="text"
           inputMode="numeric"
+          disabled={deshabilitado === true}
           isInvalid={tieneError()}
           {...register(name, {
             valueAsNumber: true,
@@ -78,12 +93,12 @@ export const InputDias: React.FC<InputDiasProps> = ({
               message: 'Este campo es obligatorio',
             },
             min: {
-              value: 0,
-              message: 'No puede ingresar menos de 0 días',
+              value: minDiasFinal,
+              message: `No puede ingresar menos de ${minDiasFinal} días`,
             },
             max: {
-              value: 30,
-              message: 'No puede ingresar más de 30 días',
+              value: maxDiasFinal,
+              message: `No puede ingresar más de ${maxDiasFinal} días`,
             },
             onChange: (event: any) => {
               const regex = /[^0-9]/g; // solo números postivos
