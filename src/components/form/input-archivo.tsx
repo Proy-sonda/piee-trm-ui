@@ -6,10 +6,18 @@ import { BaseProps } from '.';
 
 interface InputArchivoProps extends BaseProps {
   opcional?: boolean;
+
+  multiple?: boolean;
 }
 
 /** El valor del input va a ser un arreglo de objetos {@link File} */
-export const InputArchivo: React.FC<InputArchivoProps> = ({ name, label, className, opcional }) => {
+export const InputArchivo: React.FC<InputArchivoProps> = ({
+  name,
+  label,
+  className,
+  opcional,
+  multiple,
+}) => {
   const idInput = useRandomId('archivo');
 
   const {
@@ -25,6 +33,7 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({ name, label, classNa
         <Form.Control
           type="file"
           isInvalid={!!errors[name]}
+          multiple={multiple !== undefined && multiple === true}
           {...register(name, {
             required: {
               value: !opcional,

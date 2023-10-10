@@ -13,6 +13,7 @@ interface myprops {
   step: any[];
   title: string;
   rutEmpleador?: (run: string) => void;
+  onLicenciaCargada?: (licencia: LicenciaTramitar) => void;
 }
 const options: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -21,7 +22,13 @@ const options: Intl.DateTimeFormatOptions = {
   hour12: false, // Para usar formato de 24 horas
 };
 
-const Cabecera: React.FC<myprops> = ({ foliotramitacion, step, title, rutEmpleador }) => {
+const Cabecera: React.FC<myprops> = ({
+  foliotramitacion,
+  step,
+  title,
+  rutEmpleador,
+  onLicenciaCargada,
+}) => {
   const [refrescar, refrescarPagina] = useRefrescarPagina();
   const [datopaciente, setdatopaciente] = useState<LicenciaTramitar>();
   const [fechafin, setfechafin] = useState<string>('');
@@ -33,7 +40,12 @@ const Cabecera: React.FC<myprops> = ({ foliotramitacion, step, title, rutEmplead
   );
 
   useEffect(() => {
-    setdatopaciente(data?.LMETRM.find(({ foliolicencia }) => foliotramitacion == foliolicencia));
+    const licencia = data?.LMETRM.find(({ foliolicencia }) => foliotramitacion == foliolicencia);
+    if (licencia && onLicenciaCargada) {
+      onLicenciaCargada(licencia);
+    }
+
+    setdatopaciente(licencia);
     if (rutEmpleador == undefined) return;
     if (datopaciente?.rutempleador) rutEmpleador(datopaciente?.rutempleador);
   }, [cargandoData]);

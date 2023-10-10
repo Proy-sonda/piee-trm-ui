@@ -17,3 +17,7 @@ export const thresholdAlertaExpiraSesion = () => {
 export const urlBackendTramitacion = () => {
   return process.env.NEXT_PUBLIC_URL_BACKEND_TRAMITACION!;
 };
+
+export const montoMaximoPorDefecto = () => {
+  return parseInt(process.env.NEXT_PUBLIC_MONTO_MAXIMO_POR_DEFECTO!, 10);
+};
