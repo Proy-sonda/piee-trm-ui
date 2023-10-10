@@ -22,6 +22,7 @@ import InputPeriodoRenta from './(componentes)/input-periodo-renta';
 import ModalDesgloseDeHaberes, {
   DatosModalDesgloseHaberes,
 } from './(componentes)/modal-desglose-haberes';
+import { DesgloseDeHaberes } from './(modelos)/desglose-de-haberes';
 import { FormularioC3 } from './(modelos)/formulario-c3';
 
 interface C3PageProps {
@@ -57,8 +58,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
   const formulario = useForm<FormularioC3>({
     mode: 'onBlur',
     defaultValues: {
-      remuneraciones: [{}, {}, {}],
-      remuneracionesMaternidad: [{}, {}, {}],
+      remuneraciones: [{ desgloseHaberes: {} }, { desgloseHaberes: {} }, { desgloseHaberes: {} }],
+      remuneracionesMaternidad: [
+        { desgloseHaberes: {} },
+        { desgloseHaberes: {} },
+        { desgloseHaberes: {} },
+      ],
     },
   });
 
@@ -91,10 +96,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     console.log('Yendome a paso 4...');
     console.log(datos);
 
-    let periodos = datos.remuneraciones.map((r) => r.periodoRenta);
-    if (licencia && esLicenciaMaternidad(licencia)) {
-      periodos = [...periodos, ...datos.remuneracionesMaternidad.map((r) => r.periodoRenta)];
-    }
+    const periodos = datos.remuneraciones
+      .map((r) => r.periodoRenta)
+      .concat(
+        esLicenciaMaternidad(licencia!)
+          ? datos.remuneracionesMaternidad.map((r) => r.periodoRenta)
+          : [],
+      );
 
     const { isConfirmed } = await Swal.fire({
       html: `
@@ -126,17 +134,49 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     });
   };
 
+  const guardarDesglose = (
+    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
+    index: number,
+    desglose: DesgloseDeHaberes,
+  ): void => {
+    const montoImponible = formulario.getValues(`${fieldArray}.${index}.montoImponible`);
+    const totalDesglose = Object.values(desglose).reduce(
+      (total, monto: number) => total + monto,
+      0,
+    );
+
+    formulario.setValue(`${fieldArray}.${index}.desgloseHaberes`, desglose);
+
+    if (totalDesglose !== montoImponible) {
+      formulario.setError(`${fieldArray}.${index}.desgloseHaberes`, {
+        type: 'validate',
+        message: 'No coincide con monto imponible',
+      });
+    } else {
+      formulario.clearErrors(`${fieldArray}.${index}.desgloseHaberes`);
+    }
+
+    limpiarModalDesglose();
+  };
+
+  const descartarDesglose = (
+    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
+    index: number,
+  ): void => {
+    formulario.setValue(`${fieldArray}.${index}.desgloseHaberes`, {});
+    formulario.clearErrors(`${fieldArray}.${index}.desgloseHaberes`);
+    limpiarModalDesglose();
+  };
+
   return (
     <>
-      {/* No meter este modal dentro del FormProvider para que no se mezclen los formularios */}
+      {/* No meter este modal dentro del FormProvider para que no se mezclen los formularios del
+       * modal y la pagina */}
       <ModalDesgloseDeHaberes
         datos={datosModalDesglose}
         onCerrar={limpiarModalDesglose}
-        onGuardarDesglose={(fieldArray, index, desglose) => {
-          formulario.setValue(`${fieldArray}.${index}.desgloseHaberes`, desglose);
-          formulario.clearErrors(`${fieldArray}.${index}.desgloseHaberes`);
-          limpiarModalDesglose();
-        }}
+        onGuardarDesglose={guardarDesglose}
+        onDescartarDesglose={descartarDesglose}
       />
 
       <FormProvider {...formulario}>
@@ -248,6 +288,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                             </button>
 
                             <InputDesgloseDeHaberes
+                              opcional
                               name={`remuneraciones.${index}.desgloseHaberes`}
                               unirConFieldArray={{
                                 index,

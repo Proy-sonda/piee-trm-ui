@@ -8,7 +8,7 @@ import { useFormContext } from 'react-hook-form';
 interface InputMontoImponibleProps extends Omit<BaseProps, 'label'> {
   opcional?: boolean;
 
-  /** (defecto: `1`) */
+  /** (defecto: `0`) */
   montoMinimo?: number;
 
   /** (defecto: lo definido por la función {@link montoMaximoPorDefecto} ) */
@@ -45,7 +45,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
   montoMaximo,
   unirConFieldArray,
 }) => {
-  const montoMinimoFinal = montoMinimo ?? 1;
+  const montoMinimoFinal = montoMinimo ?? 0;
   const montoMaximoFinal = montoMaximo ?? montoMaximoPorDefecto();
 
   const idInput = useRandomId('monto');
@@ -80,11 +80,10 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
         <Form.Control
-          type="number"
+          type="text"
           inputMode="numeric"
           isInvalid={tieneError()}
           {...register(name, {
-            // setValueAs: (value) => (isNaN(Number(value)) ? 0 : Number(value)),
             valueAsNumber: true,
             required: {
               value: !opcional,
@@ -104,7 +103,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
 
               if (regex.test(montoImponible)) {
                 montoImponible = montoImponible.replaceAll(regex, '');
-                setValue(name, parseInt(montoImponible), { shouldValidate: true });
+                setValue(name, montoImponible, { shouldValidate: true });
               }
             },
           })}
