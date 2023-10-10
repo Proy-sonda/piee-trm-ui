@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { buscarInstitucionPrevisional } from '../(servicios)/buscar-institucion-previsional';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
@@ -90,33 +91,30 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     console.log('Yendome a paso 4...');
     console.log(datos);
 
-    // TODO: Descomentar de aqui pa abajo
-    // const { isConfirmed } = await Swal.fire({
-    //   html: `
-    //     <p>Antes de seguir, recuerde confirmar que debe ingresar Comprobante de Liquidación mensual para todos los periodos declarados:</p>
+    let periodos = datos.remuneraciones.map((r) => r.periodoRenta);
+    if (licencia && esLicenciaMaternidad(licencia)) {
+      periodos = [...periodos, ...datos.remuneracionesMaternidad.map((r) => r.periodoRenta)];
+    }
 
-    //       <li>Enero 2023</li>
-    //       <li>Febrero 2023</li>
-    //       <li>Marzo 2023</li>
-    //       <li>Agosto 2022</li>
-    //       <li>Septiembre 2022</li>
-    //       <li>Octubre 2022</li>
+    const { isConfirmed } = await Swal.fire({
+      html: `
+        <p>Antes de seguir, recuerde confirmar que debe ingresar Comprobante de Liquidación mensual para todos los periodos declarados:</p>
+        ${periodos.map((periodo) => `<li>${periodo}</li>`).join('\n')}
+        <p class="mt-3 fw-bold">¿Está seguro que desea continuar, o desea volver a ingresar o revisar la documentación?</p>
+        `,
+      showConfirmButton: true,
+      confirmButtonText: 'Continuar',
+      confirmButtonColor: 'var(--color-blue)',
+      showCancelButton: true,
+      cancelButtonText: 'Volver',
+      cancelButtonColor: 'var(--bs-danger)',
+    });
 
-    //     <p class="mt-3 fw-bold">¿Está seguro que desea continuar, o desea volver a ingresar o revisar la documentación?</p>
-    //     `,
-    //   showConfirmButton: true,
-    //   confirmButtonText: 'Continuar',
-    //   confirmButtonColor: 'var(--color-blue)',
-    //   showCancelButton: true,
-    //   cancelButtonText: 'Volver',
-    //   cancelButtonColor: 'var(--bs-danger)',
-    // });
+    if (!isConfirmed) {
+      return;
+    }
 
-    // if (!isConfirmed) {
-    //   return;
-    // }
-
-    // router.push(`/tramitacion/${foliotramitacion}/c4`);
+    router.push(`/tramitacion/${foliotramitacion}/c4`);
   };
 
   const limpiarModalDesglose = () => {
