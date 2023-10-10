@@ -78,12 +78,12 @@ export const InputDias: React.FC<InputDiasProps> = ({
               message: 'Este campo es obligatorio',
             },
             min: {
-              value: 1,
-              message: 'Debe ingresar al menos 1 día',
+              value: 0,
+              message: 'No puede ingresar menos de 0 días',
             },
             max: {
-              value: 31,
-              message: 'No puede ingresar más de 31 días',
+              value: 30,
+              message: 'No puede ingresar más de 30 días',
             },
             onChange: (event: any) => {
               const regex = /[^0-9]/g; // solo números postivos
