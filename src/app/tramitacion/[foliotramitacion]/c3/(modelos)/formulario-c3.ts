@@ -14,5 +14,11 @@ interface Remuneracion {
   dias: string;
   montoImponible: number;
   montoImponibleDesahucio: number;
-  desgloseHaberes: DesgloseDeHaberes;
+  desgloseHaberes: DesgloseDeHaberes | Record<string, never>;
 }
+
+export const tieneDesglose = (
+  x: DesgloseDeHaberes | Record<string, never>,
+): x is DesgloseDeHaberes => {
+  return Object.values(x).length !== 0;
+};

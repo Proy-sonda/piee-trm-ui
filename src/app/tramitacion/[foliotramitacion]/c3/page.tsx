@@ -58,8 +58,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
   const formulario = useForm<FormularioC3>({
     mode: 'onBlur',
     defaultValues: {
-      remuneraciones: [{}, {}, {}],
-      remuneracionesMaternidad: [{}, {}, {}],
+      remuneraciones: [{ desgloseHaberes: {} }, { desgloseHaberes: {} }, { desgloseHaberes: {} }],
+      remuneracionesMaternidad: [
+        { desgloseHaberes: {} },
+        { desgloseHaberes: {} },
+        { desgloseHaberes: {} },
+      ],
     },
   });
 
@@ -155,6 +159,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     limpiarModalDesglose();
   };
 
+  const descartarDesglose = (
+    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
+    index: number,
+  ): void => {
+    formulario.setValue(`${fieldArray}.${index}.desgloseHaberes`, {});
+    formulario.clearErrors(`${fieldArray}.${index}.desgloseHaberes`);
+    limpiarModalDesglose();
+  };
+
   return (
     <>
       {/* No meter este modal dentro del FormProvider para que no se mezclen los formularios del
@@ -163,6 +176,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
         datos={datosModalDesglose}
         onCerrar={limpiarModalDesglose}
         onGuardarDesglose={guardarDesglose}
+        onDescartarDesglose={descartarDesglose}
       />
 
       <FormProvider {...formulario}>
@@ -274,6 +288,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                             </button>
 
                             <InputDesgloseDeHaberes
+                              opcional
                               name={`remuneraciones.${index}.desgloseHaberes`}
                               unirConFieldArray={{
                                 index,

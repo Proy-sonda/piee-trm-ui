@@ -10,7 +10,7 @@ export interface DatosModalDesgloseHaberes {
   periodoRenta: string;
   fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>;
   indexInput: number;
-  desgloseInicial?: DesgloseDeHaberes;
+  desgloseInicial?: DesgloseDeHaberes | Record<string, never>;
 }
 
 interface ModalDesgloseDeHaberesProps {
@@ -21,6 +21,10 @@ interface ModalDesgloseDeHaberesProps {
     indexInput: number,
     desglose: DesgloseDeHaberes,
   ) => void;
+  onDescartarDesglose: (
+    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
+    indexInput: number,
+  ) => void;
 }
 
 type FormularioDesgloseHaberes = DesgloseDeHaberes;
@@ -29,6 +33,7 @@ const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
   datos,
   onCerrar,
   onGuardarDesglose,
+  onDescartarDesglose,
 }) => {
   const formulario = useForm<FormularioDesgloseHaberes>({ mode: 'onBlur' });
 
@@ -57,6 +62,11 @@ const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
     formulario.reset();
 
     onGuardarDesglose(datos.fieldArray, datos.indexInput, desglose);
+  };
+
+  const descartarCambios = () => {
+    formulario.reset();
+    onDescartarDesglose(datos.fieldArray, datos.indexInput);
   };
 
   return (
@@ -142,6 +152,12 @@ const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
               <div className="w-100 d-flex flex-column flex-md-row flex-md-row-reverse">
                 <button type="submit" form="formularioDesgloseHaberes" className="btn btn-primary">
                   Grabar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-success mt-2 mt-md-0 me-0 me-md-2"
+                  onClick={descartarCambios}>
+                  Descartar
                 </button>
                 <button
                   type="button"
