@@ -1,5 +1,6 @@
 'use client';
 import { InputFecha } from '@/components/form';
+import { esFechaInvalida } from '@/utilidades';
 import { useState } from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
@@ -38,13 +39,29 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
 
   const informarLicencias = formulario.watch('informarLicencia');
 
-  const tramitarLicencia: SubmitHandler<FormularioC4> = async (data) => {
+  const tramitarLicencia1: SubmitHandler<FormularioC4> = async (data) => {
     setModalConfirmarTramitacion(true);
   };
 
   const tramitarLaLicencia = () => {
     console.log('TRAMITANDO LICENCIA:', formulario.getValues());
     setModalConfirmarTramitacion(false);
+  };
+
+  const estaLafilaVacia = (index: number) => {
+    const { dias, desde, hasta } = formulario.getValues(`licenciasAnteriores.${index}`);
+
+    /** Si el campo es invalido se considera como que no se ingreso. Cada elemento va a ser `true`
+     * solo si no se ingreso */
+    const camposSinIngresar = [
+      dias === undefined || isNaN(dias),
+      esFechaInvalida(desde),
+      esFechaInvalida(hasta),
+    ];
+
+    /* El filter solo toma los campos sin ingresar, y si luego del filter el arreglo no cambia de
+     * tamaño, es porque esta toda la fila vacía. */
+    return camposSinIngresar.filter((x) => x).length === camposSinIngresar.length;
   };
 
   return (
@@ -74,7 +91,7 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
           </div>
 
           <FormProvider {...formulario}>
-            <form onSubmit={formulario.handleSubmit(tramitarLicencia)}>
+            <form onSubmit={formulario.handleSubmit(tramitarLicencia1)}>
               <div className="row mt-2">
                 <Table className="table table-bordered">
                   <Thead>
@@ -89,7 +106,7 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                       <Tr key={field.id}>
                         <Td>
                           <InputDias
-                            opcional
+                            opcional={estaLafilaVacia(index)}
                             maxDias={184}
                             deshabilitado={!informarLicencias}
                             name={`licenciasAnteriores.${index}.dias`}
@@ -102,7 +119,7 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                         </Td>
                         <Td>
                           <InputFecha
-                            opcional
+                            opcional={estaLafilaVacia(index)}
                             deshabilitado={!informarLicencias}
                             name={`licenciasAnteriores.${index}.desde`}
                             noPosteriorA={`licenciasAnteriores.${index}.hasta`}
@@ -115,7 +132,7 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                         </Td>
                         <Td>
                           <InputFecha
-                            opcional
+                            opcional={estaLafilaVacia(index)}
                             deshabilitado={!informarLicencias}
                             name={`licenciasAnteriores.${index}.hasta`}
                             noAnteriorA={`licenciasAnteriores.${index}.desde`}

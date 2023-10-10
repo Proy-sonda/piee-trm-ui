@@ -3,6 +3,7 @@ import { Modal } from 'react-bootstrap';
 
 interface ModalConfirmarTramitacionProps {
   show: boolean;
+  // datosC4: FormularioC4,
   onCerrar: () => void;
   onTramitacionConfirmada: () => void;
 }
