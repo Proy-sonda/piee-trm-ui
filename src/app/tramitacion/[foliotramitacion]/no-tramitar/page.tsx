@@ -3,11 +3,14 @@
 import { ComboSimple, InputArchivo, InputFecha, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import Titulo from '@/components/titulo/titulo';
+import { useFetch } from '@/hooks/use-merge-fetch';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import InformacionLicencia from '../(componentes)/informacion-licencia';
+import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
+import { LicenciaTramitar, esLicenciaFONASA } from '../../(modelos)/licencia-tramitar';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar-licencia';
 
@@ -20,6 +23,10 @@ interface NoRecepcionarLicenciaPageProps {
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliotramitacion },
 }) => {
+  const [errorCargar, cajasDeCompensacion, cargando] = useFetch(buscarCajasDeCompensacion());
+
+  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
+
   const formulario = useForm<FormularioNoTramitarLicencia>({
     mode: 'onBlur',
   });
@@ -54,7 +61,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
           </Row>
 
           <Row>
-            <InformacionLicencia folioLicencia={foliotramitacion} />
+            <InformacionLicencia folioLicencia={foliotramitacion} onLicenciaCargada={setLicencia} />
           </Row>
 
           <Row className="mt-2">
@@ -133,17 +140,16 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 </Col>
 
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
-                  <ComboSimple
-                    name="entidadPagadoraId"
-                    label="Entidad que debe pagar subsidio o Mantener remuneración"
-                    datos={[
-                      { id: '1', descripcion: 'Entidad 1' },
-                      { id: '2', descripcion: 'Entidad 2' },
-                      { id: '3', descripcion: 'Entidad 3' },
-                    ]}
-                    idElemento="id"
-                    descripcion="descripcion"
-                  />
+                  <IfContainer show={licencia && esLicenciaFONASA(licencia)}>
+                    <ComboSimple
+                      opcional={!licencia || !esLicenciaFONASA(licencia)}
+                      name="entidadPagadoraId"
+                      label="Entidad que debe pagar subsidio o Mantener remuneración"
+                      datos={cajasDeCompensacion}
+                      idElemento="idccaf"
+                      descripcion="nombre"
+                    />
+                  </IfContainer>
                 </Col>
               </Row>
 
