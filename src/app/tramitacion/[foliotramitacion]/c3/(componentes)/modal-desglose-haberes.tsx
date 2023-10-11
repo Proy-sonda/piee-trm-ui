@@ -1,3 +1,6 @@
+import { capitalizar } from '@/utilidades';
+import { format } from 'date-fns';
+import esLocale from 'date-fns/locale/es';
 import React, { useEffect } from 'react';
 import { Form, Modal, Table } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -7,7 +10,7 @@ import { InputMonto } from './input-monto';
 
 export interface DatosModalDesgloseHaberes {
   show: boolean;
-  periodoRenta: string;
+  periodoRenta: Date;
   fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>;
   indexInput: number;
   desgloseInicial?: DesgloseDeHaberes | Record<string, never>;
@@ -29,7 +32,7 @@ interface ModalDesgloseDeHaberesProps {
 
 type FormularioDesgloseHaberes = DesgloseDeHaberes;
 
-const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
+export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
   datos,
   onCerrar,
   onGuardarDesglose,
@@ -74,7 +77,8 @@ const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
       <Modal show={datos.show} centered backdrop="static">
         <Modal.Header closeButton onClick={handleCerrarModal}>
           <Modal.Title className="fs-5">
-            Desglose de Haberes Periodo {datos.periodoRenta}
+            Desglose de Haberes Periodo{' '}
+            {capitalizar(format(datos.periodoRenta, 'MMMM yyyy', { locale: esLocale }))}
           </Modal.Title>
         </Modal.Header>
 
@@ -173,5 +177,3 @@ const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
     </>
   );
 };
-
-export default ModalDesgloseDeHaberes;

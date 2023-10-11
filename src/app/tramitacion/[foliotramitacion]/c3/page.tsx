@@ -1,5 +1,5 @@
 'use client';
-import { ComboSimple, InputArchivo } from '@/components/form';
+import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { capitalizar } from '@/utilidades';
@@ -18,9 +18,9 @@ import { LicenciaTramitar, esLicenciaMaternidad } from '../../(modelos)/licencia
 import { InputDesgloseDeHaberes } from './(componentes)/input-desglose-de-haberes';
 import { InputDias } from './(componentes)/input-dias';
 import { InputMonto } from './(componentes)/input-monto';
-import InputPeriodoRenta from './(componentes)/input-periodo-renta';
-import ModalDesgloseDeHaberes, {
+import {
   DatosModalDesgloseHaberes,
+  ModalDesgloseDeHaberes,
 } from './(componentes)/modal-desglose-haberes';
 import { DesgloseDeHaberes } from './(modelos)/desglose-de-haberes';
 import { FormularioC3 } from './(modelos)/formulario-c3';
@@ -50,7 +50,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
 
   const [datosModalDesglose, setDatosModalDesglose] = useState<DatosModalDesgloseHaberes>({
     show: false,
-    periodoRenta: '',
+    periodoRenta: new Date(),
     fieldArray: 'remuneraciones',
     indexInput: -1,
   });
@@ -86,9 +86,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     const fechaReferencia = new Date(licencia.fechaemision);
     for (let index = 0; index < remuneraciones.fields.length; index++) {
       const mesRenta = subMonths(fechaReferencia, index + 1);
-      const mesString = capitalizar(format(mesRenta, 'MMMM yyyy', { locale: esLocale }));
+      const mesString = format(mesRenta, 'yyyy-MM');
 
-      formulario.setValue(`remuneraciones.${index}.periodoRenta`, mesString);
+      formulario.setValue(`remuneraciones.${index}.periodoRenta`, mesString as any);
     }
   }, [licencia]);
 
@@ -102,7 +102,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
         esLicenciaMaternidad(licencia!)
           ? datos.remuneracionesMaternidad.map((r) => r.periodoRenta)
           : [],
-      );
+      )
+      .map((periodo) => capitalizar(format(periodo, 'MMMM yyyy', { locale: esLocale })));
 
     const { isConfirmed } = await Swal.fire({
       html: `
@@ -127,7 +128,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
 
   const limpiarModalDesglose = () => {
     setDatosModalDesglose({
-      periodoRenta: '',
+      periodoRenta: new Date(),
       show: false,
       fieldArray: 'remuneraciones',
       indexInput: -1,
@@ -228,7 +229,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                           />
                         </Td>
                         <Td>
-                          <InputPeriodoRenta
+                          <InputMesAno
                             name={`remuneraciones.${index}.periodoRenta`}
                             unirConFieldArray={{
                               index,
@@ -399,7 +400,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                             />
                           </Td>
                           <Td>
-                            <InputPeriodoRenta
+                            <InputMesAno
                               opcional={licencia && !esLicenciaMaternidad(licencia)}
                               name={`remuneracionesMaternidad.${index}.periodoRenta`}
                               unirConFieldArray={{

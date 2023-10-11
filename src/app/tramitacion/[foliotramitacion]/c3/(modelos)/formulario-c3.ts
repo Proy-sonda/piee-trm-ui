@@ -10,7 +10,7 @@ export interface FormularioC3 {
 
 interface Remuneracion {
   prevision: number;
-  periodoRenta: string;
+  periodoRenta: Date;
   dias: string;
   montoImponible: number;
   montoImponibleDesahucio: number;
