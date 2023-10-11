@@ -7,22 +7,24 @@ import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
-import ModalConfirmarTramitacion from './(componentes)/modal-confirmar-tramitacion';
+import {
+  DatosModalConfirmarTramitacion,
+  ModalConfirmarTramitacion,
+} from './(componentes)/modal-confirmar-tramitacion';
 import { FormularioC4 } from './(modelos)/formulario-c4';
-interface myprops {
+interface PasoC4Props {
   params: {
     foliotramitacion: string;
   };
 }
-const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
+
+const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
   const step = [
     { label: 'Entidad Empleadora/Independiente', num: 1, active: false, url: '/adscripcion' },
     { label: 'Previsión persona trabajadora', num: 2, active: false, url: '/adscripcion/pasodos' },
     { label: 'Renta y/o subsidios', num: 3, active: false, url: '/adscripcion/pasodos' },
     { label: 'LME Anteriores', num: 4, active: true, url: '/adscripcion/pasodos' },
   ];
-
-  const [modalConfirmarTramitacion, setModalConfirmarTramitacion] = useState(false);
 
   const formulario = useForm<FormularioC4>({
     mode: 'onBlur',
@@ -39,13 +41,34 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
 
   const informarLicencias = formulario.watch('informarLicencia');
 
-  const tramitarLicencia1: SubmitHandler<FormularioC4> = async (data) => {
-    setModalConfirmarTramitacion(true);
+  const [datosModalConfirmarTramitacion, setDatosModalConfirmarTramitacion] =
+    useState<DatosModalConfirmarTramitacion>({
+      show: false,
+      licenciasAnteriores: [],
+    });
+
+  const confirmarTramitacionDeLicencia: SubmitHandler<FormularioC4> = async (data) => {
+    /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
+    const licenciasInformadas = data.licenciasAnteriores.filter(
+      (licencia) => !esFechaInvalida(licencia.hasta),
+    );
+
+    setDatosModalConfirmarTramitacion({
+      show: true,
+      licenciasAnteriores: licenciasInformadas,
+    });
   };
 
   const tramitarLaLicencia = () => {
     console.log('TRAMITANDO LICENCIA:', formulario.getValues());
-    setModalConfirmarTramitacion(false);
+    cerrarModal();
+  };
+
+  const cerrarModal = () => {
+    setDatosModalConfirmarTramitacion({
+      show: false,
+      licenciasAnteriores: [],
+    });
   };
 
   const estaLafilaVacia = (index: number) => {
@@ -67,8 +90,8 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   return (
     <>
       <ModalConfirmarTramitacion
-        show={modalConfirmarTramitacion}
-        onCerrar={() => setModalConfirmarTramitacion(false)}
+        datos={datosModalConfirmarTramitacion}
+        onCerrar={cerrarModal}
         onTramitacionConfirmada={tramitarLaLicencia}
       />
 
@@ -91,7 +114,7 @@ const C4Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
           </div>
 
           <FormProvider {...formulario}>
-            <form onSubmit={formulario.handleSubmit(tramitarLicencia1)}>
+            <form onSubmit={formulario.handleSubmit(confirmarTramitacionDeLicencia)}>
               <div className="row mt-2">
                 <Table className="table table-bordered">
                   <Thead>

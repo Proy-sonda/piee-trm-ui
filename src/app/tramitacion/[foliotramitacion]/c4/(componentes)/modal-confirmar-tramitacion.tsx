@@ -1,15 +1,22 @@
+import IfContainer from '@/components/if-container';
+import { format } from 'date-fns';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
+import { LicenciaAnterior } from '../(modelos)/formulario-c4';
 
 interface ModalConfirmarTramitacionProps {
-  show: boolean;
-  // datosC4: FormularioC4,
+  datos: DatosModalConfirmarTramitacion;
   onCerrar: () => void;
   onTramitacionConfirmada: () => void;
 }
 
-const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps> = ({
-  show,
+export interface DatosModalConfirmarTramitacion {
+  show: boolean;
+  licenciasAnteriores: LicenciaAnterior[];
+}
+
+export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps> = ({
+  datos,
   onCerrar,
   onTramitacionConfirmada,
 }) => {
@@ -23,7 +30,7 @@ const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps> = ({
 
   return (
     <>
-      <Modal show={show} size="xl" backdrop="static" centered>
+      <Modal show={datos.show} size="xl" backdrop="static" centered>
         <Modal.Header closeButton onClick={handleCerrar}>
           <Modal.Title className="fs-5">Resumen Tramitación</Modal.Title>
         </Modal.Header>
@@ -132,6 +139,7 @@ const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps> = ({
                   </tbody>
                 </table>
               </div>
+
               <div className="col-md-6">
                 <table className="table table-bordered">
                   <thead className="text-center">
@@ -145,20 +153,27 @@ const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps> = ({
                     </tr>
                   </thead>
                   <tbody className="text-center">
-                    <tr>
-                      <td>4</td>
-                      <td>20-12-2022</td>
-                      <td>24-12-2022</td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>01-02-2023</td>
-                      <td>03-02-2023</td>
-                    </tr>
+                    <IfContainer show={datos.licenciasAnteriores.length === 0}>
+                      <tr>
+                        <td colSpan={3} className="fw-bold">
+                          No se informaron licencias en los últimos 6 meses
+                        </td>
+                      </tr>
+                    </IfContainer>
+                    <IfContainer show={datos.licenciasAnteriores.length > 0}>
+                      {datos.licenciasAnteriores.map((licencia, index) => (
+                        <tr key={index}>
+                          <td>{licencia.dias}</td>
+                          <td>{format(licencia.desde, 'dd/MM/yyyy')}</td>
+                          <td>{format(licencia.desde, 'dd/MM/yyyy')}</td>
+                        </tr>
+                      ))}
+                    </IfContainer>
                   </tbody>
                 </table>
               </div>
             </div>
+
             <div className="row mt-2">
               <div className="col-md-6">
                 <table className="table table-bordered">
@@ -227,5 +242,3 @@ const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps> = ({
     </>
   );
 };
-
-export default ModalConfirmarTramitacion;

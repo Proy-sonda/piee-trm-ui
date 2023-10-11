@@ -3,7 +3,7 @@ export interface FormularioC4 {
   licenciasAnteriores: LicenciaAnterior[];
 }
 
-interface LicenciaAnterior {
+export interface LicenciaAnterior {
   dias: number;
   desde: Date;
   hasta: Date;
