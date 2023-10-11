@@ -110,7 +110,7 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
               },
               despuesDe1920: (fecha: Date) => {
                 if (isBefore(fecha, new Date(1920, 11, 31))) {
-                  return 'Debe ser mayor o igual al 31/12/1920';
+                  return 'Debe ser mayor o igual a enero de 1921';
                 }
               },
               noMayorQueHoy: (fecha: Date) => {

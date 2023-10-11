@@ -32,3 +32,14 @@ export const estaRemuneracionCompleta = (fila: Remuneracion) => {
     !isNaN(fila.montoImponible)
   );
 };
+
+export const tieneAlgunCampoValido = (fila: Remuneracion) => {
+  return (
+    !isNaN(fila.prevision) ||
+    !esFechaInvalida(fila.periodoRenta) ||
+    !isNaN(fila.dias) ||
+    !isNaN(fila.montoImponible) ||
+    !isNaN(fila.montoImponibleDesahucio) ||
+    tieneDesglose(fila.desgloseHaberes)
+  );
+};
