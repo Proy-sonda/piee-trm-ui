@@ -136,23 +136,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     index: number,
     desglose: DesgloseDeHaberes,
   ): void => {
-    const montoImponible = formulario.getValues(`${fieldArray}.${index}.montoImponible`);
-    const totalDesglose = Object.values(desglose).reduce(
-      (total, monto: number) => total + monto,
-      0,
-    );
-
     formulario.setValue(`${fieldArray}.${index}.desgloseHaberes`, desglose);
-
-    if (totalDesglose !== montoImponible) {
-      formulario.setError(`${fieldArray}.${index}.desgloseHaberes`, {
-        type: 'validate',
-        message: 'No coincide con monto imponible',
-      });
-    } else {
-      formulario.clearErrors(`${fieldArray}.${index}.desgloseHaberes`);
-    }
-
+    formulario.trigger(fieldArray);
     limpiarModalDesglose();
   };
 
@@ -291,6 +276,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                             <InputDesgloseDeHaberes
                               opcional
                               name={`remuneraciones.${index}.desgloseHaberes`}
+                              montoImponibleName={`remuneraciones.${index}.montoImponible`}
                               unirConFieldArray={{
                                 index,
                                 campo: 'desgloseHaberes',
@@ -448,6 +434,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
 
                               <InputDesgloseDeHaberes
                                 opcional
+                                montoImponibleName={`remuneracionesMaternidad.${index}.montoImponible`}
                                 name={`remuneracionesMaternidad.${index}.desgloseHaberes`}
                                 unirConFieldArray={{
                                   index,
