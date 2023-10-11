@@ -23,7 +23,7 @@ import {
   ModalDesgloseDeHaberes,
 } from './(componentes)/modal-desglose-haberes';
 import { DesgloseDeHaberes } from './(modelos)/desglose-de-haberes';
-import { FormularioC3 } from './(modelos)/formulario-c3';
+import { FormularioC3, estaRemuneracionCompleta } from './(modelos)/formulario-c3';
 
 interface C3PageProps {
   params: {
@@ -96,19 +96,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     console.log('Yendome a paso 4...');
     console.log(datos);
 
-    const periodos = datos.remuneraciones
-      .map((r) => r.periodoRenta)
-      .concat(
-        esLicenciaMaternidad(licencia!)
-          ? datos.remuneracionesMaternidad.map((r) => r.periodoRenta)
-          : [],
-      )
-      .map((periodo) => capitalizar(format(periodo, 'MMMM yyyy', { locale: esLocale })));
+    const periodosDeclarados = datos.remuneraciones
+      .concat(esLicenciaMaternidad(licencia!) ? datos.remuneracionesMaternidad : [])
+      .filter(estaRemuneracionCompleta)
+      .map((r) => capitalizar(format(r.periodoRenta, 'MMMM yyyy', { locale: esLocale })));
 
     const { isConfirmed } = await Swal.fire({
       html: `
         <p>Antes de seguir, recuerde confirmar que debe ingresar Comprobante de Liquidación mensual para todos los periodos declarados:</p>
-        ${periodos.map((periodo) => `<li>${periodo}</li>`).join('\n')}
+        ${periodosDeclarados.map((periodo) => `<li>${periodo}</li>`).join('')}
         <p class="mt-3 fw-bold">¿Está seguro que desea continuar, o desea volver a ingresar o revisar la documentación?</p>
         `,
       showConfirmButton: true,
@@ -212,6 +208,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                       <Tr key={field.id}>
                         <Td>
                           <ComboSimple
+                            opcional={index !== 0}
                             name={`remuneraciones.${index}.prevision`}
                             // datos={combos?.tiposPrevisiones} // TODO: descomentar
                             datos={[
@@ -230,6 +227,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                         </Td>
                         <Td>
                           <InputMesAno
+                            opcional={index !== 0}
                             name={`remuneraciones.${index}.periodoRenta`}
                             unirConFieldArray={{
                               index,
@@ -240,6 +238,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                         </Td>
                         <Td>
                           <InputDias
+                            opcional={index !== 0}
                             name={`remuneraciones.${index}.dias`}
                             unirConFieldArray={{
                               index,
@@ -250,6 +249,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                         </Td>
                         <Td>
                           <InputMonto
+                            opcional={index !== 0}
                             name={`remuneraciones.${index}.montoImponible`}
                             unirConFieldArray={{
                               index,
@@ -382,7 +382,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                         <Tr key={field.id}>
                           <Td>
                             <ComboSimple
-                              opcional={licencia && !esLicenciaMaternidad(licencia)}
+                              opcional
                               name={`remuneracionesMaternidad.${index}.prevision`}
                               // datos={combos?.tiposPrevisiones} // TODO: descomentar
                               datos={[
@@ -401,7 +401,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                           </Td>
                           <Td>
                             <InputMesAno
-                              opcional={licencia && !esLicenciaMaternidad(licencia)}
+                              opcional
                               name={`remuneracionesMaternidad.${index}.periodoRenta`}
                               unirConFieldArray={{
                                 index,
@@ -412,7 +412,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                           </Td>
                           <Td>
                             <InputDias
-                              opcional={licencia && !esLicenciaMaternidad(licencia)}
+                              opcional
                               name={`remuneracionesMaternidad.${index}.dias`}
                               unirConFieldArray={{
                                 index,
@@ -423,7 +423,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                           </Td>
                           <Td>
                             <InputMonto
-                              opcional={licencia && !esLicenciaMaternidad(licencia)}
+                              opcional
                               name={`remuneracionesMaternidad.${index}.montoImponible`}
                               unirConFieldArray={{
                                 index,
@@ -463,7 +463,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                               </button>
 
                               <InputDesgloseDeHaberes
-                                opcional={licencia && !esLicenciaMaternidad(licencia)}
+                                opcional
                                 name={`remuneracionesMaternidad.${index}.desgloseHaberes`}
                                 unirConFieldArray={{
                                   index,
@@ -493,16 +493,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
                   name="tipoDocumento"
                   descripcion="tipoadjunto"
                   idElemento="idtipoadjunto"
-                  // datos={combos?.tiposDeDocumentos} // TODO: descomentar
-                  datos={[
-                    { idtipoadjunto: 1, tipoadjunto: 'Comprobante Liquidación Mensual' },
-                    { idtipoadjunto: 2, tipoadjunto: 'Contrato de Trabajo Vigente a la Fecha' },
-                    { idtipoadjunto: 3, tipoadjunto: 'Certificado de Pago Cotizaciones' },
-                    {
-                      idtipoadjunto: 4,
-                      tipoadjunto: 'Comprobante Pago Cotizaciones Operación Renta',
-                    },
-                  ]}
+                  datos={combos?.tiposDeDocumentos} // TODO: descomentar
                   className="col-md-4 mb-2"
                 />
 

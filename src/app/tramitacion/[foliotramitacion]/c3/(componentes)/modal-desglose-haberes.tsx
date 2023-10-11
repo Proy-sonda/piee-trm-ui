@@ -1,4 +1,4 @@
-import { capitalizar } from '@/utilidades';
+import { capitalizar, esFechaInvalida } from '@/utilidades';
 import { format } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
 import React, { useEffect } from 'react';
@@ -78,7 +78,9 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
         <Modal.Header closeButton onClick={handleCerrarModal}>
           <Modal.Title className="fs-5">
             Desglose de Haberes Periodo{' '}
-            {capitalizar(format(datos.periodoRenta, 'MMMM yyyy', { locale: esLocale }))}
+            {esFechaInvalida(datos.periodoRenta)
+              ? 'Sin Definir'
+              : capitalizar(format(datos.periodoRenta, 'MMMM yyyy', { locale: esLocale }))}
           </Modal.Title>
         </Modal.Header>
 
