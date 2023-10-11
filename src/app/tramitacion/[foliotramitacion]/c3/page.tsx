@@ -306,42 +306,26 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
               </div>
 
               <Row className="mt-2">
-                <Col sm={6} md={6}>
-                  <p className="small fw-bold">
+                <Col sm={6} md={6} className="d-flex align-items-center justify-content-end">
+                  <span className="small fw-bold">
                     Remuneración imponible previsional mes anterior inicio licencia médica:
-                  </p>
-                </Col>
-                <Col sm={6} md={2}>
-                  <FormGroup controlId={'remImpPrevisional'} className="position-relative">
-                    <Form.Control
-                      type="text"
-                      isInvalid={!!formulario.formState.errors.remuneracionImponiblePrevisional}
-                      {...formulario.register('remuneracionImponiblePrevisional', {
-                        required: {
-                          value: true,
-                          message: 'Este campo es obligatorio',
-                        },
-                      })}
-                    />
-                    <Form.Control.Feedback type="invalid" tooltip>
-                      {formulario.formState.errors.remuneracionImponiblePrevisional?.message?.toString()}
-                    </Form.Control.Feedback>
-                  </FormGroup>
+                  </span>
                 </Col>
 
-                <Col xs={8} sm={8} md={2}>
-                  <p className="small fw-bold">% Desahucio:</p>
+                <Col sm={6} md={2}>
+                  <InputMonto opcional name="remuneracionImponiblePrevisional" />
                 </Col>
+
+                <Col xs={8} sm={8} md={2} className="d-flex align-items-center justify-content-end">
+                  <span className="small fw-bold">% Desahucio:</span>
+                </Col>
+
                 <Col xs={4} sm={4} md={2}>
                   <FormGroup controlId={'porcentajeDesahucio'} className="position-relative">
                     <Form.Control
                       type="number"
                       isInvalid={!!formulario.formState.errors.porcentajeDesahucio}
                       {...formulario.register('porcentajeDesahucio', {
-                        required: {
-                          value: true,
-                          message: 'Este campo es obligatorio',
-                        },
                         min: {
                           value: 0,
                           message: 'No puede ser menor a 0%',
