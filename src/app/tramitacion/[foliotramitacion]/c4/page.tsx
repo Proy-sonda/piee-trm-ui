@@ -1,7 +1,7 @@
 'use client';
 import { InputFecha } from '@/components/form';
 import IfContainer from '@/components/if-container';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
@@ -53,6 +53,13 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
     });
 
   const [filasIncompletas, setFilasIncompletas] = useState<number[]>([]);
+
+  // Limpiar errores al no informar licencias
+  useEffect(() => {
+    if (!informarLicencias) {
+      formulario.clearErrors();
+    }
+  }, [informarLicencias]);
 
   const confirmarTramitacionDeLicencia: SubmitHandler<FormularioC4> = async (datos) => {
     /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
