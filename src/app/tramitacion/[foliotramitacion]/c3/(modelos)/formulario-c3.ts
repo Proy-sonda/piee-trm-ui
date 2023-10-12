@@ -33,7 +33,7 @@ export const estaRemuneracionCompleta = (fila: Remuneracion) => {
   );
 };
 
-export const tieneAlgunCampoValido = (fila: Remuneracion) => {
+export const remuneracionTieneAlgunCampoValido = (fila: Remuneracion) => {
   return (
     !isNaN(fila.prevision) ||
     !esFechaInvalida(fila.periodoRenta) ||

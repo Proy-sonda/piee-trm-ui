@@ -26,7 +26,7 @@ import { DesgloseDeHaberes } from './(modelos)/desglose-de-haberes';
 import {
   FormularioC3,
   estaRemuneracionCompleta,
-  tieneAlgunCampoValido,
+  remuneracionTieneAlgunCampoValido,
 } from './(modelos)/formulario-c3';
 
 interface C3PageProps {
@@ -67,12 +67,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
   const formulario = useForm<FormularioC3>({
     mode: 'onBlur',
     defaultValues: {
-      remuneraciones: [{ desgloseHaberes: {} }, { desgloseHaberes: {} }, { desgloseHaberes: {} }],
-      remuneracionesMaternidad: [
-        { desgloseHaberes: {} },
-        { desgloseHaberes: {} },
-        { desgloseHaberes: {} },
-      ],
+      remuneraciones: [],
+      remuneracionesMaternidad: [],
     },
   });
 
@@ -86,19 +82,40 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     name: 'remuneracionesMaternidad',
   });
 
+  // Agregar las filas de remuneraciones
+  useEffect(() => {
+    if (!licencia) {
+      return;
+    }
+
+    if (remuneraciones.fields.length === 0) {
+      const fechaReferencia = new Date(licencia.fechaemision);
+
+      // TODO: Si trabajador es independiente (calidadTrabajador == 4) son 12 periodos
+      for (let index = 0; index < 3; index++) {
+        const mesRenta = subMonths(fechaReferencia, index + 1);
+
+        remuneraciones.append({
+          periodoRenta: format(mesRenta, 'yyyy-MM') as any,
+          desgloseHaberes: {},
+        } as any);
+      }
+    }
+
+    if (esLicenciaMaternidad(licencia) && remuneracionesMaternidad.fields.length === 0) {
+      for (let index = 0; index < 3; index++) {
+        remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
+      }
+    }
+  }, [licencia]);
+
   // Cargar los periodos de renta de la licencia
   useEffect(() => {
     if (!licencia) {
       return;
     }
 
-    const fechaReferencia = new Date(licencia.fechaemision);
-    for (let index = 0; index < remuneraciones.fields.length; index++) {
-      const mesRenta = subMonths(fechaReferencia, index + 1);
-      const mesString = format(mesRenta, 'yyyy-MM');
-
-      formulario.setValue(`remuneraciones.${index}.periodoRenta`, mesString as any);
-    }
+    for (let index = 0; index < remuneraciones.fields.length; index++) {}
   }, [licencia]);
 
   const pasarAPaso4: SubmitHandler<FormularioC3> = async (datos) => {
@@ -147,7 +164,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     for (let i = 0; i < datos.remuneraciones.length; i++) {
       const remuneracion = datos.remuneraciones[i];
 
-      if (tieneAlgunCampoValido(remuneracion) && !estaRemuneracionCompleta(remuneracion)) {
+      if (
+        remuneracionTieneAlgunCampoValido(remuneracion) &&
+        !estaRemuneracionCompleta(remuneracion)
+      ) {
         errores.normales.push(i + 1);
       }
     }
@@ -155,7 +175,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     for (let i = 0; i < datos.remuneracionesMaternidad.length; i++) {
       const remuneracion = datos.remuneracionesMaternidad[i];
 
-      if (tieneAlgunCampoValido(remuneracion) && !estaRemuneracionCompleta(remuneracion)) {
+      if (
+        remuneracionTieneAlgunCampoValido(remuneracion) &&
+        !estaRemuneracionCompleta(remuneracion)
+      ) {
         errores.maternidad.push(i + 1);
       }
     }
