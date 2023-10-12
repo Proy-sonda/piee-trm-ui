@@ -1,0 +1,63 @@
+export interface Empleador {
+  idempleador: number;
+  rutempleador: string;
+  razonsocial: string;
+  nombrefantasia: string;
+  estadoempleador: Estadoempleador;
+  ccaf: Ccaf;
+  tipoempleador: Tipoempleador;
+  sistemaremuneracion: Sistemaremuneracion;
+  direccionempleador: Direccionempleador;
+  actividadlaboral: Actividadlaboral;
+  tamanoempresa: Tamanoempresa;
+}
+
+interface Actividadlaboral {
+  idactividadlaboral: number;
+  actividadlaboral: string;
+}
+
+interface Ccaf {
+  idccaf: number;
+  nombre: string;
+}
+
+interface Direccionempleador {
+  iddireccionempleador: number;
+  calle: string;
+  numero: string;
+  depto: string;
+  comuna: Comuna;
+}
+
+interface Comuna {
+  idcomuna: string;
+  nombre: string;
+  region: Region;
+}
+
+interface Region {
+  idregion: string;
+  nombre: string;
+}
+
+interface Estadoempleador {
+  idestadoempleador: number;
+  estadoempleador: string;
+}
+
+interface Sistemaremuneracion {
+  idsistemaremuneracion: number;
+  descripcion: string;
+}
+
+interface Tamanoempresa {
+  idtamanoempresa: number;
+  nrotrabajadores: number;
+  descripcion: string;
+}
+
+interface Tipoempleador {
+  idtipoempleador: number;
+  tipoempleador: string;
+}

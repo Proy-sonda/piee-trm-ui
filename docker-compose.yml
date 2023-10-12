@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  frontend:
+    container_name: piie-trm-ui
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_ADS_URL=${NEXT_PUBLIC_ADS_URL}
+        - NEXT_PUBLIC_THRESHOLD_ALERTA_EXPIRA_SESION_MS=${NEXT_PUBLIC_THRESHOLD_ALERTA_EXPIRA_SESION_MS}
+    ports:
+      - 3103:3005
