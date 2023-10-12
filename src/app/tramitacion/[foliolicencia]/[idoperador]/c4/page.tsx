@@ -144,7 +144,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       />
 
       <div className="bgads">
-        <div className="ms-5 me-5">
+        <div className="pb-3 px-3 px-lg-5">
           <Cabecera
             foliotramitacion={foliolicencia}
             idoperador={parseInt(idoperador)}

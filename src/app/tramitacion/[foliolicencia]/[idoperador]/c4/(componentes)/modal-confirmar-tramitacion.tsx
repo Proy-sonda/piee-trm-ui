@@ -5,6 +5,7 @@ import { emptyFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { addDays, format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Modal, Row } from 'react-bootstrap';
+import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { LicenciaAnterior } from '../(modelos)/formulario-c4';
 import { buscarEmpleador } from '../../(servicios)/buscar-empleador';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
@@ -219,114 +220,120 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                 </p>
               </Col>
             </Row>
+
             <hr />
 
-            <Row className="mt-2">
-              <Col xs={12} md={6}>
-                <table className="table table-bordered">
-                  <thead className="text-center">
-                    <tr>
-                      <th colSpan={4}>Renta de meses anteriores a la incapacidad</th>
-                    </tr>
-                    <tr>
-                      <th>Código Provisional</th>
-                      <th>Fecha</th>
-                      <th>Total Remuneraciones</th>
-                      <th>N° Días Subsidio Incapacidad Laboral</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-center">
-                    <tr>
-                      <td>123</td>
-                      <td>23-03-2023</td>
-                      <td>$1.600.000</td>
-                      <td>21 Día(s)</td>
-                    </tr>
-                    <tr>
-                      <td>123</td>
-                      <td>23-03-2023</td>
-                      <td>$1.600.000</td>
-                      <td>21 Día(s)</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </Col>
-
-              <Col xs={12} md={6}>
-                <table className="table table-bordered">
-                  <thead className="text-center">
-                    <tr>
-                      <th colSpan={3}>Licencias Anteriores en los Últimos 6 meses</th>
-                    </tr>
-                    <tr>
-                      <th>Total días</th>
-                      <th>Desde</th>
-                      <th>Hasta</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-center">
-                    <IfContainer show={datos.licenciasAnteriores.length === 0}>
-                      <tr>
-                        <td colSpan={3} className="fw-bold">
-                          No se informaron licencias en los últimos 6 meses
-                        </td>
-                      </tr>
-                    </IfContainer>
-                    <IfContainer show={datos.licenciasAnteriores.length > 0}>
-                      {datos.licenciasAnteriores.map((licencia, index) => (
-                        <tr key={index}>
-                          <td>{licencia.dias}</td>
-                          <td>{format(licencia.desde, 'dd/MM/yyyy')}</td>
-                          <td>{format(licencia.hasta, 'dd/MM/yyyy')}</td>
-                        </tr>
-                      ))}
-                    </IfContainer>
-                  </tbody>
-                </table>
+            <Row className="mt-4">
+              <Col xs={12}>
+                <h2 className="fs-5 text-center">Rentas de meses anteriores a la incapacidad</h2>
+                <h3 className="fs-6 text-center">Rentas</h3>
               </Col>
             </Row>
 
             <Row className="mt-2">
-              <Col xs={12} md={6}>
-                <table className="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th className="text-center">TIPO DOCUMENTO</th>
-                      <th className="text-center">NOMBRE DOCUMENTO</th>
-                    </tr>
-                  </thead>
+              <Col xs={12}>
+                <Table className="table table-bordered">
+                  <Thead>
+                    <Tr>
+                      <Th>Código Provisional</Th>
+                      <Th>Fecha</Th>
+                      <Th>Total Remuneraciones</Th>
+                      <Th>N° Días Subsidio Incapacidad Laboral</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    <Tr>
+                      <Td>123</Td>
+                      <Td>23-03-2023</Td>
+                      <Td>$1.600.000</Td>
+                      <Td>21 Día(s)</Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </Col>
+            </Row>
 
-                  <tbody className="text-center">
-                    <tr>
-                      <td>Comprobante Liquidacion Mensual</td>
-                      <td>liquidacion_202301.pdf</td>
-                    </tr>
-                    <tr>
-                      <td>Contrato de Trabajo Vigente a la fecha</td>
-                      <td>ContratoTrabajo.pdf</td>
-                    </tr>
-                    <tr>
-                      <td>Certificado de Pago Cotizaciones</td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>Comprobante Pago Cotizaciones operación Renta</td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>Certificado de Afiliación</td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>Denuncia Individual de Accidente del Trabajo (DIAT)</td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td>Denuncia Individual de Enfermedad Profesional (DIEP)</td>
-                      <td></td>
-                    </tr>
-                  </tbody>
-                </table>
+            <Row className="mt-3">
+              <Col xs={12}>
+                <h3 className="fs-6 text-center">Documentos</h3>
+              </Col>
+            </Row>
+
+            <Row className="mt-2">
+              <Col xs={12}>
+                <Table className="table table-bordered">
+                  <Thead>
+                    <Tr>
+                      <Th className="text-center">TIPO DOCUMENTO</Th>
+                      <Th className="text-center">NOMBRE DOCUMENTO</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody className="text-center">
+                    <Tr>
+                      <Td>Comprobante Liquidacion Mensual</Td>
+                      <Td>liquidacion_202301.pdf</Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Contrato de Trabajo Vigente a la fecha</Td>
+                      <Td>ContratoTrabajo.pdf</Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Certificado de Pago Cotizaciones</Td>
+                      <Td> </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Comprobante Pago Cotizaciones operación Renta</Td>
+                      <Td> </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Certificado de Afiliación</Td>
+                      <Td> </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Denuncia Individual de Accidente del Trabajo (DIAT)</Td>
+                      <Td> </Td>
+                    </Tr>
+                    <Tr>
+                      <Td>Denuncia Individual de Enfermedad Profesional (DIEP)</Td>
+                      <Td> </Td>
+                    </Tr>
+                  </Tbody>
+                </Table>
+              </Col>
+            </Row>
+
+            <Row className="mt-3">
+              <Col xs={12}>
+                <h2 className="fs-5 text-center">Licencias Anteriores en los Últimos 6 meses</h2>
+              </Col>
+            </Row>
+
+            <Row className="mt-3">
+              <Col xs={12}>
+                <IfContainer show={datos.licenciasAnteriores.length === 0}>
+                  <p className="text-center">No se informaron licencias de los últimos 6 meses</p>
+                </IfContainer>
+
+                <IfContainer show={datos.licenciasAnteriores.length > 0}>
+                  <Table className="table table-bordered">
+                    <Thead className="text-center">
+                      <Tr>
+                        <Th>Total días</Th>
+                        <Th>Desde</Th>
+                        <Th>Hasta</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {datos.licenciasAnteriores.map((licencia, index) => (
+                        <Tr key={index}>
+                          <Td>{licencia.dias}</Td>
+                          <Td>{format(licencia.desde, 'dd/MM/yyyy')}</Td>
+                          <Td>{format(licencia.hasta, 'dd/MM/yyyy')}</Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </IfContainer>
               </Col>
             </Row>
           </IfContainer>
