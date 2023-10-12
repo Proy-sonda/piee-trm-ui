@@ -18,7 +18,10 @@ interface InputDiasProps extends Omit<BaseProps, 'label'> {
   deshabilitado?: boolean;
 
   coincideConRango?: {
+    /** Nombre del input en la función `register` para la fecha desde */
     desde: string;
+
+    /** Nombre del input en la función `register` para la fecha hasta */
     hasta: string;
   };
 
