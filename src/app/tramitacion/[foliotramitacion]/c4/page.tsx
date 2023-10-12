@@ -1,17 +1,22 @@
 'use client';
 import { InputFecha } from '@/components/form';
-import { esFechaInvalida } from '@/utilidades';
+import IfContainer from '@/components/if-container';
 import { useState } from 'react';
-import { Form, FormGroup } from 'react-bootstrap';
+import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
 import {
   DatosModalConfirmarTramitacion,
   ModalConfirmarTramitacion,
 } from './(componentes)/modal-confirmar-tramitacion';
-import { FormularioC4 } from './(modelos)/formulario-c4';
+import {
+  FormularioC4,
+  estaLicenciaAnteriorCompleta,
+  licenciaAnteriorTieneCamposValidos,
+} from './(modelos)/formulario-c4';
 interface PasoC4Props {
   params: {
     foliotramitacion: string;
@@ -47,11 +52,21 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
       licenciasAnteriores: [],
     });
 
-  const confirmarTramitacionDeLicencia: SubmitHandler<FormularioC4> = async (data) => {
+  const [filasIncompletas, setFilasIncompletas] = useState<number[]>([]);
+
+  const confirmarTramitacionDeLicencia: SubmitHandler<FormularioC4> = async (datos) => {
     /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
-    const licenciasInformadas = data.licenciasAnteriores.filter(
-      (licencia) => !esFechaInvalida(licencia.hasta),
-    );
+    const licenciasInformadas = obtenerLicenciasInformadas(datos);
+
+    if (!validarQueFilasEstenCompletas(datos)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Filas Incompletas',
+        text: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+      return;
+    }
 
     setDatosModalConfirmarTramitacion({
       show: true,
@@ -59,8 +74,39 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
     });
   };
 
+  const obtenerLicenciasInformadas = (datos: FormularioC4) => {
+    return !datos.informarLicencia
+      ? []
+      : datos.licenciasAnteriores.filter(licenciaAnteriorTieneCamposValidos);
+  };
+
+  const validarQueFilasEstenCompletas = (datos: FormularioC4) => {
+    const filasMalas: number[] = [];
+
+    for (let index = 0; index < datos.licenciasAnteriores.length; index++) {
+      const licencia = datos.licenciasAnteriores[index];
+
+      if (!licenciaAnteriorTieneCamposValidos(licencia)) {
+        continue;
+      }
+
+      if (licenciaAnteriorTieneCamposValidos(licencia) && !estaLicenciaAnteriorCompleta(licencia)) {
+        filasMalas.push(index + 1);
+      }
+    }
+
+    setFilasIncompletas(filasMalas);
+
+    return filasMalas.length === 0;
+  };
+
   const tramitarLaLicencia = () => {
-    console.log('TRAMITANDO LICENCIA:', formulario.getValues());
+    /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
+    const datos = formulario.getValues();
+    const licenciasInformadas = obtenerLicenciasInformadas(datos);
+    const datosLimpios = { ...datos, licenciasAnteriores: licenciasInformadas };
+
+    console.log('TRAMITANDO LICENCIA:', datosLimpios);
     cerrarModal();
   };
 
@@ -69,22 +115,6 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
       show: false,
       licenciasAnteriores: [],
     });
-  };
-
-  const estaLafilaVacia = (index: number) => {
-    const { dias, desde, hasta } = formulario.getValues(`licenciasAnteriores.${index}`);
-
-    /** Si el campo es invalido se considera como que no se ingreso. Cada elemento va a ser `true`
-     * solo si no se ingreso */
-    const camposSinIngresar = [
-      dias === undefined || isNaN(dias),
-      esFechaInvalida(desde),
-      esFechaInvalida(hasta),
-    ];
-
-    /* El filter solo toma los campos sin ingresar, y si luego del filter el arreglo no cambia de
-     * tamaño, es porque esta toda la fila vacía. */
-    return camposSinIngresar.filter((x) => x).length === camposSinIngresar.length;
   };
 
   return (
@@ -103,74 +133,95 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
             title="Licencias Anteriores en los Últimos 6 Meses"
           />
 
-          <div className="row mt-2">
-            <FormGroup controlId="informarLicencias" className="ps-0">
-              <Form.Check
-                type="checkbox"
-                label="Informar Licencias Médicas Anteriores últimos 6 meses"
-                {...formulario.register('informarLicencia')}
-              />
-            </FormGroup>
-          </div>
+          <Row className="mt-2 mb-3">
+            <Col xs={12}>
+              <FormGroup controlId="informarLicencias" className="ps-0">
+                <Form.Check
+                  type="checkbox"
+                  label="Informar Licencias Médicas Anteriores últimos 6 meses"
+                  {...formulario.register('informarLicencia')}
+                />
+              </FormGroup>
+            </Col>
+          </Row>
+
+          <IfContainer show={informarLicencias && filasIncompletas.length !== 0}>
+            <Row>
+              <Col xs={12}>
+                <Alert variant="danger" className="d-flex align-items-center fade show">
+                  <i className="bi bi-exclamation-triangle me-2"></i>
+                  <span>
+                    Las siguientes filas están incompletas:
+                    {filasIncompletas.reduce(
+                      (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
+                      '',
+                    )}
+                  </span>
+                </Alert>
+              </Col>
+            </Row>
+          </IfContainer>
 
           <FormProvider {...formulario}>
             <form onSubmit={formulario.handleSubmit(confirmarTramitacionDeLicencia)}>
-              <div className="row mt-2">
-                <Table className="table table-bordered">
-                  <Thead>
-                    <Tr className="align-middle">
-                      <Th>Total Días</Th>
-                      <Th>Desde</Th>
-                      <Th>Hasta</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {licenciasAnteriores.fields.map((field, index) => (
-                      <Tr key={field.id}>
-                        <Td>
-                          <InputDias
-                            opcional={estaLafilaVacia(index)}
-                            maxDias={184}
-                            deshabilitado={!informarLicencias}
-                            name={`licenciasAnteriores.${index}.dias`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'dias',
-                              fieldArrayName: 'licenciasAnteriores',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <InputFecha
-                            opcional={estaLafilaVacia(index)}
-                            deshabilitado={!informarLicencias}
-                            name={`licenciasAnteriores.${index}.desde`}
-                            noPosteriorA={`licenciasAnteriores.${index}.hasta`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'desde',
-                              fieldArrayName: 'licenciasAnteriores',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <InputFecha
-                            opcional={estaLafilaVacia(index)}
-                            deshabilitado={!informarLicencias}
-                            name={`licenciasAnteriores.${index}.hasta`}
-                            noAnteriorA={`licenciasAnteriores.${index}.desde`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'hasta',
-                              fieldArrayName: 'licenciasAnteriores',
-                            }}
-                          />
-                        </Td>
+              <Row>
+                <Col xs={12}>
+                  <Table className="table table-bordered">
+                    <Thead>
+                      <Tr className="align-middle">
+                        <Th>Total Días</Th>
+                        <Th>Desde</Th>
+                        <Th>Hasta</Th>
                       </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </div>
+                    </Thead>
+                    <Tbody>
+                      {licenciasAnteriores.fields.map((field, index) => (
+                        <Tr key={field.id}>
+                          <Td>
+                            <InputDias
+                              opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                              maxDias={184}
+                              deshabilitado={!informarLicencias}
+                              name={`licenciasAnteriores.${index}.dias`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'dias',
+                                fieldArrayName: 'licenciasAnteriores',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputFecha
+                              opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                              deshabilitado={!informarLicencias}
+                              name={`licenciasAnteriores.${index}.desde`}
+                              noPosteriorA={`licenciasAnteriores.${index}.hasta`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'desde',
+                                fieldArrayName: 'licenciasAnteriores',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputFecha
+                              opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                              deshabilitado={!informarLicencias}
+                              name={`licenciasAnteriores.${index}.hasta`}
+                              noAnteriorA={`licenciasAnteriores.${index}.desde`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'hasta',
+                                fieldArrayName: 'licenciasAnteriores',
+                              }}
+                            />
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Col>
+              </Row>
 
               <div className="row">
                 <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
