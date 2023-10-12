@@ -183,6 +183,10 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
                               maxDias={184}
                               deshabilitado={!informarLicencias}
                               name={`licenciasAnteriores.${index}.dias`}
+                              coincideConRango={{
+                                desde: `licenciasAnteriores.${index}.desde`,
+                                hasta: `licenciasAnteriores.${index}.hasta`,
+                              }}
                               unirConFieldArray={{
                                 index,
                                 campo: 'dias',

@@ -1,5 +1,7 @@
 import { BaseProps } from '@/components/form';
 import { useRandomId } from '@/hooks/use-random-id';
+import { esFechaInvalida } from '@/utilidades';
+import { differenceInDays } from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
@@ -14,6 +16,11 @@ interface InputDiasProps extends Omit<BaseProps, 'label'> {
   maxDias?: number;
 
   deshabilitado?: boolean;
+
+  coincideConRango?: {
+    desde: string;
+    hasta: string;
+  };
 
   /**
    * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
@@ -46,6 +53,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
   maxDias,
   deshabilitado,
   unirConFieldArray,
+  coincideConRango,
 }) => {
   const minDiasFinal = minDias ?? 0;
   const maxDiasFinal = maxDias ?? 30;
@@ -56,6 +64,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
     register,
     formState: { errors },
     setValue,
+    getValues,
   } = useFormContext();
 
   const tieneError = () => {
@@ -99,6 +108,24 @@ export const InputDias: React.FC<InputDiasProps> = ({
             max: {
               value: maxDiasFinal,
               message: `No puede ingresar más de ${maxDiasFinal} días`,
+            },
+            validate: {
+              estaEnRango: (dias) => {
+                if (!coincideConRango) {
+                  return;
+                }
+
+                const desde = getValues(coincideConRango.desde);
+                const hasta = getValues(coincideConRango.hasta);
+
+                if (!esFechaInvalida(desde) && !esFechaInvalida(hasta)) {
+                  const diasEnRango = differenceInDays(hasta, desde);
+
+                  if (dias !== diasEnRango) {
+                    return 'Los días no coinciden con el rango indicado';
+                  }
+                }
+              },
             },
             onChange: (event: any) => {
               const regex = /[^0-9]/g; // solo números postivos
