@@ -1,12 +1,15 @@
 import { BaseProps } from '@/components/form';
 import { useRandomId } from '@/hooks/use-random-id';
+import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
+import { endOfDay, isAfter, isBefore, parse, startOfMonth } from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { DesgloseDeHaberes } from '../(modelos)/desglose-de-haberes';
-import { tieneDesglose } from '../(modelos)/formulario-c3';
+import IfContainer from '../if-container';
 
-interface InputDesgloseDeHaberes extends Omit<BaseProps, 'label'> {
+interface InputMesAnoProps extends Omit<BaseProps, 'label'> {
+  label?: string;
+
   opcional?: boolean;
 
   /**
@@ -30,27 +33,34 @@ interface InputDesgloseDeHaberes extends Omit<BaseProps, 'label'> {
      */
     campo: string;
   };
-
-  /**
-   * Nombre de la propiedad `name` usada en el campo de monto imponible para validar que el
-   * desglose coincida con este.
-   */
-  montoImponibleName: string;
 }
 
-export const InputDesgloseDeHaberes: React.FC<InputDesgloseDeHaberes> = ({
+/**
+ * El valor del input va a ser un objeto `Date` con la fecha seleccionada. En caso de que la fecha
+ * sea invalida el valor del input va a ser `Invalid Date`, que se puede revisar con la funcion
+ * `esFechaInvalida` de las utilidades.
+ */
+export const InputMesAno: React.FC<InputMesAnoProps> = ({
   name,
+  label,
+  className,
   opcional,
   unirConFieldArray,
-  montoImponibleName,
 }) => {
-  const idInput = useRandomId('desgloseHaberes');
+  const idInput = useRandomId('fecha');
 
   const {
     register,
     formState: { errors },
-    getValues,
   } = useFormContext();
+
+  const determinarLabel = () => {
+    if (label === undefined || label === null) {
+      return '';
+    }
+
+    return opcional ? `${label}` : `${label} (*)`;
+  };
 
   const tieneError = () => {
     if (!unirConFieldArray) {
@@ -74,33 +84,38 @@ export const InputDesgloseDeHaberes: React.FC<InputDesgloseDeHaberes> = ({
 
   return (
     <>
-      <FormGroup controlId={idInput} className="position-relative">
+      <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
+        <IfContainer show={label !== undefined}>
+          <Form.Label>{determinarLabel()}</Form.Label>
+        </IfContainer>
+
         <Form.Control
-          type="hidden"
+          type="month"
+          autoComplete="new-custom-value"
           isInvalid={tieneError()}
           {...register(name, {
+            setValueAs: (date: string) => {
+              /** Situa la fecha con respecto al inicio de hoy */
+              return parse(date, 'yyyy-MM', startOfMonth(new Date()));
+            },
             required: {
               value: !opcional,
-              message: 'El desglose de haberes es obligatorio',
+              message: 'La fecha es obligatoria',
             },
             validate: {
-              coincideConMontoImponible: (desglose: DesgloseDeHaberes | Record<string, never>) => {
-                if (!tieneDesglose(desglose)) {
-                  return;
+              esFechaValida: (fecha: Date) => {
+                if (!opcional && esFechaInvalida(fecha)) {
+                  return 'La fecha es inválida';
                 }
-
-                const montoImponibleEnBruto = getValues(montoImponibleName);
-                const montoImponible = isNaN(montoImponibleEnBruto)
-                  ? 0
-                  : getValues(montoImponibleName);
-
-                const totalDesglose = Object.values(desglose).reduce(
-                  (total, monto: number) => total + monto,
-                  0,
-                );
-
-                if (totalDesglose !== montoImponible) {
-                  return 'No coincide con monto imponible';
+              },
+              despuesDe1920: (fecha: Date) => {
+                if (isBefore(fecha, new Date(1920, 11, 31))) {
+                  return 'Debe ser mayor o igual a enero de 1921';
+                }
+              },
+              noMayorQueHoy: (fecha: Date) => {
+                if (isAfter(fecha, endOfDay(Date.now()))) {
+                  return 'No puede ser posterior a hoy';
                 }
               },
             },
