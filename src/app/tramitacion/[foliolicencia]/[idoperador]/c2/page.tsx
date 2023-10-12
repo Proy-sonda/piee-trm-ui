@@ -1,20 +1,26 @@
 'use client';
-import { ComboSimple, InputFecha, InputRadioButtons } from '@/components/form';
+import { ComboSimple, InputFecha, InputNombres, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
+import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { buscarCalidadTrabajador } from '../(servicios)/buscar-calidad-trabajador';
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { buscarZona1 } from '../c1/(servicios)';
+import { EntidadPagadora } from './(modelos)/entidad-pagadora';
 import { EntidadPrevisional } from './(modelos)/entidad-previsional';
 import { Licenciac2 } from './(modelos)/licencia-c2';
 import { buscarEntidadPagadora } from './(servicios)/buscar-entidad-pagadora';
 import { buscarEntidadPrevisional } from './(servicios)/buscar-entidad-previsional';
+import { buscarZona2 } from './(servicios)/buscar-z2';
+import { ErrorCrearLicenciaC2, crearLicenciaZ2 } from './(servicios)/licencia-create-z2';
 
 interface myprops {
   params: {
@@ -36,7 +42,9 @@ interface formularioApp {
 
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
   const [esAFC, setesAFC] = useState(false);
+  const [entePagador, setentePagador] = useState<EntidadPagadora[]>([]);
   const [fadeinOut, setfadeinOut] = useState('');
+  const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
   const router = useRouter();
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
@@ -44,7 +52,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     CALIDADTRABAJADOR: buscarCalidadTrabajador(),
     ENTIDADPAGADORA: buscarEntidadPagadora(),
     LMECABECERA: buscarZona1(foliolicencia, Number(idoperador)),
+    LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
   });
+
   const step = [
     { label: 'Entidad Empleadora/Independiente', num: 1, active: false, url: '/adscripcion' },
     { label: 'Previsión persona trabajadora', num: 2, active: true, url: '/adscripcion/pasodos' },
@@ -53,7 +63,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   ];
 
   const formulario = useForm<formularioApp>({ mode: 'onSubmit' });
-  // PREVISIONAL: buscarInstitucionPrevisional(),
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
     GuardarZ2();
@@ -69,11 +78,14 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       },
       foliolicencia,
       operador: {
-        idoperador,
+        idoperador: Number(idoperador),
         operador: '',
       },
-      fechacontrato: formulario.getValues('fechacontratotrabajo'),
-      fechaafiliacion: formulario.getValues('fechaafilacionprevisional'),
+      fechacontrato: format(new Date(formulario.getValues('fechacontratotrabajo')), 'yyyy-MM-dd'),
+      fechaafiliacion: format(
+        new Date(formulario.getValues('fechaafilacionprevisional')),
+        'yyyy-MM-dd',
+      ),
       entidadpagadora: {
         identidadpagadora: formulario.getValues('entidadremuneradora'),
         entidadpagadora: '',
@@ -82,16 +94,29 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       nombrepagador: formulario.getValues('nombreentidadpagadorasubsidio'),
       entidadprevisional: {
         codigoentidadprevisional: Number(
-          formulario.getValues('previsional').toString().substring(0, 1),
+          formulario.getValues('regimen') == 2
+            ? formulario.getValues('previsional').toString()
+            : formulario.getValues('previsional').toString().substring(0, 1),
         ),
         codigoregimenprevisional: Number(formulario.getValues('regimen')),
         letraentidadprevisional: formulario.getValues('previsional').substring(1, 2),
       },
       codigoseguroafc: Number(formulario.getValues('perteneceAFC')),
-      codigoletracaja: '',
+      codigoletracaja: 'AAAA',
     };
 
-    console.log(licenciac2);
+    try {
+      await crearLicenciaZ2(licenciac2);
+      Swal.fire({
+        html: 'Operación realizada con éxito',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } catch (error) {
+      if (error instanceof ErrorCrearLicenciaC2)
+        Swal.fire({ html: 'Ha ocurrido un problema: ' + ErrorCrearLicenciaC2, icon: 'error' });
+    }
   };
 
   const calidadtrabajador = formulario.watch('calidad');
@@ -115,10 +140,102 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       setesAFC(false);
       formulario.setValue('perteneceAFC', '0');
     }
+
+    setentePagador(
+      combos!?.ENTIDADPAGADORA.filter((value) => {
+        switch (Number(calidadtrabajador)) {
+          case 1:
+            if (
+              value.identidadpagadora == 'A' ||
+              value.identidadpagadora == 'B' ||
+              value.identidadpagadora == 'C'
+            ) {
+            } else {
+              return value;
+            }
+
+            break;
+          case 2:
+            if (value.identidadpagadora !== 'B') {
+              return value;
+            }
+            break;
+          case 3:
+            if (value.identidadpagadora === 'B' || value.identidadpagadora === 'D') {
+            } else {
+              return value;
+            }
+            break;
+          case 4:
+            if (
+              value.identidadpagadora == 'B' ||
+              value.identidadpagadora == 'C' ||
+              value.identidadpagadora == 'D'
+            ) {
+            } else {
+              return value;
+            }
+            break;
+
+          default:
+            break;
+        }
+      }),
+    );
   }, [calidadtrabajador]);
+
+  useEffect(() => {
+    setspinner(true);
+    if (combos?.LMEEXISTEZONA2 !== undefined) {
+      formulario.setValue(
+        'regimen',
+        combos.LMEEXISTEZONA2.entidadprevisional.codigoregimenprevisional,
+      );
+
+      formulario.setValue(
+        'calidad',
+        combos!?.LMEEXISTEZONA2.calidadtrabajador.idcalidadtrabajador.toString(),
+      );
+
+      formulario.setValue(
+        'contratoIndefinido',
+        combos!?.LMEEXISTEZONA2.codigocontratoindef == 1 ? '1' : '0',
+      );
+
+      formulario.setValue('perteneceAFC', combos!?.LMEEXISTEZONA2.codigoseguroafc == 1 ? '1' : '0');
+
+      formulario.setValue(
+        'fechaafilacionprevisional',
+        format(new Date(combos!?.LMEEXISTEZONA2.fechaafiliacion), 'yyyy-MM-dd'),
+      );
+
+      formulario.setValue(
+        'fechacontratotrabajo',
+        format(new Date(combos!?.LMEEXISTEZONA2.fechacontrato), 'yyyy-MM-dd'),
+      );
+
+      setTimeout(() => {
+        formulario.setValue(
+          'entidadremuneradora',
+          combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora,
+        );
+        formulario.setValue(
+          'previsional',
+          combos!?.LMEEXISTEZONA2.entidadprevisional.codigoentidadprevisional +
+            combos!?.LMEEXISTEZONA2.entidadprevisional.letraentidadprevisional,
+        );
+        setspinner(false);
+      }, 2000);
+
+      formulario.setValue('nombreentidadpagadorasubsidio', combos!?.LMEEXISTEZONA2.nombrepagador);
+    }
+  }, [combos?.LMEEXISTEZONA2]);
 
   return (
     <div className="bgads">
+      <IfContainer show={spinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
       <div className="ms-5 me-5">
         <Cabecera
           foliotramitacion={foliolicencia}
@@ -153,7 +270,19 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2 position-relative">
                   <label>Institución Previsional (*)</label>
                   <select
-                    name="previsional"
+                    {...formulario.register('previsional', {
+                      validate: {
+                        comboObligatorio: (valor: number | string) => {
+                          if (Number.isNaN(valor)) {
+                            return 'Este campo es obligatorio';
+                          }
+
+                          if (typeof valor === 'string' && valor === '') {
+                            return 'Este campo es obligatorio';
+                          }
+                        },
+                      },
+                    })}
                     className={`form-select ${
                       formulario.formState.errors.previsional && 'is-invalid'
                     }`}
@@ -164,6 +293,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                           type: 'onBlur',
                         });
                       else formulario.clearErrors('previsional');
+
                       formulario.setValue('previsional', e.target.value);
                     }}>
                     <option value={''}>Seleccionar</option>
@@ -174,19 +304,31 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                           glosa,
                           letraentidadprevisional,
                           codigoregimenprevisional,
-                        }) => (
-                          <option
-                            key={codigoentidadprevisional + letraentidadprevisional}
-                            value={codigoentidadprevisional + letraentidadprevisional}>
-                            {codigoregimenprevisional == 1 ? (
-                              <>
-                                {glosa} / {letraentidadprevisional}
-                              </>
+                        }) =>
+                          codigoregimenprevisional == 1 ? (
+                            letraentidadprevisional == '-' ? (
+                              <option
+                                value={codigoentidadprevisional + letraentidadprevisional}
+                                key={codigoentidadprevisional + letraentidadprevisional}>
+                                {glosa.toLowerCase().charAt(0).toUpperCase() +
+                                  glosa.slice(1).toLowerCase()}
+                              </option>
                             ) : (
-                              <>{glosa}</>
-                            )}
-                          </option>
-                        ),
+                              <option
+                                value={codigoentidadprevisional + letraentidadprevisional}
+                                key={codigoentidadprevisional + letraentidadprevisional}>
+                                [{letraentidadprevisional}]{' '}
+                                {glosa.toLowerCase().charAt(0).toUpperCase() +
+                                  glosa.slice(1).toLowerCase()}
+                              </option>
+                            )
+                          ) : (
+                            <option
+                              key={codigoentidadprevisional + letraentidadprevisional}
+                              value={codigoentidadprevisional}>
+                              {glosa}
+                            </option>
+                          ),
                       )
                     ) : (
                       <></>
@@ -283,22 +425,16 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   idElemento="identidadpagadora"
                   descripcion="entidadpagadora"
                   label="Entidad Pagadora Subsidio o Mantener remuneración"
-                  datos={combos?.ENTIDADPAGADORA}
+                  datos={entePagador}
                   name="entidadremuneradora"
                   tipoValor="string"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                 />
-
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <label className="mb-2">Nombre Entidad Pagadora Subsidio</label>
-                  <input
-                    className="form-control"
-                    name="nombreentidadpagadorasubsidio"
-                    onInput={(e: ChangeEvent<HTMLInputElement>) =>
-                      formulario.setValue('nombreentidadpagadorasubsidio', e.currentTarget.value)
-                    }
-                  />
-                </div>
+                <InputNombres
+                  name="nombreentidadpagadorasubsidio"
+                  label="Nombre Entidad Pagadora Subsidio"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
               </div>
               <div className="row">
                 <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
