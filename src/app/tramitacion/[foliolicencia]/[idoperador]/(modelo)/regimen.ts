@@ -1,4 +1,4 @@
 export interface regimen {
-  idregimenprevisional: number;
+  codigoregimenprevisional: number;
   regimenprevisional: string;
 }

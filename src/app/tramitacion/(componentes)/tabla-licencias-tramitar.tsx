@@ -94,7 +94,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <Stack gap={2}>
                     <Link
                       className="btn btn-sm btn-success"
-                      href={`/tramitacion/${licencia.foliolicencia}/c1`}>
+                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
                       <small className="text-nowrap">TRAMITAR</small>
                     </Link>
                     <button className="btn btn-sm btn-primary">
@@ -102,7 +102,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     </button>
                     <Link
                       className="btn btn-sm btn-danger"
-                      href={`/tramitacion/${licencia.foliolicencia}/no-tramitar`}>
+                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
                       <small className="text-nowrap"> NO RECEPCIONAR</small>
                     </Link>
                   </Stack>

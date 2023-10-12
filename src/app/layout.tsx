@@ -21,16 +21,16 @@ export default function RootLayout(
 ) {
   return (
     <StepProvider>
+      <Head>
+        <title>Portal Tramitación LME - {title} </title>
+        <meta name="description" content={dsc} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.png" />
+      </Head>
       <AuthProvider>
         <InscribeProvider>
           <EmpleadorProvider>
             <html>
-              <Head>
-                <title>Portal Tramitación LME - {title} </title>
-                <meta name="description" content={dsc} />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
-              </Head>
               <body>
                 <AppHeader />
 

@@ -1,7 +1,7 @@
 import { obtenerToken } from '@/servicios/auth';
+import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 import { LicenciaC1 } from '../(modelos)';
-import { urlBackendTramitacion } from '../../../../../servicios/environment';
 
 export class ErrorCrearLicenciaC1 extends Error {}
 

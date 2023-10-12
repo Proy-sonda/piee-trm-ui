@@ -26,23 +26,25 @@ import { buscarEmpleador } from '../(servicios)/buscar-empleador';
 import { buscarOcupacion } from '../(servicios)/buscar-ocupacion';
 import { buscarRegiones } from '../(servicios)/buscar-regiones';
 import { buscarCalle } from '../(servicios)/tipo-calle';
-import { LicenciaTramitar } from '../../(modelos)/licencia-tramitar';
 
 import format from 'date-fns/format';
 import Swal from 'sweetalert2';
-import { buscarLicenciasParaTramitar } from '../../(servicios)/buscar-licencias-para-tramitar';
+import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
+import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 import { LicenciaC1 } from './(modelos)';
 import { LicenciaC0 } from './(modelos)/licencia-c0';
 import {
   ErrorCrearLicencia,
   ErrorCrearLicenciaC1,
+  buscarZona1,
   crearLicenciaZ0,
   crearLicenciaZ1,
 } from './(servicios)/';
 
 interface myprops {
   params: {
-    foliotramitacion: string;
+    foliolicencia: string;
+    idoperador: number;
   };
 }
 interface formularioApp {
@@ -68,7 +70,7 @@ const step = [
   { label: 'LME Anteriores', num: 4, active: false, url: '/adscripcion/pasodos' },
 ];
 
-const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
+const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador } }) => {
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'numeric',
@@ -93,14 +95,14 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   const [errorCargaData, licencia, cargandoData] = useMergeFetchObject(
     {
       LMETRM: buscarLicenciasParaTramitar(),
+      LMEEXIS: buscarZona1(folio, Number(idoperador)),
+      // LMEHEADER: buscarZona0(folio, idoperador),
     },
     [refrescar],
   );
 
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
-  const fechaEmitida = formulario.watch('fechaemision');
-
 
   const fechaActual = () => {
     let fechaHoy = new Date().toLocaleString('es-CL', options).split('-');
@@ -112,34 +114,28 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     return `${fechaFinal[2]}-${fechaFinal[1]}-${fechaFinal[0]}`;
   };
 
+  useEffect(
+    () => formulario.setValue('comuna', licencia?.LMEEXIS!?.comuna.idcomuna),
+    [regionSeleccionada],
+  );
 
   useEffect(() => {
     if (licencia == undefined) return;
-
-    setlicenciaTramite(
-      licencia.LMETRM.find(({ foliolicencia }) => foliolicencia == foliotramitacion),
-    );
+    setlicenciaTramite(licencia.LMETRM.find(({ foliolicencia }) => foliolicencia == folio));
   }, [licencia]);
 
   useEffect(() => {
     if (licencia!?.LMETRM == undefined) return;
-    formulario.setValue(
-      'run',
-      licencia.LMETRM.find(({ foliolicencia }) => foliolicencia == foliotramitacion)!?.rutempleador,
-    );
-    setrunEmpleador(
-      licencia.LMETRM.find(({ foliolicencia }) => foliolicencia == foliotramitacion)!?.rutempleador,
-    );
-
+    formulario.setValue('run', licencia.LMEEXIS!?.rutempleador);
+    setrunEmpleador(licencia.LMEEXIS!?.rutempleador);
     formulario.setValue(
       'fechaemision',
-      convertirFecha(
+      format(
         new Date(
-          licencia.LMETRM.find(({ foliolicencia }) => foliolicencia === foliotramitacion)
-            ?.fechaemision || '',
-        ).toLocaleString('es-CL', options),
+          licencia.LMETRM.find(({ foliolicencia }) => foliolicencia === folio)?.fechaemision || '',
+        ),
+        'yyyy-MM-dd',
       ),
-
     );
   }, [licencia?.LMETRM]);
 
@@ -148,8 +144,27 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     const busquedaEmpleador = async () => {
       const [empleador, resp] = await buscarEmpleador(runEmpleador);
       formulario.setValue('razon', (await empleador()).razonsocial);
-      // !!TODO
-      //En esta parte es para validar si es que no trae datos desde base de datos
+      if (licencia?.LMEEXIS != undefined) {
+        formulario.setValue('region', licencia.LMEEXIS.comuna.idcomuna.substring(0, 2));
+        formulario.setValue('calle', licencia.LMEEXIS.direccion);
+        formulario.setValue('numero', licencia.LMEEXIS.numero);
+        formulario.setValue('departamento', licencia.LMEEXIS.depto);
+        formulario.setValue('telefono', licencia.LMEEXIS.telefono);
+        formulario.setValue('ocupacion', licencia.LMEEXIS.ocupacion.idocupacion.toString());
+        formulario.setValue(
+          'fecharecepcionlme',
+          format(new Date(licencia.LMEEXIS.fecharecepcion), 'yyyy-MM-dd'),
+        );
+        formulario.setValue('tipo', licencia.LMEEXIS.tipocalle.idtipocalle.toString());
+
+        formulario.setValue(
+          'actividadlaboral',
+          licencia.LMEEXIS.actividadlaboral.idactividadlaboral.toString(),
+        );
+
+        return;
+      }
+
       formulario.setValue('region', (await empleador()).direccionempleador.comuna.region.idregion);
       formulario.setValue('comuna', (await empleador()).direccionempleador.comuna.idcomuna);
       formulario.setValue('calle', (await empleador()).direccionempleador.calle);
@@ -172,24 +187,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
   );
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
-    router.push(`/tramitacion/${foliotramitacion}/c2`);
-    // let LicenciaATramitar: LicenciaCreate = {
-    //   licencia: {
-    //     foliolicencia: foliotramitacion,
-    //     estadolicencia: {
-    //       idestadolicencia:
-    //         licencia?.LMETRM.find(({ foliolicencia }) => foliolicencia == foliotramitacion)
-    //           ?.estadolicencia.idestadolicencia || 0,
-    //       estadolicencia:
-    //         licencia?.LMETRM.find(({ foliolicencia }) => foliolicencia == foliotramitacion)
-    //           ?.estadolicencia.estadolicencia || '',
-    //     },
-    //    fechaemision:
-    //   },
-    // };
+    await GuardarZ0Z1();
   };
-  const onHandleGuardar = async (e: FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
+
+  const GuardarZ0Z1 = async () => {
+    let respuesta = false;
     let licencia: LicenciaC0 = {
       estadolicencia: licenciaTramite!?.estadolicencia,
       fechaemision: format(new Date(licenciaTramite!?.fechaemision), 'yyyy-MM-dd'),
@@ -198,12 +200,15 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
         idestadotramitacion: 1,
         estadotramitacion: 'PENDIENTE',
       },
-      foliolicencia: foliotramitacion,
+      foliolicencia: folio,
       motivodevolucion: licenciaTramite!?.motivodevolucion,
       ndias: licenciaTramite!?.diasreposo,
       operador: licenciaTramite!?.operador,
       ruttrabajador: licenciaTramite!?.runtrabajador,
       tipolicencia: licenciaTramite!?.tipolicencia,
+      nombres: licenciaTramite!?.nombres,
+      apellidomaterno: licenciaTramite!?.apellidomaterno,
+      apellidopaterno: licenciaTramite!?.apellidopaterno,
     };
 
     let licenciac1: LicenciaC1 = {
@@ -218,7 +223,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
       depto: formulario.getValues('departamento'),
       direccion: formulario.getValues('calle'),
       fecharecepcion: format(new Date(formulario.getValues('fecharecepcionlme')), 'yyyy-MM-dd'),
-      foliolicencia: foliotramitacion,
+      foliolicencia: folio,
       glosaotraocupacion: formulario.getValues('otro') || '',
       ocupacion: {
         idocupacion: Number(formulario.getValues('ocupacion')),
@@ -237,40 +242,53 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
     try {
       await crearLicenciaZ0(licencia);
       await crearLicenciaZ1(licenciac1);
-
-      return Swal.fire({
+      respuesta = true;
+      Swal.fire({
         icon: 'success',
         html: 'Se ha guardado con éxito',
         timer: 2000,
         showConfirmButton: false,
       });
+      return respuesta;
     } catch (error) {
       if (error instanceof ErrorCrearLicencia) {
-        return Swal.fire({
+        respuesta = false;
+
+        Swal.fire({
           icon: 'error',
           title: 'Existe un problema al guardar los datos',
           showConfirmButton: true,
           confirmButtonColor: 'var(--color-blue)',
           confirmButtonText: 'OK',
         });
+
+        return respuesta;
       }
 
       if (error instanceof ErrorCrearLicenciaC1) {
-        return Swal.fire({
+        respuesta = false;
+        Swal.fire({
           icon: 'error',
           title: 'Existe un problema al guardar los datos',
           showConfirmButton: true,
           confirmButtonColor: 'var(--color-blue)',
           confirmButtonText: 'OK',
         });
+
+        return respuesta;
       }
     }
+  };
+  const OnHandleSiguiente = async (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    router.push(`/tramitacion/${folio}/${idoperador}/c2`);
   };
   return (
     <div className="bgads">
       <div className="me-5 ms-5">
         <Cabecera
-          foliotramitacion={foliotramitacion}
+          foliotramitacion={folio}
+          idoperador={idoperador}
           step={step}
           title="Identificación de la Entidad Empleadora o Persona Trabajadora Independiente"
           rutEmpleador={(run) => {
@@ -279,7 +297,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
           }}
         />
 
-        <IfContainer show={cargandoCombos}>
+        <IfContainer show={cargandoCombos || cargandoData}>
           <div className={fadeinOut}>
             <LoadingSpinner titulo="Cargando datos..." />
           </div>
@@ -355,7 +373,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   descripcion="tipocalle"
                   idElemento="idtipocalle"
                   datos={combos?.CALLE}
-                  opcional
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                 />
 
@@ -429,12 +446,12 @@ const C1Page: React.FC<myprops> = ({ params: { foliotramitacion } }) => {
                   </a>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-success" onClick={onHandleGuardar}>
-                    Guardar
-                  </button>
+                  <button className="btn btn-success">Guardar</button>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-primary">Siguiente</button>
+                  <button className="btn btn-primary" onClick={OnHandleSiguiente}>
+                    Siguiente
+                  </button>
                 </div>
               </div>
             </form>
