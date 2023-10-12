@@ -12,11 +12,11 @@ import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
+import { InputDias } from '../(componentes)/input-dias';
 import { buscarInstitucionPrevisional } from '../(servicios)/buscar-institucion-previsional';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
 import { LicenciaTramitar, esLicenciaMaternidad } from '../../(modelos)/licencia-tramitar';
 import { InputDesgloseDeHaberes } from './(componentes)/input-desglose-de-haberes';
-import { InputDias } from './(componentes)/input-dias';
 import { InputMonto } from './(componentes)/input-monto';
 import {
   DatosModalDesgloseHaberes,

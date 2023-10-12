@@ -1,11 +1,29 @@
 import { BaseProps } from '@/components/form';
 import { useRandomId } from '@/hooks/use-random-id';
+import { esFechaInvalida } from '@/utilidades';
+import { differenceInDays } from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
 interface InputDiasProps extends Omit<BaseProps, 'label'> {
   opcional?: boolean;
+
+  /** Número mínimo de días (default: 0) */
+  minDias?: number;
+
+  /** Numero maximo de dias (default: `30`) */
+  maxDias?: number;
+
+  deshabilitado?: boolean;
+
+  coincideConRango?: {
+    /** Nombre del input en la función `register` para la fecha desde */
+    desde: string;
+
+    /** Nombre del input en la función `register` para la fecha hasta */
+    hasta: string;
+  };
 
   /**
    * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
@@ -34,14 +52,22 @@ export const InputDias: React.FC<InputDiasProps> = ({
   name,
   className,
   opcional,
+  minDias,
+  maxDias,
+  deshabilitado,
   unirConFieldArray,
+  coincideConRango,
 }) => {
+  const minDiasFinal = minDias ?? 0;
+  const maxDiasFinal = maxDias ?? 30;
+
   const idInput = useRandomId('dias');
 
   const {
     register,
     formState: { errors },
     setValue,
+    getValues,
   } = useFormContext();
 
   const tieneError = () => {
@@ -70,6 +96,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
         <Form.Control
           type="text"
           inputMode="numeric"
+          disabled={deshabilitado === true}
           isInvalid={tieneError()}
           {...register(name, {
             valueAsNumber: true,
@@ -78,12 +105,30 @@ export const InputDias: React.FC<InputDiasProps> = ({
               message: 'Este campo es obligatorio',
             },
             min: {
-              value: 0,
-              message: 'No puede ingresar menos de 0 días',
+              value: minDiasFinal,
+              message: `No puede ingresar menos de ${minDiasFinal} días`,
             },
             max: {
-              value: 30,
-              message: 'No puede ingresar más de 30 días',
+              value: maxDiasFinal,
+              message: `No puede ingresar más de ${maxDiasFinal} días`,
+            },
+            validate: {
+              estaEnRango: (dias) => {
+                if (!coincideConRango) {
+                  return;
+                }
+
+                const desde = getValues(coincideConRango.desde);
+                const hasta = getValues(coincideConRango.hasta);
+
+                if (!esFechaInvalida(desde) && !esFechaInvalida(hasta)) {
+                  const diasEnRango = differenceInDays(hasta, desde);
+
+                  if (dias !== diasEnRango) {
+                    return 'Los días no coinciden con el rango indicado';
+                  }
+                }
+              },
             },
             onChange: (event: any) => {
               const regex = /[^0-9]/g; // solo números postivos
