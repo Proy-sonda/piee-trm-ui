@@ -9,9 +9,14 @@ import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licenci
 interface InformacionLicenciaProps {
   folioLicencia: string;
   idoperador: number;
+  onLicenciaCargada?: (licencia: LicenciaTramitar) => void;
 }
 
-const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({ folioLicencia, idoperador }) => {
+const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
+  folioLicencia,
+  idoperador,
+  onLicenciaCargada,
+}) => {
   const [, licenciasTramitar, cargando] = useFetch(buscarLicenciasParaTramitar());
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
@@ -19,6 +24,12 @@ const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({ folioLicencia
   useEffect(() => {
     setLicencia((licenciasTramitar ?? []).find((lic) => lic.foliolicencia === folioLicencia));
   }, [licenciasTramitar]);
+
+  useEffect(() => {
+    if (licencia && onLicenciaCargada) {
+      onLicenciaCargada(licencia);
+    }
+  }, [licencia]);
 
   const calcularFechaFin = () => {
     return addDays(new Date(licencia!.fechaemision), licencia!.diasreposo);

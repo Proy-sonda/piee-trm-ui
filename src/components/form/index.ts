@@ -8,6 +8,7 @@ export * from './input-calle';
 export * from './input-clave';
 export * from './input-email';
 export * from './input-fecha';
+export * from './input-mes-ano';
 export * from './input-nombres';
 export * from './input-numero';
 export * from './input-radio-buttons';

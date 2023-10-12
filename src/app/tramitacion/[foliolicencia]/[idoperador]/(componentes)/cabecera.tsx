@@ -5,6 +5,7 @@ import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { useEffect, useState } from 'react';
+
 import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 import InformacionLicencia from './informacion-licencia';
 
@@ -14,6 +15,7 @@ interface myprops {
   step: any[];
   title: string;
   rutEmpleador?: (run: string) => void;
+  onLicenciaCargada?: (licencia: LicenciaTramitar) => void;
 }
 const options: Intl.DateTimeFormatOptions = {
   year: 'numeric',
@@ -28,6 +30,7 @@ const Cabecera: React.FC<myprops> = ({
   title,
   rutEmpleador,
   idoperador,
+  onLicenciaCargada,
 }) => {
   const [refrescar, refrescarPagina] = useRefrescarPagina();
   const [datopaciente, setdatopaciente] = useState<LicenciaTramitar>();
@@ -40,7 +43,12 @@ const Cabecera: React.FC<myprops> = ({
   );
 
   useEffect(() => {
-    setdatopaciente(data?.LMETRM.find(({ foliolicencia }) => foliotramitacion == foliolicencia));
+    const licencia = data?.LMETRM.find(({ foliolicencia }) => foliotramitacion == foliolicencia);
+    if (licencia && onLicenciaCargada) {
+      onLicenciaCargada(licencia);
+    }
+
+    setdatopaciente(licencia);
     if (rutEmpleador == undefined) return;
     if (datopaciente?.rutempleador) rutEmpleador(datopaciente?.rutempleador);
   }, [cargandoData]);

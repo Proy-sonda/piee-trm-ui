@@ -5,8 +5,11 @@ import { endOfDay, isAfter, isBefore, parse, startOfDay } from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
+import IfContainer from '../if-container';
 
-interface InputFechaProps extends BaseProps {
+interface InputFechaProps extends Omit<BaseProps, 'label'> {
+  label?: string;
+
   opcional?: boolean;
 
   /**
@@ -42,6 +45,30 @@ interface InputFechaProps extends BaseProps {
   noPosteriorA?: string;
 
   esEmision?: boolean;
+
+  deshabilitado?: boolean;
+
+  /**
+   * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
+   *
+   * Si se incluye esta propiedad se obtienen desde el arreglo usado por `useFieldArray`, pero si
+   * no se incluye se van a tratar de obtener los errores desde la propiedad`formState.errors[name]`
+   * que devuelve `useFormContext`.
+   */
+  unirConFieldArray?: {
+    /**
+     * La propiedad `name` usada cuando se creo el field array con `useFieldArray`.
+     * */
+    fieldArrayName: string;
+
+    /** El indice del input. */
+    index: number;
+
+    /**
+     * Nombre de la propiedad de un elemento del field array.
+     */
+    campo: string;
+  };
 }
 
 /**
@@ -57,22 +84,56 @@ export const InputFecha: React.FC<InputFechaProps> = ({
   noAnteriorA,
   noPosteriorA,
   esEmision,
+  deshabilitado,
+  unirConFieldArray,
 }) => {
   const idInput = useRandomId('fecha');
 
   const {
     register,
     formState: { errors },
+    getValues,
   } = useFormContext();
+
+  const determinarLabel = () => {
+    if (label === undefined || label === null) {
+      return '';
+    }
+
+    return opcional ? `${label}` : `${label} (*)`;
+  };
+
+  const tieneError = () => {
+    if (!unirConFieldArray) {
+      return !!errors[name];
+    }
+
+    const { fieldArrayName, index, campo } = unirConFieldArray;
+
+    return !!(errors[fieldArrayName] as any)?.at?.(index)?.[campo];
+  };
+
+  const mensajeDeError = () => {
+    if (!unirConFieldArray) {
+      return errors[name]?.message?.toString();
+    }
+
+    const { fieldArrayName, index, campo } = unirConFieldArray;
+
+    return (errors[fieldArrayName] as any)?.at?.(index)?.[campo]?.message?.toString();
+  };
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label}${!opcional ? ' (*)' : ''}`}</Form.Label>
+        <IfContainer show={label}>
+          <Form.Label>{determinarLabel()}</Form.Label>
+        </IfContainer>
         <Form.Control
           type="date"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          disabled={deshabilitado === true}
+          isInvalid={tieneError()}
           {...register(name, {
             setValueAs: (date: string) => {
               /** Situa la fecha con respecto al inicio de hoy */
@@ -98,7 +159,7 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   return 'No puede ser posterior a hoy';
                 }
               },
-              obligatorioSiHayFechaHasta: (fecha: Date, otrosCampos: Record<string, any>) => {
+              obligatorioSiHayFechaHasta: (fecha: Date) => {
                 // Este input es de "tipo desde"
                 if (noPosteriorA === name) {
                   throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
@@ -108,13 +169,13 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   return;
                 }
 
-                const hasta: Date = otrosCampos[noPosteriorA];
+                const hasta: Date = getValues(noPosteriorA);
 
                 if (esFechaInvalida(fecha) && !esFechaInvalida(hasta)) {
                   return 'Debe incluir la fecha desde';
                 }
               },
-              noPosteriorAHasta: (fecha: Date, otrosCampos: Record<string, any>) => {
+              noPosteriorAHasta: (fecha: Date) => {
                 // Este input es de "tipo desde"
                 if (noPosteriorA === name) {
                   throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
@@ -124,7 +185,7 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   return;
                 }
 
-                const hasta: Date = otrosCampos[noPosteriorA];
+                const hasta: Date = getValues(noPosteriorA);
                 if (!esFechaInvalida(hasta) && isAfter(fecha, hasta)) {
                   return 'No puede ser posterior a hasta';
                 }
@@ -139,13 +200,13 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   return;
                 }
 
-                const desde: Date = otrosCampos[noAnteriorA];
+                const desde: Date = getValues(noAnteriorA);
 
                 if (esFechaInvalida(fecha) && !esFechaInvalida(desde)) {
                   return 'Debe incluir la fecha hasta';
                 }
               },
-              noAnteriorADesde: (fecha: Date, otrosCampos: Record<string, any>) => {
+              noAnteriorADesde: (fecha: Date) => {
                 // Este input es de "tipo hasta"
                 if (noAnteriorA === name) {
                   throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
@@ -155,7 +216,7 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   return;
                 }
 
-                const desde: Date = otrosCampos[noAnteriorA];
+                const desde: Date = getValues(noAnteriorA);
                 if (!esFechaInvalida(desde) && isBefore(fecha, desde)) {
                   return esEmision
                     ? 'La fecha no puede ser menor a la emisión'
@@ -167,7 +228,7 @@ export const InputFecha: React.FC<InputFechaProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeDeError()}
         </Form.Control.Feedback>
       </FormGroup>
     </>

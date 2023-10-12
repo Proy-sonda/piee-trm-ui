@@ -1,32 +1,14 @@
+import { BaseProps } from '@/components/form';
 import { useRandomId } from '@/hooks/use-random-id';
+import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
+import { endOfDay, isAfter, isBefore, parse, startOfMonth } from 'date-fns';
+import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import IfContainer from '../if-container';
-import { BaseProps } from './base-props';
 
-interface ComboSimpleProps<T> extends Omit<BaseProps, 'label'> {
+interface InputMesAnoProps extends Omit<BaseProps, 'label'> {
   label?: string;
-
-  /** Datos para rellenar el combo */
-  datos?: T[];
-
-  /**
-   * Propiedad de un elemento de los datos para usar en las propiedades `key` y `value` del tag
-   * `<option>`.
-   */
-  idElemento: keyof T;
-
-  /** Propiedad de un elemento de los datos para usar como texto de tag `<option />` */
-  descripcion: keyof T;
-
-  /** Texto para incluir como la opción nula (default: `'Seleccionar'`). */
-  textoOpcionPorDefecto?: string;
-
-  /**
-   * Si parsear la propiedad `value` del tag `<option />` a numero o dejarla como string
-   * (default: `number`).
-   * */
-  tipoValor?: 'number' | 'string';
 
   opcional?: boolean;
 
@@ -54,22 +36,18 @@ interface ComboSimpleProps<T> extends Omit<BaseProps, 'label'> {
 }
 
 /**
- * El valor en caso de ser opcional es un string vacío cuando el combo es tipo `string` o `isNan`
- * cuando es un combo tipo `number`.
+ * El valor del input va a ser un objeto `Date` con la fecha seleccionada. En caso de que la fecha
+ * sea invalida el valor del input va a ser `Invalid Date`, que se puede revisar con la funcion
+ * `esFechaInvalida` de las utilidades.
  */
-export const ComboSimple = <T extends Record<string, any>>({
+export const InputMesAno: React.FC<InputMesAnoProps> = ({
   name,
   label,
   className,
-  datos,
-  idElemento,
-  descripcion,
-  textoOpcionPorDefecto,
-  tipoValor,
   opcional,
   unirConFieldArray,
-}: ComboSimpleProps<T>) => {
-  const idInput = useRandomId('combo');
+}) => {
+  const idInput = useRandomId('fecha');
 
   const {
     register,
@@ -111,40 +89,38 @@ export const ComboSimple = <T extends Record<string, any>>({
           <Form.Label>{determinarLabel()}</Form.Label>
         </IfContainer>
 
-        <Form.Select
+        <Form.Control
+          type="month"
           autoComplete="new-custom-value"
           isInvalid={tieneError()}
           {...register(name, {
-            setValueAs: (value) => {
-              if (!tipoValor || tipoValor === 'number') {
-                return parseInt(value, 10);
-              } else {
-                return value;
-              }
+            setValueAs: (date: string) => {
+              /** Situa la fecha con respecto al inicio de hoy */
+              return parse(date, 'yyyy-MM', startOfMonth(new Date()));
+            },
+            required: {
+              value: !opcional,
+              message: 'La fecha es obligatoria',
             },
             validate: {
-              comboObligatorio: (valor: number | string) => {
-                if (opcional) {
-                  return;
+              esFechaValida: (fecha: Date) => {
+                if (!opcional && esFechaInvalida(fecha)) {
+                  return 'La fecha es inválida';
                 }
-
-                if (Number.isNaN(valor)) {
-                  return 'Este campo es obligatorio';
+              },
+              despuesDe1920: (fecha: Date) => {
+                if (isBefore(fecha, new Date(1920, 11, 31))) {
+                  return 'Debe ser mayor o igual a enero de 1921';
                 }
-
-                if (typeof valor === 'string' && valor === '') {
-                  return 'Este campo es obligatorio';
+              },
+              noMayorQueHoy: (fecha: Date) => {
+                if (isAfter(fecha, endOfDay(Date.now()))) {
+                  return 'No puede ser posterior a hoy';
                 }
               },
             },
-          })}>
-          <option value={''}>{textoOpcionPorDefecto ?? 'Seleccionar'}</option>
-          {(datos ?? []).map((dato) => (
-            <option key={dato[idElemento] as any} value={dato[idElemento] as any}>
-              {dato[descripcion] as any}
-            </option>
-          ))}
-        </Form.Select>
+          })}
+        />
 
         <Form.Control.Feedback type="invalid" tooltip>
           {mensajeDeError()}
