@@ -109,15 +109,6 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliotramitacion } }) => {
     }
   }, [licencia]);
 
-  // Cargar los periodos de renta de la licencia
-  useEffect(() => {
-    if (!licencia) {
-      return;
-    }
-
-    for (let index = 0; index < remuneraciones.fields.length; index++) {}
-  }, [licencia]);
-
   const pasarAPaso4: SubmitHandler<FormularioC3> = async (datos) => {
     console.log('Yendome a paso 4...');
     console.log(datos);
