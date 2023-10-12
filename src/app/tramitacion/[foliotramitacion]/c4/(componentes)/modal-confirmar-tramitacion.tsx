@@ -165,7 +165,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                         <tr key={index}>
                           <td>{licencia.dias}</td>
                           <td>{format(licencia.desde, 'dd/MM/yyyy')}</td>
-                          <td>{format(licencia.desde, 'dd/MM/yyyy')}</td>
+                          <td>{format(licencia.hasta, 'dd/MM/yyyy')}</td>
                         </tr>
                       ))}
                     </IfContainer>
