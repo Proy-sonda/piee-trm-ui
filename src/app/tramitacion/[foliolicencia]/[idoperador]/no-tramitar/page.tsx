@@ -13,12 +13,13 @@ import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar
 
 interface NoRecepcionarLicenciaPageProps {
   params: {
-    foliotramitacion: string;
+    foliolicencia: string;
+    idoperador: number;
   };
 }
 
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
-  params: { foliotramitacion },
+  params: { foliolicencia, idoperador },
 }) => {
   const formulario = useForm<FormularioNoTramitarLicencia>({
     mode: 'onBlur',
@@ -53,7 +54,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
           </Row>
 
           <Row>
-            <InformacionLicencia folioLicencia={foliotramitacion} />
+            <InformacionLicencia folioLicencia={foliolicencia} idoperador={idoperador} />
           </Row>
 
           <Row className="mt-2">

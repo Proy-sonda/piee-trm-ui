@@ -17,13 +17,15 @@ import {
   estaLicenciaAnteriorCompleta,
   licenciaAnteriorTieneCamposValidos,
 } from './(modelos)/formulario-c4';
+
 interface PasoC4Props {
   params: {
-    foliotramitacion: string;
+    foliolicencia: string;
+    idoperador: number;
   };
 }
 
-const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
+const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
   const step = [
     { label: 'Entidad Empleadora/Independiente', num: 1, active: false, url: '/adscripcion' },
     { label: 'Previsión persona trabajadora', num: 2, active: false, url: '/adscripcion/pasodos' },
@@ -135,7 +137,8 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliotramitacion } }) => {
       <div className="bgads">
         <div className="ms-5 me-5">
           <Cabecera
-            foliotramitacion={foliotramitacion}
+            foliotramitacion={foliolicencia}
+            idoperador={idoperador}
             step={step}
             title="Licencias Anteriores en los Últimos 6 Meses"
           />
