@@ -1,4 +1,5 @@
 'use client';
+import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { InputFecha } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { useEffect, useState } from 'react';
@@ -21,7 +22,7 @@ import {
 interface PasoC4Props {
   params: {
     foliolicencia: string;
-    idoperador: number;
+    idoperador: string;
   };
 }
 
@@ -48,13 +49,16 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   const informarLicencias = formulario.watch('informarLicencia');
 
-  const [datosModalConfirmarTramitacion, setDatosModalConfirmarTramitacion] =
-    useState<DatosModalConfirmarTramitacion>({
-      show: false,
-      licenciasAnteriores: [],
-    });
+  const [datosModalConfirmarTramitacion, setDatosModalConfirmarTramitacion] = useState<
+    Pick<DatosModalConfirmarTramitacion, 'show' | 'licenciasAnteriores'>
+  >({
+    show: false,
+    licenciasAnteriores: [],
+  });
 
   const [filasIncompletas, setFilasIncompletas] = useState<number[]>([]);
+
+  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
   // Limpiar errores al no informar licencias
   useEffect(() => {
@@ -129,7 +133,12 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   return (
     <>
       <ModalConfirmarTramitacion
-        datos={datosModalConfirmarTramitacion}
+        datos={{
+          ...datosModalConfirmarTramitacion,
+          licencia,
+          folioLicencia: foliolicencia,
+          idOperador: parseInt(idoperador),
+        }}
         onCerrar={cerrarModal}
         onTramitacionConfirmada={tramitarLaLicencia}
       />
@@ -138,9 +147,10 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         <div className="ms-5 me-5">
           <Cabecera
             foliotramitacion={foliolicencia}
-            idoperador={idoperador}
+            idoperador={parseInt(idoperador)}
             step={step}
             title="Licencias Anteriores en los Últimos 6 Meses"
+            onLicenciaCargada={setLicencia}
           />
 
           <Row className="mt-2 mb-3">

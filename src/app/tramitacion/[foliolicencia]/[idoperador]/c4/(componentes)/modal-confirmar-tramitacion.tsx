@@ -1,8 +1,14 @@
+import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import IfContainer from '@/components/if-container';
-import { format } from 'date-fns';
-import React from 'react';
-import { Modal } from 'react-bootstrap';
+import LoadingSpinner from '@/components/loading-spinner';
+import { emptyFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { addDays, format } from 'date-fns';
+import React, { useEffect, useState } from 'react';
+import { Alert, Col, Modal, Row } from 'react-bootstrap';
 import { LicenciaAnterior } from '../(modelos)/formulario-c4';
+import { buscarEmpleador } from '../../(servicios)/buscar-empleador';
+import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
+import { buscarZona2 } from '../../c2/(servicios)/buscar-z2';
 
 interface ModalConfirmarTramitacionProps {
   datos: DatosModalConfirmarTramitacion;
@@ -12,7 +18,10 @@ interface ModalConfirmarTramitacionProps {
 
 export interface DatosModalConfirmarTramitacion {
   show: boolean;
+  licencia?: LicenciaTramitar;
   licenciasAnteriores: LicenciaAnterior[];
+  folioLicencia: string;
+  idOperador: number;
 }
 
 export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps> = ({
@@ -20,12 +29,66 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
   onCerrar,
   onTramitacionConfirmada,
 }) => {
+  const [erroresZona, [zona0, zona1, zona2, empleador], cargandoZonas] = useMergeFetchArray([
+    buscarZona0(datos.folioLicencia, datos.idOperador),
+    buscarZona1(datos.folioLicencia, datos.idOperador),
+    buscarZona2(datos.folioLicencia, datos.idOperador),
+    datos.licencia ? buscarEmpleador(datos.licencia.rutempleador) : emptyFetch(),
+  ]);
+
+  const zonas = [zona0, zona1, zona2];
+
+  const [hayErrores, setHayErrores] = useState(false);
+
+  // Determina si el modal esta ok
+  useEffect(() => {
+    if (erroresZona.length > 0) {
+      setHayErrores(true);
+      return;
+    }
+
+    if (!cargandoZonas && zonas.some((zona) => !zona)) {
+      setHayErrores(true);
+      return;
+    }
+
+    setHayErrores(false);
+  }, [erroresZona, zonas, cargandoZonas]);
+
   const handleCerrar = () => {
     onCerrar();
   };
 
   const confirmarTramitacion = () => {
     onTramitacionConfirmada();
+  };
+
+  const formatearDireccion = () => {
+    if (!zona1) {
+      return '';
+    }
+
+    const { direccion, comuna, numero, depto } = zona1;
+
+    return `${direccion} ${numero} ${depto ? 'departamento ' + depto : ''}, ${comuna.nombre}`;
+  };
+
+  const formatearFecha = (fechaStr?: string) => {
+    if (!fechaStr) {
+      return '';
+    }
+
+    return format(new Date(fechaStr), 'dd/MM/yyyy');
+  };
+
+  const calcularFechaFin = (licencia?: LicenciaTramitar) => {
+    if (!licencia) {
+      return '';
+    }
+
+    const fechaFin = addDays(new Date(licencia!.fechaemision), licencia!.diasreposo);
+
+    return formatearFecha(fechaFin.toISOString());
   };
 
   return (
@@ -36,81 +99,130 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
         </Modal.Header>
 
         <Modal.Body>
-          <div className="row">
-            <div className="alert alert-warning" role="alert">
-              Antes de enviar a tramitación, por favor revisa que todos los datos estén correctos.
-            </div>
-          </div>
+          <IfContainer show={!cargandoZonas && hayErrores}>
+            <Row>
+              <Col xs={12} className="my-5">
+                <div className="text-center">
+                  <h1 className="fs-4">Error al crear resumen de datos</h1>
+                  <IfContainer show={!zona1}>
+                    <p>No se han completados los datos del paso 1.</p>
+                  </IfContainer>
 
-          <div className="row mt-3">
-            <div className="alert alert-warning" role="alert">
-              <div className="row">
-                <div className="col-md-6">
-                  <p>
-                    <b>Run Entidad Empleadora:</b> 11111-1{' '}
-                  </p>
-                </div>
-                <div className="col-md-6">
-                  <p>
-                    <b>Calidad de la Persona Trabajadora:</b> Ejemplo{' '}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="row mt-3">
-            <div className="col-md-6">
-              <p>
-                <b>RUN: </b>1111111-1
-              </p>
-              <p>
-                <b>Nombre:</b> Juan Perez
-              </p>
-              <p>
-                <b>Razón social Entidad Empleadora:</b> Capacitaciones spa{' '}
-              </p>
-              {/* <p><b>Fecha Recepción Entidad Empleadora</b>:  23/06/2023 </p> */}
-              <p>
-                <b>Dirección donde cumple funciones:</b> Pasaje 1234, Maule{' '}
-              </p>
-              <p>
-                <b>Actividad Laboral:</b> Ejemplo{' '}
-              </p>
-              <p>
-                <b>Ocupación:</b> Encargado de Ejemplo...{' '}
-              </p>
-              <p>
-                <b>Nombre Entidad Pagadora Subsidio:</b> Ejemplo S.A...{' '}
-              </p>
-            </div>
+                  <IfContainer show={!zona2}>
+                    <p>No se han completados los datos del paso 2.</p>
+                  </IfContainer>
 
-            <div className="col-md-6">
-              <p>
-                <b>Folio LME: </b>11111-1
-              </p>
-              <p>
-                <b>Fecha primera afiliación:</b> Ejemplo{' '}
-              </p>
-              <p>
-                <b>Institución Provisional:</b> Ejemplo S.A{' '}
-              </p>
-              <p>
-                <b>Afiliado a AFC:</b> Si{' '}
-              </p>
-              <p>
-                <b>Contrato de duración Indefinida:</b> No{' '}
-              </p>
-              <p>
-                <b>Fecha Contrato:</b> 12-01-2015{' '}
-              </p>
-              <p>
-                <b>Reposo Total</b> por <b>30 días(s)</b> desde <b>29/05/2022</b> al{' '}
-                <b>28/06/2022</b>
-              </p>
-            </div>
+                  {/* TODO: Agregar mensaje de que no se han completado los datos del paso 3 */}
+
+                  <IfContainer show={erroresZona.length > 0}>
+                    <p>
+                      Por favor revise que los datos de cada uno de los pasos hayan sido completados
+                      para poder tramitar la licencia médica.
+                    </p>
+                  </IfContainer>
+                </div>
+              </Col>
+            </Row>
+          </IfContainer>
+
+          <IfContainer show={cargandoZonas}>
+            <Row>
+              <Col xs={12} className="my-4">
+                <LoadingSpinner titulo="Creando resumen, por favor espere..." />
+              </Col>
+            </Row>
+          </IfContainer>
+
+          <IfContainer show={!cargandoZonas && !hayErrores}>
+            <Row>
+              <Col xs={12}>
+                <Alert variant="warning">
+                  Antes de enviar a tramitación, por favor revise que todos los datos estén
+                  correctos.
+                </Alert>
+              </Col>
+            </Row>
+
+            <Row className="mt-3">
+              <Col xs={12}>
+                <Alert variant="warning">
+                  <div className="row">
+                    <div className="col-md-6">
+                      <p>
+                        <b>Run Entidad Empleadora:</b> {empleador?.rutempleador}
+                      </p>
+                    </div>
+                    <div className="col-md-6">
+                      <p>
+                        <b>Calidad de la Persona Trabajadora:</b>{' '}
+                        {zona2?.calidadtrabajador.calidadtrabajador}
+                      </p>
+                    </div>
+                  </div>
+                </Alert>
+              </Col>
+            </Row>
+
+            <Row className="mt-3">
+              <Col xs={12} md={6}>
+                <p>
+                  <b>RUN: </b> {zona0?.ruttrabajador}
+                </p>
+                <p>
+                  <b>Nombre:</b>{' '}
+                  {!zona0
+                    ? ''
+                    : `${zona0.nombres} ${zona0?.apellidopaterno} ${zona0?.apellidomaterno}`}
+                </p>
+                <p>
+                  <b>Razón social Entidad Empleadora:</b> {empleador?.razonsocial}
+                </p>
+                <p>
+                  <b>Dirección donde cumple funciones:</b> {formatearDireccion()}
+                </p>
+                <p>
+                  <b>Actividad Laboral:</b> {zona1?.actividadlaboral.actividadlaboral}
+                </p>
+                <p>
+                  <b>Ocupación:</b> {zona1?.ocupacion.ocupacion}
+                </p>
+                <p>
+                  <b>Nombre Entidad Pagadora Subsidio:</b> {zona2?.entidadpagadora.entidadpagadora}
+                </p>
+              </Col>
+
+              <Col xs={12} md={6}>
+                <p>
+                  <b>Folio LME: </b> {zona0?.foliolicencia}
+                </p>
+                <p>
+                  <b>Fecha primera afiliación:</b> {formatearFecha(zona2?.fechaafiliacion)}
+                </p>
+                <p>
+                  <b>Institución Provisional:</b> {zona2?.entidadprevisional.glosa}
+                </p>
+                <p>
+                  <b>Afiliado a AFC:</b> {zona2 && zona2.codigoseguroafc === 1 ? 'SÍ' : 'NO'}
+                </p>
+                <p>
+                  <b>Contrato de duración Indefinida:</b>{' '}
+                  {zona2 && zona2.codigocontratoindef === 1 ? 'SÍ' : 'NO'}
+                </p>
+                <p>
+                  <b>Fecha Contrato:</b> {formatearFecha(zona2?.fechacontrato)}
+                </p>
+                <p>
+                  <b>{datos.licencia?.tiporesposo.tiporeposo}</b> por{' '}
+                  <b>{datos.licencia?.diasreposo} días(s)</b> desde el{' '}
+                  <b>{formatearFecha(datos.licencia?.fechainicioreposo)} </b>
+                  al <b>{calcularFechaFin(datos.licencia)}</b>
+                </p>
+              </Col>
+            </Row>
             <hr />
-            <div className="row mt-2">
-              <div className="col-md-6">
+
+            <Row className="mt-2">
+              <Col xs={12} md={6}>
                 <table className="table table-bordered">
                   <thead className="text-center">
                     <tr>
@@ -138,9 +250,9 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     </tr>
                   </tbody>
                 </table>
-              </div>
+              </Col>
 
-              <div className="col-md-6">
+              <Col xs={12} md={6}>
                 <table className="table table-bordered">
                   <thead className="text-center">
                     <tr>
@@ -171,11 +283,11 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     </IfContainer>
                   </tbody>
                 </table>
-              </div>
-            </div>
+              </Col>
+            </Row>
 
-            <div className="row mt-2">
-              <div className="col-md-6">
+            <Row className="mt-2">
+              <Col xs={12} md={6}>
                 <table className="table table-bordered">
                   <thead>
                     <tr>
@@ -215,9 +327,9 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     </tr>
                   </tbody>
                 </table>
-              </div>
-            </div>
-          </div>
+              </Col>
+            </Row>
+          </IfContainer>
         </Modal.Body>
 
         <Modal.Footer>
@@ -226,6 +338,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
               type="button"
               form="formularioDesgloseHaberes"
               className="btn btn-primary"
+              disabled={cargandoZonas || hayErrores}
               onClick={confirmarTramitacion}>
               Confirmar
             </button>

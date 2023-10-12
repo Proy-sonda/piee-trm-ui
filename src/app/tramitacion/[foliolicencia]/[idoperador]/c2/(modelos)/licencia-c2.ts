@@ -21,6 +21,9 @@ interface Entidadprevisional {
   codigoentidadprevisional: number;
   codigoregimenprevisional: number;
   letraentidadprevisional: string;
+  glosa?: string; // TODO: Deberian ser obligatorias
+  codigosuceso?: number; // TODO: Deberian ser obligatorias
+  vigente?: number; // TODO: Deberian ser obligatorias
 }
 
 interface Calidadtrabajador {
