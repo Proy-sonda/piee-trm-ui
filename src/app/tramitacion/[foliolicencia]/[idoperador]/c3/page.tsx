@@ -205,9 +205,6 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   };
 
   const irAlPaso4 = async (datos: FormularioC3) => {
-    console.log('Yendome a paso 4...');
-    console.log(datos);
-
     const periodosDeclarados = datos.remuneraciones
       .concat(datos.remuneracionesMaternidad)
       .map((r) => capitalizar(format(r.periodoRenta, 'MMMM yyyy', { locale: esLocale })));
@@ -230,7 +227,28 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       return;
     }
 
-    router.push(`/tramitacion/${foliolicencia}/${idoperador}/c4`);
+    try {
+      setMostrarSpinner(true);
+
+      await crearLicenciaZ3({
+        ...datos,
+        folioLicencia: foliolicencia,
+        idOperador: parseInt(idoperador),
+      });
+
+      router.push(`/tramitacion/${foliolicencia}/${idoperador}/c4`);
+    } catch (error) {
+      setMostrarSpinner(false);
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudieron guardar los cambios en la licencia',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
   };
 
   const guardarCambios = async (datos: FormularioC3) => {
