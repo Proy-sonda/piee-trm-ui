@@ -96,14 +96,21 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         codigoentidadprevisional: Number(
           formulario.getValues('regimen') == 2
             ? formulario.getValues('previsional').toString()
+            : formulario.getValues('previsional').length > 2
+            ? formulario.getValues('previsional').toString().substring(0, 2)
             : formulario.getValues('previsional').toString().substring(0, 1),
         ),
         codigoregimenprevisional: Number(formulario.getValues('regimen')),
-        letraentidadprevisional: formulario.getValues('previsional').substring(1, 2),
+        letraentidadprevisional:
+          formulario.getValues('previsional').length > 2
+            ? formulario.getValues('previsional').toString().substring(2, 3)
+            : formulario.getValues('previsional').substring(1, 2),
       },
       codigoseguroafc: Number(formulario.getValues('perteneceAFC')),
       codigoletracaja: 'AAAA',
     };
+
+    console.log(licenciac2);
 
     try {
       await crearLicenciaZ2(licenciac2);
