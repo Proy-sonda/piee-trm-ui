@@ -94,7 +94,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
         <Form.Control
-          type="text"
+          type="number"
           inputMode="numeric"
           disabled={deshabilitado === true}
           isInvalid={tieneError()}
@@ -131,12 +131,12 @@ export const InputDias: React.FC<InputDiasProps> = ({
               },
             },
             onChange: (event: any) => {
-              const regex = /[^0-9]/g; // solo números postivos
-              let montoImponible = event.target.value as string;
+              const regex = /[^0-9-]/g; // solo números enteros
+              let dias = event.target.value as string;
 
-              if (regex.test(montoImponible)) {
-                montoImponible = montoImponible.replaceAll(regex, '');
-                setValue(name, montoImponible, { shouldValidate: true });
+              if (regex.test(dias)) {
+                dias = dias.replaceAll(regex, '');
+                setValue(name, dias === '' ? undefined : parseInt(dias), { shouldValidate: true });
               }
             },
           })}

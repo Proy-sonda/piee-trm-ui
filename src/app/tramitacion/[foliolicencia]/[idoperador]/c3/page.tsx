@@ -24,6 +24,7 @@ import { DesgloseDeHaberes } from '@/app/tramitacion/[foliolicencia]/[idoperador
 import {
   FormularioC3,
   estaRemuneracionCompleta,
+  limpiarRemuneracion,
   remuneracionTieneAlgunCampoValido,
 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -35,6 +36,7 @@ import {
   DatosModalDesgloseHaberes,
   ModalDesgloseDeHaberes,
 } from './(componentes)/modal-desglose-haberes';
+import { crearLicenciaZ3 } from './(servicios)/licencia-create-z3';
 
 interface C3PageProps {
   params: {
@@ -55,7 +57,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     buscarZona2(foliolicencia, parseInt(idoperador)),
   );
 
-  const [erroresCombos, [tiposDeDocumentos, tiposPrevisiones], cargandocombos] = useMergeFetchArray(
+  const [erroresCombos, [tiposDeDocumentos, tiposPrevisiones], cargandoCombos] = useMergeFetchArray(
     [
       BuscarTipoDocumento(),
       zona2
@@ -75,6 +77,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
   const [hayErrores, setHayErrores] = useState(false);
+
+  const [cargando, setCargando] = useState(true);
+
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   const [datosModalDesglose, setDatosModalDesglose] = useState<DatosModalDesgloseHaberes>({
     show: false,
@@ -116,6 +122,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
     setHayErrores(false);
   }, [errorZona2, zona2, cargandoZona2, erroresCombos]);
+
+  // Unifica todas las posibles cargas de datos
+  useEffect(() => {
+    setCargando(cargandoZona2 || cargandoCombos);
+  }, [cargandoZona2, cargandoCombos]);
 
   // Agregar las filas de remuneraciones
   useEffect(() => {
@@ -167,12 +178,17 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
     const datosLimpios: FormularioC3 = {
       ...datos,
-      porcentajeDesahucio: isNaN(datos.porcentajeDesahucio) ? 0 : datos.porcentajeDesahucio,
+      porcentajeDesahucio:
+        (datos.porcentajeDesahucio as any) === '' ? 0 : datos.porcentajeDesahucio,
       remuneracionImponiblePrevisional: isNaN(datos.remuneracionImponiblePrevisional)
         ? 0
         : datos.remuneracionImponiblePrevisional,
-      remuneraciones: datos.remuneraciones.filter(estaRemuneracionCompleta),
-      remuneracionesMaternidad: datos.remuneracionesMaternidad.filter(estaRemuneracionCompleta),
+      remuneraciones: datos.remuneraciones
+        .filter(estaRemuneracionCompleta)
+        .map(limpiarRemuneracion),
+      remuneracionesMaternidad: datos.remuneracionesMaternidad
+        .filter(estaRemuneracionCompleta)
+        .map(limpiarRemuneracion),
     };
 
     switch (datosLimpios.accion) {
@@ -217,8 +233,31 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   };
 
   const guardarCambios = async (datos: FormularioC3) => {
-    console.log('Guardando cambios C3...');
-    console.log(datos);
+    try {
+      setMostrarSpinner(true);
+
+      await crearLicenciaZ3({
+        ...datos,
+        folioLicencia: foliolicencia,
+        idOperador: parseInt(idoperador),
+      });
+
+      Swal.fire({
+        html: 'Cambios guardados con éxito',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudieron guardar los cambios en la licencia',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
   };
 
   const validarCompletitudDeFilas = (datos: FormularioC3) => {
@@ -290,11 +329,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
       <div className="bgads">
         <div className="mx-3 mx-lg-5 pb-4">
-          <IfContainer show={cargandocombos || cargandoZona2}>
+          <IfContainer show={cargando || mostrarSpinner}>
             <SpinnerPantallaCompleta />
           </IfContainer>
 
-          <IfContainer show={!cargandocombos && !cargandoZona2 && hayErrores}>
+          <IfContainer show={!cargando && hayErrores}>
             <Row className="pt-5 pb-1">
               <Col xs={12}>
                 <h1 className="fs-3 text-center">Error al cargar el paso 3</h1>
@@ -312,7 +351,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
             </Row>
           </IfContainer>
 
-          <IfContainer show={!cargandocombos && !cargandoZona2 && !hayErrores}>
+          <IfContainer show={!cargandoCombos && !cargandoZona2 && !hayErrores}>
             <FormProvider {...formulario}>
               <Form onSubmit={formulario.handleSubmit(onSubmitForm)}>
                 <Cabecera
@@ -368,8 +407,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                           <Tr key={field.id}>
                             <Td>
                               <ComboSimple
-                                // opcional={index !== 0}
-                                opcional
+                                opcional={index !== 0}
                                 name={`remuneraciones.${index}.prevision`}
                                 datos={tiposPrevisiones}
                                 idElemento="codigoentidadprevisional"

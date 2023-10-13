@@ -1,14 +1,19 @@
 import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { FormularioC3 } from '../(modelos)/formulario-c3';
+import { format } from 'date-fns';
+import { DesgloseDeHaberes, obtenerGlosaDesglosaHaberes } from '../(modelos)/desglose-de-haberes';
+import { FormularioC3, Remuneracion } from '../(modelos)/formulario-c3';
 
 export type LicenciaCrearZ3Request = FormularioC3 & {
   folioLicencia: string;
   idOperador: number;
 };
 
-export const licenciaCreateZ3 = (request: LicenciaCrearZ3Request) => {
+export const crearLicenciaZ3 = (request: LicenciaCrearZ3Request) => {
+  const remuneraciones = request.remuneraciones.map(convertirRemuneracion(0));
+  const remuneracionesMaternidad = request.remuneracionesMaternidad.map(convertirRemuneracion(1));
+
   const payload = {
     foliolicencia: request.folioLicencia,
     operador: {
@@ -17,29 +22,7 @@ export const licenciaCreateZ3 = (request: LicenciaCrearZ3Request) => {
     },
     porcendesahucio: request.porcentajeDesahucio,
     montoimponible: request.remuneracionImponiblePrevisional,
-
-    // TODO: Como distingo de las rentas de maternidad? Agregar un flag (0=normal, 1=maternal)
-    licenciazc3rentas: request.remuneraciones.map((renta) => ({
-      prevision: {
-        idprevision: renta.prevision,
-      },
-      periodorenta: 202308, // Tiene que ser tipo number y en formato `yyyyMM`. Enero parte en 1
-      nrodias: renta.dias,
-      montoimponible: renta.montoImponible,
-      totalrem: 0, // Se manda en 0 cuando no se incluye
-      montoincapacidad: 0, // Se manda en 0 cuando no se incluye
-      ndiasincapacidad: 0, // Se manda en 0 cuando no se incluye
-      licenciazc3haberes: [
-        {
-          tipohaber: 0, // Mandar la glosa, tal cual aparece en la pantalla
-          montohaber: 0,
-          periodorenta: {
-            // Este no va ir
-            idperiodorenta: 0,
-          },
-        },
-      ],
-    })),
+    licenciazc3rentas: remuneraciones.concat(remuneracionesMaternidad),
   };
 
   return runFetchConThrow(`${urlBackendTramitacion()}/licencia/zona3/create`, {
@@ -51,3 +34,30 @@ export const licenciaCreateZ3 = (request: LicenciaCrearZ3Request) => {
     body: JSON.stringify(payload),
   });
 };
+
+/** @param tipoRenta 0 = normal, 1 = maternal */
+function convertirRemuneracion(tipoRenta: 0 | 1) {
+  return (remuneracion: Remuneracion) => {
+    const haberes = Object.entries(remuneracion.desgloseHaberes) as [
+      keyof DesgloseDeHaberes,
+      number,
+    ][];
+
+    return {
+      tiporenta: tipoRenta,
+      periodorenta: parseInt(format(new Date(remuneracion.periodoRenta), 'yyyyMM'), 10),
+      nrodias: remuneracion.dias,
+      montoimponible: remuneracion.montoImponible,
+      totalrem: remuneracion.totalRemuneracion,
+      montoincapacidad: remuneracion.montoIncapacidad,
+      ndiasincapacidad: remuneracion.diasIncapacidad,
+      prevision: {
+        idprevision: remuneracion.prevision,
+      },
+      licenciazc3haberes: haberes.map(([key, value]) => ({
+        tipohaber: obtenerGlosaDesglosaHaberes(key),
+        montohaber: value,
+      })),
+    };
+  };
+}

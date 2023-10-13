@@ -48,3 +48,15 @@ export const remuneracionTieneAlgunCampoValido = (fila: Remuneracion) => {
     tieneDesglose(fila.desgloseHaberes)
   );
 };
+
+export const limpiarRemuneracion = (remuneracion: Remuneracion): Remuneracion => {
+  return {
+    ...remuneracion,
+    prevision: isNaN(remuneracion.prevision) ? 0 : remuneracion.prevision,
+    dias: isNaN(remuneracion.dias) ? 0 : remuneracion.dias,
+    montoImponible: isNaN(remuneracion.montoImponible) ? 0 : remuneracion.montoImponible,
+    totalRemuneracion: isNaN(remuneracion.totalRemuneracion) ? 0 : remuneracion.totalRemuneracion,
+    montoIncapacidad: isNaN(remuneracion.montoIncapacidad) ? 0 : remuneracion.montoIncapacidad,
+    diasIncapacidad: isNaN(remuneracion.diasIncapacidad) ? 0 : remuneracion.diasIncapacidad,
+  };
+};
