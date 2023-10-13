@@ -107,7 +107,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             : formulario.getValues('previsional').substring(1, 2),
       },
       codigoseguroafc: Number(formulario.getValues('perteneceAFC')),
-      codigoletracaja: 'AAAA',
     };
 
     try {

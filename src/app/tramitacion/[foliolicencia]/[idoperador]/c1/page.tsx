@@ -31,6 +31,7 @@ import format from 'date-fns/format';
 import Swal from 'sweetalert2';
 import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
+import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { LicenciaC1 } from './(modelos)';
 import { LicenciaC0 } from './(modelos)/licencia-c0';
 import {
@@ -96,6 +97,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     {
       LMETRM: buscarLicenciasParaTramitar(),
       LMEEXIS: buscarZona1(folio, Number(idoperador)),
+      LMEZONAC2: buscarZona2(folio, Number(idoperador)),
       // LMEHEADER: buscarZona0(folio, idoperador),
     },
     [refrescar],
@@ -192,7 +194,15 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
   const GuardarZ0Z1 = async () => {
     let respuesta = false;
-    let licencia: LicenciaC0 = {
+
+    if (licencia?.LMEZONAC2.codigoseguroafc == 1 && formulario.getValues('ocupacion') == '18') {
+      return Swal.fire({
+        icon: 'info',
+        html: '<b>Persona trabajadora de casa particular</b> no puede pertenecer a AFC, favor verificar <b>"Previsión persona trabajadora"</b>',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    }
+    let licenciaC0: LicenciaC0 = {
       estadolicencia: licenciaTramite!?.estadolicencia,
       fechaemision: format(new Date(licenciaTramite!?.fechaemision), 'yyyy-MM-dd'),
       fechainicioreposo: format(new Date(licenciaTramite!?.fechainicioreposo), 'yyy-MM-dd'),
@@ -211,7 +221,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       apellidopaterno: licenciaTramite!?.apellidopaterno,
     };
 
-    let licenciac1: LicenciaC1 = {
+    let licenciaC1: LicenciaC1 = {
       actividadlaboral: {
         idactividadlaboral: Number(formulario.getValues('actividadlaboral')),
         actividadlaboral: '',
@@ -240,8 +250,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     };
 
     try {
-      await crearLicenciaZ0(licencia);
-      await crearLicenciaZ1(licenciac1);
+      await crearLicenciaZ0(licenciaC0);
+      await crearLicenciaZ1(licenciaC1);
       respuesta = true;
       Swal.fire({
         icon: 'success',

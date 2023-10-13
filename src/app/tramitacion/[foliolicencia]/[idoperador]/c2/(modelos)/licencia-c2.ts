@@ -2,7 +2,6 @@ export interface Licenciac2 {
   foliolicencia: string;
   operador: Operador;
   fecharecepcionccaf: string;
-  codigoletracaja: string;
   codigoseguroafc: number;
   codigocontratoindef: number;
   fechaafiliacion: string;
