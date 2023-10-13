@@ -1,7 +1,7 @@
 'use client';
 import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { emptyFetch, useFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { capitalizar } from '@/utilidades';
 import { format, subMonths } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
@@ -13,7 +13,6 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
-import { buscarInstitucionPrevisional } from '../(servicios)/buscar-institucion-previsional';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
 
 import {
@@ -29,6 +28,7 @@ import {
 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { esTrabajadorIndependiente } from '../c2/(modelos)/licencia-c2';
+import { buscarEntidadPrevisional } from '../c2/(servicios)/buscar-entidad-previsional';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { InputDesgloseDeHaberes } from './(componentes)/input-desglose-de-haberes';
 import {
@@ -51,11 +51,19 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     { label: 'LME Anteriores', num: 4, active: false },
   ];
 
-  const [errores, datos, cargando] = useMergeFetchObject({
-    zona2: buscarZona2(foliolicencia, parseInt(idoperador)),
-    tiposDeDocumentos: BuscarTipoDocumento(),
-    tiposPrevisiones: buscarInstitucionPrevisional(),
-  });
+  const [errorZona2, zona2, cargandoZona2] = useFetch(
+    buscarZona2(foliolicencia, parseInt(idoperador)),
+  );
+
+  const [erroresCombos, [tiposDeDocumentos, tiposPrevisiones], cargandocombos] = useMergeFetchArray(
+    [
+      BuscarTipoDocumento(),
+      zona2
+        ? buscarEntidadPrevisional(zona2.entidadprevisional.codigoregimenprevisional)
+        : emptyFetch(),
+    ],
+    [zona2],
+  );
 
   const router = useRouter();
 
@@ -95,18 +103,18 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   // Determina si hay algun error en la pagina
   useEffect(() => {
-    if (errores.length > 0) {
+    if (erroresCombos.length > 0 || errorZona2) {
       setHayErrores(true);
       return;
     }
 
-    if (!cargando && !datos?.zona2) {
+    if (!cargandoZona2 && !zona2) {
       setHayErrores(true);
       return;
     }
 
     setHayErrores(false);
-  }, [errores, datos, cargando]);
+  }, [errorZona2, zona2, cargandoZona2, erroresCombos]);
 
   // Agregar las filas de remuneraciones
   useEffect(() => {
@@ -114,10 +122,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       return;
     }
 
-    if (remuneraciones.fields.length === 0 && datos?.zona2) {
+    if (remuneraciones.fields.length === 0 && zona2) {
       const fechaReferencia = new Date(licencia.fechaemision);
 
-      const totalPeriodos = esTrabajadorIndependiente(datos.zona2) ? 12 : 3;
+      const totalPeriodos = esTrabajadorIndependiente(zona2) ? 12 : 3;
       for (let index = 0; index < totalPeriodos; index++) {
         const mesRenta = subMonths(fechaReferencia, index + 1);
 
@@ -133,7 +141,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
       }
     }
-  }, [licencia]);
+  }, [licencia, zona2]);
 
   const pasarAPaso4: SubmitHandler<FormularioC3> = async (datos) => {
     console.log('Yendome a paso 4...');
@@ -245,32 +253,29 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
       <div className="bgads">
         <div className="mx-3 mx-lg-5 pb-4">
-          <IfContainer show={cargando}>
+          <IfContainer show={cargandocombos || cargandoZona2}>
             <SpinnerPantallaCompleta />
           </IfContainer>
 
-          <IfContainer show={!cargando && hayErrores}>
+          <IfContainer show={!cargandocombos && !cargandoZona2 && hayErrores}>
             <Row className="pt-5 pb-1">
               <Col xs={12}>
                 <h1 className="fs-3 text-center">Error al cargar el paso 3</h1>
 
-                <IfContainer show={!datos?.zona2 && errores.length === 0}>
+                <IfContainer show={!zona2 && !errorZona2}>
                   <p className="text-center">
                     Debe completar el paso 2 antes de poder continuar con el paso 3
                   </p>
                 </IfContainer>
 
-                <IfContainer show={errores.length > 0}>
-                  <p className="text-center">
-                    Por favor revise que los pasos 1 y 2 hayan sido completados antes de poder
-                    continuar.
-                  </p>
+                <IfContainer show={erroresCombos.length > 0}>
+                  <p className="text-center">Hubo un error al cargar los combos del paso 3</p>
                 </IfContainer>
               </Col>
             </Row>
           </IfContainer>
 
-          <IfContainer show={!cargando && !hayErrores}>
+          <IfContainer show={!cargandocombos && !cargandoZona2 && !hayErrores}>
             <FormProvider {...formulario}>
               <Form id="formularioC3" onSubmit={formulario.handleSubmit(pasarAPaso4)}>
                 <Cabecera
@@ -326,14 +331,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                               <ComboSimple
                                 opcional={index !== 0}
                                 name={`remuneraciones.${index}.prevision`}
-                                // datos={combos?.tiposPrevisiones} // TODO: descomentar
-                                datos={[
-                                  { identidadprevisional: 1, entidadprevisional: 'Entidad 1' },
-                                  { identidadprevisional: 2, entidadprevisional: 'Entidad 2' },
-                                  { identidadprevisional: 3, entidadprevisional: 'Entidad 3' },
-                                ]}
-                                idElemento="identidadprevisional"
-                                descripcion="entidadprevisional"
+                                datos={tiposPrevisiones}
+                                idElemento="codigoentidadprevisional"
+                                descripcion="glosa"
                                 unirConFieldArray={{
                                   index,
                                   campo: 'prevision',
@@ -512,14 +512,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                                 <ComboSimple
                                   opcional
                                   name={`remuneracionesMaternidad.${index}.prevision`}
-                                  // datos={combos?.tiposPrevisiones} // TODO: descomentar
-                                  datos={[
-                                    { identidadprevisional: 1, entidadprevisional: 'Entidad 1' },
-                                    { identidadprevisional: 2, entidadprevisional: 'Entidad 2' },
-                                    { identidadprevisional: 3, entidadprevisional: 'Entidad 3' },
-                                  ]}
-                                  idElemento="identidadprevisional"
-                                  descripcion="entidadprevisional"
+                                  datos={tiposPrevisiones}
+                                  idElemento="codigoentidadprevisional"
+                                  descripcion="glosa"
                                   unirConFieldArray={{
                                     index,
                                     campo: 'prevision',
@@ -623,7 +618,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                     name="tipoDocumento"
                     descripcion="tipoadjunto"
                     idElemento="idtipoadjunto"
-                    datos={datos?.tiposDeDocumentos} // TODO: descomentar
+                    datos={tiposDeDocumentos}
                     className="col-md-4 mb-2"
                   />
 

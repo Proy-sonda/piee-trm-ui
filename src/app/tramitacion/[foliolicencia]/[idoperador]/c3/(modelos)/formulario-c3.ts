@@ -3,7 +3,7 @@ import { DesgloseDeHaberes } from './desglose-de-haberes';
 
 export interface FormularioC3 {
   tipoDocumento: string;
-  remuneracionImponiblePrevisional: string;
+  remuneracionImponiblePrevisional: number;
   porcentajeDesahucio: number;
   remuneraciones: Remuneracion[];
   remuneracionesMaternidad: Remuneracion[];
