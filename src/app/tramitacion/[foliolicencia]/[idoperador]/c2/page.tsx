@@ -268,7 +268,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 />
 
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2 position-relative">
-                  <label>Institución Previsional (*)</label>
+                  <label className="mb-2">Institución Previsional (*)</label>
                   <select
                     {...formulario.register('previsional', {
                       validate: {
