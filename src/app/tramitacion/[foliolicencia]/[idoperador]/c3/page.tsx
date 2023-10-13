@@ -1,7 +1,7 @@
 'use client';
 import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
-import { emptyFetch, useFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { capitalizar } from '@/utilidades';
 import { format, subMonths } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
@@ -56,17 +56,22 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     { label: 'LME Anteriores', num: 4, active: false },
   ];
 
-  const [errorZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
+  const [errZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
 
-  const [erroresCombos, [tiposDeDocumentos, tiposPrevisiones], cargandoCombos] = useMergeFetchArray(
-    [
-      BuscarTipoDocumento(),
-      zona2
-        ? buscarEntidadPrevisional(zona2.entidadprevisional.codigoregimenprevisional)
-        : emptyFetch(),
-    ],
+  const [errTipoDocumentos, tiposDeDocumentos, cargandoTipoDocumentos] = useFetch(
+    BuscarTipoDocumento(),
+  );
+
+  const [errPrevision, tiposPrevisiones, cargandoPrevision] = useFetch(
+    zona2
+      ? buscarEntidadPrevisional(zona2.entidadprevisional.codigoregimenprevisional)
+      : emptyFetch(),
     [zona2],
   );
+
+  const [hayErrores, setHayErrores] = useState(false);
+
+  const [cargando, setCargando] = useState(true);
 
   const router = useRouter();
 
@@ -76,10 +81,6 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   });
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
-
-  const [hayErrores, setHayErrores] = useState(false);
-
-  const [cargando, setCargando] = useState(true);
 
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
@@ -111,7 +112,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   // Determina si hay algun error en la pagina
   useEffect(() => {
-    if (erroresCombos.length > 0 || errorZona2) {
+    const errores = [errZona2, errPrevision, errTipoDocumentos];
+    if (errores.some((err) => err !== undefined)) {
       setHayErrores(true);
       return;
     }
@@ -122,12 +124,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     }
 
     setHayErrores(false);
-  }, [errorZona2, zona2, cargandoZona2, erroresCombos]);
+  }, [errZona2, errPrevision, errTipoDocumentos, zona2, cargandoZona2]);
 
   // Unifica todas las posibles cargas de datos
   useEffect(() => {
-    setCargando(cargandoZona2 || cargandoCombos);
-  }, [cargandoZona2, cargandoCombos]);
+    setCargando(cargandoZona2 || cargandoTipoDocumentos || cargandoPrevision);
+  }, [cargandoZona2, cargandoPrevision]);
 
   // Agregar las filas de remuneraciones
   useEffect(() => {
@@ -357,22 +359,24 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           <IfContainer show={!cargando && hayErrores}>
             <Row className="pt-5 pb-1">
               <Col xs={12}>
-                <h1 className="fs-3 text-center">Error al cargar el paso 3</h1>
+                <h1 className="fs-3 text-center">Error</h1>
 
-                <IfContainer show={!zona2 && !errorZona2}>
+                <IfContainer show={!zona2 && !errZona2}>
                   <p className="text-center">
-                    Debe completar el paso 2 antes de poder continuar con el paso 3
+                    Debe completar el paso 2 antes de poder continuar con el paso 3.
                   </p>
                 </IfContainer>
 
-                <IfContainer show={erroresCombos.length > 0}>
-                  <p className="text-center">Hubo un error al cargar los combos del paso 3</p>
+                <IfContainer show={errPrevision || errTipoDocumentos}>
+                  <p className="text-center">
+                    Hubo un error al cargar los datos. Por favor intente más tarde.
+                  </p>
                 </IfContainer>
               </Col>
             </Row>
           </IfContainer>
 
-          <IfContainer show={!cargandoCombos && !cargandoZona2 && !hayErrores}>
+          <IfContainer show={!cargandoPrevision && !cargandoZona2 && !hayErrores}>
             <FormProvider {...formulario}>
               <Form onSubmit={formulario.handleSubmit(onSubmitForm)}>
                 <Cabecera
