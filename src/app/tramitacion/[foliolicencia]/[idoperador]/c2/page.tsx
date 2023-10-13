@@ -102,7 +102,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         ),
         codigoregimenprevisional: Number(formulario.getValues('regimen')),
         letraentidadprevisional:
-          formulario.getValues('previsional').length > 2
+          formulario.getValues('regimen') == 2
+            ? '-'
+            : formulario.getValues('previsional').length > 2
             ? formulario.getValues('previsional').toString().substring(2, 3)
             : formulario.getValues('previsional').substring(1, 2),
       },
@@ -131,6 +133,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       const buscarInstitucion = async () => {
         const [data] = await buscarEntidadPrevisional(regimenPrevisional);
         setentidadPrevisional(await data());
+        console.log(await data());
       };
       buscarInstitucion();
     } else {
@@ -190,7 +193,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
   useEffect(() => {
     setspinner(true);
-    console.log(combos?.LMEEXISTEZONA2);
     if (combos?.LMEEXISTEZONA2 !== undefined) {
       formulario.setValue(
         'regimen',
