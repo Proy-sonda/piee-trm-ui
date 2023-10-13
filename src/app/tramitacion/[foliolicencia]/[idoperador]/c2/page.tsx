@@ -190,6 +190,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
   useEffect(() => {
     setspinner(true);
+    console.log(combos?.LMEEXISTEZONA2);
     if (combos?.LMEEXISTEZONA2 !== undefined) {
       formulario.setValue(
         'regimen',
@@ -233,6 +234,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
       formulario.setValue('nombreentidadpagadorasubsidio', combos!?.LMEEXISTEZONA2.nombrepagador);
     }
+
+    setTimeout(() => {
+      setspinner(false);
+    }, 2000);
   }, [combos?.LMEEXISTEZONA2]);
 
   return (

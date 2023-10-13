@@ -123,13 +123,19 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
   useEffect(() => {
     if (licencia == undefined) return;
+    setrunEmpleador(
+      licencia!?.LMETRM.find(({ foliolicencia }) => foliolicencia == folio)!?.rutempleador,
+    );
     setlicenciaTramite(licencia.LMETRM.find(({ foliolicencia }) => foliolicencia == folio));
+    formulario.setValue(
+      'run',
+      licencia!?.LMETRM.find(({ foliolicencia }) => foliolicencia == folio)!?.rutempleador,
+    );
   }, [licencia]);
 
   useEffect(() => {
     if (licencia!?.LMETRM == undefined) return;
-    formulario.setValue('run', licencia.LMEEXIS!?.rutempleador);
-    setrunEmpleador(licencia.LMEEXIS!?.rutempleador);
+
     formulario.setValue(
       'fechaemision',
       format(
@@ -195,7 +201,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   const GuardarZ0Z1 = async () => {
     let respuesta = false;
 
-    if (licencia?.LMEZONAC2.codigoseguroafc == 1 && formulario.getValues('ocupacion') == '18') {
+    if (
+      licencia?.LMEZONAC2 !== undefined &&
+      licencia?.LMEZONAC2.codigoseguroafc == 1 &&
+      formulario.getValues('ocupacion') == '18'
+    ) {
       return Swal.fire({
         icon: 'info',
         html: '<b>Persona trabajadora de casa particular</b> no puede pertenecer a AFC, favor verificar <b>"Previsión persona trabajadora"</b>',
