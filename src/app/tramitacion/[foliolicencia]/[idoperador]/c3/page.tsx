@@ -27,6 +27,7 @@ import {
   limpiarRemuneracion,
   remuneracionTieneAlgunCampoValido,
 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
+import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { esTrabajadorIndependiente } from '../c2/(modelos)/licencia-c2';
 import { buscarEntidadPrevisional } from '../c2/(servicios)/buscar-entidad-previsional';
@@ -46,6 +47,8 @@ interface C3PageProps {
 }
 
 const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }) => {
+  const idOperadorNumber = parseInt(idoperador);
+
   const step = [
     { label: 'Entidad Empleadora/Independiente', num: 1, active: false },
     { label: 'Previsión persona trabajadora', num: 2, active: false },
@@ -53,9 +56,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     { label: 'LME Anteriores', num: 4, active: false },
   ];
 
-  const [errorZona2, zona2, cargandoZona2] = useFetch(
-    buscarZona2(foliolicencia, parseInt(idoperador)),
-  );
+  const [errorZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
 
   const [erroresCombos, [tiposDeDocumentos, tiposPrevisiones], cargandoCombos] = useMergeFetchArray(
     [
@@ -318,8 +319,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   return (
     <>
-      {/* No meter este modal dentro del FormProvider para que no se mezclen los formularios del
-       * modal y la pagina */}
+      <IfContainer show={mostrarSpinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
+
       <ModalDesgloseDeHaberes
         datos={datosModalDesglose}
         onCerrar={limpiarModalDesglose}
@@ -329,8 +332,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
       <div className="bgads">
         <div className="mx-3 mx-lg-5 pb-4">
-          <IfContainer show={cargando || mostrarSpinner}>
-            <SpinnerPantallaCompleta />
+          <IfContainer show={cargando}>
+            <LoadingSpinner titulo="Cargando información" />
           </IfContainer>
 
           <IfContainer show={!cargando && hayErrores}>
