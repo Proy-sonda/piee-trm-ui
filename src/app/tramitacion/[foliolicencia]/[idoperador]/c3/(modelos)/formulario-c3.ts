@@ -11,7 +11,12 @@ export interface FormularioC3 {
 }
 
 export interface Remuneracion {
-  prevision: number;
+  /**
+   * El "ID" de la entidad previsional llenada con la función {@link idEntidadPrevisional} y que
+   * luego deberia ser parseada con la funcion {@link parsearIdEntidadPrevisional}. Ambas funciones
+   * en el modelo de la entidad previsional.
+   */
+  prevision: string;
   periodoRenta: Date;
   dias: number;
   montoImponible: number;
@@ -29,7 +34,7 @@ export const tieneDesglose = (
 
 export const estaRemuneracionCompleta = (fila: Remuneracion) => {
   return (
-    !isNaN(fila.prevision) &&
+    fila.prevision !== '' &&
     !esFechaInvalida(fila.periodoRenta) &&
     !isNaN(fila.dias) &&
     !isNaN(fila.montoImponible)
@@ -38,7 +43,7 @@ export const estaRemuneracionCompleta = (fila: Remuneracion) => {
 
 export const remuneracionTieneAlgunCampoValido = (fila: Remuneracion) => {
   return (
-    !isNaN(fila.prevision) ||
+    fila.prevision !== '' ||
     !esFechaInvalida(fila.periodoRenta) ||
     !isNaN(fila.dias) ||
     !isNaN(fila.montoImponible) ||
@@ -52,7 +57,6 @@ export const remuneracionTieneAlgunCampoValido = (fila: Remuneracion) => {
 export const limpiarRemuneracion = (remuneracion: Remuneracion): Remuneracion => {
   return {
     ...remuneracion,
-    prevision: isNaN(remuneracion.prevision) ? 0 : remuneracion.prevision,
     dias: isNaN(remuneracion.dias) ? 0 : remuneracion.dias,
     montoImponible: isNaN(remuneracion.montoImponible) ? 0 : remuneracion.montoImponible,
     totalRemuneracion: isNaN(remuneracion.totalRemuneracion) ? 0 : remuneracion.totalRemuneracion,

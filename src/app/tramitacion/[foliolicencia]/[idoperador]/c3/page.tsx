@@ -29,6 +29,10 @@ import {
 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import {
+  crearIdEntidadPrevisional,
+  glosaCompletaEntidadPrevisional,
+} from '../c2/(modelos)/entidad-previsional';
 import { esTrabajadorIndependiente } from '../c2/(modelos)/licencia-c2';
 import { buscarEntidadPrevisional } from '../c2/(servicios)/buscar-entidad-previsional';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
@@ -435,8 +439,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                                 opcional={index !== 0}
                                 name={`remuneraciones.${index}.prevision`}
                                 datos={tiposPrevisiones}
-                                idElemento="codigoentidadprevisional"
-                                descripcion="glosa"
+                                idElemento={crearIdEntidadPrevisional}
+                                descripcion={glosaCompletaEntidadPrevisional}
+                                tipoValor="string"
                                 unirConFieldArray={{
                                   index,
                                   campo: 'prevision',
@@ -640,8 +645,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                                   opcional
                                   name={`remuneracionesMaternidad.${index}.prevision`}
                                   datos={tiposPrevisiones}
-                                  idElemento="codigoentidadprevisional"
-                                  descripcion="glosa"
+                                  idElemento={crearIdEntidadPrevisional}
+                                  descripcion={glosaCompletaEntidadPrevisional}
+                                  tipoValor="string"
                                   unirConFieldArray={{
                                     index,
                                     campo: 'prevision',

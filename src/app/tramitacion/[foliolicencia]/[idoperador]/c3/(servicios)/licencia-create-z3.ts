@@ -4,6 +4,7 @@ import { runFetchConThrow } from '@/servicios/fetch';
 import { format } from 'date-fns';
 import { DesgloseDeHaberes, obtenerGlosaDesglosaHaberes } from '../(modelos)/desglose-de-haberes';
 import { FormularioC3, Remuneracion } from '../(modelos)/formulario-c3';
+import { parsearIdEntidadPrevisional } from '../../c2/(modelos)/entidad-previsional';
 
 export type LicenciaCrearZ3Request = FormularioC3 & {
   folioLicencia: string;
@@ -36,12 +37,10 @@ export const crearLicenciaZ3 = (request: LicenciaCrearZ3Request) => {
 };
 
 /** @param tipoRenta 0 = normal, 1 = maternal */
-function convertirRemuneracion(tipoRenta: 0 | 1) {
+function convertirRemuneracion(tipoRenta: number) {
   return (remuneracion: Remuneracion) => {
-    const haberes = Object.entries(remuneracion.desgloseHaberes) as [
-      keyof DesgloseDeHaberes,
-      number,
-    ][];
+    const haberes = Object.entries(remuneracion.desgloseHaberes);
+    const idParseada = parsearIdEntidadPrevisional(remuneracion.prevision);
 
     return {
       tiporenta: tipoRenta,
@@ -51,11 +50,13 @@ function convertirRemuneracion(tipoRenta: 0 | 1) {
       totalrem: remuneracion.totalRemuneracion,
       montoincapacidad: remuneracion.montoIncapacidad,
       ndiasincapacidad: remuneracion.diasIncapacidad,
-      prevision: {
-        idprevision: remuneracion.prevision,
+      entidadprevisional: {
+        codigoentidadprevisional: idParseada.codigoentidadprevisional,
+        codigoregimenprevisional: idParseada.codigoregimenprevisional,
+        letraentidadprevisional: idParseada.letraentidadprevisional,
       },
       licenciazc3haberes: haberes.map(([key, value]) => ({
-        tipohaber: obtenerGlosaDesglosaHaberes(key),
+        tipohaber: obtenerGlosaDesglosaHaberes(key as keyof DesgloseDeHaberes),
         montohaber: value,
       })),
     };
