@@ -5,7 +5,7 @@ interface Data {
   label: string;
   num: number;
   active: boolean;
-  url: string;
+  url?: string;
   disabled?: boolean;
 }
 

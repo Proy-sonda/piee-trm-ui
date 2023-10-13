@@ -27,10 +27,10 @@ interface PasoC4Props {
 
 const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
   const step = [
-    { label: 'Entidad Empleadora/Independiente', num: 1, active: false, url: '/adscripcion' },
-    { label: 'Previsión persona trabajadora', num: 2, active: false, url: '/adscripcion/pasodos' },
-    { label: 'Renta y/o subsidios', num: 3, active: false, url: '/adscripcion/pasodos' },
-    { label: 'LME Anteriores', num: 4, active: true, url: '/adscripcion/pasodos' },
+    { label: 'Entidad Empleadora/Independiente', num: 1, active: false },
+    { label: 'Previsión persona trabajadora', num: 2, active: false },
+    { label: 'Renta y/o subsidios', num: 3, active: false },
+    { label: 'LME Anteriores', num: 4, active: true },
   ];
 
   const formulario = useForm<FormularioC4>({

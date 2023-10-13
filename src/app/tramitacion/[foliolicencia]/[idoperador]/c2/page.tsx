@@ -56,10 +56,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   });
 
   const step = [
-    { label: 'Entidad Empleadora/Independiente', num: 1, active: false, url: '/adscripcion' },
-    { label: 'Previsión persona trabajadora', num: 2, active: true, url: '/adscripcion/pasodos' },
-    { label: 'Renta y/o subsidios', num: 3, active: false, url: '/adscripcion/pasodos' },
-    { label: 'LME Anteriores', num: 4, active: false, url: '/adscripcion/pasodos' },
+    { label: 'Entidad Empleadora/Independiente', num: 1, active: false },
+    { label: 'Previsión persona trabajadora', num: 2, active: true },
+    { label: 'Renta y/o subsidios', num: 3, active: false },
+    { label: 'LME Anteriores', num: 4, active: false },
   ];
 
   const formulario = useForm<formularioApp>({ mode: 'onSubmit' });
@@ -109,8 +109,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       codigoseguroafc: Number(formulario.getValues('perteneceAFC')),
       codigoletracaja: 'AAAA',
     };
-
-    console.log(licenciac2);
 
     try {
       await crearLicenciaZ2(licenciac2);

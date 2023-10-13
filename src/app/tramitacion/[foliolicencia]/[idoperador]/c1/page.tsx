@@ -64,10 +64,10 @@ interface formularioApp {
   otro: string;
 }
 const step = [
-  { label: 'Entidad Empleadora/Independiente', num: 1, active: true, url: '/adscripcion' },
-  { label: 'Previsión persona trabajadora', num: 2, active: false, url: '/adscripcion/pasodos' },
-  { label: 'Renta y/o subsidios', num: 3, active: false, url: '/adscripcion/pasodos' },
-  { label: 'LME Anteriores', num: 4, active: false, url: '/adscripcion/pasodos' },
+  { label: 'Entidad Empleadora/Independiente', num: 1, active: true },
+  { label: 'Previsión persona trabajadora', num: 2, active: false },
+  { label: 'Renta y/o subsidios', num: 3, active: false },
+  { label: 'LME Anteriores', num: 4, active: false },
 ];
 
 const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador } }) => {
