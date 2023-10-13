@@ -12,7 +12,7 @@ interface InputDiasProps extends Omit<BaseProps, 'label'> {
   /** Número mínimo de días (default: 0) */
   minDias?: number;
 
-  /** Numero maximo de dias (default: `30`) */
+  /** Numero maximo de dias (default: `31`) */
   maxDias?: number;
 
   deshabilitado?: boolean;
@@ -59,7 +59,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
   coincideConRango,
 }) => {
   const minDiasFinal = minDias ?? 0;
-  const maxDiasFinal = maxDias ?? 30;
+  const maxDiasFinal = maxDias ?? 31;
 
   const idInput = useRandomId('dias');
 
