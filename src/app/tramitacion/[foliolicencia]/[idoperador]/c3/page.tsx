@@ -86,6 +86,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   const formulario = useForm<FormularioC3>({
     mode: 'onBlur',
     defaultValues: {
+      accion: 'siguiente',
       remuneraciones: [],
       remuneracionesMaternidad: [],
     },
@@ -143,10 +144,16 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     }
   }, [licencia, zona2]);
 
-  const pasarAPaso4: SubmitHandler<FormularioC3> = async (datos) => {
-    console.log('Yendome a paso 4...');
-    console.log(datos);
-    formulario.trigger();
+  const onSubmitForm: SubmitHandler<FormularioC3> = async (datos) => {
+    if (!(await formulario.trigger())) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Hay campos inválidos',
+        text: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+      return;
+    }
 
     if (!validarCompletitudDeFilas(datos)) {
       Swal.fire({
@@ -158,9 +165,34 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       return;
     }
 
+    const datosLimpios: FormularioC3 = {
+      ...datos,
+      porcentajeDesahucio: isNaN(datos.porcentajeDesahucio) ? 0 : datos.porcentajeDesahucio,
+      remuneracionImponiblePrevisional: isNaN(datos.remuneracionImponiblePrevisional)
+        ? 0
+        : datos.remuneracionImponiblePrevisional,
+      remuneraciones: datos.remuneraciones.filter(estaRemuneracionCompleta),
+      remuneracionesMaternidad: datos.remuneracionesMaternidad.filter(estaRemuneracionCompleta),
+    };
+
+    switch (datosLimpios.accion) {
+      case 'guardar':
+        await guardarCambios(datosLimpios);
+        break;
+      case 'siguiente':
+        await irAlPaso4(datosLimpios);
+        break;
+      default:
+        throw new Error('Accion desconocida en Paso 3');
+    }
+  };
+
+  const irAlPaso4 = async (datos: FormularioC3) => {
+    console.log('Yendome a paso 4...');
+    console.log(datos);
+
     const periodosDeclarados = datos.remuneraciones
-      .concat(esLicenciaMaternidad(licencia!) ? datos.remuneracionesMaternidad : [])
-      .filter(estaRemuneracionCompleta)
+      .concat(datos.remuneracionesMaternidad)
       .map((r) => capitalizar(format(r.periodoRenta, 'MMMM yyyy', { locale: esLocale })));
 
     const { isConfirmed } = await Swal.fire({
@@ -182,6 +214,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     }
 
     router.push(`/tramitacion/${foliolicencia}/${idoperador}/c4`);
+  };
+
+  const guardarCambios = async (datos: FormularioC3) => {
+    console.log('Guardando cambios C3...');
+    console.log(datos);
   };
 
   const validarCompletitudDeFilas = (datos: FormularioC3) => {
@@ -277,7 +314,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           <IfContainer show={!cargandocombos && !cargandoZona2 && !hayErrores}>
             <FormProvider {...formulario}>
-              <Form id="formularioC3" onSubmit={formulario.handleSubmit(pasarAPaso4)}>
+              <Form onSubmit={formulario.handleSubmit(onSubmitForm)}>
                 <Cabecera
                   foliotramitacion={foliolicencia}
                   step={step}
@@ -331,7 +368,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                           <Tr key={field.id}>
                             <Td>
                               <ComboSimple
-                                opcional={index !== 0}
+                                // opcional={index !== 0}
+                                opcional
                                 name={`remuneraciones.${index}.prevision`}
                                 datos={tiposPrevisiones}
                                 idElemento="codigoentidadprevisional"
@@ -718,10 +756,20 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                     </a>
                   </div>
                   <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                    <button className="btn btn-success">Guardar</button>
+                    <button
+                      type="submit"
+                      className="btn btn-success"
+                      {...formulario.register('accion')}
+                      onClick={() => formulario.setValue('accion', 'guardar')}>
+                      Guardar
+                    </button>
                   </div>
                   <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                    <button type="submit" form="formularioC3" className="btn btn-primary">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      {...formulario.register('accion')}
+                      onClick={() => formulario.setValue('accion', 'siguiente')}>
                       Siguiente
                     </button>
                   </div>

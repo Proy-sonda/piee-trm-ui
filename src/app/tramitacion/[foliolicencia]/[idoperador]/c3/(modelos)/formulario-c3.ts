@@ -2,6 +2,7 @@ import { esFechaInvalida } from '@/utilidades';
 import { DesgloseDeHaberes } from './desglose-de-haberes';
 
 export interface FormularioC3 {
+  accion: 'siguiente' | 'guardar';
   tipoDocumento: string;
   remuneracionImponiblePrevisional: number;
   porcentajeDesahucio: number;
