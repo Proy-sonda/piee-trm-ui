@@ -228,8 +228,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         );
         formulario.setValue(
           'previsional',
-          combos!?.LMEEXISTEZONA2.entidadprevisional.codigoentidadprevisional +
-            combos!?.LMEEXISTEZONA2.entidadprevisional.letraentidadprevisional,
+          formulario.getValues('regimen') == 1
+            ? combos!?.LMEEXISTEZONA2.entidadprevisional.codigoentidadprevisional +
+                combos!?.LMEEXISTEZONA2.entidadprevisional.letraentidadprevisional
+            : combos!?.LMEEXISTEZONA2.entidadprevisional.codigoentidadprevisional.toString(),
         );
         setspinner(false);
       }, 2000);
