@@ -32,3 +32,7 @@ interface Operador {
   idoperador: number;
   operador: string;
 }
+
+export const esTrabajadorIndependiente = (licencia: Licenciac2) => {
+  return licencia.calidadtrabajador.idcalidadtrabajador === 4;
+};
