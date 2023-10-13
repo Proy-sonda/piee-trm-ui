@@ -320,7 +320,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                           <Th>Periodo Renta</Th>
                           <Th>N° Días</Th>
                           <Th>Monto Imponible</Th>
-                          <Th>Monto Imponible Desahucio</Th>
+                          <Th>Total Remuneración</Th>
+                          <Th>Monto Incapacidad</Th>
+                          <Th>Días Incapacidad</Th>
                           <Th>Registrar Desglose de haberes</Th>
                         </Tr>
                       </Thead>
@@ -377,10 +379,32 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                             <Td>
                               <InputMonto
                                 opcional
-                                name={`remuneraciones.${index}.montoImponibleDesahucio`}
+                                name={`remuneraciones.${index}.totalRemuneracion`}
                                 unirConFieldArray={{
                                   index,
-                                  campo: 'montoImponibleDesahucio',
+                                  campo: 'totalRemuneracion',
+                                  fieldArrayName: 'remuneraciones',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputMonto
+                                opcional
+                                name={`remuneraciones.${index}.montoIncapacidad`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'montoIncapacidad',
+                                  fieldArrayName: 'remuneraciones',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputDias
+                                opcional
+                                name={`remuneraciones.${index}.diasIncapacidad`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'diasIncapacidad',
                                   fieldArrayName: 'remuneraciones',
                                 }}
                               />
@@ -501,7 +525,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                             <Th>Periodo Renta</Th>
                             <Th>N° Días</Th>
                             <Th>Monto Imponible</Th>
-                            <Th>Monto Imponible Desahucio</Th>
+                            <Th>Total Remuneración</Th>
+                            <Th>Monto Incapacidad</Th>
+                            <Th>Días Incapacidad</Th>
                             <Th>Registrar Desglose de haberes</Th>
                           </Tr>
                         </Thead>
@@ -558,10 +584,32 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                               <Td>
                                 <InputMonto
                                   opcional
-                                  name={`remuneracionesMaternidad.${index}.montoImponibleDesahucio`}
+                                  name={`remuneracionesMaternidad.${index}.totalRemuneracion`}
                                   unirConFieldArray={{
                                     index,
-                                    campo: 'montoImponibleDesahucio',
+                                    campo: 'totalRemuneracion',
+                                    fieldArrayName: 'remuneracionesMaternidad',
+                                  }}
+                                />
+                              </Td>
+                              <Td>
+                                <InputMonto
+                                  opcional
+                                  name={`remuneracionesMaternidad.${index}.montoIncapacidad`}
+                                  unirConFieldArray={{
+                                    index,
+                                    campo: 'montoIncapacidad',
+                                    fieldArrayName: 'remuneracionesMaternidad',
+                                  }}
+                                />
+                              </Td>
+                              <Td>
+                                <InputDias
+                                  opcional
+                                  name={`remuneracionesMaternidad.${index}.diasIncapacidad`}
+                                  unirConFieldArray={{
+                                    index,
+                                    campo: 'diasIncapacidad',
                                     fieldArrayName: 'remuneracionesMaternidad',
                                   }}
                                 />

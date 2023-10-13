@@ -14,7 +14,9 @@ export interface Remuneracion {
   periodoRenta: Date;
   dias: number;
   montoImponible: number;
-  montoImponibleDesahucio: number;
+  totalRemuneracion: number;
+  montoIncapacidad: number;
+  diasIncapacidad: number;
   desgloseHaberes: DesgloseDeHaberes | Record<string, never>;
 }
 
@@ -39,7 +41,9 @@ export const remuneracionTieneAlgunCampoValido = (fila: Remuneracion) => {
     !esFechaInvalida(fila.periodoRenta) ||
     !isNaN(fila.dias) ||
     !isNaN(fila.montoImponible) ||
-    !isNaN(fila.montoImponibleDesahucio) ||
+    !isNaN(fila.totalRemuneracion) ||
+    !isNaN(fila.montoIncapacidad) ||
+    !isNaN(fila.diasIncapacidad) ||
     tieneDesglose(fila.desgloseHaberes)
   );
 };
