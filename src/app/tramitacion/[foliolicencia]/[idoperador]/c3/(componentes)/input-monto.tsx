@@ -80,7 +80,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
         <Form.Control
-          type="text"
+          type="number"
           inputMode="numeric"
           isInvalid={tieneError()}
           {...register(name, {
@@ -98,12 +98,14 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
               message: `No puede ser mayor a $${montoMaximoFinal.toLocaleString()}`,
             },
             onChange: (event: any) => {
-              const regex = /[^0-9]/g; // solo números postivos
+              const regex = /[^0-9-]/g; // Solo numeros enteros
               let montoImponible = event.target.value as string;
 
               if (regex.test(montoImponible)) {
                 montoImponible = montoImponible.replaceAll(regex, '');
-                setValue(name, montoImponible, { shouldValidate: true });
+                setValue(name, montoImponible === '' ? undefined : parseInt(montoImponible), {
+                  shouldValidate: true,
+                });
               }
             },
           })}

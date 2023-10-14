@@ -14,10 +14,10 @@ interface ComboSimpleProps<T> extends Omit<BaseProps, 'label'> {
    * Propiedad de un elemento de los datos para usar en las propiedades `key` y `value` del tag
    * `<option>`.
    */
-  idElemento: keyof T;
+  idElemento: keyof T | ((elemento: T) => number | string);
 
   /** Propiedad de un elemento de los datos para usar como texto de tag `<option />` */
-  descripcion: keyof T;
+  descripcion: keyof T | ((elemento: T) => string);
 
   /** Texto para incluir como la opción nula (default: `'Seleccionar'`). */
   textoOpcionPorDefecto?: string;
@@ -104,6 +104,14 @@ export const ComboSimple = <T extends Record<string, any>>({
     return (errors[fieldArrayName] as any)?.at?.(index)?.[campo]?.message?.toString();
   };
 
+  const calcularId = (x: T) => {
+    return typeof idElemento === 'function' ? idElemento(x) : (x[idElemento] as any);
+  };
+
+  const calcularDescripcion = (x: T) => {
+    return typeof descripcion === 'function' ? descripcion(x) : (x[descripcion] as any);
+  };
+
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
@@ -140,8 +148,8 @@ export const ComboSimple = <T extends Record<string, any>>({
           })}>
           <option value={''}>{textoOpcionPorDefecto ?? 'Seleccionar'}</option>
           {(datos ?? []).map((dato) => (
-            <option key={dato[idElemento] as any} value={dato[idElemento] as any}>
-              {dato[descripcion] as any}
+            <option key={calcularId(dato)} value={calcularId(dato)}>
+              {calcularDescripcion(dato)}
             </option>
           ))}
         </Form.Select>
