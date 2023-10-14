@@ -23,7 +23,7 @@ export interface RentaC3 {
   periodo: string;
   dias: number;
   montoImponible: number;
-  totalRemuneraciones: number;
+  totalRemuneracion: number;
   montoIncapacidad: number;
   diasIncapacidad: number;
 

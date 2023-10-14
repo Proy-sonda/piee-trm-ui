@@ -56,7 +56,7 @@ function parsearRenta(renta: RentaAPI): RentaC3 {
     montoImponible: renta.montoimponible,
     montoIncapacidad: renta.montoincapacidad,
     diasIncapacidad: renta.ndiasincapacidad,
-    totalRemuneraciones: renta.totalrem,
+    totalRemuneracion: renta.totalrem,
     dias: renta.nrodias,
     tipoRenta: renta.tiporenta as 0 | 1,
     desgloseHaberes: desgloseFromGlosas(renta.licenciazc3haberes),

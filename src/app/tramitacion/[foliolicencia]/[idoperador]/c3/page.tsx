@@ -161,7 +161,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
             periodoRenta: renta.periodo as any,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
-            totalRemuneracion: renta.totalRemuneraciones,
+            totalRemuneracion: renta.totalRemuneracion,
             montoIncapacidad: renta.montoIncapacidad,
             diasIncapacidad: renta.diasIncapacidad,
             desgloseHaberes: renta.desgloseHaberes,
@@ -187,7 +187,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
             periodoRenta: renta.periodo as any,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
-            totalRemuneracion: renta.totalRemuneraciones,
+            totalRemuneracion: renta.totalRemuneracion,
             montoIncapacidad: renta.montoIncapacidad,
             diasIncapacidad: renta.diasIncapacidad,
             desgloseHaberes: renta.desgloseHaberes,
@@ -251,8 +251,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
     const datosLimpios: FormularioC3 = {
       ...datos,
-      porcentajeDesahucio:
-        (datos.porcentajeDesahucio as any) === '' ? 0 : datos.porcentajeDesahucio,
+      porcentajeDesahucio: isNaN(datos.porcentajeDesahucio) ? 0 : datos.porcentajeDesahucio,
       remuneracionImponiblePrevisional: isNaN(datos.remuneracionImponiblePrevisional)
         ? 0
         : datos.remuneracionImponiblePrevisional,
@@ -642,8 +641,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                     <FormGroup controlId={'porcentajeDesahucio'} className="position-relative">
                       <Form.Control
                         type="number"
+                        step={0.02}
                         isInvalid={!!formulario.formState.errors.porcentajeDesahucio}
                         {...formulario.register('porcentajeDesahucio', {
+                          valueAsNumber: true,
                           min: {
                             value: 0,
                             message: 'No puede ser menor a 0%',
