@@ -29,6 +29,7 @@ import {
 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import {
   crearIdEntidadPrevisional,
   glosaCompletaEntidadPrevisional,
@@ -61,9 +62,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     { label: 'LME Anteriores', num: 4, active: false },
   ];
 
+  const [refresh, refrescarZona3] = useRefrescarPagina();
+
   const [errZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
 
-  const [errZona3, zona3, cargandoZona3] = useFetch(buscarZona3(foliolicencia, idOperadorNumber));
+  const [errZona3, zona3, cargandoZona3] = useFetch(buscarZona3(foliolicencia, idOperadorNumber), [
+    refresh,
+  ]);
 
   const [errTipoDocumentos, tiposDeDocumentos, cargandoTipoDocumentos] = useFetch(
     BuscarTipoDocumento(),
@@ -228,6 +233,60 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     }
   }, [licencia, zona2, zona3]);
 
+  // Refresca los valores de la zona 3
+  useEffect(() => {
+    if (!zona3 || !licencia) {
+      return;
+    }
+
+    if (remuneraciones.fields.length > 0) {
+      // Parchar lo que venga desde la API
+      for (let index = 0; index < zona3.rentas.length; index++) {
+        const renta = zona3.rentas[index];
+
+        formulario.setValue(`remuneraciones.${index}.prevision`, renta.idPrevision);
+        formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo as any);
+        formulario.setValue(`remuneraciones.${index}.dias`, renta.dias);
+        formulario.setValue(`remuneraciones.${index}.montoImponible`, renta.montoImponible);
+        formulario.setValue(`remuneraciones.${index}.totalRemuneracion`, renta.totalRemuneracion);
+        formulario.setValue(`remuneraciones.${index}.montoIncapacidad`, renta.montoIncapacidad);
+        formulario.setValue(`remuneraciones.${index}.diasIncapacidad`, renta.diasIncapacidad);
+        formulario.setValue(`remuneraciones.${index}.desgloseHaberes`, renta.desgloseHaberes);
+      }
+    }
+
+    // REMUNERACIONES MATERNIDAD
+    if (esLicenciaMaternidad(licencia) && remuneracionesMaternidad.fields.length > 0) {
+      for (let index = 0; index < zona3.rentasMaternidad.length; index++) {
+        const renta = zona3.rentasMaternidad[index];
+
+        formulario.setValue(`remuneracionesMaternidad.${index}.prevision`, renta.idPrevision);
+        formulario.setValue(`remuneracionesMaternidad.${index}.periodoRenta`, renta.periodo as any);
+        formulario.setValue(`remuneracionesMaternidad.${index}.dias`, renta.dias);
+        formulario.setValue(
+          `remuneracionesMaternidad.${index}.montoImponible`,
+          renta.montoImponible,
+        );
+        formulario.setValue(
+          `remuneracionesMaternidad.${index}.totalRemuneracion`,
+          renta.totalRemuneracion,
+        );
+        formulario.setValue(
+          `remuneracionesMaternidad.${index}.montoIncapacidad`,
+          renta.montoIncapacidad,
+        );
+        formulario.setValue(
+          `remuneracionesMaternidad.${index}.diasIncapacidad`,
+          renta.diasIncapacidad,
+        );
+        formulario.setValue(
+          `remuneracionesMaternidad.${index}.desgloseHaberes`,
+          renta.desgloseHaberes,
+        );
+      }
+    }
+  }, [zona3]);
+
   const onSubmitForm: SubmitHandler<FormularioC3> = async (datos) => {
     if (!(await formulario.trigger())) {
       Swal.fire({
@@ -338,6 +397,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         showConfirmButton: false,
         timer: 2000,
       });
+
+      refrescarZona3();
     } catch (error) {
       Swal.fire({
         icon: 'error',
