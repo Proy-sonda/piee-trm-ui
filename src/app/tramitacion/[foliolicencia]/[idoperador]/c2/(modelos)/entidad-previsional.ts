@@ -9,7 +9,12 @@ export interface EntidadPrevisional {
   vigente: number;
 }
 
-export const crearIdEntidadPrevisional = (x: EntidadPrevisional) => {
+type EntidadPrevisionalBasica = Pick<
+  EntidadPrevisional,
+  'codigoentidadprevisional' | 'codigoregimenprevisional' | 'letraentidadprevisional'
+>;
+
+export const crearIdEntidadPrevisional = (x: EntidadPrevisionalBasica) => {
   return `${x.codigoregimenprevisional}|${x.codigoentidadprevisional}|${x.letraentidadprevisional}`;
 };
 

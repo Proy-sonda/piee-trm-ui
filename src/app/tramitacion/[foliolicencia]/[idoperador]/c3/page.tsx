@@ -41,6 +41,7 @@ import {
   DatosModalDesgloseHaberes,
   ModalDesgloseDeHaberes,
 } from './(componentes)/modal-desglose-haberes';
+import { buscarZona3 } from './(servicios)/buscar-z3';
 import { crearLicenciaZ3 } from './(servicios)/licencia-create-z3';
 
 interface C3PageProps {
@@ -61,6 +62,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   ];
 
   const [errZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
+
+  const [errZona3, zona3, cargandoZona3] = useFetch(buscarZona3(foliolicencia, idOperadorNumber));
 
   const [errTipoDocumentos, tiposDeDocumentos, cargandoTipoDocumentos] = useFetch(
     BuscarTipoDocumento(),
@@ -116,7 +119,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   // Determina si hay algun error en la pagina
   useEffect(() => {
-    const errores = [errZona2, errPrevision, errTipoDocumentos];
+    const errores = [errZona2, errZona3, errPrevision, errTipoDocumentos];
     if (errores.some((err) => err !== undefined)) {
       setHayErrores(true);
       return;
@@ -128,39 +131,102 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     }
 
     setHayErrores(false);
-  }, [errZona2, errPrevision, errTipoDocumentos, zona2, cargandoZona2]);
+  }, [errZona2, errZona3, errPrevision, errTipoDocumentos, zona2, cargandoZona2]);
 
   // Unifica todas las posibles cargas de datos
   useEffect(() => {
-    setCargando(cargandoZona2 || cargandoTipoDocumentos || cargandoPrevision);
-  }, [cargandoZona2, cargandoPrevision]);
+    setCargando(cargandoZona2 || cargandoZona3 || cargandoTipoDocumentos || cargandoPrevision);
+  }, [cargandoZona2, cargandoZona3, cargandoPrevision]);
 
-  // Agregar las filas de remuneraciones
+  // Agregar las filas de remuneraciones (parchar o crear)
   useEffect(() => {
-    if (!licencia) {
+    if (!licencia || !zona2) {
       return;
     }
 
-    if (remuneraciones.fields.length === 0 && zona2) {
-      const fechaReferencia = new Date(licencia.fechaemision);
+    // Existe zona C3 en la base de datos
+    if (zona2 && zona3) {
+      // prettier-ignore
+      formulario.setValue('remuneracionImponiblePrevisional', zona3.remuneracionImponiblePrevisional);
+      formulario.setValue('porcentajeDesahucio', zona3.porcentajeDesahucio);
 
-      const totalPeriodos = esTrabajadorIndependiente(zona2) ? 12 : 3;
-      for (let index = 0; index < totalPeriodos; index++) {
-        const mesRenta = subMonths(fechaReferencia, index + 1);
+      // REMUNERACIONES NORMALES
+      if (remuneraciones.fields.length === 0) {
+        // Parchar lo que venga desde la API
+        for (let index = 0; index < zona3.rentas.length; index++) {
+          const renta = zona3.rentas[index];
 
-        remuneraciones.append({
-          periodoRenta: format(mesRenta, 'yyyy-MM') as any,
-          desgloseHaberes: {},
-        } as any);
+          remuneraciones.append({
+            prevision: renta.idPrevision,
+            periodoRenta: renta.periodo as any,
+            dias: renta.dias,
+            montoImponible: renta.montoImponible,
+            totalRemuneracion: renta.totalRemuneraciones,
+            montoIncapacidad: renta.montoIncapacidad,
+            diasIncapacidad: renta.diasIncapacidad,
+            desgloseHaberes: renta.desgloseHaberes,
+          });
+        }
+
+        // Rellenar las filas faltantes
+        const periodosNormalesEsperados = esTrabajadorIndependiente(zona2) ? 12 : 3;
+        let filasRestantes = periodosNormalesEsperados - zona3.rentas.length;
+        while (filasRestantes-- > 0) {
+          remuneraciones.append({ desgloseHaberes: {} } as any);
+        }
+      }
+
+      // REMUNERACIONES MATERNIDAD
+      if (esLicenciaMaternidad(licencia) && remuneracionesMaternidad.fields.length === 0) {
+        // Parchar lo que venga desde la API
+        for (let index = 0; index < zona3.rentasMaternidad.length; index++) {
+          const renta = zona3.rentasMaternidad[index];
+
+          remuneracionesMaternidad.append({
+            prevision: renta.idPrevision,
+            periodoRenta: renta.periodo as any,
+            dias: renta.dias,
+            montoImponible: renta.montoImponible,
+            totalRemuneracion: renta.totalRemuneraciones,
+            montoIncapacidad: renta.montoIncapacidad,
+            diasIncapacidad: renta.diasIncapacidad,
+            desgloseHaberes: renta.desgloseHaberes,
+          });
+        }
+
+        // Rellenar las columnas faltantes
+        const periodosMaternidadEsperados = 3;
+        let filasRestantesMaternidad = periodosMaternidadEsperados - zona3.rentasMaternidad.length;
+        while (filasRestantesMaternidad-- > 0) {
+          remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
+        }
       }
     }
 
-    if (esLicenciaMaternidad(licencia) && remuneracionesMaternidad.fields.length === 0) {
-      for (let index = 0; index < 3; index++) {
-        remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
+    // No existe zona C3 en la base de datos, colocar filas por defecto
+    if (zona2 && !zona3) {
+      if (remuneraciones.fields.length === 0) {
+        const fechaReferencia = new Date(licencia.fechaemision);
+
+        const totalPeriodos = esTrabajadorIndependiente(zona2) ? 12 : 3;
+        for (let index = 0; index < totalPeriodos; index++) {
+          const mesRenta = subMonths(fechaReferencia, index + 1);
+
+          remuneraciones.append({
+            periodoRenta: format(mesRenta, 'yyyy-MM') as any,
+            desgloseHaberes: {},
+          } as any);
+        }
+      }
+
+      if (esLicenciaMaternidad(licencia) && remuneracionesMaternidad.fields.length === 0) {
+        const periodosMaternidad = 3;
+        for (let index = 0; index < periodosMaternidad; index++) {
+          remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
+        }
       }
     }
-  }, [licencia, zona2]);
+  }, [licencia, zona2, zona3]);
 
   const onSubmitForm: SubmitHandler<FormularioC3> = async (datos) => {
     if (!(await formulario.trigger())) {

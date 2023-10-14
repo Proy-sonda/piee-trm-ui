@@ -2,14 +2,17 @@ import { DesgloseDeHaberes } from './desglose-de-haberes';
 
 export interface LicenciaC3 {
   folioLicencia: string;
-  operador: Operador;
+  operador: {
+    idOperador: number;
+    glosa: string;
+  };
   remuneracionImponiblePrevisional: number;
   porcentajeDesahucio: number;
-  rentas: Renta[];
-  rentasMaternidad: Renta[];
+  rentas: RentaC3[];
+  rentasMaternidad: RentaC3[];
 }
 
-export interface Renta {
+export interface RentaC3 {
   /**
    * - `0`: Normal
    * - `1`: Maternal
@@ -23,40 +26,12 @@ export interface Renta {
   totalRemuneraciones: number;
   montoIncapacidad: number;
   diasIncapacidad: number;
-  idPrevision: number;
+
+  /**
+   * El "ID" de la entidad previsional llenada con la función {@link idEntidadPrevisional} y que
+   * luego deberia ser parseada con la funcion {@link parsearIdEntidadPrevisional}. Ambas funciones
+   * en el modelo de la entidad previsional.
+   */
+  idPrevision: string;
   desgloseHaberes: DesgloseDeHaberes | Record<string, never>;
-}
-
-export interface LicenciaC3Api {
-  foliolicencia: string;
-  operador: Operador;
-  porcendesahucio: number;
-  montoimponible: number;
-  licenciazc3rentas: RentaApi[];
-}
-
-export interface RentaApi {
-  tiporenta: number;
-  periodorenta: number;
-  nrodias: number;
-  montoimponible: number;
-  totalrem: number;
-  montoincapacidad: number;
-  ndiasincapacidad: number;
-  prevision: Prevision;
-  licenciazc3haberes: Haberes[];
-}
-
-interface Haberes {
-  tipohaber: string;
-  montohaber: number;
-}
-
-interface Prevision {
-  idprevision: number;
-}
-
-interface Operador {
-  idoperador: number;
-  operador: string;
 }
