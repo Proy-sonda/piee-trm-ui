@@ -22,7 +22,8 @@ const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
   useEffect(() => {
-    setLicencia((licenciasTramitar ?? []).find((lic) => lic.foliolicencia === folioLicencia));
+    const x = (licenciasTramitar ?? []).find((lic) => lic.foliolicencia === folioLicencia);
+    setLicencia(x);
   }, [licenciasTramitar]);
 
   useEffect(() => {
