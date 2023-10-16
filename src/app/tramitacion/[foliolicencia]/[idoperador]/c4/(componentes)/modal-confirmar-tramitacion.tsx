@@ -374,7 +374,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                         <Th>Hasta</Th>
                       </Tr>
                     </Thead>
-                    <Tbody>
+                    <Tbody className="text-center">
                       {datos.licenciasAnteriores.map((licencia, index) => (
                         <Tr key={index}>
                           <Td>{licencia.dias}</Td>
