@@ -158,6 +158,26 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       );
     }
 
+    console.log(combos);
+
+    console.log(
+      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
+        .idtipolicencia,
+    );
+    if (
+      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
+        .idtipolicencia == 5 ||
+      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
+        .idtipolicencia == 6
+    ) {
+      setentePagador(
+        combos!?.ENTIDADPAGADORA.filter(
+          (value) => value.identidadpagadora == 'F' || value.identidadpagadora == 'H',
+        ),
+      );
+      return;
+    }
+
     setentePagador(
       combos!?.ENTIDADPAGADORA.filter((value) => {
         switch (Number(calidadtrabajador)) {
@@ -165,7 +185,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             if (
               value.identidadpagadora == 'A' ||
               value.identidadpagadora == 'B' ||
-              value.identidadpagadora == 'C'
+              value.identidadpagadora == 'C' ||
+              value.identidadpagadora == 'E' ||
+              value.identidadpagadora == 'F' ||
+              value.identidadpagadora == 'G' ||
+              value.identidadpagadora == 'H'
             ) {
             } else {
               return value;
@@ -173,12 +197,25 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
             break;
           case 2:
-            if (value.identidadpagadora !== 'B') {
+            if (
+              value.identidadpagadora !== 'B' &&
+              value.identidadpagadora !== 'E' &&
+              value.identidadpagadora !== 'F' &&
+              value.identidadpagadora !== 'G' &&
+              value.identidadpagadora !== 'H'
+            ) {
               return value;
             }
             break;
           case 3:
-            if (value.identidadpagadora === 'B' || value.identidadpagadora === 'D') {
+            if (
+              value.identidadpagadora === 'B' ||
+              value.identidadpagadora === 'D' ||
+              value.identidadpagadora == 'E' ||
+              value.identidadpagadora == 'F' ||
+              value.identidadpagadora == 'G' ||
+              value.identidadpagadora == 'H'
+            ) {
             } else {
               return value;
             }
@@ -187,14 +224,15 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             if (
               value.identidadpagadora == 'B' ||
               value.identidadpagadora == 'C' ||
-              value.identidadpagadora == 'D'
+              value.identidadpagadora == 'D' ||
+              value.identidadpagadora == 'E' ||
+              value.identidadpagadora == 'F' ||
+              value.identidadpagadora == 'G' ||
+              value.identidadpagadora == 'H'
             ) {
             } else {
               return value;
             }
-            break;
-
-          default:
             break;
         }
       }),
