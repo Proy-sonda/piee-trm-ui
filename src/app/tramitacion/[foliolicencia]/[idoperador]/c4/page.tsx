@@ -2,6 +2,7 @@
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { InputFecha } from '@/components/form';
 import IfContainer from '@/components/if-container';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
@@ -18,6 +19,8 @@ import {
   estaLicenciaAnteriorCompleta,
   licenciaAnteriorTieneCamposValidos,
 } from './(modelos)/formulario-c4';
+import { crearLicenciaZ4 } from './(servicios)/licencia-create-z4';
+import { tramitarLicenciaMedica } from './(servicios)/tramitar-licencia';
 
 interface PasoC4Props {
   params: {
@@ -27,12 +30,16 @@ interface PasoC4Props {
 }
 
 const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
+  const idOperadorNumber = parseInt(idoperador);
+
   const step = [
     { label: 'Entidad Empleadora/Independiente', num: 1, active: false },
     { label: 'Previsión persona trabajadora', num: 2, active: false },
     { label: 'Renta y/o subsidios', num: 3, active: false },
     { label: 'LME Anteriores', num: 4, active: true },
   ];
+
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   const formulario = useForm<FormularioC4>({
     mode: 'onBlur',
@@ -115,9 +122,11 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     }
   };
 
-  const abrirModalParaConfirmarTramitacion = (datos: FormularioC4) => {
-    // TODO: Guardar cambios
-    console.log('Preparando tramitacion');
+  const abrirModalParaConfirmarTramitacion = async (datos: FormularioC4) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
+    }
 
     setDatosModalConfirmarTramitacion({
       show: true,
@@ -125,8 +134,43 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     });
   };
 
-  const guardarCambios = (datos: FormularioC4) => {
-    console.log('Preparando guardado');
+  const guardarCambios = async (datos: FormularioC4) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
+    }
+
+    Swal.fire({
+      icon: 'success',
+      html: 'Cambios guardados con éxito',
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
+
+  const llamarEndpointGuardarDeCambios = async (datos: FormularioC4) => {
+    try {
+      setMostrarSpinner(true);
+
+      await crearLicenciaZ4({
+        ...datos,
+        folioLicencia: foliolicencia,
+        idOperador: idOperadorNumber,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudieron guardar los cambios',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+
+      return false;
+    } finally {
+      setMostrarSpinner(false);
+    }
+
+    return true;
   };
 
   const obtenerLicenciasInformadas = (datos: FormularioC4) => {
@@ -155,14 +199,35 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     return filasMalas.length === 0;
   };
 
-  const tramitarLaLicencia = () => {
+  const tramitarLaLicencia = async () => {
     /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
     const datos = formulario.getValues();
     const licenciasInformadas = obtenerLicenciasInformadas(datos);
     const datosLimpios = { ...datos, licenciasAnteriores: licenciasInformadas };
 
-    console.log('TRAMITANDO LICENCIA:', datosLimpios);
     cerrarModal();
+
+    try {
+      setMostrarSpinner(true);
+
+      await tramitarLicenciaMedica();
+
+      Swal.fire({
+        icon: 'success',
+        html: 'Licencia tramitada con éxito',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudieron guardar los cambios',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
   };
 
   const cerrarModal = () => {
@@ -179,17 +244,21 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
           ...datosModalConfirmarTramitacion,
           licencia,
           folioLicencia: foliolicencia,
-          idOperador: parseInt(idoperador),
+          idOperador: idOperadorNumber,
         }}
         onCerrar={cerrarModal}
         onTramitacionConfirmada={tramitarLaLicencia}
       />
 
+      <IfContainer show={mostrarSpinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
+
       <div className="bgads">
         <div className="pb-3 px-3 px-lg-5">
           <Cabecera
             foliotramitacion={foliolicencia}
-            idoperador={parseInt(idoperador)}
+            idoperador={idOperadorNumber}
             step={step}
             title="Licencias Anteriores en los Últimos 6 Meses"
             onLicenciaCargada={setLicencia}
