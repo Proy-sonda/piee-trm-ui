@@ -25,7 +25,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
 
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
-    return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.nombrefantasia ?? '';
+    return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
   };
 
   return (
