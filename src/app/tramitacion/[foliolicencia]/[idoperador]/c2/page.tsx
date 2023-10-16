@@ -153,7 +153,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
         .identidadsalud !== 1
     ) {
-      return setentePagador(combos!?.ENTIDADPAGADORA);
+      return setentePagador(
+        combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora == 'B'),
+      );
     }
 
     setentePagador(
