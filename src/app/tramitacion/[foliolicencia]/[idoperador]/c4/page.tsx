@@ -63,6 +63,12 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   // Limpiar errores al no informar licencias
   useEffect(() => {
     if (!informarLicencias) {
+      for (let index = 0; index < licenciasAnteriores.fields.length; index++) {
+        formulario.setValue(`licenciasAnteriores.${index}.dias`, undefined as any);
+        formulario.setValue(`licenciasAnteriores.${index}.desde`, undefined as any);
+        formulario.setValue(`licenciasAnteriores.${index}.hasta`, undefined as any);
+      }
+
       formulario.clearErrors();
     }
   }, [informarLicencias]);
