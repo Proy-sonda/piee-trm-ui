@@ -467,6 +467,22 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     limpiarModalDesglose();
   };
 
+  const limpiarFila = (
+    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
+    index: number,
+  ) => {
+    formulario.setValue(`${fieldArray}.${index}`, {
+      prevision: '',
+      periodoRenta: undefined,
+      desgloseHaberes: {},
+      dias: undefined,
+      diasIncapacidad: undefined,
+      montoImponible: undefined,
+      montoIncapacidad: undefined,
+      totalRemuneracion: undefined,
+    } as any);
+  };
+
   return (
     <>
       <IfContainer show={mostrarSpinner}>
@@ -555,6 +571,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                           <Th>Monto Incapacidad</Th>
                           <Th>Días Incapacidad</Th>
                           <Th>Registrar Desglose de haberes</Th>
+                          <Th> </Th>
                         </Tr>
                       </Thead>
                       <Tbody>
@@ -672,6 +689,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                                 />
                               </div>
                             </Td>
+                            <Td>
+                              <button
+                                type="button"
+                                className="btn text-danger"
+                                title="Descartar fila"
+                                onClick={() => limpiarFila('remuneraciones', index)}>
+                                <i className="bi bi-trash"></i>
+                              </button>
+                            </Td>
                           </Tr>
                         ))}
                       </Tbody>
@@ -763,6 +789,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                             <Th>Monto Incapacidad</Th>
                             <Th>Días Incapacidad</Th>
                             <Th>Registrar Desglose de haberes</Th>
+                            <Th> </Th>
                           </Tr>
                         </Thead>
                         <Tbody>
@@ -879,6 +906,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                                     }}
                                   />
                                 </div>
+                              </Td>
+                              <Td>
+                                <button
+                                  type="button"
+                                  className="btn text-danger"
+                                  title="Descartar fila"
+                                  onClick={() => limpiarFila('remuneracionesMaternidad', index)}>
+                                  <i className="bi bi-trash"></i>
+                                </button>
                               </Td>
                             </Tr>
                           ))}
