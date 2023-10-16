@@ -1,6 +1,7 @@
 import { esFechaInvalida } from '@/utilidades';
 
 export interface FormularioC4 {
+  accion: 'guardar' | 'tramitar';
   informarLicencia: boolean;
   licenciasAnteriores: LicenciaAnterior[];
 }
