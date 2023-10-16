@@ -1,4 +1,5 @@
 'use client';
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { ComboSimple, InputFecha, InputNombres, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
@@ -53,6 +54,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     ENTIDADPAGADORA: buscarEntidadPagadora(),
     LMECABECERA: buscarZona1(foliolicencia, Number(idoperador)),
     LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
+    LMETRM: buscarLicenciasParaTramitar(),
   });
 
   const step = [
@@ -133,7 +135,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       const buscarInstitucion = async () => {
         const [data] = await buscarEntidadPrevisional(regimenPrevisional);
         setentidadPrevisional(await data());
-        console.log(await data());
       };
       buscarInstitucion();
     } else {
@@ -146,6 +147,13 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     else {
       setesAFC(false);
       formulario.setValue('perteneceAFC', '0');
+    }
+
+    if (
+      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
+        .identidadsalud !== 1
+    ) {
+      return setentePagador(combos!?.ENTIDADPAGADORA);
     }
 
     setentePagador(
