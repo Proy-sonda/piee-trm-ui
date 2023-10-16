@@ -49,6 +49,7 @@ interface myprops {
   };
 }
 interface formularioApp {
+  accion: 'siguiente' | 'guardar';
   run: string;
   razon: string;
   telefono: string;
@@ -78,11 +79,15 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     day: 'numeric',
     hour12: false, // Para usar formato de 24 horas
   };
-  const formulario = useForm<formularioApp>({ mode: 'onBlur' });
+  const formulario = useForm<formularioApp>({
+    mode: 'onBlur',
+    defaultValues: {
+      accion: 'siguiente',
+    },
+  });
   const router = useRouter();
   const [fadeinOut, setfadeinOut] = useState('');
   const [runEmpleador, setrunEmpleador] = useState<string>('');
-  const [otros, setotros] = useState<Boolean>(false);
   const [licenciaTramite, setlicenciaTramite] = useState<LicenciaTramitar>();
   const [refrescar, refrescarPagina] = useRefrescarPagina();
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
@@ -93,7 +98,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     OCUPACION: buscarOcupacion(),
   });
 
-  const [errorCargaData, licencia, cargandoData] = useMergeFetchObject(
+  const [, licencia, cargandoData] = useMergeFetchObject(
     {
       LMETRM: buscarLicenciasParaTramitar(),
       LMEEXIS: buscarZona1(folio, Number(idoperador)),
@@ -109,11 +114,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   const fechaActual = () => {
     let fechaHoy = new Date().toLocaleString('es-CL', options).split('-');
     return `${fechaHoy[2]}-${fechaHoy[1]}-${fechaHoy[0]}`;
-  };
-
-  const convertirFecha = (fecha: string) => {
-    let fechaFinal = fecha.split('-');
-    return `${fechaFinal[2]}-${fechaFinal[1]}-${fechaFinal[0]}`;
   };
 
   useEffect(
@@ -301,7 +301,12 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   };
   const OnHandleSiguiente = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    router.push(`/tramitacion/${folio}/${idoperador}/c2`);
+    try {
+      await GuardarZ0Z1();
+      setTimeout(() => {
+        router.push(`/tramitacion/${folio}/${idoperador}/c2`);
+      }, 2000);
+    } catch (error) {}
   };
   return (
     <div className="bgads">

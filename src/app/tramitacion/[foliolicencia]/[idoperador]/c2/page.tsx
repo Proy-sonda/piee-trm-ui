@@ -65,7 +65,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   const formulario = useForm<formularioApp>({ mode: 'onSubmit' });
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
-    GuardarZ2();
+    await GuardarZ2();
     // if (resp) router.push(`/tramitacion/${foliolicencia}/${idoperador}/c2`);
   };
 
@@ -462,9 +462,14 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
                   <button
                     className="btn btn-primary"
-                    onClick={(e) => {
+                    onClick={async (e) => {
                       e.preventDefault();
-                      router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
+                      try {
+                        await GuardarZ2();
+                        setTimeout(() => {
+                          router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
+                        }, 2000);
+                      } catch (error) {}
                     }}>
                     Siguiente
                   </button>
