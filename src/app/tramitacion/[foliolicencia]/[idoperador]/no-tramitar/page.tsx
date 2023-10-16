@@ -1,26 +1,35 @@
 'use client';
 
-import { ComboSimple, InputArchivo, InputRadioButtons } from '@/components/form';
+import { LicenciaTramitar, esLicenciaFONASA } from '@/app/tramitacion/(modelos)/licencia-tramitar';
+import { ComboSimple, InputArchivo, InputFecha, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import Titulo from '@/components/titulo/titulo';
+import { useFetch } from '@/hooks/use-merge-fetch';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import InformacionLicencia from '../(componentes)/informacion-licencia';
+import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar-licencia';
 
 interface NoRecepcionarLicenciaPageProps {
   params: {
     foliolicencia: string;
-    idoperador: number;
+    idoperador: string;
   };
 }
 
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliolicencia, idoperador },
 }) => {
+  const idOperadorNumber = parseInt(idoperador, 10);
+
+  const [, cajasDeCompensacion] = useFetch(buscarCajasDeCompensacion());
+
+  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
+
   const formulario = useForm<FormularioNoTramitarLicencia>({
     mode: 'onBlur',
   });
@@ -36,6 +45,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   useEffect(() => {
     if (motivoRechazo !== 'relacion-laboral-terminada') {
       formulario.clearErrors('documentoAdjunto');
+      formulario.clearErrors('fechaTerminoRelacion');
     }
 
     if (motivoRechazo !== 'otro') {
@@ -54,7 +64,11 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
           </Row>
 
           <Row>
-            <InformacionLicencia folioLicencia={foliolicencia} idoperador={idoperador} />
+            <InformacionLicencia
+              folioLicencia={foliolicencia}
+              idoperador={idOperadorNumber}
+              onLicenciaCargada={setLicencia}
+            />
           </Row>
 
           <Row className="mt-2">
@@ -82,16 +96,20 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                     errores={{ obligatorio: 'Debe seleccionar el motivo para no tramitar' }}
                     opciones={[
                       {
-                        label: 'Inexistencia de Relación Laboral',
+                        label: 'Inexistencia de relación laboral',
                         value: 'inexistencia-relacion-laboral',
                       },
                       {
-                        label: 'Relación Laboral Terminada',
+                        label: 'Relación laboral terminada',
                         value: 'relacion-laboral-terminada',
                       },
                       {
-                        label: 'Persona Trabajadora con permiso sin goce de sueldo',
+                        label: 'Persona trabajadora con permiso sin goce de sueldo',
                         value: 'permiso-sin-goce-de-sueldo',
+                      },
+                      {
+                        label: 'Persona trabajadora sector público con feriado legal',
+                        value: 'trabajador-publico-feriado-legal',
                       },
                       {
                         label: 'Otras Razones',
@@ -110,8 +128,17 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                       />
                     </IfContainer>
 
+                    <IfContainer show={motivoRechazo === 'relacion-laboral-terminada'}>
+                      <InputFecha
+                        name="fechaTerminoRelacion"
+                        label="Fecha de término de relación laboral"
+                        className="mt-3"
+                      />
+                    </IfContainer>
+
                     <InputArchivo
-                      opcional={motivoRechazo !== 'relacion-laboral-terminada'}
+                      // opcional={motivoRechazo !== 'relacion-laboral-terminada'} // TODO: Descomentar cuando subir archivos sea obligatorio
+                      opcional
                       name="documentoAdjunto"
                       label="Adjuntar Documento"
                       className="mt-3"
@@ -120,17 +147,16 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 </Col>
 
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
-                  <ComboSimple
-                    name="entidadPagadoraId"
-                    label="Entidad que debe pagar subsidio o Mantener remuneración"
-                    datos={[
-                      { id: '1', descripcion: 'Entidad 1' },
-                      { id: '2', descripcion: 'Entidad 2' },
-                      { id: '3', descripcion: 'Entidad 3' },
-                    ]}
-                    idElemento="id"
-                    descripcion="descripcion"
-                  />
+                  <IfContainer show={licencia && esLicenciaFONASA(licencia)}>
+                    <ComboSimple
+                      opcional={!licencia || !esLicenciaFONASA(licencia)}
+                      name="entidadPagadoraId"
+                      label="Entidad que debe pagar subsidio o Mantener remuneración"
+                      datos={cajasDeCompensacion}
+                      idElemento="idccaf"
+                      descripcion="nombre"
+                    />
+                  </IfContainer>
                 </Col>
               </Row>
 
