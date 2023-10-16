@@ -12,8 +12,13 @@ export interface LicenciaC0 {
   estadolicencia: Estadolicencia;
   motivodevolucion: Motivodevolucion;
   estadotramitacion: Estadotramitacion;
+  entidadsalud: Entidadsalud;
 }
 
+export interface Entidadsalud {
+  identidadsalud: number;
+  nombre: string;
+}
 export interface Estadolicencia {
   idestadolicencia: number;
   estadolicencia: string;

@@ -158,12 +158,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       );
     }
 
-    console.log(combos);
-
-    console.log(
-      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
-        .idtipolicencia,
-    );
     if (
       combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
         .idtipolicencia == 5 ||
