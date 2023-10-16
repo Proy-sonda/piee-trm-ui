@@ -37,6 +37,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   const formulario = useForm<FormularioC4>({
     mode: 'onBlur',
     defaultValues: {
+      accion: 'guardar',
       informarLicencia: false,
       licenciasAnteriores: [{}, {}, {}, {}, {}, {}],
     },
@@ -73,9 +74,19 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     }
   }, [informarLicencias]);
 
-  const confirmarTramitacionDeLicencia: SubmitHandler<FormularioC4> = async (datos) => {
+  const onSubmitForm: SubmitHandler<FormularioC4> = async (datos) => {
     /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
     const licenciasInformadas = obtenerLicenciasInformadas(datos);
+
+    if (!(await formulario.trigger())) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Hay campos inválidos',
+        text: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+      return;
+    }
 
     if (!validarQueFilasEstenCompletas(datos)) {
       Swal.fire({
@@ -87,10 +98,35 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       return;
     }
 
+    const datosLimpios: FormularioC4 = {
+      ...datos,
+      licenciasAnteriores: licenciasInformadas,
+    };
+
+    switch (datosLimpios.accion) {
+      case 'guardar':
+        await guardarCambios(datosLimpios);
+        break;
+      case 'tramitar':
+        await abrirModalParaConfirmarTramitacion(datosLimpios);
+        break;
+      default:
+        throw new Error('Accion desconocida en Paso 3');
+    }
+  };
+
+  const abrirModalParaConfirmarTramitacion = (datos: FormularioC4) => {
+    // TODO: Guardar cambios
+    console.log('Preparando tramitacion');
+
     setDatosModalConfirmarTramitacion({
       show: true,
-      licenciasAnteriores: licenciasInformadas,
+      licenciasAnteriores: datos.licenciasAnteriores,
     });
+  };
+
+  const guardarCambios = (datos: FormularioC4) => {
+    console.log('Preparando guardado');
   };
 
   const obtenerLicenciasInformadas = (datos: FormularioC4) => {
@@ -189,7 +225,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
           </IfContainer>
 
           <FormProvider {...formulario}>
-            <form onSubmit={formulario.handleSubmit(confirmarTramitacionDeLicencia)}>
+            <form onSubmit={formulario.handleSubmit(onSubmitForm)}>
               <Row>
                 <Col xs={12}>
                   <Table className="table table-bordered">
@@ -261,12 +297,20 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                   </a>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button type="button" className="btn btn-success">
+                  <button
+                    type="submit"
+                    className="btn btn-success"
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'guardar')}>
                     Guardar
                   </button>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-primary" type="submit">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'tramitar')}>
                     Tramitar
                   </button>
                 </div>
