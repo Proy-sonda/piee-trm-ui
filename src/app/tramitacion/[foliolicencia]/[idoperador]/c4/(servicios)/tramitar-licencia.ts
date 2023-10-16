@@ -1,11 +1,19 @@
-export const tramitarLicenciaMedica = () => {
-  return new Promise<void>((r) => setTimeout(r, 1000));
-  // return runFetchConThrow(`${urlBackendTramitacion()}/licencia/zona4/create`, {
-  //   method: 'POST',
-  //   headers: {
-  //     Authorization: obtenerToken(),
-  //     'Content-type': 'application/json',
-  //   },
-  //   body: JSON.stringify(payload),
-  // });
+import { obtenerToken } from '@/servicios/auth';
+import { urlBackendTramitacion } from '@/servicios/environment';
+import { runFetchConThrow } from '@/servicios/fetch';
+
+export const tramitarLicenciaMedica = (folioLicencia: string, idOperador: number) => {
+  const payload = {
+    foliolicencia: folioLicencia,
+    idoperador: idOperador,
+  };
+
+  return runFetchConThrow(`${urlBackendTramitacion()}/licencia/zona0/tramitar`, {
+    method: 'POST',
+    headers: {
+      Authorization: obtenerToken(),
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
 };
