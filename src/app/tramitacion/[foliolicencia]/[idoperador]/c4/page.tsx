@@ -2,7 +2,10 @@
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { InputFecha } from '@/components/form';
 import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { useFetch } from '@/hooks/use-merge-fetch';
+import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
@@ -19,6 +22,7 @@ import {
   estaLicenciaAnteriorCompleta,
   licenciaAnteriorTieneCamposValidos,
 } from './(modelos)/formulario-c4';
+import { buscarZona4 } from './(servicios)/buscar-z4';
 import { crearLicenciaZ4 } from './(servicios)/licencia-create-z4';
 import { tramitarLicenciaMedica } from './(servicios)/tramitar-licencia';
 
@@ -68,6 +72,13 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
+  const [refresh, refrescarZona4] = useRefrescarPagina();
+
+  const [errorZona4, zona4, cargandoZona4] = useFetch(
+    buscarZona4(foliolicencia, idOperadorNumber),
+    [refresh],
+  );
+
   // Limpiar errores al no informar licencias
   useEffect(() => {
     if (!informarLicencias) {
@@ -83,18 +94,62 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   // Parchar cambios o crear filas de ser necesario
   useEffect(() => {
-    // TODO: Parchar la zona4 si es que existe
-    if (licenciasAnteriores.fields.length === 0) {
-      const numeroLicenciasAnteriores = 6;
+    const numeroLicenciasAnteriores = 6;
+
+    // Crear si no existen
+    if (!zona4 && licenciasAnteriores.fields.length === 0) {
       for (let index = 0; index < numeroLicenciasAnteriores; index++) {
         licenciasAnteriores.append({
-          desde: undefined,
           dias: undefined,
+          desde: undefined,
           hasta: undefined,
         } as any);
       }
     }
-  }, []);
+
+    // Crear si hay zona 4
+    if (zona4 && licenciasAnteriores.fields.length === 0) {
+      for (const licenciaZ4 of zona4) {
+        licenciasAnteriores.append({
+          dias: licenciaZ4.lmandias,
+          desde: licenciaZ4.lmafechadesde,
+          hasta: licenciaZ4.lmafechahasta,
+        } as any);
+      }
+
+      let filasRestantes = numeroLicenciasAnteriores - zona4.length;
+      while (filasRestantes-- > 0) {
+        licenciasAnteriores.append({
+          dias: undefined,
+          desde: undefined,
+          hasta: undefined,
+        } as any);
+      }
+
+      formulario.setValue('informarLicencia', zona4.length === 0);
+    }
+
+    // Parchar cuando las filas ya estan creadas
+    if (zona4 && licenciasAnteriores.fields.length > 0) {
+      let index = 0;
+      for (index = 0; index < zona4.length; index++) {
+        const licenciaZ4 = zona4[index];
+
+        formulario.setValue(`licenciasAnteriores.${index}.dias`, licenciaZ4.lmandias);
+        formulario.setValue(`licenciasAnteriores.${index}.desde`, licenciaZ4.lmafechadesde as any);
+        formulario.setValue(`licenciasAnteriores.${index}.hasta`, licenciaZ4.lmafechahasta as any);
+      }
+
+      // Borrar el resto de filas
+      while (index++ < numeroLicenciasAnteriores) {
+        formulario.setValue(`licenciasAnteriores.${index}.dias`, undefined as any);
+        formulario.setValue(`licenciasAnteriores.${index}.desde`, undefined as any);
+        formulario.setValue(`licenciasAnteriores.${index}.hasta`, undefined as any);
+      }
+
+      formulario.setValue('informarLicencia', zona4.length !== 0);
+    }
+  }, [zona4]);
 
   const onSubmitForm: SubmitHandler<FormularioC4> = async (datos) => {
     /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
@@ -154,6 +209,8 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     if (!guardadoExitoso) {
       return;
     }
+
+    refrescarZona4();
 
     Swal.fire({
       icon: 'success',
@@ -279,128 +336,145 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
             onLicenciaCargada={setLicencia}
           />
 
-          <Row className="mt-2 mb-3">
-            <Col xs={12}>
-              <FormGroup controlId="informarLicencias" className="ps-0">
-                <Form.Check
-                  type="checkbox"
-                  label="Informar Licencias Médicas Anteriores últimos 6 meses"
-                  {...formulario.register('informarLicencia')}
-                />
-              </FormGroup>
-            </Col>
-          </Row>
+          <IfContainer show={cargandoZona4}>
+            <LoadingSpinner titulo="Cargando información..." />
+          </IfContainer>
 
-          <IfContainer show={informarLicencias && filasIncompletas.length !== 0}>
-            <Row>
+          <IfContainer show={!cargandoZona4 && errorZona4}>
+            <Row className="pt-5 pb-1">
               <Col xs={12}>
-                <Alert variant="danger" className="d-flex align-items-center fade show">
-                  <i className="bi bi-exclamation-triangle me-2"></i>
-                  <span>
-                    Las siguientes filas están incompletas:
-                    {filasIncompletas.reduce(
-                      (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
-                      '',
-                    )}
-                  </span>
-                </Alert>
+                <h1 className="fs-3 text-center">Error</h1>
+                <p className="text-center">
+                  Hubo un error al cargar los datos. Por favor intente más tarde.
+                </p>
               </Col>
             </Row>
           </IfContainer>
 
-          <FormProvider {...formulario}>
-            <form onSubmit={formulario.handleSubmit(onSubmitForm)}>
+          <IfContainer show={!cargandoZona4 && !errorZona4}>
+            <Row className="mt-2 mb-3">
+              <Col xs={12}>
+                <FormGroup controlId="informarLicencias" className="ps-0">
+                  <Form.Check
+                    type="checkbox"
+                    label="Informar Licencias Médicas Anteriores últimos 6 meses"
+                    {...formulario.register('informarLicencia')}
+                  />
+                </FormGroup>
+              </Col>
+            </Row>
+
+            <IfContainer show={informarLicencias && filasIncompletas.length !== 0}>
               <Row>
                 <Col xs={12}>
-                  <Table className="table table-bordered">
-                    <Thead>
-                      <Tr className="align-middle">
-                        <Th>Total Días</Th>
-                        <Th>Desde</Th>
-                        <Th>Hasta</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {licenciasAnteriores.fields.map((field, index) => (
-                        <Tr key={field.id}>
-                          <Td>
-                            <InputDias
-                              opcional={!informarLicencias || (informarLicencias && index !== 0)}
-                              maxDias={184}
-                              deshabilitado={!informarLicencias}
-                              name={`licenciasAnteriores.${index}.dias`}
-                              coincideConRango={{
-                                desde: `licenciasAnteriores.${index}.desde`,
-                                hasta: `licenciasAnteriores.${index}.hasta`,
-                              }}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'dias',
-                                fieldArrayName: 'licenciasAnteriores',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <InputFecha
-                              opcional={!informarLicencias || (informarLicencias && index !== 0)}
-                              deshabilitado={!informarLicencias}
-                              name={`licenciasAnteriores.${index}.desde`}
-                              noPosteriorA={`licenciasAnteriores.${index}.hasta`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'desde',
-                                fieldArrayName: 'licenciasAnteriores',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <InputFecha
-                              opcional={!informarLicencias || (informarLicencias && index !== 0)}
-                              deshabilitado={!informarLicencias}
-                              name={`licenciasAnteriores.${index}.hasta`}
-                              noAnteriorA={`licenciasAnteriores.${index}.desde`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'hasta',
-                                fieldArrayName: 'licenciasAnteriores',
-                              }}
-                            />
-                          </Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
+                  <Alert variant="danger" className="d-flex align-items-center fade show">
+                    <i className="bi bi-exclamation-triangle me-2"></i>
+                    <span>
+                      Las siguientes filas están incompletas:
+                      {filasIncompletas.reduce(
+                        (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
+                        '',
+                      )}
+                    </span>
+                  </Alert>
                 </Col>
               </Row>
+            </IfContainer>
 
-              <div className="row">
-                <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <a className="btn btn-danger" href="/tramitacion">
-                    Tramitación
-                  </a>
+            <FormProvider {...formulario}>
+              <form onSubmit={formulario.handleSubmit(onSubmitForm)}>
+                <Row>
+                  <Col xs={12}>
+                    <Table className="table table-bordered">
+                      <Thead>
+                        <Tr className="align-middle">
+                          <Th>Total Días</Th>
+                          <Th>Desde</Th>
+                          <Th>Hasta</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {licenciasAnteriores.fields.map((field, index) => (
+                          <Tr key={field.id}>
+                            <Td>
+                              <InputDias
+                                opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                                maxDias={184}
+                                deshabilitado={!informarLicencias}
+                                name={`licenciasAnteriores.${index}.dias`}
+                                coincideConRango={{
+                                  desde: `licenciasAnteriores.${index}.desde`,
+                                  hasta: `licenciasAnteriores.${index}.hasta`,
+                                }}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'dias',
+                                  fieldArrayName: 'licenciasAnteriores',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputFecha
+                                opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                                deshabilitado={!informarLicencias}
+                                name={`licenciasAnteriores.${index}.desde`}
+                                noPosteriorA={`licenciasAnteriores.${index}.hasta`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'desde',
+                                  fieldArrayName: 'licenciasAnteriores',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputFecha
+                                opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                                deshabilitado={!informarLicencias}
+                                name={`licenciasAnteriores.${index}.hasta`}
+                                noAnteriorA={`licenciasAnteriores.${index}.desde`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'hasta',
+                                  fieldArrayName: 'licenciasAnteriores',
+                                }}
+                              />
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </Col>
+                </Row>
+
+                <div className="row">
+                  <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
+                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                    <a className="btn btn-danger" href="/tramitacion">
+                      Tramitación
+                    </a>
+                  </div>
+                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                    <button
+                      type="submit"
+                      className="btn btn-success"
+                      {...formulario.register('accion')}
+                      onClick={() => formulario.setValue('accion', 'guardar')}>
+                      Guardar
+                    </button>
+                  </div>
+                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      {...formulario.register('accion')}
+                      onClick={() => formulario.setValue('accion', 'tramitar')}>
+                      Tramitar
+                    </button>
+                  </div>
                 </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-success"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'guardar')}>
-                    Guardar
-                  </button>
-                </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'tramitar')}>
-                    Tramitar
-                  </button>
-                </div>
-              </div>
-            </form>
-          </FormProvider>
+              </form>
+            </FormProvider>
+          </IfContainer>
         </div>
       </div>
     </>
