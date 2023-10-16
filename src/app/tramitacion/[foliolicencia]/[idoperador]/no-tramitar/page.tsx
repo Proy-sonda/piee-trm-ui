@@ -3,16 +3,20 @@
 import { LicenciaTramitar, esLicenciaFONASA } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { ComboSimple, InputArchivo, InputFecha, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useFetch } from '@/hooks/use-merge-fetch';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import Swal from 'sweetalert2';
 import InformacionLicencia from '../(componentes)/informacion-licencia';
 import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar-licencia';
+import { noTamitarLicenciaMedica } from './(servicios)/no-tramitar-licencia';
 
 interface NoRecepcionarLicenciaPageProps {
   params: {
@@ -26,9 +30,13 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 }) => {
   const idOperadorNumber = parseInt(idoperador, 10);
 
+  const router = useRouter();
+
   const [, cajasDeCompensacion] = useFetch(buscarCajasDeCompensacion());
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
+
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   const formulario = useForm<FormularioNoTramitarLicencia>({
     mode: 'onBlur',
@@ -37,8 +45,33 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   const motivoRechazo = formulario.watch('motivoRechazo');
 
   const noTramitarLicencia: SubmitHandler<FormularioNoTramitarLicencia> = async (datos) => {
-    console.log('TRAMITANDO LICENCIA');
-    console.table(datos);
+    try {
+      setMostrarSpinner(true);
+
+      await noTamitarLicenciaMedica({
+        ...datos,
+        folioLicencia: foliolicencia,
+        idOperador: idOperadorNumber,
+      });
+
+      Swal.fire({
+        icon: 'success',
+        html: 'Licencia no será tramitada',
+        showConfirmButton: false,
+        timer: 2000,
+      });
+
+      router.push('/tramitacion');
+    } catch (error) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Error al no tramitar la licencia ',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
   };
 
   // Elimina errores cuando el motivo de rechazo cambia
@@ -55,6 +88,10 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   return (
     <>
+      <IfContainer show={mostrarSpinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
+
       <div className="px-2 px-lg-5 pb-4 bgads">
         <Container fluid>
           <Row>
