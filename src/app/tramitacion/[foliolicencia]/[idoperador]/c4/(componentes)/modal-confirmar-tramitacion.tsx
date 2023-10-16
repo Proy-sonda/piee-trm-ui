@@ -1,8 +1,13 @@
-import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
+import {
+  LicenciaTramitar,
+  esLicenciaMaternidad,
+} from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { emptyFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
-import { addDays, format } from 'date-fns';
+import { capitalizar } from '@/utilidades';
+import { addDays, format, parse, startOfMonth } from 'date-fns';
+import esLocale from 'date-fns/locale/es';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Modal, Row } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
@@ -10,6 +15,7 @@ import { LicenciaAnterior } from '../(modelos)/formulario-c4';
 import { buscarEmpleador } from '../../(servicios)/buscar-empleador';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
 import { buscarZona2 } from '../../c2/(servicios)/buscar-z2';
+import { buscarZona3 } from '../../c3/(servicios)/buscar-z3';
 
 interface ModalConfirmarTramitacionProps {
   datos: DatosModalConfirmarTramitacion;
@@ -30,14 +36,15 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
   onCerrar,
   onTramitacionConfirmada,
 }) => {
-  const [erroresZona, [zona0, zona1, zona2, empleador], cargandoZonas] = useMergeFetchArray([
+  const [erroresZona, [zona0, zona1, zona2, zona3, empleador], cargandoZonas] = useMergeFetchArray([
     buscarZona0(datos.folioLicencia, datos.idOperador),
     buscarZona1(datos.folioLicencia, datos.idOperador),
     buscarZona2(datos.folioLicencia, datos.idOperador),
+    buscarZona3(datos.folioLicencia, datos.idOperador),
     datos.licencia ? buscarEmpleador(datos.licencia.rutempleador) : emptyFetch(),
   ]);
 
-  const zonas = [zona0, zona1, zona2];
+  const zonas = [zona0, zona1, zona2, zona3];
 
   const [hayErrores, setHayErrores] = useState(false);
 
@@ -92,6 +99,13 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
     return formatearFecha(fechaFin.toISOString());
   };
 
+  /** Espera un periodo en formato `yyyy-MM` */
+  const obtenerPeriodoRenta = (periodoStr: string) => {
+    const periodoDate = parse(periodoStr, 'yyyy-MM', startOfMonth(new Date()));
+
+    return capitalizar(format(periodoDate, "MMMM 'de' yyyy", { locale: esLocale }));
+  };
+
   return (
     <>
       <Modal show={datos.show} size="xl" backdrop="static" centered>
@@ -113,7 +127,9 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     <p>No se han completados los datos del paso 2.</p>
                   </IfContainer>
 
-                  {/* TODO: Agregar mensaje de que no se han completado los datos del paso 3 */}
+                  <IfContainer show={!zona3}>
+                    <p>No se han completados los datos del paso 3.</p>
+                  </IfContainer>
 
                   <IfContainer show={erroresZona.length > 0}>
                     <p>
@@ -233,7 +249,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
             <Row className="mt-2">
               <Col xs={12}>
                 <Table className="table table-bordered">
-                  <Thead>
+                  <Thead className="text-center">
                     <Tr>
                       <Th>Código Provisional</Th>
                       <Th>Fecha</Th>
@@ -241,21 +257,56 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                       <Th>N° Días Subsidio Incapacidad Laboral</Th>
                     </Tr>
                   </Thead>
-                  <Tbody>
-                    <Tr>
-                      <Td>123</Td>
-                      <Td>23-03-2023</Td>
-                      <Td>$1.600.000</Td>
-                      <Td>21 Día(s)</Td>
-                    </Tr>
+                  <Tbody className="text-center">
+                    {(zona3?.rentas ?? []).map((renta, index) => (
+                      <Tr key={index}>
+                        <Td></Td>
+                        <Td>{obtenerPeriodoRenta(renta.periodo)}</Td>
+                        <Td>${renta.montoImponible.toLocaleString()}</Td>
+                        <Td>{renta.dias}</Td>
+                      </Tr>
+                    ))}
                   </Tbody>
                 </Table>
               </Col>
             </Row>
 
+            <IfContainer show={datos.licencia && esLicenciaMaternidad(datos.licencia)}>
+              <Row className="mt-3">
+                <Col xs={12}>
+                  <h3 className="fs-6 text-center">Rentas de maternidad</h3>
+                </Col>
+              </Row>
+
+              <Row className="mt-2">
+                <Col xs={12}>
+                  <Table className="table table-bordered">
+                    <Thead className="text-center">
+                      <Tr>
+                        <Th>Código Provisional</Th>
+                        <Th>Fecha</Th>
+                        <Th>Total Remuneraciones</Th>
+                        <Th>N° Días Subsidio Incapacidad Laboral</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody className="text-center">
+                      {(zona3?.rentasMaternidad ?? []).map((renta, index) => (
+                        <Tr key={index}>
+                          <Td></Td>
+                          <Td>{obtenerPeriodoRenta(renta.periodo)}</Td>
+                          <Td>${renta.montoImponible.toLocaleString()}</Td>
+                          <Td>{renta.dias}</Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </Col>
+              </Row>
+            </IfContainer>
+
             <Row className="mt-3">
               <Col xs={12}>
-                <h3 className="fs-6 text-center">Documentos</h3>
+                <h3 className="fs-6 text-center">Documentos Adjuntos</h3>
               </Col>
             </Row>
 
