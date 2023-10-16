@@ -272,17 +272,12 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   };
 
   const tramitarLaLicencia = async () => {
-    /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
-    const datos = formulario.getValues();
-    const licenciasInformadas = obtenerLicenciasInformadas(datos);
-    const datosLimpios = { ...datos, licenciasAnteriores: licenciasInformadas };
-
     cerrarModal();
 
     try {
       setMostrarSpinner(true);
 
-      await tramitarLicenciaMedica();
+      await tramitarLicenciaMedica(foliolicencia, idOperadorNumber);
 
       Swal.fire({
         icon: 'success',
@@ -294,7 +289,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'No se pudieron guardar los cambios',
+        text: 'No se pudo tramitar la licencia',
         confirmButtonColor: 'var(--color-blue)',
       });
     } finally {

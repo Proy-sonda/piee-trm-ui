@@ -317,7 +317,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
           step={step}
           title="Identificación de la Entidad Empleadora o Persona Trabajadora Independiente"
           rutEmpleador={(run) => {
-            console.log(run);
             setrunEmpleador(run);
           }}
         />
