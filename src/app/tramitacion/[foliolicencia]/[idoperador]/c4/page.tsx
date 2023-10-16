@@ -46,7 +46,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     defaultValues: {
       accion: 'guardar',
       informarLicencia: false,
-      licenciasAnteriores: [{}, {}, {}, {}, {}, {}],
+      licenciasAnteriores: [],
     },
   });
 
@@ -80,6 +80,21 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       formulario.clearErrors();
     }
   }, [informarLicencias]);
+
+  // Parchar cambios o crear filas de ser necesario
+  useEffect(() => {
+    // TODO: Parchar la zona4 si es que existe
+    if (licenciasAnteriores.fields.length === 0) {
+      const numeroLicenciasAnteriores = 6;
+      for (let index = 0; index < numeroLicenciasAnteriores; index++) {
+        licenciasAnteriores.append({
+          desde: undefined,
+          dias: undefined,
+          hasta: undefined,
+        } as any);
+      }
+    }
+  }, []);
 
   const onSubmitForm: SubmitHandler<FormularioC4> = async (datos) => {
     /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
