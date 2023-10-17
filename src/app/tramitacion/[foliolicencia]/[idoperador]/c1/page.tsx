@@ -65,14 +65,29 @@ interface formularioApp {
   ocupacion: string;
   otro: string;
 }
-const step = [
-  { label: 'Entidad Empleadora/Independiente', num: 1, active: true },
-  { label: 'Previsión persona trabajadora', num: 2, active: false },
-  { label: 'Renta y/o subsidios', num: 3, active: false },
-  { label: 'LME Anteriores', num: 4, active: false },
-];
 
 const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador } }) => {
+  const step = [
+    { label: 'Entidad Empleadora/Independiente', num: 1, active: true },
+    {
+      label: 'Previsión persona trabajadora',
+      num: 2,
+      active: false,
+      url: `/tramitacion/${folio}/${idoperador}/c2`,
+    },
+    {
+      label: 'Renta y/o subsidios',
+      num: 3,
+      active: false,
+      url: `/tramitacion/${folio}/${idoperador}/c3`,
+    },
+    {
+      label: 'LME Anteriores',
+      num: 4,
+      active: false,
+      url: `/tramitacion/${folio}/${idoperador}/c4`,
+    },
+  ];
   const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'numeric',
@@ -290,12 +305,20 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       await crearLicenciaZ0(licenciaC0);
       await crearLicenciaZ1(licenciaC1);
       respuesta = true;
-      Swal.fire({
-        icon: 'success',
-        html: 'Se ha guardado con éxito',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      switch (formulario.getValues('accion')) {
+        case 'siguiente':
+          break;
+
+        case 'guardar':
+          Swal.fire({
+            icon: 'success',
+            html: 'Se ha guardado con éxito',
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          break;
+      }
+
       return respuesta;
     } catch (error) {
       if (error instanceof ErrorCrearLicencia) {
@@ -482,7 +505,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 </IfContainer>
               </div>
               <div className="row">
-                <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
+                <div className="d-nne d-md-none col-lg-6 d-lg-inline"></div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
                   <a className="btn btn-danger" href="/tramitacion">
                     Tramitación

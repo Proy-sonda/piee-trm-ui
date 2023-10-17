@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { FC, Fragment } from 'react';
 import styles from './stepper.module.css';
 
@@ -24,9 +25,17 @@ export const Stepper: FC<Myprops> = ({ Options }) => {
               <div className={value.active ? styles.step + ' ' + styles.active : styles.step}>
                 <div className="d-flex flex-md-column align-items-center justify-content-center">
                   <div className={styles['step-circle']}>{value.num}</div>
-                  <span className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
-                    {value.label}
-                  </span>
+                  {value.url ? (
+                    <Link
+                      href={value.url || ''}
+                      className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
+                      {value.label}
+                    </Link>
+                  ) : (
+                    <span className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
+                      {value.label}
+                    </span>
+                  )}
                 </div>
               </div>
             </Fragment>
@@ -38,9 +47,17 @@ export const Stepper: FC<Myprops> = ({ Options }) => {
               <div className={value.active ? styles.step + ' ' + styles.active : styles.step}>
                 <div className="d-flex flex-md-column align-items-center justify-content-center">
                   <div className={styles['step-circle']}>{value.num}</div>
-                  <span className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
-                    {value.label}
-                  </span>
+                  {value.url ? (
+                    <Link
+                      href={value.url || ''}
+                      className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
+                      {value.label}
+                    </Link>
+                  ) : (
+                    <span className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
+                      {value.label}
+                    </span>
+                  )}
                 </div>
               </div>
               <div className={`${styles.line} d-none d-md-inline-block`}></div>

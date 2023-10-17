@@ -38,9 +38,24 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   const idOperadorNumber = parseInt(idoperador);
 
   const step = [
-    { label: 'Entidad Empleadora/Independiente', num: 1, active: false },
-    { label: 'Previsión persona trabajadora', num: 2, active: false },
-    { label: 'Renta y/o subsidios', num: 3, active: false },
+    {
+      label: 'Entidad Empleadora/Independiente',
+      num: 1,
+      active: false,
+      url: `/tramitacion/${foliolicencia}/${idoperador}/c1`,
+    },
+    {
+      label: 'Previsión persona trabajadora',
+      num: 2,
+      active: false,
+      url: `/tramitacion/${foliolicencia}/${idoperador}/c2`,
+    },
+    {
+      label: 'Renta y/o subsidios',
+      num: 3,
+      active: false,
+      url: `/tramitacion/${foliolicencia}/${idoperador}/c3`,
+    },
     { label: 'LME Anteriores', num: 4, active: true },
   ];
 
@@ -447,13 +462,21 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                 </Row>
 
                 <div className="row">
-                  <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
-                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                  <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
+                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      onClick={() => router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`)}>
+                      Anterior
+                    </button>
+                  </div>
+                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                     <a className="btn btn-danger" href="/tramitacion">
                       Tramitación
                     </a>
                   </div>
-                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                     <button
                       type="submit"
                       className="btn btn-success"
@@ -462,7 +485,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                       Guardar
                     </button>
                   </div>
-                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                     <button
                       type="submit"
                       className="btn btn-primary"

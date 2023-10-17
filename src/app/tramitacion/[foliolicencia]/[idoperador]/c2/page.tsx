@@ -60,10 +60,25 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   });
 
   const step = [
-    { label: 'Entidad Empleadora/Independiente', num: 1, active: false },
+    {
+      label: 'Entidad Empleadora/Independiente',
+      num: 1,
+      active: false,
+      url: `/tramitacion/${foliolicencia}/${idoperador}/c1`,
+    },
     { label: 'Previsión persona trabajadora', num: 2, active: true },
-    { label: 'Renta y/o subsidios', num: 3, active: false },
-    { label: 'LME Anteriores', num: 4, active: false },
+    {
+      label: 'Renta y/o subsidios',
+      num: 3,
+      active: false,
+      url: `/tramitacion/${foliolicencia}/${idoperador}/c3`,
+    },
+    {
+      label: 'LME Anteriores',
+      num: 4,
+      active: false,
+      url: `/tramitacion/${foliolicencia}/${idoperador}/c4`,
+    },
   ];
 
   const formulario = useForm<formularioApp>({
@@ -131,12 +146,19 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
     try {
       await crearLicenciaZ2(licenciac2);
-      Swal.fire({
-        html: 'Operación realizada con éxito',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      switch (formulario.getValues('accion')) {
+        case 'siguiente':
+          break;
+
+        case 'guardar':
+          Swal.fire({
+            icon: 'success',
+            html: 'Se ha guardado con éxito',
+            timer: 2000,
+            showConfirmButton: false,
+          });
+          break;
+      }
     } catch (error) {
       if (error instanceof ErrorCrearLicenciaC2)
         Swal.fire({ html: 'Ha ocurrido un problema: ' + ErrorCrearLicenciaC2, icon: 'error' });
@@ -509,13 +531,21 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 />
               </div>
               <div className="row">
-                <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
+                <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => router.push(`/tramitacion/${foliolicencia}/${idoperador}/c1`)}>
+                    Anterior
+                  </button>
+                </div>
+                <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                   <a className="btn btn-danger" href="/tramitacion">
                     Tramitación
                   </a>
                 </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                   <button
                     type="submit"
                     className="btn btn-success"
@@ -524,7 +554,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                     Guardar
                   </button>
                 </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                   <button
                     type="submit"
                     className="btn btn-primary"
