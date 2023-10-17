@@ -1,8 +1,8 @@
 export interface FormularioNoTramitarLicencia {
-  /** El ID del motivo de rechazo */
+  /** El ID del motivo de rechazo en string . */
   motivoRechazo: string;
   otroMotivoDeRechazo: string;
   fechaTerminoRelacion: Date;
-  documentoAdjunto: File[];
-  entidadPagadoraId: string;
+  documentoAdjunto: FileList;
+  entidadPagadoraId: number;
 }
