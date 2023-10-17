@@ -122,7 +122,9 @@ export const InputDias: React.FC<InputDiasProps> = ({
                 const hasta = getValues(coincideConRango.hasta);
 
                 if (!esFechaInvalida(desde) && !esFechaInvalida(hasta)) {
-                  const diasEnRango = differenceInDays(hasta, desde);
+                  /* `differenceInDays` cuenta los dias completos, el "+1" es para que considere
+                   * el mismo dia que se emite la licencia */
+                  const diasEnRango = differenceInDays(hasta, desde) + 1;
 
                   if (dias !== diasEnRango) {
                     return 'Los días no coinciden con el rango indicado';

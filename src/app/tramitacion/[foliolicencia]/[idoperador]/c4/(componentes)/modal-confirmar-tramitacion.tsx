@@ -4,7 +4,7 @@ import {
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
-import { emptyFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { emptyFetch, useFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { capitalizar } from '@/utilidades';
 import { addDays, format, parse, startOfMonth } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
@@ -14,6 +14,11 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { LicenciaAnterior } from '../(modelos)/formulario-c4';
 import { buscarEmpleador } from '../../(servicios)/buscar-empleador';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
+import {
+  crearIdEntidadPrevisional,
+  glosaCompletaEntidadPrevisional,
+} from '../../c2/(modelos)/entidad-previsional';
+import { buscarEntidadPrevisional } from '../../c2/(servicios)/buscar-entidad-previsional';
 import { buscarZona2 } from '../../c2/(servicios)/buscar-z2';
 import { buscarZona3 } from '../../c3/(servicios)/buscar-z3';
 
@@ -36,13 +41,24 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
   onCerrar,
   onTramitacionConfirmada,
 }) => {
-  const [erroresZona, [zona0, zona1, zona2, zona3, empleador], cargandoZonas] = useMergeFetchArray([
+  const [erroresZona, [zona0, zona1, zona2, zona3], cargandoZonas] = useMergeFetchArray([
     buscarZona0(datos.folioLicencia, datos.idOperador),
     buscarZona1(datos.folioLicencia, datos.idOperador),
     buscarZona2(datos.folioLicencia, datos.idOperador),
     buscarZona3(datos.folioLicencia, datos.idOperador),
-    datos.licencia ? buscarEmpleador(datos.licencia.rutempleador) : emptyFetch(),
   ]);
+
+  const [, empleador] = useFetch(
+    datos.licencia ? buscarEmpleador(datos.licencia.rutempleador) : emptyFetch(),
+    [datos.licencia],
+  );
+
+  const [, entidadesPrevisionales] = useFetch(
+    zona2
+      ? buscarEntidadPrevisional(zona2.entidadprevisional.codigoregimenprevisional)
+      : emptyFetch(),
+    [zona2],
+  );
 
   const zonas = [zona0, zona1, zona2, zona3];
 
@@ -76,9 +92,10 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
       return '';
     }
 
-    const { direccion, comuna, numero, depto } = zona1;
+    const { tipocalle, direccion, comuna, numero, depto } = zona1;
 
-    return `${direccion} ${numero} ${depto ? 'departamento ' + depto : ''}, ${comuna.nombre}`;
+    // prettier-ignore
+    return `${tipocalle.tipocalle} ${direccion} ${numero} ${depto ? 'departamento ' + depto : ''}, ${comuna.nombre}`;
   };
 
   const formatearFecha = (fechaStr?: string) => {
@@ -104,6 +121,15 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
     const periodoDate = parse(periodoStr, 'yyyy-MM', startOfMonth(new Date()));
 
     return capitalizar(format(periodoDate, "MMMM 'de' yyyy", { locale: esLocale }));
+  };
+
+  /** @param idEntidad Creada con la funcion crearIdEntidadPrevisional  */
+  const obtenerEntidadPrevisional = (idEntidad: string) => {
+    const entidad = (entidadesPrevisionales ?? []).find(
+      (e) => crearIdEntidadPrevisional(e) === idEntidad,
+    );
+
+    return !entidad ? '' : glosaCompletaEntidadPrevisional(entidad);
   };
 
   return (
@@ -166,7 +192,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                   <div className="row">
                     <div className="col-md-6">
                       <p>
-                        <b>Run Entidad Empleadora:</b> {empleador?.rutempleador}
+                        <b>Run Entidad Empleadora:</b> {datos.licencia?.rutempleador}
                       </p>
                     </div>
                     <div className="col-md-6">
@@ -251,7 +277,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                 <Table className="table table-bordered">
                   <Thead className="text-center">
                     <Tr>
-                      <Th>Código Provisional</Th>
+                      <Th>Institución Previsional</Th>
                       <Th>Fecha</Th>
                       <Th>Total Remuneraciones</Th>
                       <Th>N° Días Subsidio Incapacidad Laboral</Th>
@@ -260,7 +286,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                   <Tbody className="text-center">
                     {(zona3?.rentas ?? []).map((renta, index) => (
                       <Tr key={index}>
-                        <Td></Td>
+                        <Td>{obtenerEntidadPrevisional(renta.idPrevision)}</Td>
                         <Td>{obtenerPeriodoRenta(renta.periodo)}</Td>
                         <Td>${renta.montoImponible.toLocaleString()}</Td>
                         <Td>{renta.dias}</Td>
@@ -283,7 +309,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                   <Table className="table table-bordered">
                     <Thead className="text-center">
                       <Tr>
-                        <Th>Código Provisional</Th>
+                        <Th>Institución Previsional</Th>
                         <Th>Fecha</Th>
                         <Th>Total Remuneraciones</Th>
                         <Th>N° Días Subsidio Incapacidad Laboral</Th>
@@ -292,7 +318,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     <Tbody className="text-center">
                       {(zona3?.rentasMaternidad ?? []).map((renta, index) => (
                         <Tr key={index}>
-                          <Td></Td>
+                          <Td>{obtenerEntidadPrevisional(renta.idPrevision)}</Td>
                           <Td>{obtenerPeriodoRenta(renta.periodo)}</Td>
                           <Td>${renta.montoImponible.toLocaleString()}</Td>
                           <Td>{renta.dias}</Td>

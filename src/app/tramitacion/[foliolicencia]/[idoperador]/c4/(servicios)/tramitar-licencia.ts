@@ -8,7 +8,7 @@ export const tramitarLicenciaMedica = (folioLicencia: string, idOperador: number
     idoperador: idOperador,
   };
 
-  return runFetchConThrow(`${urlBackendTramitacion()}/licencia/zona0/tramitar`, {
+  return runFetchConThrow(`${urlBackendTramitacion()}/licencia/tramitar`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),

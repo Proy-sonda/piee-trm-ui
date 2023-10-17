@@ -6,6 +6,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
@@ -42,6 +43,8 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     { label: 'Renta y/o subsidios', num: 3, active: false },
     { label: 'LME Anteriores', num: 4, active: true },
   ];
+
+  const router = useRouter();
 
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
@@ -285,6 +288,8 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         showConfirmButton: false,
         timer: 2000,
       });
+
+      router.push('/tramitacion');
     } catch (error) {
       Swal.fire({
         icon: 'error',

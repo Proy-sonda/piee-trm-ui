@@ -690,13 +690,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                               </div>
                             </Td>
                             <Td>
-                              <button
-                                type="button"
-                                className="btn text-danger"
-                                title="Descartar fila"
-                                onClick={() => limpiarFila('remuneraciones', index)}>
-                                <i className="bi bi-trash"></i>
-                              </button>
+                              <div className="text-center align-middle">
+                                <button
+                                  type="button"
+                                  className="btn text-danger"
+                                  title="Descartar fila"
+                                  onClick={() => limpiarFila('remuneraciones', index)}>
+                                  <i className="bi bi-trash"></i>
+                                </button>
+                              </div>
                             </Td>
                           </Tr>
                         ))}
@@ -908,13 +910,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                                 </div>
                               </Td>
                               <Td>
-                                <button
-                                  type="button"
-                                  className="btn text-danger"
-                                  title="Descartar fila"
-                                  onClick={() => limpiarFila('remuneracionesMaternidad', index)}>
-                                  <i className="bi bi-trash"></i>
-                                </button>
+                                <div className="text-center align-middle">
+                                  <button
+                                    type="button"
+                                    className="btn text-danger"
+                                    title="Descartar fila"
+                                    onClick={() => limpiarFila('remuneracionesMaternidad', index)}>
+                                    <i className="bi bi-trash"></i>
+                                  </button>
+                                </div>
                               </Td>
                             </Tr>
                           ))}
