@@ -218,6 +218,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           const mesRenta = subMonths(fechaReferencia, index + 1);
 
           remuneraciones.append({
+            prevision: crearIdEntidadPrevisional(zona2.entidadprevisional),
             periodoRenta: format(mesRenta, 'yyyy-MM') as any,
             desgloseHaberes: {},
           } as any);
