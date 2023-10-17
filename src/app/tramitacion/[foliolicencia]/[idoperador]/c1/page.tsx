@@ -248,6 +248,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       operador: licenciaTramite!?.operador,
       ruttrabajador: licenciaTramite!?.runtrabajador,
       tipolicencia: licenciaTramite!?.tipolicencia,
+      fechaestado: format(new Date(licenciaTramite!?.fechaestadolicencia), 'yyyy-MM-dd'),
       nombres: licenciaTramite!?.nombres,
       apellidomaterno: licenciaTramite!?.apellidomaterno,
       apellidopaterno: licenciaTramite!?.apellidopaterno,

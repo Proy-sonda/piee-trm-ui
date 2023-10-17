@@ -34,6 +34,7 @@ export const noTamitarLicenciaMedica = async (
       tipolicencia: licencia.tipolicencia,
       estadolicencia: licencia.estadolicencia,
       motivodevolucion: licencia.motivodevolucion,
+      fechaestado: format(new Date(licencia.fechaestadolicencia), 'yyyy-MM-dd'),
       estadotramitacion: {
         idestadotramitacion: 1, // 1 = PENDIENTE
         estadotramitacion: ' ',
