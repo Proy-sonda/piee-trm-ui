@@ -1,6 +1,6 @@
 'use client';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
-import { ComboSimple, InputFecha, InputNombres, InputRadioButtons } from '@/components/form';
+import { ComboSimple, InputFecha, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -15,6 +15,7 @@ import Cabecera from '../(componentes)/cabecera';
 import { buscarCalidadTrabajador } from '../(servicios)/buscar-calidad-trabajador';
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { buscarZona1 } from '../c1/(servicios)';
+import { InputOtroMotivoDeRechazo } from '../no-tramitar/(componentes)/input-otro-motivo-rechazo';
 import { EntidadPagadora } from './(modelos)/entidad-pagadora';
 import { EntidadPrevisional } from './(modelos)/entidad-previsional';
 import { Licenciac2 } from './(modelos)/licencia-c2';
@@ -500,8 +501,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   tipoValor="string"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                 />
-                <InputNombres
+                <InputOtroMotivoDeRechazo
                   name="nombreentidadpagadorasubsidio"
+                  opcional
                   label="Nombre Entidad Pagadora Subsidio"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                 />
