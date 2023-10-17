@@ -15,6 +15,7 @@ import TablaLicenciasTramitar from './(componentes)/tabla-licencias-tramitar';
 
 import { buscarLicenciasParaTramitar } from '../tramitacion/(servicios)/buscar-licencias-para-tramitar';
 
+import Head from 'next/head';
 import { FiltroBusquedaLicencias, hayFiltros } from './(modelos)/filtro-busqueda-licencias';
 import { LicenciaTramitar } from './(modelos)/licencia-tramitar';
 
@@ -73,6 +74,9 @@ const TramitacionPage = () => {
 
   return (
     <div className="bgads">
+      <Head>
+        <title>Portal de Tramitación</title>
+      </Head>
       <Position />
 
       <IfContainer show={cargando}>

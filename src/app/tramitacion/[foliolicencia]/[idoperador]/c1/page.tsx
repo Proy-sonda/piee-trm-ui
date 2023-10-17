@@ -17,7 +17,7 @@ import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import 'animate.css';
 import { useRouter } from 'next/navigation';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Cabecera from '../(componentes)/cabecera';
 import { buscarComunas } from '../(servicios)/buscar-comunas';
@@ -195,7 +195,29 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   );
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
-    await GuardarZ0Z1();
+    if (!(await formulario.trigger())) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Hay campos inválidos',
+        text: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
+        confirmButtonColor: 'var(--color-blue)',
+      });
+      return;
+    }
+
+    switch (data.accion) {
+      case 'guardar':
+        await GuardarZ0Z1();
+        break;
+      case 'siguiente':
+        await GuardarZ0Z1();
+        setTimeout(() => {
+          router.push(`/tramitacion/${folio}/${idoperador}/c2`);
+        }, 2000);
+        break;
+      default:
+        throw new Error('Accion desconocida en Paso 3');
+    }
   };
 
   const GuardarZ0Z1 = async () => {
@@ -303,15 +325,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       }
     }
   };
-  const OnHandleSiguiente = async (e: FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    try {
-      await GuardarZ0Z1();
-      setTimeout(() => {
-        router.push(`/tramitacion/${folio}/${idoperador}/c2`);
-      }, 2000);
-    } catch (error) {}
-  };
+
   return (
     <div className="bgads">
       <div className="me-5 ms-5">
@@ -474,10 +488,20 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   </a>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-success">Guardar</button>
+                  <button
+                    type="submit"
+                    className="btn btn-success"
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'guardar')}>
+                    Guardar
+                  </button>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-primary" onClick={OnHandleSiguiente}>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'siguiente')}>
                     Siguiente
                   </button>
                 </div>

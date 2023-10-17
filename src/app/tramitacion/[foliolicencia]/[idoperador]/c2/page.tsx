@@ -1,6 +1,6 @@
 'use client';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
-import { ComboSimple, InputFecha, InputNombres, InputRadioButtons } from '@/components/form';
+import { ComboSimple, InputFecha, InputRadioButtons } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -15,6 +15,7 @@ import Cabecera from '../(componentes)/cabecera';
 import { buscarCalidadTrabajador } from '../(servicios)/buscar-calidad-trabajador';
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { buscarZona1 } from '../c1/(servicios)';
+import { InputOtroMotivoDeRechazo } from '../no-tramitar/(componentes)/input-otro-motivo-rechazo';
 import { EntidadPagadora } from './(modelos)/entidad-pagadora';
 import { EntidadPrevisional } from './(modelos)/entidad-previsional';
 import { Licenciac2 } from './(modelos)/licencia-c2';
@@ -30,6 +31,7 @@ interface myprops {
   };
 }
 interface formularioApp {
+  accion: 'siguiente' | 'guardar';
   regimen: number;
   previsional: string;
   calidad: string;
@@ -64,11 +66,25 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     { label: 'LME Anteriores', num: 4, active: false },
   ];
 
-  const formulario = useForm<formularioApp>({ mode: 'onSubmit' });
+  const formulario = useForm<formularioApp>({
+    mode: 'onSubmit',
+    defaultValues: {
+      accion: 'siguiente',
+    },
+  });
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
-    await GuardarZ2();
-    // if (resp) router.push(`/tramitacion/${foliolicencia}/${idoperador}/c2`);
+    switch (data.accion) {
+      case 'guardar':
+        await GuardarZ2();
+        break;
+      case 'siguiente':
+        await GuardarZ2();
+        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
+        break;
+      default:
+        throw new Error('Accion desconocida en Paso 3');
+    }
   };
 
   const GuardarZ2 = async () => {
@@ -485,8 +501,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   tipoValor="string"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                 />
-                <InputNombres
+                <InputOtroMotivoDeRechazo
                   name="nombreentidadpagadorasubsidio"
+                  opcional
                   label="Nombre Entidad Pagadora Subsidio"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
                 />
@@ -499,20 +516,20 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   </a>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button className="btn btn-success">Guardar</button>
+                  <button
+                    type="submit"
+                    className="btn btn-success"
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'guardar')}>
+                    Guardar
+                  </button>
                 </div>
                 <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
                   <button
+                    type="submit"
                     className="btn btn-primary"
-                    onClick={async (e) => {
-                      e.preventDefault();
-                      try {
-                        await GuardarZ2();
-                        setTimeout(() => {
-                          router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
-                        }, 2000);
-                      } catch (error) {}
-                    }}>
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'siguiente')}>
                     Siguiente
                   </button>
                 </div>
