@@ -1,3 +1,4 @@
+'use client';
 import { DatoEmpleador } from '@/modelos/dato-empleador';
 import { ReactNode, createContext, useState } from 'react';
 
