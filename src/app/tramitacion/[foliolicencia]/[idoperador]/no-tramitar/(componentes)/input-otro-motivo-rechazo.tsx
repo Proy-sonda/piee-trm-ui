@@ -19,6 +19,7 @@ export const InputOtroMotivoDeRechazo: React.FC<InputOtroMotivoDeRechazoProps> =
   const {
     register,
     formState: { errors },
+    setValue,
   } = useFormContext();
 
   return (
@@ -33,6 +34,17 @@ export const InputOtroMotivoDeRechazo: React.FC<InputOtroMotivoDeRechazoProps> =
             required: {
               value: !opcional,
               message: 'Debe especificar el motivo de rechazo',
+            },
+            maxLength: {
+              value: 80,
+              message: 'No puede tener más de 80 caracteres',
+            },
+            onBlur: (event: any) => {
+              const value = event.target.value;
+
+              if (typeof value === 'string') {
+                setValue(name, value.trim(), { shouldValidate: true });
+              }
             },
           })}
         />

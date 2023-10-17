@@ -1,12 +1,8 @@
 export interface FormularioNoTramitarLicencia {
-  motivoRechazo:
-    | 'inexistencia-relacion-laboral'
-    | 'relacion-laboral-terminada'
-    | 'permiso-sin-goce-de-sueldo'
-    | 'trabajador-publico-feriado-legal'
-    | 'otro';
+  /** El ID del motivo de rechazo en string . */
+  motivoRechazo: string;
   otroMotivoDeRechazo: string;
   fechaTerminoRelacion: Date;
-  documentoAdjunto: File[];
-  entidadPagadoraId: string;
+  documentoAdjunto: FileList;
+  entidadPagadoraId: number;
 }
