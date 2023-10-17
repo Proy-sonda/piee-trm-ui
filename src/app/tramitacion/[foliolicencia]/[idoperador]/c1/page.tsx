@@ -211,7 +211,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         break;
       case 'siguiente':
         await GuardarZ0Z1();
-        router.push(`/tramitacion/${folio}/${idoperador}/c2`);
+        setTimeout(() => {
+          router.push(`/tramitacion/${folio}/${idoperador}/c2`);
+        }, 2000);
         break;
       default:
         throw new Error('Accion desconocida en Paso 3');
