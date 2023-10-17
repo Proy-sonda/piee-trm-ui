@@ -19,7 +19,11 @@ import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rech
 import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar-licencia';
 import { esOtroMotivoDeRechazo, esRelacionLaboralTerminada } from './(modelos)/motivo-de-rechazo';
 import { buscarMotivosDeRechazo } from './(servicios)/buscar-motivos-de-rechazo';
-import { noTamitarLicenciaMedica } from './(servicios)/no-tramitar-licencia';
+import {
+  NoPuedeCrearZona0Error,
+  NoTramitarError,
+  noTamitarLicenciaMedica,
+} from './(servicios)/no-tramitar-licencia';
 
 interface NoRecepcionarLicenciaPageProps {
   params: {
@@ -51,10 +55,14 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   const motivoRechazo = formulario.watch('motivoRechazo');
 
   const noTramitarLicencia: SubmitHandler<FormularioNoTramitarLicencia> = async (datos) => {
+    if (!licencia) {
+      throw new Error('FALTA LICENCIA PARA TRAMITAR');
+    }
+
     try {
       setMostrarSpinner(true);
 
-      await noTamitarLicenciaMedica({
+      await noTamitarLicenciaMedica(licencia, {
         ...datos,
         folioLicencia: foliolicencia,
         idOperador: idOperadorNumber,
@@ -69,10 +77,20 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
       router.push('/tramitacion');
     } catch (error) {
+      let mensajeError = 'Hubo un error inesperado. Por favor intente más tarde.';
+
+      if (error instanceof NoPuedeCrearZona0Error) {
+        mensajeError = 'Error al guardar licencia';
+      }
+
+      if (error instanceof NoTramitarError) {
+        mensajeError = 'Error al no tramitar la licencia';
+      }
+
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Error al no tramitar la licencia ',
+        text: mensajeError,
         confirmButtonColor: 'var(--color-blue)',
       });
     } finally {
@@ -85,10 +103,13 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     if (esRelacionLaboralTerminada(motivoRechazo)) {
       formulario.clearErrors('documentoAdjunto');
       formulario.clearErrors('fechaTerminoRelacion');
+      formulario.setValue('otroMotivoDeRechazo', undefined as any);
+      formulario.setValue('otroMotivoDeRechazo', undefined as any);
     }
 
     if (esOtroMotivoDeRechazo(motivoRechazo)) {
       formulario.clearErrors('otroMotivoDeRechazo');
+      formulario.setValue('otroMotivoDeRechazo', '');
     }
   }, [motivoRechazo]);
 
