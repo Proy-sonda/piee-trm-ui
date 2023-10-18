@@ -205,6 +205,10 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       case 'tramitar':
         await abrirModalParaConfirmarTramitacion(datosLimpios);
         break;
+      case 'anterior':
+        await guardarCambios(datosLimpios);
+        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
+        break;
       default:
         throw new Error('Accion desconocida en Paso 3');
     }
@@ -230,12 +234,19 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
     refrescarZona4();
 
-    Swal.fire({
-      icon: 'success',
-      html: 'Cambios guardados con éxito',
-      showConfirmButton: false,
-      timer: 2000,
-    });
+    switch (datos.accion) {
+      case 'guardar':
+        Swal.fire({
+          icon: 'success',
+          html: 'Cambios guardados con éxito',
+          showConfirmButton: false,
+          timer: 2000,
+        });
+        break;
+
+      default:
+        break;
+    }
   };
 
   const llamarEndpointGuardarDeCambios = async (datos: FormularioC4) => {
@@ -465,9 +476,10 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                   <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
                   <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                     <button
-                      type="button"
+                      type="submit"
                       className="btn btn-primary"
-                      onClick={() => router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`)}>
+                      {...formulario.register('accion')}
+                      onClick={() => formulario.setValue('accion', 'anterior')}>
                       Anterior
                     </button>
                   </div>

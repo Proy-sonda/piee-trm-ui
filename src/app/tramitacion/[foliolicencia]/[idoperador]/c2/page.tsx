@@ -31,7 +31,7 @@ interface myprops {
   };
 }
 interface formularioApp {
-  accion: 'siguiente' | 'guardar';
+  accion: 'siguiente' | 'guardar' | 'anterior';
   regimen: number;
   previsional: string;
   calidad: string;
@@ -97,6 +97,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         await GuardarZ2();
         router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
         break;
+      case 'anterior':
+        await GuardarZ2();
+        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c1`);
+        break;
       default:
         throw new Error('Accion desconocida en Paso 3');
     }
@@ -149,7 +153,8 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       switch (formulario.getValues('accion')) {
         case 'siguiente':
           break;
-
+        case 'anterior':
+          break;
         case 'guardar':
           Swal.fire({
             icon: 'success',
@@ -534,9 +539,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
                 <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                   <button
-                    type="button"
+                    type="submit"
                     className="btn btn-primary"
-                    onClick={() => router.push(`/tramitacion/${foliolicencia}/${idoperador}/c1`)}>
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'anterior')}>
                     Anterior
                   </button>
                 </div>

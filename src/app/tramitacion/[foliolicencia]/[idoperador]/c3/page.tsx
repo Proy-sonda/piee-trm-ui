@@ -345,6 +345,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       case 'siguiente':
         await irAlPaso4(datosLimpios);
         break;
+      case 'anterior':
+        await guardarCambios(datosLimpios);
+        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c2`);
+        break;
+
       default:
         throw new Error('Accion desconocida en Paso 3');
     }
@@ -407,12 +412,21 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         idOperador: parseInt(idoperador),
       });
 
-      Swal.fire({
-        html: 'Cambios guardados con éxito',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      switch (datos.accion) {
+        case 'guardar':
+          Swal.fire({
+            html: 'Cambios guardados con éxito',
+            icon: 'success',
+            showConfirmButton: false,
+            timer: 2000,
+          });
+          break;
+        case 'anterior':
+          break;
+
+        default:
+          break;
+      }
 
       refrescarZona3();
     } catch (error) {
@@ -1005,9 +1019,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                   <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
                   <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
                     <button
-                      type="button"
+                      type="submit"
                       className="btn btn-primary"
-                      onClick={() => router.push(`/tramitacion/${foliolicencia}/${idoperador}/c2`)}>
+                      {...formulario.register('accion')}
+                      onClick={() => formulario.setValue('accion', 'anterior')}>
                       Anterior
                     </button>
                   </div>
