@@ -12,9 +12,10 @@ interface Data {
 
 type Myprops = {
   Options: Data[];
+  onLinkClickeado?: (link: string) => void;
 };
 
-export const Stepper: FC<Myprops> = ({ Options }) => {
+export const Stepper: FC<Myprops> = ({ Options, onLinkClickeado }) => {
   return (
     <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-center">
       {Options.map((value: Data) => {
@@ -28,6 +29,12 @@ export const Stepper: FC<Myprops> = ({ Options }) => {
                   {value.url ? (
                     <Link
                       href={value.url || ''}
+                      onClick={(event) => {
+                        if (onLinkClickeado) {
+                          event.preventDefault();
+                          onLinkClickeado(value.url ?? '');
+                        }
+                      }}
                       className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
                       {value.label}
                     </Link>
@@ -50,6 +57,12 @@ export const Stepper: FC<Myprops> = ({ Options }) => {
                   {value.url ? (
                     <Link
                       href={value.url || ''}
+                      onClick={(event) => {
+                        if (onLinkClickeado) {
+                          event.preventDefault();
+                          onLinkClickeado(value.url ?? '');
+                        }
+                      }}
                       className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
                       {value.label}
                     </Link>

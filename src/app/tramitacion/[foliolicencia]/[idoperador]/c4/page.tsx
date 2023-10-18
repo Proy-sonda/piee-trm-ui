@@ -211,7 +211,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
         break;
       case 'navegar':
-        router.push(datosLimpios.linkNavegacion);
+        await navegarOtroPasoPorStepper(datosLimpios);
         break;
       default:
         throw new Error('Accion desconocida en Paso 3');
@@ -251,6 +251,15 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       default:
         break;
     }
+  };
+
+  const navegarOtroPasoPorStepper = async (datos: FormularioC4) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
+    }
+
+    router.push(datos.linkNavegacion);
   };
 
   const llamarEndpointGuardarDeCambios = async (datos: FormularioC4) => {
