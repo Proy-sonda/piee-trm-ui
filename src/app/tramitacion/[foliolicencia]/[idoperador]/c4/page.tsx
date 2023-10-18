@@ -67,6 +67,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     mode: 'onBlur',
     defaultValues: {
       accion: 'guardar',
+      linkNavegacion: '',
       informarLicencia: false,
       licenciasAnteriores: [],
     },
@@ -208,6 +209,9 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       case 'anterior':
         await guardarCambios(datosLimpios);
         router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
+        break;
+      case 'navegar':
+        router.push(datosLimpios.linkNavegacion);
         break;
       default:
         throw new Error('Accion desconocida en Paso 3');
@@ -360,6 +364,11 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
             step={step}
             title="Licencias Anteriores en los Últimos 6 Meses"
             onLicenciaCargada={setLicencia}
+            onLinkClickeado={(link) => {
+              formulario.setValue('linkNavegacion', link);
+              formulario.setValue('accion', 'navegar');
+              formulario.handleSubmit(onSubmitForm)();
+            }}
           />
 
           <IfContainer show={cargandoZona4}>
