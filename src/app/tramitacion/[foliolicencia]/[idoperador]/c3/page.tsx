@@ -122,6 +122,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     mode: 'onBlur',
     defaultValues: {
       accion: 'siguiente',
+      linkNavegacion: '',
       remuneraciones: [],
       remuneracionesMaternidad: [],
     },
@@ -350,6 +351,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         router.push(`/tramitacion/${foliolicencia}/${idoperador}/c2`);
         break;
 
+      case 'navegar':
+        await navegarOtroPasoPorStepper(datosLimpios);
+        break;
       default:
         throw new Error('Accion desconocida en Paso 3');
     }
@@ -378,31 +382,40 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       return;
     }
 
-    try {
-      setMostrarSpinner(true);
-
-      await crearLicenciaZ3({
-        ...datos,
-        folioLicencia: foliolicencia,
-        idOperador: parseInt(idoperador),
-      });
-
-      router.push(`/tramitacion/${foliolicencia}/${idoperador}/c4`);
-    } catch (error) {
-      setMostrarSpinner(false);
-
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'No se pudieron guardar los cambios en la licencia',
-        confirmButtonColor: 'var(--color-blue)',
-      });
-    } finally {
-      setMostrarSpinner(false);
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
     }
+
+    router.push(`/tramitacion/${foliolicencia}/${idoperador}/c4`);
   };
 
   const guardarCambios = async (datos: FormularioC3) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
+    }
+
+    refrescarZona3();
+
+    Swal.fire({
+      html: 'Cambios guardados con éxito',
+      icon: 'success',
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
+
+  const navegarOtroPasoPorStepper = async (datos: FormularioC3) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
+    }
+
+    router.push(datos.linkNavegacion);
+  };
+
+  const llamarEndpointGuardarDeCambios = async (datos: FormularioC3) => {
     try {
       setMostrarSpinner(true);
 
@@ -412,21 +425,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         idOperador: parseInt(idoperador),
       });
 
-      switch (datos.accion) {
-        case 'guardar':
-          Swal.fire({
-            html: 'Cambios guardados con éxito',
-            icon: 'success',
-            showConfirmButton: false,
-            timer: 2000,
-          });
-          break;
-        case 'anterior':
-          break;
-
-        default:
-          break;
-      }
+      Swal.fire({
+        html: 'Cambios guardados con éxito',
+        icon: 'success',
+        showConfirmButton: false,
+        timer: 2000,
+      });
 
       refrescarZona3();
     } catch (error) {
@@ -436,9 +440,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         text: 'No se pudieron guardar los cambios en la licencia',
         confirmButtonColor: 'var(--color-blue)',
       });
+
+      return false;
     } finally {
       setMostrarSpinner(false);
     }
+
+    return true;
   };
 
   const validarCompletitudDeFilas = (datos: FormularioC3) => {
@@ -561,6 +569,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                   idoperador={parseInt(idoperador)}
                   title="Informe de Remuneraciones Rentas y/o Subsidios"
                   onLicenciaCargada={setLicencia}
+                  onLinkClickeado={(link) => {
+                    formulario.setValue('linkNavegacion', link);
+                    formulario.setValue('accion', 'navegar');
+                    formulario.handleSubmit(onSubmitForm)();
+                  }}
                 />
 
                 <Row className="my-3">
