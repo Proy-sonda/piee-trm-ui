@@ -49,7 +49,8 @@ interface myprops {
   };
 }
 interface formularioApp {
-  accion: 'siguiente' | 'guardar';
+  accion: 'siguiente' | 'guardar' | 'navegar';
+  linkNavegacion: string;
   run: string;
   razon: string;
   telefono: string;
@@ -98,6 +99,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     mode: 'onBlur',
     defaultValues: {
       accion: 'siguiente',
+      linkNavegacion: '',
     },
   });
   const router = useRouter();
@@ -220,15 +222,21 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       return;
     }
 
+    const guardadoExitoso = await GuardarZ0Z1();
+    if (!guardadoExitoso) {
+      return;
+    }
+
     switch (data.accion) {
       case 'guardar':
-        await GuardarZ0Z1();
         break;
       case 'siguiente':
-        await GuardarZ0Z1();
         setTimeout(() => {
           router.push(`/tramitacion/${folio}/${idoperador}/c2`);
         }, 2000);
+        break;
+      case 'navegar':
+        router.push(data.linkNavegacion);
         break;
       default:
         throw new Error('Accion desconocida en Paso 3');
@@ -243,11 +251,12 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       licencia?.LMEZONAC2.codigoseguroafc == 1 &&
       formulario.getValues('ocupacion') == '18'
     ) {
-      return Swal.fire({
+      Swal.fire({
         icon: 'info',
         html: '<b>Persona trabajadora de casa particular</b> no puede pertenecer a AFC, favor verificar <b>"Previsión persona trabajadora"</b>',
         confirmButtonColor: 'var(--color-blue)',
       });
+      return false;
     }
     let licenciaC0: LicenciaC0 = {
       estadolicencia: licenciaTramite!?.estadolicencia,
@@ -347,6 +356,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
         return respuesta;
       }
+
+      return false;
     }
   };
 
@@ -360,6 +371,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
           title="Identificación de la Entidad Empleadora o Persona Trabajadora Independiente"
           rutEmpleador={(run) => {
             setrunEmpleador(run);
+          }}
+          onLinkClickeado={(link) => {
+            formulario.setValue('linkNavegacion', link);
+            formulario.setValue('accion', 'navegar');
+            formulario.handleSubmit(onHandleSubmit)();
           }}
         />
 
