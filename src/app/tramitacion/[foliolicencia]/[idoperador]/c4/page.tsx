@@ -67,6 +67,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     mode: 'onBlur',
     defaultValues: {
       accion: 'guardar',
+      linkNavegacion: '',
       informarLicencia: false,
       licenciasAnteriores: [],
     },
@@ -206,8 +207,10 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         await abrirModalParaConfirmarTramitacion(datosLimpios);
         break;
       case 'anterior':
-        await guardarCambios(datosLimpios);
-        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
+        await irAPasoAnterior(datosLimpios);
+        break;
+      case 'navegar':
+        await navegarOtroPasoPorStepper(datosLimpios);
         break;
       default:
         throw new Error('Accion desconocida en Paso 3');
@@ -234,19 +237,30 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
     refrescarZona4();
 
-    switch (datos.accion) {
-      case 'guardar':
-        Swal.fire({
-          icon: 'success',
-          html: 'Cambios guardados con éxito',
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        break;
+    Swal.fire({
+      icon: 'success',
+      html: 'Cambios guardados con éxito',
+      showConfirmButton: false,
+      timer: 2000,
+    });
+  };
 
-      default:
-        break;
+  const navegarOtroPasoPorStepper = async (datos: FormularioC4) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
     }
+
+    router.push(datos.linkNavegacion);
+  };
+
+  const irAPasoAnterior = async (datos: FormularioC4) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
+    }
+
+    router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
   };
 
   const llamarEndpointGuardarDeCambios = async (datos: FormularioC4) => {
@@ -360,6 +374,11 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
             step={step}
             title="Licencias Anteriores en los Últimos 6 Meses"
             onLicenciaCargada={setLicencia}
+            onLinkClickeado={(link) => {
+              formulario.setValue('linkNavegacion', link);
+              formulario.setValue('accion', 'navegar');
+              formulario.handleSubmit(onSubmitForm)();
+            }}
           />
 
           <IfContainer show={cargandoZona4}>

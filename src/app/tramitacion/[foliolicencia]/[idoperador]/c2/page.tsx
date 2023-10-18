@@ -31,7 +31,8 @@ interface myprops {
   };
 }
 interface formularioApp {
-  accion: 'siguiente' | 'guardar' | 'anterior';
+  accion: 'siguiente' | 'guardar' | 'anterior' | 'navegar';
+  linkNavegacion: string;
   regimen: number;
   previsional: string;
   calidad: string;
@@ -85,25 +86,12 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     mode: 'onSubmit',
     defaultValues: {
       accion: 'siguiente',
+      linkNavegacion: '',
     },
   });
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
-    switch (data.accion) {
-      case 'guardar':
-        await GuardarZ2();
-        break;
-      case 'siguiente':
-        await GuardarZ2();
-        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
-        break;
-      case 'anterior':
-        await GuardarZ2();
-        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c1`);
-        break;
-      default:
-        throw new Error('Accion desconocida en Paso 3');
-    }
+    await GuardarZ2();
   };
 
   const GuardarZ2 = async () => {
@@ -152,8 +140,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       await crearLicenciaZ2(licenciac2);
       switch (formulario.getValues('accion')) {
         case 'siguiente':
+          router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
           break;
         case 'anterior':
+          router.push(`/tramitacion/${foliolicencia}/${idoperador}/c1`);
           break;
         case 'guardar':
           Swal.fire({
@@ -163,6 +153,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             showConfirmButton: false,
           });
           break;
+        case 'navegar':
+          router.push(formulario.getValues('linkNavegacion'));
+          break;
+        default:
+          throw new Error('Accion desconocida en Paso 3');
       }
     } catch (error) {
       if (error instanceof ErrorCrearLicenciaC2)
@@ -340,6 +335,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           idoperador={idoperador}
           step={step}
           title="Identificación del Régimen Previsional de la Persona Trabajadora y Entidad Pagadora del subsidio"
+          onLinkClickeado={(link) => {
+            formulario.setValue('linkNavegacion', link);
+            formulario.setValue('accion', 'navegar');
+            formulario.handleSubmit(onHandleSubmit)();
+          }}
         />
         <IfContainer show={cargandoCombos}>
           <div className={fadeinOut}>

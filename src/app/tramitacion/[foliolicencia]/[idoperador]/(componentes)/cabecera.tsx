@@ -16,7 +16,9 @@ interface myprops {
   title: string;
   rutEmpleador?: (run: string) => void;
   onLicenciaCargada?: (licencia: LicenciaTramitar) => void;
+  onLinkClickeado?: (link: string) => void;
 }
+
 const options: Intl.DateTimeFormatOptions = {
   year: 'numeric',
   month: 'numeric',
@@ -31,6 +33,7 @@ const Cabecera: React.FC<myprops> = ({
   rutEmpleador,
   idoperador,
   onLicenciaCargada,
+  onLinkClickeado,
 }) => {
   const [refrescar, refrescarPagina] = useRefrescarPagina();
   const [datopaciente, setdatopaciente] = useState<LicenciaTramitar>();
@@ -71,7 +74,7 @@ const Cabecera: React.FC<myprops> = ({
       </div>
       <div className="row me-5">
         <div className="mt-3 mb-4 mx-0 mx-md-5">
-          <Stepper Options={step} />
+          <Stepper Options={step} onLinkClickeado={onLinkClickeado} />
         </div>
       </div>
       <div className="row mt-2">
