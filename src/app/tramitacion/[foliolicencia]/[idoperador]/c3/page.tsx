@@ -347,10 +347,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         await irAlPaso4(datosLimpios);
         break;
       case 'anterior':
-        await guardarCambios(datosLimpios);
-        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c2`);
+        await irAPasoAnterior(datosLimpios);
         break;
-
       case 'navegar':
         await navegarOtroPasoPorStepper(datosLimpios);
         break;
@@ -415,6 +413,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     router.push(datos.linkNavegacion);
   };
 
+  const irAPasoAnterior = async (datos: FormularioC3) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
+    }
+
+    router.push(`/tramitacion/${foliolicencia}/${idoperador}/c2`);
+  };
+
   const llamarEndpointGuardarDeCambios = async (datos: FormularioC3) => {
     try {
       setMostrarSpinner(true);
@@ -424,15 +431,6 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         folioLicencia: foliolicencia,
         idOperador: parseInt(idoperador),
       });
-
-      Swal.fire({
-        html: 'Cambios guardados con éxito',
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 2000,
-      });
-
-      refrescarZona3();
     } catch (error) {
       Swal.fire({
         icon: 'error',

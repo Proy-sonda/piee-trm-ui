@@ -207,8 +207,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         await abrirModalParaConfirmarTramitacion(datosLimpios);
         break;
       case 'anterior':
-        await guardarCambios(datosLimpios);
-        router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
+        await irAPasoAnterior(datosLimpios);
         break;
       case 'navegar':
         await navegarOtroPasoPorStepper(datosLimpios);
@@ -238,19 +237,12 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
     refrescarZona4();
 
-    switch (datos.accion) {
-      case 'guardar':
-        Swal.fire({
-          icon: 'success',
-          html: 'Cambios guardados con éxito',
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        break;
-
-      default:
-        break;
-    }
+    Swal.fire({
+      icon: 'success',
+      html: 'Cambios guardados con éxito',
+      showConfirmButton: false,
+      timer: 2000,
+    });
   };
 
   const navegarOtroPasoPorStepper = async (datos: FormularioC4) => {
@@ -260,6 +252,15 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     }
 
     router.push(datos.linkNavegacion);
+  };
+
+  const irAPasoAnterior = async (datos: FormularioC4) => {
+    const guardadoExitoso = await llamarEndpointGuardarDeCambios(datos);
+    if (!guardadoExitoso) {
+      return;
+    }
+
+    router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
   };
 
   const llamarEndpointGuardarDeCambios = async (datos: FormularioC4) => {

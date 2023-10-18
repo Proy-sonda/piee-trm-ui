@@ -143,7 +143,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
           break;
         case 'anterior':
-          await GuardarZ2();
           router.push(`/tramitacion/${foliolicencia}/${idoperador}/c1`);
           break;
         case 'guardar':
