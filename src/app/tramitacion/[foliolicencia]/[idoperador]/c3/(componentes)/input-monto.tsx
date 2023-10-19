@@ -1,6 +1,5 @@
 import { BaseProps } from '@/components/form';
 import { useRandomId } from '@/hooks/use-random-id';
-import { montoMaximoPorDefecto } from '@/servicios/environment';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
@@ -46,7 +45,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
   unirConFieldArray,
 }) => {
   const montoMinimoFinal = montoMinimo ?? 0;
-  const montoMaximoFinal = montoMaximo ?? montoMaximoPorDefecto();
+  const montoMaximoFinal = montoMaximo ?? 5_000_000;
 
   const idInput = useRandomId('monto');
 
