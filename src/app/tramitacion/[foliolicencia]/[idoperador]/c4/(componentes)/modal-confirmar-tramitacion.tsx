@@ -13,6 +13,7 @@ import { Alert, Col, Modal, Row } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { LicenciaAnterior } from '../(modelos)/formulario-c4';
 import { buscarEmpleador } from '../../(servicios)/buscar-empleador';
+import { LicenciaC1 } from '../../c1/(modelos)';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
 import {
   crearIdEntidadPrevisional,
@@ -41,12 +42,21 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
   onCerrar,
   onTramitacionConfirmada,
 }) => {
-  const [erroresZona, [zona0, zona1, zona2, zona3], cargandoZonas] = useMergeFetchArray([
+  const [erroresZona, [zona0, zona2, zona3], cargandoZonas] = useMergeFetchArray([
     buscarZona0(datos.folioLicencia, datos.idOperador),
-    buscarZona1(datos.folioLicencia, datos.idOperador),
     buscarZona2(datos.folioLicencia, datos.idOperador),
     buscarZona3(datos.folioLicencia, datos.idOperador),
   ]);
+
+  const [zona1, setzona1] = useState<LicenciaC1>();
+
+  useEffect(() => {
+    const BuscarZona1 = async () => {
+      const data = await buscarZona1(datos.folioLicencia, datos.idOperador);
+      if (data !== undefined) setzona1(data);
+    };
+    BuscarZona1();
+  }, []);
 
   const [, empleador] = useFetch(
     datos.licencia ? buscarEmpleador(datos.licencia.rutempleador) : emptyFetch(),
