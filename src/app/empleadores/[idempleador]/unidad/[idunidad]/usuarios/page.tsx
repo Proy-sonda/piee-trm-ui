@@ -6,6 +6,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { useRouter } from 'next/navigation';
 import React, { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 import { buscarEmpleadorPorId } from '../../../datos/(servicios)/buscar-empleador-por-id';
@@ -33,6 +34,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const [refresh, setRefresh] = useState(0);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
   const [usuariosAsociados, setusuariosAsociados] = useState<UsuarioEmpleador[]>([]);
+
+  const router = useRouter();
 
   useEffect(() => {
     const busquedaUnidad = async () => {
@@ -175,7 +178,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       });
     } finally {
       refrescarComponente();
-      window.location.href = document.referrer;
+      router.push(`/empleadores/${idempleador}/unidad/${idunidad}/usuarios`);
     }
   };
 
