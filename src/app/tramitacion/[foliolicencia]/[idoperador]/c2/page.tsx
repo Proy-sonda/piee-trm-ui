@@ -14,6 +14,7 @@ import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { buscarCalidadTrabajador } from '../(servicios)/buscar-calidad-trabajador';
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
+import { LicenciaC1 } from '../c1/(modelos)';
 import { buscarZona1 } from '../c1/(servicios)';
 import { InputOtroMotivoDeRechazo } from '../no-tramitar/(componentes)/input-otro-motivo-rechazo';
 import { EntidadPagadora } from './(modelos)/entidad-pagadora';
@@ -47,6 +48,7 @@ interface formularioApp {
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
   const [esAFC, setesAFC] = useState(false);
   const [entePagador, setentePagador] = useState<EntidadPagadora[]>([]);
+  const [LMECABECERA, setLMECABECERA] = useState<LicenciaC1>();
   const [fadeinOut, setfadeinOut] = useState('');
   const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
@@ -55,10 +57,19 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     REGIMEN: buscarRegimen(),
     CALIDADTRABAJADOR: buscarCalidadTrabajador(),
     ENTIDADPAGADORA: buscarEntidadPagadora(),
-    LMECABECERA: buscarZona1(foliolicencia, Number(idoperador)),
+
     LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
     LMETRM: buscarLicenciasParaTramitar(),
   });
+
+  useEffect(() => {
+    const BuscarZonaC1 = async () => {
+      const data = await buscarZona1(foliolicencia, Number(idoperador));
+      if (data !== undefined) setLMECABECERA(data);
+    };
+
+    BuscarZonaC1();
+  }, []);
 
   const step = [
     {
@@ -449,9 +460,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
                   <label className="mb-2 animate__animated animate__fadeIn">
                     Persona Pertenece a AFC{' '}
-                    {esAFC && combos?.LMECABECERA?.ocupacion.idocupacion != 18 && '(*)'}
+                    {esAFC && LMECABECERA?.ocupacion.idocupacion != 18 && '(*)'}
                   </label>
-                  <IfContainer show={esAFC && combos?.LMECABECERA?.ocupacion.idocupacion != 18}>
+                  <IfContainer show={esAFC && LMECABECERA?.ocupacion.idocupacion != 18}>
                     <InputRadioButtons
                       className="animate__animated animate__fadeIn"
                       name="perteneceAFC"
@@ -469,16 +480,16 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                       ]}
                     />
                   </IfContainer>
-                  <IfContainer show={!esAFC || combos?.LMECABECERA?.ocupacion.idocupacion == 18}>
+                  <IfContainer show={!esAFC || LMECABECERA!?.ocupacion.idocupacion == 18}>
                     <p>
                       <sub className="animate__animated animate__fadeIn">
-                        <IfContainer show={combos?.LMECABECERA?.ocupacion.idocupacion == 18}>
+                        <IfContainer show={LMECABECERA?.ocupacion.idocupacion == 18}>
                           <i>
                             Persona trabajadora con ocupacion 18 (Trabajador de casa particular) No
                             puede tener seguro cesantia
                           </i>
                         </IfContainer>
-                        <IfContainer show={combos?.LMECABECERA?.ocupacion.idocupacion !== 18}>
+                        <IfContainer show={LMECABECERA?.ocupacion.idocupacion !== 18}>
                           <i>
                             Persona trabajadora con seguro de cesantía debe tener calidad de
                             trabajador privado dependiente
