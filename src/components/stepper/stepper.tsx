@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { FC, Fragment } from 'react';
 import styles from './stepper.module.css';
 
@@ -5,37 +6,74 @@ interface Data {
   label: string;
   num: number;
   active: boolean;
-  url: string;
+  url?: string;
   disabled?: boolean;
 }
 
 type Myprops = {
   Options: Data[];
+  onLinkClickeado?: (link: string) => void;
 };
 
-export const Stepper: FC<Myprops> = ({ Options }) => {
+export const Stepper: FC<Myprops> = ({ Options, onLinkClickeado }) => {
   return (
-    <div className={styles.stepper}>
+    <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-center">
       {Options.map((value: Data) => {
         if (value.num == 1) {
           return (
             <Fragment key={value.num}>
-              <div className={styles.line}></div>
+              <div className={`${styles.line} d-none d-md-inline-block`}></div>
               <div className={value.active ? styles.step + ' ' + styles.active : styles.step}>
-                <div className={styles['step-circle']}>{value.num}</div>
-                <span className={styles['step-label']}>{value.label}</span>
+                <div className="d-flex flex-md-column align-items-center justify-content-center">
+                  <div className={styles['step-circle']}>{value.num}</div>
+                  {value.url ? (
+                    <Link
+                      href={value.url || ''}
+                      onClick={(event) => {
+                        if (onLinkClickeado) {
+                          event.preventDefault();
+                          onLinkClickeado(value.url ?? '');
+                        }
+                      }}
+                      className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
+                      {value.label}
+                    </Link>
+                  ) : (
+                    <span className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
+                      {value.label}
+                    </span>
+                  )}
+                </div>
               </div>
             </Fragment>
           );
         } else {
           return (
             <Fragment key={value.num}>
-              <div className={styles.line}></div>
+              <div className={`${styles.line} d-none d-md-inline-block`}></div>
               <div className={value.active ? styles.step + ' ' + styles.active : styles.step}>
-                <div className={styles['step-circle']}>{value.num}</div>
-                <span className={styles['step-label']}>{value.label}</span>
+                <div className="d-flex flex-md-column align-items-center justify-content-center">
+                  <div className={styles['step-circle']}>{value.num}</div>
+                  {value.url ? (
+                    <Link
+                      href={value.url || ''}
+                      onClick={(event) => {
+                        if (onLinkClickeado) {
+                          event.preventDefault();
+                          onLinkClickeado(value.url ?? '');
+                        }
+                      }}
+                      className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
+                      {value.label}
+                    </Link>
+                  ) : (
+                    <span className={`${styles['step-label']} ms-2 ms-md-0 mt-md-2`}>
+                      {value.label}
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className={styles.line}></div>
+              <div className={`${styles.line} d-none d-md-inline-block`}></div>
             </Fragment>
           );
         }

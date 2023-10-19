@@ -1,9 +1,9 @@
 import { ClaveTemporalInvalidaError, cambiarClave } from '@/servicios/auth';
-import React, { useState } from 'react';
+import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
-import IfContainer from '../if-container';
+import { InputClave } from '../form';
 
 interface FormularioCambiarClaveTransitoria {
   claveTransitoria: string;
@@ -24,22 +24,9 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
   onCerrarModal,
   onClaveCambiada,
 }) => {
-  const [verClaveTemporal, setVerClaveTemporal] = useState(false);
-  const [verNuevaClave, setVerNuevaClave] = useState(false);
-  const [verConfirmaClave, setVerConfirmaClave] = useState(false);
+  const formulario = useForm<FormularioCambiarClaveTransitoria>({ mode: 'onBlur' });
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    getValues,
-    setError,
-    formState: { errors },
-  } = useForm<FormularioCambiarClaveTransitoria>({
-    mode: 'onBlur',
-  });
-
-  const resetearFormulario = () => reset();
+  const resetearFormulario = () => formulario.reset();
 
   const handleCerrarModal = () => {
     resetearFormulario();
@@ -98,109 +85,55 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
         <Modal.Header closeButton>
           <Modal.Title>Clave Transitoria</Modal.Title>
         </Modal.Header>
-        <form onSubmit={handleSubmit(cambiarClaveTransitoria)}>
-          <Modal.Body>
-            <h6>
-              Tu cuenta posee con una clave transitoria, completa el siguiente formulario para
-              activar tu cuenta.
-            </h6>
-            <br />
-            <label className="form-label" htmlFor="transitoria">
-              Contraseña transitoria
-            </label>
-            <div className="input-group mb-3 position-relative">
-              <input
-                id="transitoria"
-                type={verClaveTemporal ? 'text' : 'password'}
-                className={`form-control ${errors.claveTransitoria ? 'is-invalid' : ''}`}
-                autoComplete="new-custom-value"
-                {...register('claveTransitoria', {
-                  required: 'La contraseña transitoria es obligatoria',
-                })}
-              />
-              <button
-                className="btn btn-primary"
-                type="button"
-                tabIndex={-1}
-                id="button-addon2"
-                title={verClaveTemporal ? 'Ocultar clave' : 'Ver clave'}
-                onClick={() => setVerClaveTemporal((x) => !x)}>
-                <i className={`bi ${verClaveTemporal ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
-              </button>
-              <IfContainer show={errors.claveTransitoria}>
-                <div className="invalid-tooltip">{errors.claveTransitoria?.message}</div>
-              </IfContainer>
-            </div>
 
-            <label className="form-label" htmlFor="claveNueva">
-              Contraseña Nueva
-            </label>
-            <div className="input-group mb-3 position-relative">
-              <input
-                id="claveNueva"
-                type={verNuevaClave ? 'text' : 'password'}
-                className={`form-control ${errors.claveNueva ? 'is-invalid' : ''}`}
-                autoComplete="new-custom-value"
-                {...register('claveNueva', {
-                  required: 'La contraseña nueva es obligatoria',
-                })}
-              />
-              <button
-                className="btn btn-primary"
-                type="button"
-                tabIndex={-1}
-                id="button-addon2"
-                title={verNuevaClave ? 'Ocultar clave' : 'Ver clave'}
-                onClick={() => setVerNuevaClave((x) => !x)}>
-                <i className={`bi ${verNuevaClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
-              </button>
-              <IfContainer show={errors.claveNueva}>
-                <div className="invalid-tooltip">{errors.claveNueva?.message}</div>
-              </IfContainer>
-            </div>
+        <FormProvider {...formulario}>
+          <form onSubmit={formulario.handleSubmit(cambiarClaveTransitoria)}>
+            <Modal.Body>
+              <h6>
+                Tu cuenta posee con una clave transitoria, completa el siguiente formulario para
+                activar tu cuenta.
+              </h6>
+              <br />
 
-            <label className="form-label" htmlFor="confirmaClaveNueva">
-              Repetir Contraseña
-            </label>
-            <div className="input-group mb-3 position-relative">
-              <input
-                id="confirmaClaveNueva"
-                type={verConfirmaClave ? 'text' : 'password'}
-                className={`form-control ${errors.confirmaClave ? 'is-invalid' : ''}`}
-                autoComplete="new-custom-value"
-                {...register('confirmaClave', {
-                  required: 'Debe repetir la contraseña',
-                  validate: (confirmaClave) => {
-                    const claveNueva = getValues('claveNueva');
-                    if (claveNueva !== confirmaClave) {
-                      return 'Las contraseñas no coinciden';
-                    }
-                  },
-                })}
+              <InputClave
+                name="claveTransitoria"
+                label="Contraseña transitoria"
+                className="mb-3"
+                errores={{
+                  requerida: 'La contraseña transitoria es obligatoria',
+                }}
               />
-              <button
-                className="btn btn-primary"
-                type="button"
-                tabIndex={-1}
-                id="button-addon2"
-                title={verConfirmaClave ? 'Ocultar clave' : 'Ver clave'}
-                onClick={() => setVerConfirmaClave((x) => !x)}>
-                <i className={`bi ${verConfirmaClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
+
+              <InputClave
+                name="claveNueva"
+                label="Contraseña Nueva"
+                className="mb-3"
+                errores={{
+                  requerida: 'La contraseña nueva es obligatoria',
+                }}
+              />
+
+              <InputClave
+                name="confirmaClave"
+                debeCoincidirCon="claveNueva"
+                label="Repetir Contraseña"
+                className="mb-3"
+                errores={{
+                  requerida: 'Debe repetir la contraseña',
+                }}
+              />
+            </Modal.Body>
+
+            <Modal.Footer>
+              <button type="button" className="btn btn-secondary" onClick={handleCerrarModal}>
+                Cerrar
               </button>
-              <IfContainer show={errors.confirmaClave}>
-                <div className="invalid-tooltip">{errors.confirmaClave?.message}</div>
-              </IfContainer>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button type="button" className="btn btn-secondary" onClick={handleCerrarModal}>
-              Cerrar
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Actualizar
-            </button>
-          </Modal.Footer>
-        </form>
+              <button type="submit" className="btn btn-primary">
+                Actualizar
+              </button>
+            </Modal.Footer>
+          </form>
+        </FormProvider>
       </Modal>
     </>
   );

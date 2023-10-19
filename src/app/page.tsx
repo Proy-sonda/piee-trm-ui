@@ -5,6 +5,7 @@ import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
 import insemp from '@/img/Inscribeem.png';
 import { adsUrl } from '@/servicios/environment';
+import Head from 'next/head';
 import React from 'react';
 
 interface HomePageProps {
@@ -27,6 +28,11 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
 
   return (
     <div className="bgads">
+      <Head>
+        <title>Portal Tramitación LME</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <div className="row">
         <IfContainer show={searchParams.redirectTo}>
           <div className="col-12">

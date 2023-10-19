@@ -17,7 +17,14 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ size, titulo }) => {
           aria-label="Loading Spinner"
           data-testid="loader"
         />
-        <p className="mt-3 text-center">{titulo ?? 'Cargando...'}</p>
+        <p
+          className="mt-3 text-center"
+          style={{
+            fontWeight: 'bold',
+            color: 'var(--color-blue)',
+          }}>
+          {titulo ?? 'Cargando...'}
+        </p>
       </div>
     </>
   );
