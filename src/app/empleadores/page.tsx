@@ -127,7 +127,7 @@ const EmpleadoresPage = () => {
           <div className="row mt-4">
             <div className="col-md-12 col-xl-12">
               <IfContainer show={mostrarSpinner}>
-                <SpinnerPantallaCompleta></SpinnerPantallaCompleta>
+                <SpinnerPantallaCompleta />
               </IfContainer>
 
               <IfContainer show={cargandoEmpleador}>
