@@ -10,6 +10,7 @@ import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
 import { useContext, useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
@@ -111,7 +112,7 @@ const EmpleadoresPage = () => {
   };
 
   return (
-    <>
+    <Container fluid className="px-3 px-lg-5 py-4">
       <Titulo url="">
         <h1 className="fs-5">Listado de entidades empleadoras</h1>
       </Titulo>
@@ -146,7 +147,7 @@ const EmpleadoresPage = () => {
       </div>
 
       <ModalInscribirEntidadEmpleadora onEntidadEmpleadoraCreada={onEntidadEmpleadoraCreada} />
-    </>
+    </Container>
   );
 };
 
