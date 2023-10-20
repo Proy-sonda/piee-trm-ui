@@ -1,0 +1,26 @@
+.link:hover {
+  background-color: rgba(128, 128, 128, 0.144);
+  color: var(----bs-dark);
+}
+
+.link-activo {
+  background-color: var(--color-blue);
+  color: white;
+}
+
+.link-activo:hover {
+  background-color: var(--color-blue);
+  color: white;
+}
+
+.btn-cerrar-sidenav {
+  position: absolute;
+  padding: 0px 3px 4px 2px;
+  background-color: white;
+
+  width: 25px;
+  height: 25px;
+
+  top: 24px;
+  right: calc(25px / -2);
+}
