@@ -4,12 +4,11 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
-import { EmpleadorContext } from '@/contexts/empleador-context';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
@@ -18,8 +17,6 @@ import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleador
 import { desadscribirEmpleador } from './(servicios)/desadscribir-empleador';
 
 const EmpleadoresPage = () => {
-  const { cargaEmpleador } = useContext(EmpleadorContext);
-
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   const [refresh, refrescarPagina] = useRefrescarPagina();
@@ -37,7 +34,6 @@ const EmpleadoresPage = () => {
     }
 
     filtrarEmpleadores('', '');
-    cargaEmpleador(empleadores as any);
   }, [empleadores]);
 
   const desadscribirEntidadEmpleadora = async (empleador: Empleador) => {

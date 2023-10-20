@@ -14,8 +14,8 @@ import InputRazonSocial from '@/components/form/input-razon-social';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
+import { useEmpleadorActual } from '@/contexts';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
-import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -31,20 +31,12 @@ import InputHolding from './(componentes)/input-holding';
 import InputNombreFantasia from './(componentes)/input-nombre-fantasia';
 import { CamposFormularioEmpleador } from './(modelos)/campos-formulario-empleador';
 import { actualizarEmpleador } from './(servicios)/actualizar-empleador';
-import { buscarEmpleadorPorId } from './(servicios)/buscar-empleador-por-id';
 
-interface DatosEmpleadoresPageProps {
-  params: {
-    idempleador: {
-      id: number;
-    };
-  };
-}
+interface DatosEmpleadoresPageProps {}
 
-const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) => {
-  const id = Number(params.idempleador);
-
-  const [refresh, refrescarPagina] = useRefrescarPagina();
+const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
+  const { cargandoEmpleador, empleadorActual, errorCargarEmpleador, refrescarEmpleador } =
+    useEmpleadorActual();
 
   const [spinnerCargar, setSpinnerCargar] = useState(false);
 
@@ -62,54 +54,49 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
     buscarTamanosEmpresa(),
   ]);
 
-  const [errorEmpleador, [empleador], cargandoEmpleador] = useMergeFetchArray(
-    [buscarEmpleadorPorId(id)],
-    [refresh],
-  );
-
   const formulario = useForm<CamposFormularioEmpleador>({ mode: 'onBlur' });
 
   const regionSeleccionada = formulario.watch('regionId');
 
   // Parchar fomulario
   useEffect(() => {
-    if (cargandoCombos || cargandoEmpleador || !empleador || errorCombos.length > 0) {
+    if (cargandoCombos || cargandoEmpleador || !empleadorActual || errorCombos.length > 0) {
       return;
     }
 
     setSpinnerCargar(true);
-    formulario.setValue('rut', empleador.rutempleador);
-    formulario.setValue('razonSocial', empleador.razonsocial);
-    formulario.setValue('nombreFantasia', empleador.nombrefantasia);
-    formulario.setValue('tipoEntidadEmpleadoraId', empleador.tipoempleador.idtipoempleador);
-    formulario.setValue('cajaCompensacionId', empleador.ccaf.idccaf);
-    formulario.setValue('actividadLaboralId', empleador.actividadlaboral.idactividadlaboral);
-    formulario.setValue('regionId', empleador.direccionempleador.comuna.region.idregion);
-    formulario.setValue('calle', empleador.direccionempleador.calle);
-    formulario.setValue('numero', empleador.direccionempleador.numero);
-    formulario.setValue('departamento', empleador.direccionempleador.depto);
+    formulario.setValue('rut', empleadorActual.rutempleador);
+    formulario.setValue('razonSocial', empleadorActual.razonsocial);
+    formulario.setValue('nombreFantasia', empleadorActual.nombrefantasia);
+    formulario.setValue('tipoEntidadEmpleadoraId', empleadorActual.tipoempleador.idtipoempleador);
+    formulario.setValue('cajaCompensacionId', empleadorActual.ccaf.idccaf);
+    formulario.setValue('actividadLaboralId', empleadorActual.actividadlaboral.idactividadlaboral);
+    formulario.setValue('regionId', empleadorActual.direccionempleador.comuna.region.idregion);
+    formulario.setValue('calle', empleadorActual.direccionempleador.calle);
+    formulario.setValue('numero', empleadorActual.direccionempleador.numero);
+    formulario.setValue('departamento', empleadorActual.direccionempleador.depto);
 
-    formulario.setValue('telefono1', empleador.telefonohabitual);
-    formulario.setValue('telefono2', empleador.telefonomovil);
-    formulario.setValue('email', empleador.email);
-    formulario.setValue('emailConfirma', empleador.email);
-    formulario.setValue('holding', empleador.holding);
-    formulario.setValue('tamanoEmpresaId', empleador.tamanoempresa.idtamanoempresa);
+    formulario.setValue('telefono1', empleadorActual.telefonohabitual);
+    formulario.setValue('telefono2', empleadorActual.telefonomovil);
+    formulario.setValue('email', empleadorActual.email);
+    formulario.setValue('emailConfirma', empleadorActual.email);
+    formulario.setValue('holding', empleadorActual.holding);
+    formulario.setValue('tamanoEmpresaId', empleadorActual.tamanoempresa.idtamanoempresa);
     formulario.setValue(
       'sistemaRemuneracionId',
-      empleador.sistemaremuneracion.idsistemaremuneracion,
+      empleadorActual.sistemaremuneracion.idsistemaremuneracion,
     );
 
     /* NOTA: Hay que darle un timeout antes de parchar la comuna. Puede ser porque react necesita
      * un tiempo para actualizar el combo de comunas al parchar la region. */
     setTimeout(() => {
-      formulario.setValue('comunaId', empleador.direccionempleador.comuna.idcomuna);
+      formulario.setValue('comunaId', empleadorActual.direccionempleador.comuna.idcomuna);
       setSpinnerCargar(false);
     }, 1000);
   }, [cargandoCombos, cargandoEmpleador]);
 
   const onGuardarCambios: SubmitHandler<CamposFormularioEmpleador> = async (data) => {
-    if (!empleador) {
+    if (!empleadorActual) {
       throw new Error('No se ha cargado el empleador aun');
     }
 
@@ -117,7 +104,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
       setSpinnerCargar(true);
 
       await actualizarEmpleador({
-        idEmpleador: empleador.idempleador,
+        idEmpleador: empleadorActual.idempleador,
         rutEmpleador: data.rut,
         razonSocial: data.razonSocial,
         nombreFantasia: data.nombreFantasia,
@@ -146,7 +133,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
         confirmButtonColor: 'var(--color-blue)',
       });
 
-      refrescarPagina();
+      refrescarEmpleador();
     } catch (error) {
       setSpinnerCargar(false);
 
@@ -165,14 +152,14 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({ params }) =
         <SpinnerPantallaCompleta />
       </IfContainer>
 
-      <IfContainer show={errorCombos.length > 0 || errorEmpleador.length > 0}>
+      <IfContainer show={errorCombos.length > 0 || errorCargarEmpleador}>
         <h4 className="text-center py-5">Error al cargar los datos de la entidad empleadora</h4>
       </IfContainer>
 
-      <IfContainer show={errorCombos.length === 0 && errorEmpleador.length === 0}>
+      <IfContainer show={errorCombos.length === 0 && !errorCargarEmpleador}>
         <Titulo url="">
-          Entidad Empleadora - <b>{empleador?.razonsocial ?? 'Cargando...'}</b> / Datos Entidad
-          Empleadora
+          Entidad Empleadora - <b>{empleadorActual?.razonsocial ?? 'Cargando...'}</b> / Datos
+          Entidad Empleadora
         </Titulo>
 
         <FormProvider {...formulario}>

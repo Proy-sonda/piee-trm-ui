@@ -1,8 +1,9 @@
 'use client';
 
+import { useEmpleadorActual } from '@/contexts';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Collapse, Container, Offcanvas, Row, Stack } from 'react-bootstrap';
 import styles from './layout.module.css';
 
@@ -28,11 +29,16 @@ export default function LayoutProps({ children, params: { idempleador } }: Layou
     { titulo: 'Usuarios', href: `/empleadores/${idempleador}/usuarios` },
   ];
 
+  const { empleadorActual, cambiarEmpleador } = useEmpleadorActual();
+
   const pathname = usePathname();
 
   const [abrirMenuDesktop, setAbrirMenuDesktop] = useState(true);
 
   const [abrirMenuMovil, setAbrirMenuMovil] = useState(false);
+
+  // Carga el empleador la primera vez
+  useEffect(() => cambiarEmpleador(parseInt(idempleador)), [idempleador]);
 
   const claseLinkActivo = (link: LinkNavegacion) => {
     return pathname.startsWith(link.href) ? styles['link-activo'] : styles['link'];
@@ -54,7 +60,9 @@ export default function LayoutProps({ children, params: { idempleador } }: Layou
 
           <Collapse in={abrirMenuDesktop} dimension="width">
             <div id="example-collapse-text">
-              <h1 className="py-4 fs-6">Nombre Empresa</h1>
+              <h1 className="py-4 fs-6">
+                {empleadorActual ? empleadorActual.razonsocial : 'Cargando...'}
+              </h1>
               <Stack gap={1}>
                 {links.map((link, index) => (
                   <Link
@@ -90,7 +98,9 @@ export default function LayoutProps({ children, params: { idempleador } }: Layou
 
         <Offcanvas show={abrirMenuMovil} onHide={() => setAbrirMenuMovil(false)} responsive="lg">
           <Offcanvas.Header closeButton>
-            <Offcanvas.Title>Nombre empresa</Offcanvas.Title>
+            <Offcanvas.Title>
+              {empleadorActual ? empleadorActual.razonsocial : 'Cargando...'}
+            </Offcanvas.Title>
           </Offcanvas.Header>
 
           <Offcanvas.Body>
