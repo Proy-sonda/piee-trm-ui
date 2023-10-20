@@ -188,111 +188,111 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   };
 
   return (
-    <div className="bgads">
+    <>
       <IfContainer show={spinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
-      <div className="ms-5 me-5">
-        <div className="row">
-          <Titulo manual="Manual" url="">
-            Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b>{unidad}</b> /
-            Personas Usuarias
-          </Titulo>
-        </div>
-        <div className="row mt-3">
-          <h5>Cargar Personas Usuarias</h5>
-          <sub className={styles['sub-title']}>Agregar RUN Persona Usuaria</sub>
-        </div>
 
-        <form className="row mt-3" onSubmit={onHandleSubmit}>
-          <div className="col-md-8 col-sm-12 col-xl-6">
-            <div className="row">
-              <div className="col-md-6">
-                <select
-                  className="form-select js-example-basic-single"
-                  data-live-search="true"
-                  required
-                  onChange={onChangeSelect}
-                  value={formIni?.idusuario}
-                  name="idusuario">
-                  <option value={''}>Seleccionar</option>
-                  {usuarios?.length || 0 > 0 ? (
-                    usuarios.map(({ idusuario, rutusuario, nombres }) => (
-                      <Fragment key={idusuario}>
-                        {datosPagina?.usuarioAso.find(
-                          (useraso) => useraso.usuario.idusuario === idusuario,
-                        ) ? (
-                          <Fragment key={Math.random()}></Fragment>
-                        ) : (
-                          <>
-                            <option key={Math.random()} value={idusuario} data-tokens={rutusuario}>
-                              {rutusuario} / {nombres}
-                            </option>
-                          </>
-                        )}
-                      </Fragment>
-                    ))
-                  ) : (
-                    <></>
-                  )}
-                </select>
-              </div>
-              <div className="col-md-6 align-self-end">
-                <button type="submit" className="btn btn-success">
-                  Agregar
-                </button>
-              </div>
+      <div className="row">
+        <Titulo manual="Manual" url="">
+          Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b>{unidad}</b> /
+          Personas Usuarias
+        </Titulo>
+      </div>
+
+      <div className="row mt-4">
+        <h5>Cargar Personas Usuarias</h5>
+        <sub className={styles['sub-title']}>Agregar RUN Persona Usuaria</sub>
+      </div>
+
+      <form className="row mt-3" onSubmit={onHandleSubmit}>
+        <div className="col-md-8 col-sm-12 col-xl-6">
+          <div className="row">
+            <div className="col-md-6">
+              <select
+                className="form-select js-example-basic-single"
+                data-live-search="true"
+                required
+                onChange={onChangeSelect}
+                value={formIni?.idusuario}
+                name="idusuario">
+                <option value={''}>Seleccionar</option>
+                {usuarios?.length || 0 > 0 ? (
+                  usuarios.map(({ idusuario, rutusuario, nombres }) => (
+                    <Fragment key={idusuario}>
+                      {datosPagina?.usuarioAso.find(
+                        (useraso) => useraso.usuario.idusuario === idusuario,
+                      ) ? (
+                        <Fragment key={Math.random()}></Fragment>
+                      ) : (
+                        <>
+                          <option key={Math.random()} value={idusuario} data-tokens={rutusuario}>
+                            {rutusuario} / {nombres}
+                          </option>
+                        </>
+                      )}
+                    </Fragment>
+                  ))
+                ) : (
+                  <></>
+                )}
+              </select>
+            </div>
+            <div className="col-md-6 align-self-end">
+              <button type="submit" className="btn btn-success">
+                Agregar
+              </button>
             </div>
           </div>
-        </form>
-
-        <div className="row mt-3 text-center">
-          <h5>Personas Usuarias</h5>
-          <div className="col-md-12 col-sm-12 col-xl-12">
-            <IfContainer show={pendiente}>
-              <div className="mb-5">
-                <LoadingSpinner titulo="Cargando personas usuarias..." />
-              </div>
-            </IfContainer>
-
-            <IfContainer show={!pendiente && err.length === 0}>
-              <div className="row mb-2">
-                <div className="col-md-4">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="...Buscar por RUN"
-                    onInput={(e: ChangeEvent<HTMLInputElement>) => {
-                      setusuariosAsociados(
-                        datosPagina?.usuarioAso.filter(({ usuario }) =>
-                          usuario.rutusuario.includes(e.target.value),
-                        ) || [],
-                      );
-                    }}
-                  />
-                </div>
-              </div>
-              <TableUsuariosAsociados
-                usuarioAsociado={usuariosAsociados ?? []}
-                handleDelete={handleDelete}
-              />
-            </IfContainer>
-          </div>
         </div>
+      </form>
 
-        <div className="d-flex flex-row-reverse">
-          <div className="p-2">
-            <button
-              className="btn btn-danger"
-              onClick={() => {
-                window.history.back();
-              }}>
-              Volver
-            </button>
-          </div>
+      <div className="row mt-3 text-center">
+        <h5>Personas Usuarias</h5>
+        <div className="col-md-12 col-sm-12 col-xl-12">
+          <IfContainer show={pendiente}>
+            <div className="mb-5">
+              <LoadingSpinner titulo="Cargando personas usuarias..." />
+            </div>
+          </IfContainer>
+
+          <IfContainer show={!pendiente && err.length === 0}>
+            <div className="row mb-2">
+              <div className="col-md-4">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="...Buscar por RUN"
+                  onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                    setusuariosAsociados(
+                      datosPagina?.usuarioAso.filter(({ usuario }) =>
+                        usuario.rutusuario.includes(e.target.value),
+                      ) || [],
+                    );
+                  }}
+                />
+              </div>
+            </div>
+            <TableUsuariosAsociados
+              usuarioAsociado={usuariosAsociados ?? []}
+              handleDelete={handleDelete}
+            />
+          </IfContainer>
         </div>
       </div>
-    </div>
+
+      <div className="d-flex flex-row-reverse">
+        <div className="p-2">
+          <button
+            className="btn btn-danger"
+            onClick={() => {
+              window.history.back();
+            }}>
+            Volver
+          </button>
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -1,5 +1,6 @@
 import AppFooter from '@/components/footer/footer';
 import AppHeader from '@/components/header/header';
+import Position from '@/components/stage/position';
 import { AuthProvider, InscribeProvider, StepProvider } from '@/contexts';
 import { EmpleadorProvider } from '@/contexts/empleador-context';
 import 'animate.css';
@@ -36,7 +37,11 @@ export default function RootLayout(
             <html>
               <body>
                 <AppHeader />
-                <main>{children}</main>
+
+                <main className="bg-white shadow-sm">
+                  <Position />
+                  <div>{children}</div>
+                </main>
 
                 <AppFooter />
               </body>

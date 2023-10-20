@@ -2,7 +2,6 @@
 
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
@@ -73,60 +72,55 @@ const TramitacionPage = () => {
   };
 
   return (
-    <div className="bgads">
+    <>
       <Head>
         <title>Portal de Tramitación</title>
       </Head>
-      <Position />
 
       <IfContainer show={cargando}>
         <SpinnerPantallaCompleta />
       </IfContainer>
 
-      <div className="mx-3 mx-lg-5">
-        <IfContainer show={erroresCarga.length > 0}>
-          <h4 className="pb-5 text-center">Error al cargar licencias para tramitar</h4>
-        </IfContainer>
+      <IfContainer show={erroresCarga.length > 0}>
+        <h4 className="pb-5 text-center">Error al cargar licencias para tramitar</h4>
+      </IfContainer>
 
-        <IfContainer show={erroresCarga.length === 0}>
-          <div className="row">
-            <div style={{ marginTop: '-50px' }}>
-              <Titulo url="">
-                <h5>Filtro para Licencias pendientes de Tramitar</h5>
-              </Titulo>
-              <p>
-                En esta pantalla se muestran todas las licencias médicas que usted tiene pendiente
-                de tramitación.
-              </p>
-            </div>
-          </div>
+      <IfContainer show={erroresCarga.length === 0}>
+        <div className="row">
+          <Titulo url="">
+            <h5>Filtro para Licencias pendientes de Tramitar</h5>
+          </Titulo>
+          <p className="mt-3">
+            En esta pantalla se muestran todas las licencias médicas que usted tiene pendiente de
+            tramitación.
+          </p>
+        </div>
 
-          <div className="pt-3 pb-4 border-bottom border-1">
-            <FiltroLicencias
+        <div className="pt-3 pb-4 border-bottom border-1">
+          <FiltroLicencias
+            empleadores={datosBandeja?.empleadores ?? []}
+            onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
+          />
+        </div>
+
+        <div className="py-4 row text-center">
+          <h5>BANDEJA DE TRAMITACIÓN</h5>
+        </div>
+
+        <div className="row text-end">
+          <SemaforoLicencias onEstadoSeleccionado={(x) => setFiltroEstado(x)} />
+        </div>
+
+        <div className="row mt-3">
+          <div className="col-md-12">
+            <TablaLicenciasTramitar
               empleadores={datosBandeja?.empleadores ?? []}
-              onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
+              licencias={licenciasFiltradas}
             />
           </div>
-
-          <div className="py-4 row text-center">
-            <h5>BANDEJA DE TRAMITACIÓN</h5>
-          </div>
-
-          <div className="row text-end">
-            <SemaforoLicencias onEstadoSeleccionado={(x) => setFiltroEstado(x)} />
-          </div>
-
-          <div className="row mt-3">
-            <div className="col-md-12">
-              <TablaLicenciasTramitar
-                empleadores={datosBandeja?.empleadores ?? []}
-                licencias={licenciasFiltradas}
-              />
-            </div>
-          </div>
-        </IfContainer>
-      </div>
-    </div>
+        </div>
+      </IfContainer>
+    </>
   );
 };
 

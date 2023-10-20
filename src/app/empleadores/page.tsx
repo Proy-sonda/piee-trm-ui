@@ -3,7 +3,6 @@
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
 import { EmpleadorContext } from '@/contexts/empleador-context';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
@@ -112,48 +111,42 @@ const EmpleadoresPage = () => {
   };
 
   return (
-    <div className="bgads">
-      <Position position={4} />
-      <div>
-        <div className="mx-3 mx-lg-5">
-          <div style={{ marginTop: '-20px' }}>
-            <Titulo url="">
-              <h5>Listado de entidades empleadoras</h5>
-            </Titulo>
-          </div>
+    <>
+      <Titulo url="">
+        <h1 className="fs-5">Listado de entidades empleadoras</h1>
+      </Titulo>
 
-          <BarraBusquedaEntidadesEmpleadoras onBuscar={filtrarEmpleadores} />
+      <div className="mt-4">
+        <BarraBusquedaEntidadesEmpleadoras onBuscar={filtrarEmpleadores} />
+      </div>
 
-          <div className="row mt-4">
-            <div className="col-md-12 col-xl-12">
-              <IfContainer show={mostrarSpinner}>
-                <SpinnerPantallaCompleta />
-              </IfContainer>
+      <div className="row mt-4">
+        <div className="col-md-12 col-xl-12">
+          <IfContainer show={mostrarSpinner}>
+            <SpinnerPantallaCompleta />
+          </IfContainer>
 
-              <IfContainer show={cargandoEmpleador}>
-                <div className="mt-4">
-                  <LoadingSpinner titulo="Cargando empleadores"></LoadingSpinner>
-                </div>
-              </IfContainer>
-
-              <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length > 0}>
-                <h4 className="my-5 text-center">Error al cargar empleadores</h4>
-              </IfContainer>
-
-              <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length === 0}>
-                <TablaEntidadesEmpleadoras
-                  empleadores={empleadoresFiltrados ?? []}
-                  onDesadscribirEmpleador={desadscribirEntidadEmpleadora}
-                />
-              </IfContainer>
+          <IfContainer show={cargandoEmpleador}>
+            <div className="mt-4">
+              <LoadingSpinner titulo="Cargando empleadores"></LoadingSpinner>
             </div>
-          </div>
-          <br />
+          </IfContainer>
+
+          <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length > 0}>
+            <h4 className="my-5 text-center">Error al cargar empleadores</h4>
+          </IfContainer>
+
+          <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length === 0}>
+            <TablaEntidadesEmpleadoras
+              empleadores={empleadoresFiltrados ?? []}
+              onDesadscribirEmpleador={desadscribirEntidadEmpleadora}
+            />
+          </IfContainer>
         </div>
       </div>
 
       <ModalInscribirEntidadEmpleadora onEntidadEmpleadoraCreada={onEntidadEmpleadoraCreada} />
-    </div>
+    </>
   );
 };
 
