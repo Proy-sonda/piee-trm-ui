@@ -25,7 +25,7 @@ import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
-import { buscarEmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(servicios)/buscar-empleador-por-id';
+import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
 import exportFromJSON from 'export-from-json';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
@@ -372,345 +372,341 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     <>
       <ProgressBarCustom show={spinnerCargar} text={textProgress} count={cuentagrabados} />
 
-      <div className="bgads">
-        <div className="me-5 ms-5 animate__animate animate__fadeIn">
-          <div className="row mt-5">
-            <Titulo url="">
-              Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b> {unidad} </b>/
-              Personas Trabajadoras
-            </Titulo>
-          </div>
+      <div className="animate__animate animate__fadeIn">
+        <div className="row">
+          <Titulo url="">
+            Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b> {unidad} </b>/
+            Personas Trabajadoras
+          </Titulo>
+        </div>
 
-          <div className="row mt-2">
-            <div className="col-md-12 col-xs-12 col-lg-5">
-              <h5>Cargar Personas Trabajadoras</h5>
-              <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
-              <br />
-              <br />
+        <div className="row mt-4">
+          <div className="col-md-12 col-xs-12 col-lg-5">
+            <h5>Cargar Personas Trabajadoras</h5>
+            <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
+            <br />
+            <br />
 
-              <form onSubmit={handleAddTrabajador}>
-                <div className="row mt-1">
-                  <div className="col-md-8 position-relative">
-                    <input
-                      id="run"
-                      type="text"
-                      className={error.run ? 'form-control is-invalid' : 'form-control'}
-                      minLength={4}
-                      maxLength={11}
-                      {...register('run', {
-                        required: {
-                          value: true,
-                          message: 'Este campo es obligatorio',
-                        },
-                        onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                          if (event.target.value.trim() == '') {
-                            return seterror({ ...error, run: false });
-                          }
-                          if (Number(event.target.value.split('-')[0]) > 50000000)
-                            return seterror({ ...error, run: true });
-                          const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
-                          let rut = event.target.value as string;
-
-                          if (regex.test(rut)) {
-                            rut = rut.replaceAll(regex, '');
-                          }
-
-                          seterror({ ...error, run: !validateRut(formatRut(rut)) });
-
-                          setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
-                        },
-                        onBlur: (event: ChangeEvent<HTMLInputElement>) => {
-                          if (event.target.value.trim() == '') {
-                            return seterror({ ...error, run: false });
-                          }
-                          if (Number(event.target.value.split('-')[0]) > 50000000)
-                            return seterror({ ...error, run: true });
-                          const rut = event.target.value as string;
-
-                          seterror({ ...error, run: !validateRut(formatRut(rut)) });
-
-                          setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
-                        },
-                      })}
-                    />
-                    <IfContainer show={error.run}>
-                      <div className="invalid-tooltip">Debe ingresar un RUN valido</div>
-                    </IfContainer>
-                  </div>
-                  <div className="d-block d-sm-none d-md-none d-xs-block">
-                    <div className="col-md-12">
-                      <br />
-                    </div>
-                  </div>
-                  <div
-                    className="col-md-4"
-                    style={{
-                      alignSelf: 'end',
-                    }}>
-                    <div className="d-grid gap-2 d-md-flex">
-                      <button type="submit" className="btn btn-success">
-                        Agregar
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="d-block d-sm-none d-md-none">
-              <div className="col-md-12">
-                <br />
-              </div>
-            </div>
-
-            <div className="d-none d-md-inline d-lg-none col-md-12">
-              <div className="col-md-12">
-                <br />
-              </div>
-            </div>
-
-            <div className="col-md-12 col-xs-12 col-lg-7">
-              <h5>Cargar Nómina</h5>
-              <sub className="d-inline d-sm-none d-xl-inline">
-                Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo tiene
-                que seleccionar un archivo (formato CSV) según el{' '}
-                <a
-                  className={styles['span-link']}
-                  download="formato.csv"
-                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                  siguiente formato
-                </a>
-              </sub>
-              <sub className="d-none d-sm-inline d-xl-none">
-                Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
-                <a
-                  className={styles['span-link']}
-                  download="formato.csv"
-                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                  siguiente formato
-                </a>
-              </sub>
-              <div className="row mt-4">
-                <div className="col-md-6 position-relative">
+            <form onSubmit={handleAddTrabajador}>
+              <div className="row mt-1">
+                <div className="col-md-8 position-relative">
                   <input
-                    type="file"
-                    accept=".csv"
-                    className={error.file ? 'form-control is-invalid' : 'form-control'}
-                    {...register('file', {
+                    id="run"
+                    type="text"
+                    className={error.run ? 'form-control is-invalid' : 'form-control'}
+                    minLength={4}
+                    maxLength={11}
+                    {...register('run', {
+                      required: {
+                        value: true,
+                        message: 'Este campo es obligatorio',
+                      },
                       onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                        if (event.target.files?.length == 0) return setValue('file', null);
-                        if (!event.target.files) setValue('file', event.target.files);
-                        if (!getValues('file')![0].name.includes('csv')) {
-                          seterror({ ...error, file: true });
-                        } else {
-                          seterror({ ...error, file: false });
-                          const file = event.target.files![0];
-                          const reader = new FileReader();
-                          reader.onload = (e: any) => {
-                            const content = e.target.result.trim();
-                            const lines = content.split('\n');
-                            setCsvData(lines);
-                          };
-
-                          reader.readAsText(file);
+                        if (event.target.value.trim() == '') {
+                          return seterror({ ...error, run: false });
                         }
+                        if (Number(event.target.value.split('-')[0]) > 50000000)
+                          return seterror({ ...error, run: true });
+                        const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
+                        let rut = event.target.value as string;
+
+                        if (regex.test(rut)) {
+                          rut = rut.replaceAll(regex, '');
+                        }
+
+                        seterror({ ...error, run: !validateRut(formatRut(rut)) });
+
+                        setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
                       },
                       onBlur: (event: ChangeEvent<HTMLInputElement>) => {
-                        if (event.target.files?.length == 0) return setValue('file', null);
-                        if (!event.target.files) setValue('file', event.target.files);
-                        if (!getValues('file')![0].name.includes('csv')) {
-                          seterror({ ...error, file: true });
-                        } else {
-                          seterror({ ...error, file: false });
-                          const file = event.target.files![0];
-                          const reader = new FileReader();
-                          reader.onload = (e: any) => {
-                            const content = e.target.result.trim();
-                            const lines = content.split('\n');
-                            setCsvData(lines);
-                          };
-
-                          reader.readAsText(file);
+                        if (event.target.value.trim() == '') {
+                          return seterror({ ...error, run: false });
                         }
+                        if (Number(event.target.value.split('-')[0]) > 50000000)
+                          return seterror({ ...error, run: true });
+                        const rut = event.target.value as string;
+
+                        seterror({ ...error, run: !validateRut(formatRut(rut)) });
+
+                        setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
                       },
                     })}
                   />
-                  <IfContainer show={error.file}>
-                    <div className="invalid-tooltip">Debe ingresar un archivo con formato .csv</div>
+                  <IfContainer show={error.run}>
+                    <div className="invalid-tooltip">Debe ingresar un RUN valido</div>
                   </IfContainer>
                 </div>
-                <div className="d-block d-sm-none d-md-none">
+                <div className="d-block d-sm-none d-md-none d-xs-block">
                   <div className="col-md-12">
                     <br />
                   </div>
                 </div>
-                <div className="col-md-6 col-xs-6">
-                  <div className="d-grid gap-2 d-md-flex">
-                    <button
-                      disabled={
-                        getValues('file')?.length === 0 || !getValues('file') ? true : false
-                      }
-                      className="btn btn-success"
-                      onClick={handleClickNomina}>
-                      Cargar
-                    </button>
-                    <button
-                      disabled={
-                        getValues('file')?.length === 0 || getValues('file') === null ? true : false
-                      }
-                      className="btn btn-primary"
-                      onClick={async () => {
-                        if (!getValues('file')) return;
-                        const resp = await Swal.fire({
-                          icon: 'question',
-                          html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name}</b>?`,
-                          confirmButtonText: 'Sí',
-                          confirmButtonColor: 'var(--color-blue)',
-                          showDenyButton: true,
-                          denyButtonText: 'No',
-                          showCancelButton: false,
-                          denyButtonColor: 'var(--bs-danger)',
-                        });
-                        if (resp.isConfirmed) {
-                          setValue('file', null);
-                          refrescarComponente();
-                        }
-                      }}>
-                      Limpiar
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="row mt-5">
-            <div className="col-md-12">
-              <div className="row">
-                <h5 className="text-center">Personas Trabajadoras</h5>
-                <span
-                  className="text-end animate animate__fadeIn"
-                  style={{
-                    display: datosPagina!?.trabajadores.length > 1 ? 'block' : 'none',
-                  }}>
-                  <button className="btn btn-danger btn-sm" onClick={handleDeleteAll}>
-                    Borrar todo
-                  </button>
-                </span>
-              </div>
-
-              <hr />
-              <IfContainer show={pendiente || loading}>
-                <div className="mb-5">
-                  <LoadingSpinner titulo="Cargando personas trabajadoras..." />
-                </div>
-              </IfContainer>
-              <IfContainer show={!pendiente || !loading}>
                 <div
-                  className="row mb-2"
-                  style={{ display: datosPagina?.trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
-                  <div className="col-md-3">
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="...Búsqueda por Run"
-                      onInput={(e: ChangeEvent<HTMLInputElement>) => {
-                        e.preventDefault();
-                        settrabajadores(
-                          datosPagina?.trabajadores.filter((trabajador) =>
-                            trabajador.ruttrabajador.includes(e.target.value.toUpperCase()),
-                          ) ||
-                            datosPagina?.trabajadores.filter((trabajador) =>
-                              trabajador.fechaafiliacion
-                                .toString()
-                                .includes(e.target.value.toUpperCase()),
-                            ) ||
-                            [],
-                        );
-                      }}
-                    />
+                  className="col-md-4"
+                  style={{
+                    alignSelf: 'end',
+                  }}>
+                  <div className="d-grid gap-2 d-md-flex">
+                    <button type="submit" className="btn btn-success">
+                      Agregar
+                    </button>
                   </div>
                 </div>
-                {trabajadores.length || 0 > 0 ? (
-                  <>
-                    <TablaTrabajadores
-                      unidad={unidad}
-                      handleDeleteTrabajador={handleDeleteTrabajador}
-                      handleEditTrabajador={handleEditTrabajador}
-                      idunidad={Number(idunidad)}
-                      trabajadores={trabajadores || []}
-                    />
-                  </>
-                ) : (
-                  <div className="text-center">
-                    <b>No se han encontrado personas trabajadoras</b>
-                  </div>
-                )}
-              </IfContainer>
+              </div>
+            </form>
+          </div>
+          <div className="d-block d-sm-none d-md-none">
+            <div className="col-md-12">
+              <br />
             </div>
           </div>
-          <div
-            className="row mt-2"
-            style={{
-              alignSelf: 'end',
-            }}>
-            <div className="col-md-6"></div>
-            <div className="col-md-6 text-end">
-              <button className="btn btn-danger" onClick={() => window.history.back()}>
-                Volver
-              </button>
+
+          <div className="d-none d-md-inline d-lg-none col-md-12">
+            <div className="col-md-12">
+              <br />
             </div>
           </div>
-          <br />
+
+          <div className="col-md-12 col-xs-12 col-lg-7">
+            <h5>Cargar Nómina</h5>
+            <sub className="d-inline d-sm-none d-xl-inline">
+              Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo tiene
+              que seleccionar un archivo (formato CSV) según el{' '}
+              <a
+                className={styles['span-link']}
+                download="formato.csv"
+                href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                siguiente formato
+              </a>
+            </sub>
+            <sub className="d-none d-sm-inline d-xl-none">
+              Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
+              <a
+                className={styles['span-link']}
+                download="formato.csv"
+                href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                siguiente formato
+              </a>
+            </sub>
+            <div className="row mt-4">
+              <div className="col-md-6 position-relative">
+                <input
+                  type="file"
+                  accept=".csv"
+                  className={error.file ? 'form-control is-invalid' : 'form-control'}
+                  {...register('file', {
+                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                      if (event.target.files?.length == 0) return setValue('file', null);
+                      if (!event.target.files) setValue('file', event.target.files);
+                      if (!getValues('file')![0].name.includes('csv')) {
+                        seterror({ ...error, file: true });
+                      } else {
+                        seterror({ ...error, file: false });
+                        const file = event.target.files![0];
+                        const reader = new FileReader();
+                        reader.onload = (e: any) => {
+                          const content = e.target.result.trim();
+                          const lines = content.split('\n');
+                          setCsvData(lines);
+                        };
+
+                        reader.readAsText(file);
+                      }
+                    },
+                    onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                      if (event.target.files?.length == 0) return setValue('file', null);
+                      if (!event.target.files) setValue('file', event.target.files);
+                      if (!getValues('file')![0].name.includes('csv')) {
+                        seterror({ ...error, file: true });
+                      } else {
+                        seterror({ ...error, file: false });
+                        const file = event.target.files![0];
+                        const reader = new FileReader();
+                        reader.onload = (e: any) => {
+                          const content = e.target.result.trim();
+                          const lines = content.split('\n');
+                          setCsvData(lines);
+                        };
+
+                        reader.readAsText(file);
+                      }
+                    },
+                  })}
+                />
+                <IfContainer show={error.file}>
+                  <div className="invalid-tooltip">Debe ingresar un archivo con formato .csv</div>
+                </IfContainer>
+              </div>
+              <div className="d-block d-sm-none d-md-none">
+                <div className="col-md-12">
+                  <br />
+                </div>
+              </div>
+              <div className="col-md-6 col-xs-6">
+                <div className="d-grid gap-2 d-md-flex">
+                  <button
+                    disabled={getValues('file')?.length === 0 || !getValues('file') ? true : false}
+                    className="btn btn-success"
+                    onClick={handleClickNomina}>
+                    Cargar
+                  </button>
+                  <button
+                    disabled={
+                      getValues('file')?.length === 0 || getValues('file') === null ? true : false
+                    }
+                    className="btn btn-primary"
+                    onClick={async () => {
+                      if (!getValues('file')) return;
+                      const resp = await Swal.fire({
+                        icon: 'question',
+                        html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name}</b>?`,
+                        confirmButtonText: 'Sí',
+                        confirmButtonColor: 'var(--color-blue)',
+                        showDenyButton: true,
+                        denyButtonText: 'No',
+                        showCancelButton: false,
+                        denyButtonColor: 'var(--bs-danger)',
+                      });
+                      if (resp.isConfirmed) {
+                        setValue('file', null);
+                        refrescarComponente();
+                      }
+                    }}>
+                    Limpiar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <Modal show={show} onHide={handleClose}>
-          <Modal.Header closeButton>
-            <Modal.Title>Modificar Persona Trabajadora</Modal.Title>
-          </Modal.Header>
-
-          <Modal.Body>
+        <div className="row mt-5">
+          <div className="col-md-12">
             <div className="row">
-              <div className="col-md-6">
-                <label>Run</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  disabled
-                  value={rutedit}
-                  onChange={(e) => e.preventDefault}
-                />
-              </div>
-              <div className="col-md-6">
-                <label>Unidad</label>
-                <select
-                  className="form-select"
-                  value={editar?.unidad.idunidad}
-                  onChange={handleChangeUnidad}>
-                  <option value={''}>Seleccionar</option>
-                  {unidadEmpleador.length || 0 > 0 ? (
-                    unidadEmpleador.map(({ idunidad, unidad }) => (
-                      <option key={idunidad} value={idunidad}>
-                        {unidad}
-                      </option>
-                    ))
-                  ) : (
-                    <></>
-                  )}
-                </select>
-              </div>
+              <h5 className="text-center">Personas Trabajadoras</h5>
+              <span
+                className="text-end animate animate__fadeIn"
+                style={{
+                  display: datosPagina!?.trabajadores.length > 1 ? 'block' : 'none',
+                }}>
+                <button className="btn btn-danger btn-sm" onClick={handleDeleteAll}>
+                  Borrar todo
+                </button>
+              </span>
             </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <button className="btn btn-danger" onClick={() => handleClose()}>
+
+            <hr />
+            <IfContainer show={pendiente || loading}>
+              <div className="mb-5">
+                <LoadingSpinner titulo="Cargando personas trabajadoras..." />
+              </div>
+            </IfContainer>
+            <IfContainer show={!pendiente || !loading}>
+              <div
+                className="row mb-2"
+                style={{ display: datosPagina?.trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
+                <div className="col-md-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="...Búsqueda por Run"
+                    onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                      e.preventDefault();
+                      settrabajadores(
+                        datosPagina?.trabajadores.filter((trabajador) =>
+                          trabajador.ruttrabajador.includes(e.target.value.toUpperCase()),
+                        ) ||
+                          datosPagina?.trabajadores.filter((trabajador) =>
+                            trabajador.fechaafiliacion
+                              .toString()
+                              .includes(e.target.value.toUpperCase()),
+                          ) ||
+                          [],
+                      );
+                    }}
+                  />
+                </div>
+              </div>
+              {trabajadores.length || 0 > 0 ? (
+                <>
+                  <TablaTrabajadores
+                    unidad={unidad}
+                    handleDeleteTrabajador={handleDeleteTrabajador}
+                    handleEditTrabajador={handleEditTrabajador}
+                    idunidad={Number(idunidad)}
+                    trabajadores={trabajadores || []}
+                  />
+                </>
+              ) : (
+                <div className="text-center">
+                  <b>No se han encontrado personas trabajadoras</b>
+                </div>
+              )}
+            </IfContainer>
+          </div>
+        </div>
+        <div
+          className="row mt-2"
+          style={{
+            alignSelf: 'end',
+          }}>
+          <div className="col-md-6"></div>
+          <div className="col-md-6 text-end">
+            <button className="btn btn-danger" onClick={() => window.history.back()}>
               Volver
-            </button>{' '}
-            &nbsp;
-            <button type="submit" className="btn btn-primary" onClick={() => handleSubmitEdit()}>
-              Grabar
             </button>
-          </Modal.Footer>
-        </Modal>
+          </div>
+        </div>
+        <br />
       </div>
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Modificar Persona Trabajadora</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          <div className="row">
+            <div className="col-md-6">
+              <label>Run</label>
+              <input
+                type="text"
+                className="form-control"
+                disabled
+                value={rutedit}
+                onChange={(e) => e.preventDefault}
+              />
+            </div>
+            <div className="col-md-6">
+              <label>Unidad</label>
+              <select
+                className="form-select"
+                value={editar?.unidad.idunidad}
+                onChange={handleChangeUnidad}>
+                <option value={''}>Seleccionar</option>
+                {unidadEmpleador.length || 0 > 0 ? (
+                  unidadEmpleador.map(({ idunidad, unidad }) => (
+                    <option key={idunidad} value={idunidad}>
+                      {unidad}
+                    </option>
+                  ))
+                ) : (
+                  <></>
+                )}
+              </select>
+            </div>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="btn btn-danger" onClick={() => handleClose()}>
+            Volver
+          </button>{' '}
+          &nbsp;
+          <button type="submit" className="btn btn-primary" onClick={() => handleSubmitEdit()}>
+            Grabar
+          </button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };

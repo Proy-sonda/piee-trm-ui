@@ -366,171 +366,167 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         <SpinnerPantallaCompleta />
       </IfContainer>
 
-      <div className="bgads">
-        <div className="pb-3 px-3 px-lg-5">
-          <Cabecera
-            foliotramitacion={foliolicencia}
-            idoperador={idOperadorNumber}
-            step={step}
-            title="Licencias Anteriores en los Últimos 6 Meses"
-            onLicenciaCargada={setLicencia}
-            onLinkClickeado={(link) => {
-              formulario.setValue('linkNavegacion', link);
-              formulario.setValue('accion', 'navegar');
-              formulario.handleSubmit(onSubmitForm)();
-            }}
-          />
+      <Cabecera
+        foliotramitacion={foliolicencia}
+        idoperador={idOperadorNumber}
+        step={step}
+        title="Licencias Anteriores en los Últimos 6 Meses"
+        onLicenciaCargada={setLicencia}
+        onLinkClickeado={(link) => {
+          formulario.setValue('linkNavegacion', link);
+          formulario.setValue('accion', 'navegar');
+          formulario.handleSubmit(onSubmitForm)();
+        }}
+      />
 
-          <IfContainer show={cargandoZona4}>
-            <LoadingSpinner titulo="Cargando información..." />
-          </IfContainer>
+      <IfContainer show={cargandoZona4}>
+        <LoadingSpinner titulo="Cargando información..." />
+      </IfContainer>
 
-          <IfContainer show={!cargandoZona4 && errorZona4}>
-            <Row className="pt-5 pb-1">
+      <IfContainer show={!cargandoZona4 && errorZona4}>
+        <Row className="pt-5 pb-1">
+          <Col xs={12}>
+            <h1 className="fs-3 text-center">Error</h1>
+            <p className="text-center">
+              Hubo un error al cargar los datos. Por favor intente más tarde.
+            </p>
+          </Col>
+        </Row>
+      </IfContainer>
+
+      <IfContainer show={!cargandoZona4 && !errorZona4}>
+        <Row className="mt-2 mb-3">
+          <Col xs={12}>
+            <FormGroup controlId="informarLicencias" className="ps-0">
+              <Form.Check
+                type="checkbox"
+                label="Informar Licencias Médicas Anteriores últimos 6 meses"
+                {...formulario.register('informarLicencia')}
+              />
+            </FormGroup>
+          </Col>
+        </Row>
+
+        <IfContainer show={informarLicencias && filasIncompletas.length !== 0}>
+          <Row>
+            <Col xs={12}>
+              <Alert variant="danger" className="d-flex align-items-center fade show">
+                <i className="bi bi-exclamation-triangle me-2"></i>
+                <span>
+                  Las siguientes filas están incompletas:
+                  {filasIncompletas.reduce(
+                    (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
+                    '',
+                  )}
+                </span>
+              </Alert>
+            </Col>
+          </Row>
+        </IfContainer>
+
+        <FormProvider {...formulario}>
+          <form onSubmit={formulario.handleSubmit(onSubmitForm)}>
+            <Row>
               <Col xs={12}>
-                <h1 className="fs-3 text-center">Error</h1>
-                <p className="text-center">
-                  Hubo un error al cargar los datos. Por favor intente más tarde.
-                </p>
+                <Table className="table table-bordered">
+                  <Thead>
+                    <Tr className="align-middle">
+                      <Th>Total Días</Th>
+                      <Th>Desde</Th>
+                      <Th>Hasta</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {licenciasAnteriores.fields.map((field, index) => (
+                      <Tr key={field.id}>
+                        <Td>
+                          <InputDias
+                            opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                            maxDias={184}
+                            deshabilitado={!informarLicencias}
+                            name={`licenciasAnteriores.${index}.dias`}
+                            coincideConRango={{
+                              desde: `licenciasAnteriores.${index}.desde`,
+                              hasta: `licenciasAnteriores.${index}.hasta`,
+                            }}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'dias',
+                              fieldArrayName: 'licenciasAnteriores',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <InputFecha
+                            opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                            deshabilitado={!informarLicencias}
+                            name={`licenciasAnteriores.${index}.desde`}
+                            noPosteriorA={`licenciasAnteriores.${index}.hasta`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'desde',
+                              fieldArrayName: 'licenciasAnteriores',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <InputFecha
+                            opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                            deshabilitado={!informarLicencias}
+                            name={`licenciasAnteriores.${index}.hasta`}
+                            noAnteriorA={`licenciasAnteriores.${index}.desde`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'hasta',
+                              fieldArrayName: 'licenciasAnteriores',
+                            }}
+                          />
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
               </Col>
             </Row>
-          </IfContainer>
 
-          <IfContainer show={!cargandoZona4 && !errorZona4}>
-            <Row className="mt-2 mb-3">
-              <Col xs={12}>
-                <FormGroup controlId="informarLicencias" className="ps-0">
-                  <Form.Check
-                    type="checkbox"
-                    label="Informar Licencias Médicas Anteriores últimos 6 meses"
-                    {...formulario.register('informarLicencia')}
-                  />
-                </FormGroup>
-              </Col>
-            </Row>
-
-            <IfContainer show={informarLicencias && filasIncompletas.length !== 0}>
-              <Row>
-                <Col xs={12}>
-                  <Alert variant="danger" className="d-flex align-items-center fade show">
-                    <i className="bi bi-exclamation-triangle me-2"></i>
-                    <span>
-                      Las siguientes filas están incompletas:
-                      {filasIncompletas.reduce(
-                        (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
-                        '',
-                      )}
-                    </span>
-                  </Alert>
-                </Col>
-              </Row>
-            </IfContainer>
-
-            <FormProvider {...formulario}>
-              <form onSubmit={formulario.handleSubmit(onSubmitForm)}>
-                <Row>
-                  <Col xs={12}>
-                    <Table className="table table-bordered">
-                      <Thead>
-                        <Tr className="align-middle">
-                          <Th>Total Días</Th>
-                          <Th>Desde</Th>
-                          <Th>Hasta</Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {licenciasAnteriores.fields.map((field, index) => (
-                          <Tr key={field.id}>
-                            <Td>
-                              <InputDias
-                                opcional={!informarLicencias || (informarLicencias && index !== 0)}
-                                maxDias={184}
-                                deshabilitado={!informarLicencias}
-                                name={`licenciasAnteriores.${index}.dias`}
-                                coincideConRango={{
-                                  desde: `licenciasAnteriores.${index}.desde`,
-                                  hasta: `licenciasAnteriores.${index}.hasta`,
-                                }}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'dias',
-                                  fieldArrayName: 'licenciasAnteriores',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <InputFecha
-                                opcional={!informarLicencias || (informarLicencias && index !== 0)}
-                                deshabilitado={!informarLicencias}
-                                name={`licenciasAnteriores.${index}.desde`}
-                                noPosteriorA={`licenciasAnteriores.${index}.hasta`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'desde',
-                                  fieldArrayName: 'licenciasAnteriores',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <InputFecha
-                                opcional={!informarLicencias || (informarLicencias && index !== 0)}
-                                deshabilitado={!informarLicencias}
-                                name={`licenciasAnteriores.${index}.hasta`}
-                                noAnteriorA={`licenciasAnteriores.${index}.desde`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'hasta',
-                                  fieldArrayName: 'licenciasAnteriores',
-                                }}
-                              />
-                            </Td>
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  </Col>
-                </Row>
-
-                <div className="row">
-                  <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
-                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      {...formulario.register('accion')}
-                      onClick={() => formulario.setValue('accion', 'anterior')}>
-                      Anterior
-                    </button>
-                  </div>
-                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                    <a className="btn btn-danger" href="/tramitacion">
-                      Tramitación
-                    </a>
-                  </div>
-                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                    <button
-                      type="submit"
-                      className="btn btn-success"
-                      {...formulario.register('accion')}
-                      onClick={() => formulario.setValue('accion', 'guardar')}>
-                      Guardar
-                    </button>
-                  </div>
-                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      {...formulario.register('accion')}
-                      onClick={() => formulario.setValue('accion', 'tramitar')}>
-                      Tramitar
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </FormProvider>
-          </IfContainer>
-        </div>
-      </div>
+            <div className="row">
+              <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
+              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  {...formulario.register('accion')}
+                  onClick={() => formulario.setValue('accion', 'anterior')}>
+                  Anterior
+                </button>
+              </div>
+              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                <a className="btn btn-danger" href="/tramitacion">
+                  Tramitación
+                </a>
+              </div>
+              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                <button
+                  type="submit"
+                  className="btn btn-success"
+                  {...formulario.register('accion')}
+                  onClick={() => formulario.setValue('accion', 'guardar')}>
+                  Guardar
+                </button>
+              </div>
+              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  {...formulario.register('accion')}
+                  onClick={() => formulario.setValue('accion', 'tramitar')}>
+                  Tramitar
+                </button>
+              </div>
+            </div>
+          </form>
+        </FormProvider>
+      </IfContainer>
     </>
   );
 };

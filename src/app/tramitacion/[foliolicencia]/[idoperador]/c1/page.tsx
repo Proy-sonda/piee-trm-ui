@@ -366,218 +366,215 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   };
 
   return (
-    <div className="bgads">
-      <div className="me-5 ms-5">
-        <IfContainer show={errorEmpleador}>
-          <br />
-          <br />
-          <div className="row">
-            <b className="text-center">
-              <h4> No existen datos de la entidad empleadora asociados al usuario</h4>
-            </b>
+    <>
+      <IfContainer show={errorEmpleador}>
+        <br />
+        <br />
+        <div className="row">
+          <b className="text-center">
+            <h4> No existen datos de la entidad empleadora asociados al usuario</h4>
+          </b>
+        </div>
+        <br />
+        <br />
+        <div className="row">
+          <div className="d-flex justify-content-center">
+            <button className="btn btn-danger" onClick={() => router.push('/tramitacion')}>
+              Volver
+            </button>
           </div>
-          <br />
-          <br />
-          <div className="row">
-            <div className="d-flex justify-content-center">
-              <button className="btn btn-danger" onClick={() => router.push('/tramitacion')}>
-                Volver
-              </button>
-            </div>
-          </div>
-          <br />
-        </IfContainer>
+        </div>
+        <br />
+      </IfContainer>
 
-        <IfContainer show={!errorEmpleador}>
-          <Cabecera
-            foliotramitacion={folio}
-            idoperador={idoperador}
-            step={step}
-            title="Identificación de la Entidad Empleadora o Persona Trabajadora Independiente"
-            rutEmpleador={(run) => {
-              setrunEmpleador(run);
-            }}
-            onLinkClickeado={(link) => {
-              formulario.setValue('linkNavegacion', link);
-              formulario.setValue('accion', 'navegar');
-              formulario.handleSubmit(onHandleSubmit)();
-            }}
-          />
+      <IfContainer show={!errorEmpleador}>
+        <Cabecera
+          foliotramitacion={folio}
+          idoperador={idoperador}
+          step={step}
+          title="Identificación de la Entidad Empleadora o Persona Trabajadora Independiente"
+          rutEmpleador={(run) => {
+            setrunEmpleador(run);
+          }}
+          onLinkClickeado={(link) => {
+            formulario.setValue('linkNavegacion', link);
+            formulario.setValue('accion', 'navegar');
+            formulario.handleSubmit(onHandleSubmit)();
+          }}
+        />
 
-          <IfContainer show={cargandoCombos || cargandoData}>
-            <div className={fadeinOut}>
-              <LoadingSpinner titulo="Cargando datos..." />
-            </div>
-          </IfContainer>
-
-          <div
-            className="row mt-2 pb-5"
-            style={{
-              display:
-                cargandoCombos || !erroresCargarCombos || !!errorEmpleador ? 'none' : 'block',
-            }}>
-            <FormProvider {...formulario}>
-              <form
-                className="animate__animated animate__fadeIn"
-                onSubmit={formulario.handleSubmit(onHandleSubmit)}>
-                <div className="row">
-                  <InputRut
-                    name="run"
-                    label="Rut Entidad Empleadora"
-                    tipo="run"
-                    deshabilitado
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <InputRazonSocial
-                    name="razon"
-                    label="Razón Social Entidad Empleadora"
-                    deshabilitado
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <InputTelefono
-                    name="telefono"
-                    label="Teléfono"
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <div
-                    style={{
-                      display: 'none',
-                    }}>
-                    <InputFecha label="Fecha Emisión" name="fechaemision" />
-                  </div>
-
-                  <InputFecha
-                    label="Fecha Recepción LME"
-                    name="fecharecepcionlme"
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                    opcional
-                    noAnteriorA="fechaemision"
-                    esEmision
-                  />
-
-                  <ComboSimple
-                    name="region"
-                    datos={combos?.CCREGION}
-                    idElemento="idregion"
-                    descripcion="nombre"
-                    label="Región"
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <ComboComuna
-                    label="Comuna"
-                    name="comuna"
-                    comunas={combos?.CCCOMUNA}
-                    regionSeleccionada={regionSeleccionada}
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <ComboSimple
-                    name="tipo"
-                    label="Tipo"
-                    descripcion="tipocalle"
-                    idElemento="idtipocalle"
-                    datos={combos?.CALLE}
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <InputCalle
-                    label="Calle"
-                    name="calle"
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <InputNumero
-                    label="Número"
-                    name="numero"
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <InputBlockDepartamento
-                    label="Departamento"
-                    name="departamento"
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <ComboSimple
-                    idElemento="idactividadlaboral"
-                    label="Actividad Laboral"
-                    name="actividadlaboral"
-                    datos={combos?.ACTIVIDAD}
-                    descripcion="actividadlaboral"
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <ComboSimple
-                    name="ocupacion"
-                    label="Ocupación"
-                    datos={combos?.OCUPACION}
-                    idElemento="idocupacion"
-                    descripcion="ocupacion"
-                    className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                  />
-
-                  <IfContainer show={Number(ocupacionSeleccionada) == 19}>
-                    <label className="mb-2"></label>
-
-                    <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mt-2 position-relative">
-                      <input
-                        type="text"
-                        className={`form-control ${
-                          formulario.formState.errors.otro ? 'is-invalid' : ''
-                        }`}
-                        placeholder="Otro..."
-                        {...formulario.register('otro', {
-                          required: {
-                            message: 'El campo otro es obligatorio',
-                            value: Number(ocupacionSeleccionada) == 19 ? true : false,
-                          },
-                        })}
-                      />
-
-                      <IfContainer show={!!formulario.formState.errors.otro}>
-                        <div className="invalid-tooltip">
-                          {formulario.formState.errors.otro?.message}
-                        </div>
-                      </IfContainer>
-                    </div>
-                  </IfContainer>
-                </div>
-                <div className="row">
-                  <div className="d-nne d-md-none col-lg-6 d-lg-inline"></div>
-                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                    <a className="btn btn-danger" href="/tramitacion">
-                      Tramitación
-                    </a>
-                  </div>
-                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                    <button
-                      type="submit"
-                      className="btn btn-success"
-                      {...formulario.register('accion')}
-                      onClick={() => formulario.setValue('accion', 'guardar')}>
-                      Guardar
-                    </button>
-                  </div>
-                  <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      {...formulario.register('accion')}
-                      onClick={() => formulario.setValue('accion', 'siguiente')}>
-                      Siguiente
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </FormProvider>
+        <IfContainer show={cargandoCombos || cargandoData}>
+          <div className={fadeinOut}>
+            <LoadingSpinner titulo="Cargando datos..." />
           </div>
         </IfContainer>
-      </div>
-    </div>
+
+        <div
+          className="row mt-2 pb-5"
+          style={{
+            display: cargandoCombos || !erroresCargarCombos || !!errorEmpleador ? 'none' : 'block',
+          }}>
+          <FormProvider {...formulario}>
+            <form
+              className="animate__animated animate__fadeIn"
+              onSubmit={formulario.handleSubmit(onHandleSubmit)}>
+              <div className="row">
+                <InputRut
+                  name="run"
+                  label="Rut Entidad Empleadora"
+                  tipo="run"
+                  deshabilitado
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <InputRazonSocial
+                  name="razon"
+                  label="Razón Social Entidad Empleadora"
+                  deshabilitado
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <InputTelefono
+                  name="telefono"
+                  label="Teléfono"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <div
+                  style={{
+                    display: 'none',
+                  }}>
+                  <InputFecha label="Fecha Emisión" name="fechaemision" />
+                </div>
+
+                <InputFecha
+                  label="Fecha Recepción LME"
+                  name="fecharecepcionlme"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  opcional
+                  noAnteriorA="fechaemision"
+                  esEmision
+                />
+
+                <ComboSimple
+                  name="region"
+                  datos={combos?.CCREGION}
+                  idElemento="idregion"
+                  descripcion="nombre"
+                  label="Región"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <ComboComuna
+                  label="Comuna"
+                  name="comuna"
+                  comunas={combos?.CCCOMUNA}
+                  regionSeleccionada={regionSeleccionada}
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <ComboSimple
+                  name="tipo"
+                  label="Tipo"
+                  descripcion="tipocalle"
+                  idElemento="idtipocalle"
+                  datos={combos?.CALLE}
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <InputCalle
+                  label="Calle"
+                  name="calle"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <InputNumero
+                  label="Número"
+                  name="numero"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <InputBlockDepartamento
+                  label="Departamento"
+                  name="departamento"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <ComboSimple
+                  idElemento="idactividadlaboral"
+                  label="Actividad Laboral"
+                  name="actividadlaboral"
+                  datos={combos?.ACTIVIDAD}
+                  descripcion="actividadlaboral"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <ComboSimple
+                  name="ocupacion"
+                  label="Ocupación"
+                  datos={combos?.OCUPACION}
+                  idElemento="idocupacion"
+                  descripcion="ocupacion"
+                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                />
+
+                <IfContainer show={Number(ocupacionSeleccionada) == 19}>
+                  <label className="mb-2"></label>
+
+                  <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mt-2 position-relative">
+                    <input
+                      type="text"
+                      className={`form-control ${
+                        formulario.formState.errors.otro ? 'is-invalid' : ''
+                      }`}
+                      placeholder="Otro..."
+                      {...formulario.register('otro', {
+                        required: {
+                          message: 'El campo otro es obligatorio',
+                          value: Number(ocupacionSeleccionada) == 19 ? true : false,
+                        },
+                      })}
+                    />
+
+                    <IfContainer show={!!formulario.formState.errors.otro}>
+                      <div className="invalid-tooltip">
+                        {formulario.formState.errors.otro?.message}
+                      </div>
+                    </IfContainer>
+                  </div>
+                </IfContainer>
+              </div>
+              <div className="row">
+                <div className="d-nne d-md-none col-lg-6 d-lg-inline"></div>
+                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                  <a className="btn btn-danger" href="/tramitacion">
+                    Tramitación
+                  </a>
+                </div>
+                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                  <button
+                    type="submit"
+                    className="btn btn-success"
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'guardar')}>
+                    Guardar
+                  </button>
+                </div>
+                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    {...formulario.register('accion')}
+                    onClick={() => formulario.setValue('accion', 'siguiente')}>
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            </form>
+          </FormProvider>
+        </div>
+      </IfContainer>
+    </>
   );
 };
 

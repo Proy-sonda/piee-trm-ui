@@ -119,128 +119,126 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
         <SpinnerPantallaCompleta />
       </IfContainer>
 
-      <div className="px-2 px-lg-5 pb-4 bgads">
-        <Container fluid>
-          <Row>
-            <Titulo url="">
-              <h5 className="m-0 p-0">Tramitación / No Recepcionar</h5>
-            </Titulo>
-          </Row>
+      <Container fluid>
+        <Row>
+          <Titulo url="">
+            <h5 className="m-0 p-0">Tramitación / No Recepcionar</h5>
+          </Titulo>
+        </Row>
 
-          <Row>
-            <InformacionLicencia
-              folioLicencia={foliolicencia}
-              idoperador={idOperadorNumber}
-              onLicenciaCargada={setLicencia}
-            />
-          </Row>
+        <Row className="mt-4">
+          <InformacionLicencia
+            folioLicencia={foliolicencia}
+            idoperador={idOperadorNumber}
+            onLicenciaCargada={setLicencia}
+          />
+        </Row>
 
-          <IfContainer show={cargando}>
-            <LoadingSpinner titulo="Cargando información..." />
-          </IfContainer>
+        <IfContainer show={cargando}>
+          <LoadingSpinner titulo="Cargando información..." />
+        </IfContainer>
 
-          <IfContainer show={!cargando && erroresCarga.length > 0}>
-            <Row className="pt-5 pb-1">
-              <Col xs={12}>
-                <h1 className="fs-3 text-center">Error</h1>
-                <p className="text-center">
-                  Hubo un error al cargar los datos. Por favor intente más tarde.
-                </p>
-              </Col>
-            </Row>
-          </IfContainer>
-
-          <IfContainer show={!cargando && erroresCarga.length === 0}>
-            <Row className="mt-2">
-              <h6 className="mb-3" style={{ color: 'var(--color-blue)' }}>
-                Por favor indique el motivo por el cual no se tramitará esta licencia:
-              </h6>
-              <p className="mb-3 small">
-                Aquí deberá marcar la opción por la que rechaza la tramitación de la licencia medica
+        <IfContainer show={!cargando && erroresCarga.length > 0}>
+          <Row className="pt-5 pb-1">
+            <Col xs={12}>
+              <h1 className="fs-3 text-center">Error</h1>
+              <p className="text-center">
+                Hubo un error al cargar los datos. Por favor intente más tarde.
               </p>
-              <IfContainer show={esRelacionLaboralTerminada(motivoRechazo)}>
-                <p>
-                  <sub className="float-end">
-                    <b>Obligatorio (*)</b>
-                  </sub>
-                </p>
-              </IfContainer>
-            </Row>
+            </Col>
+          </Row>
+        </IfContainer>
 
-            <FormProvider {...formulario}>
-              <Form onSubmit={formulario.handleSubmit(noTramitarLicencia)}>
-                <Row>
-                  <Col xs={12} md={7} lg={8}>
-                    <InputRadioButtons
-                      name="motivoRechazo"
-                      errores={{ obligatorio: 'Debe seleccionar el motivo para no tramitar' }}
-                      opciones={(motivosDeRechazo ?? []).map((motivo) => ({
-                        label: motivo.motivonorecepcion,
-                        value: motivo.idmotivonorecepcion.toString(),
-                      }))}
-                    />
+        <IfContainer show={!cargando && erroresCarga.length === 0}>
+          <Row className="mt-2">
+            <h6 className="mb-3" style={{ color: 'var(--color-blue)' }}>
+              Por favor indique el motivo por el cual no se tramitará esta licencia:
+            </h6>
+            <p className="mb-3 small">
+              Aquí deberá marcar la opción por la que rechaza la tramitación de la licencia medica
+            </p>
+            <IfContainer show={esRelacionLaboralTerminada(motivoRechazo)}>
+              <p>
+                <sub className="float-end">
+                  <b>Obligatorio (*)</b>
+                </sub>
+              </p>
+            </IfContainer>
+          </Row>
 
-                    <div style={{ maxWidth: '430px' }}>
-                      <IfContainer show={esOtroMotivoDeRechazo(motivoRechazo)}>
-                        <InputOtroMotivoDeRechazo
-                          opcional={!esOtroMotivoDeRechazo(motivoRechazo)}
-                          name="otroMotivoDeRechazo"
-                          label="Por favor indique el motivo por el cual no se tramitará esta licencia:"
-                          className="mt-3"
-                        />
-                      </IfContainer>
+          <FormProvider {...formulario}>
+            <Form onSubmit={formulario.handleSubmit(noTramitarLicencia)}>
+              <Row>
+                <Col xs={12} md={7} lg={8}>
+                  <InputRadioButtons
+                    name="motivoRechazo"
+                    errores={{ obligatorio: 'Debe seleccionar el motivo para no tramitar' }}
+                    opciones={(motivosDeRechazo ?? []).map((motivo) => ({
+                      label: motivo.motivonorecepcion,
+                      value: motivo.idmotivonorecepcion.toString(),
+                    }))}
+                  />
 
-                      <IfContainer show={esRelacionLaboralTerminada(motivoRechazo)}>
-                        <InputFecha
-                          opcional={!esRelacionLaboralTerminada(motivoRechazo)}
-                          name="fechaTerminoRelacion"
-                          label="Fecha de término de relación laboral"
-                          className="mt-3"
-                        />
-                      </IfContainer>
-
-                      <InputArchivo
-                        // opcional={esRelacionLaboralTerminada(motivoRechazo)} // TODO: Descomentar cuando subir archivos sea obligatorio
-                        opcional
-                        name="documentoAdjunto"
-                        label="Adjuntar Documento"
+                  <div style={{ maxWidth: '430px' }}>
+                    <IfContainer show={esOtroMotivoDeRechazo(motivoRechazo)}>
+                      <InputOtroMotivoDeRechazo
+                        opcional={!esOtroMotivoDeRechazo(motivoRechazo)}
+                        name="otroMotivoDeRechazo"
+                        label="Por favor indique el motivo por el cual no se tramitará esta licencia:"
                         className="mt-3"
                       />
-                    </div>
-                  </Col>
+                    </IfContainer>
 
-                  <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
-                    <IfContainer show={licencia && esLicenciaFONASA(licencia)}>
-                      <ComboSimple
-                        opcional={!licencia || !esLicenciaFONASA(licencia)}
-                        name="entidadPagadoraId"
-                        label="Entidad que debe pagar subsidio o Mantener remuneración"
-                        datos={cajasDeCompensacion}
-                        idElemento="idccaf"
-                        descripcion="nombre"
+                    <IfContainer show={esRelacionLaboralTerminada(motivoRechazo)}>
+                      <InputFecha
+                        opcional={!esRelacionLaboralTerminada(motivoRechazo)}
+                        name="fechaTerminoRelacion"
+                        label="Fecha de término de relación laboral"
+                        className="mt-3"
                       />
                     </IfContainer>
-                  </Col>
-                </Row>
 
-                <Row className="mt-5">
-                  <div className="d-flex flex-column flex-sm-row-reverse justify-content-sm-end">
-                    <button type="submit" className="btn btn-primary">
-                      Aceptar
-                    </button>
-                    <Link
-                      href={'/tramitacion'}
-                      className="btn btn-danger mt-2 mt-sm-0 me-sm-2"
-                      title="Página Bandeja de Tramitación">
-                      Volver
-                    </Link>
+                    <InputArchivo
+                      // opcional={esRelacionLaboralTerminada(motivoRechazo)} // TODO: Descomentar cuando subir archivos sea obligatorio
+                      opcional
+                      name="documentoAdjunto"
+                      label="Adjuntar Documento"
+                      className="mt-3"
+                    />
                   </div>
-                </Row>
-              </Form>
-            </FormProvider>
-          </IfContainer>
-        </Container>
-      </div>
+                </Col>
+
+                <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
+                  <IfContainer show={licencia && esLicenciaFONASA(licencia)}>
+                    <ComboSimple
+                      opcional={!licencia || !esLicenciaFONASA(licencia)}
+                      name="entidadPagadoraId"
+                      label="Entidad que debe pagar subsidio o Mantener remuneración"
+                      datos={cajasDeCompensacion}
+                      idElemento="idccaf"
+                      descripcion="nombre"
+                    />
+                  </IfContainer>
+                </Col>
+              </Row>
+
+              <Row className="mt-5">
+                <div className="d-flex flex-column flex-sm-row-reverse justify-content-sm-end">
+                  <button type="submit" className="btn btn-primary">
+                    Aceptar
+                  </button>
+                  <Link
+                    href={'/tramitacion'}
+                    className="btn btn-danger mt-2 mt-sm-0 me-sm-2"
+                    title="Página Bandeja de Tramitación">
+                    Volver
+                  </Link>
+                </div>
+              </Row>
+            </Form>
+          </FormProvider>
+        </IfContainer>
+      </Container>
     </>
   );
 };
