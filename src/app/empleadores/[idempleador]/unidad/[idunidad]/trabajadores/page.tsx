@@ -25,7 +25,7 @@ import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
-import { buscarEmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(servicios)/buscar-empleador-por-id';
+import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
 import exportFromJSON from 'export-from-json';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';

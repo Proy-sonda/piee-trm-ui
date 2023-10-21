@@ -3,56 +3,45 @@
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
-import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
-import { buscarEmpleadorPorId } from '../datos/(servicios)/buscar-empleador-por-id';
+import React, { useState } from 'react';
+import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
 import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
 import TablaUsuarios from './(componentes)/tabla-usuarios';
-import { UsuarioEntidadEmpleadora } from './(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from './(servicios)/buscar-usuarios';
 
 interface UsuariosPageProps {
   params: {
-    idempleador: {
-      id: number;
-    };
+    idempleador: string;
   };
 }
 
 const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
-  const router = useRouter();
+  const idEmpleadorNumber = parseInt(params.idempleador);
 
-  const id = Number(params.idempleador);
-  const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
+  const {
+    cargandoEmpleador: err,
+    empleadorActual: empleadores,
+    errorCargarEmpleador: pendiente,
+  } = useEmpleadorActual();
 
-  const [razon, setrazon] = useState('');
+  const [refresh, cargarUsuarios] = useRefrescarPagina();
 
-  const [refresh, refrescarComponente] = useRefrescarPagina();
+  const [, usuarios] = useFetch(
+    empleadores ? buscarUsuarios(empleadores.rutempleador) : emptyFetch(),
+    [empleadores, refresh],
+  );
 
   const [abrirModalCrearUsuario, setAbrirModalCrearUsuario] = useState(false);
 
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
 
-  const [err, [empleadores], pendiente] = useMergeFetchArray([buscarEmpleadorPorId(id)], [refresh]);
-
-  useEffect(() => {
-    if (empleadores != undefined) {
-      setrazon(empleadores.razonsocial);
-      const busqquedaUsuarios = async () => {
-        const [usuarioBusqueda] = await buscarUsuarios(empleadores.rutempleador);
-        setusuarios(await usuarioBusqueda());
-      };
-      busqquedaUsuarios();
-    }
-  }, [empleadores]);
-
   return (
     <>
       <Titulo url="">
-        Entidad Empleadora - <b>{razon}</b> / Personas Usuarias
+        Entidad Empleadora - <b>{empleadores?.razonsocial ?? 'Cargando...'}</b> / Personas Usuarias
       </Titulo>
 
       <div className="mt-4 row">
@@ -67,7 +56,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
       <div className="row mt-3">
         <div className="col-md-12">
-          <IfContainer show={!pendiente && err.length > 0}>
+          <IfContainer show={!pendiente && err}>
             <h4 className="mt-4 mb-5 text-center">Error al buscar personas usuarias</h4>
           </IfContainer>
 
@@ -77,11 +66,11 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
             </div>
           </IfContainer>
 
-          <IfContainer show={!pendiente && err.length === 0}>
+          <IfContainer show={!pendiente && !err}>
             <TablaUsuarios
               usuarios={usuarios ?? []}
               onEditarUsuario={(idUsuario) => setIdUsuarioEditar(idUsuario)}
-              onUsuarioEliminado={() => refrescarComponente()}
+              onUsuarioEliminado={() => cargarUsuarios()}
             />
           </IfContainer>
         </div>
@@ -89,9 +78,9 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
       {abrirModalCrearUsuario && (
         <ModalCrearUsuario
-          idEmpleador={id}
+          idEmpleador={idEmpleadorNumber}
           onCerrarModal={() => setAbrirModalCrearUsuario(false)}
-          onUsuarioCreado={() => refrescarComponente()}
+          onUsuarioCreado={() => cargarUsuarios()}
         />
       )}
 
@@ -101,7 +90,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
           onCerrarModal={() => setIdUsuarioEditar(undefined)}
           onUsuarioEditado={() => {
             setIdUsuarioEditar(undefined);
-            refrescarComponente();
+            cargarUsuarios();
           }}
         />
       )}

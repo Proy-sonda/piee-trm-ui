@@ -1,10 +1,10 @@
 'use client';
 
-import { useEmpleadorActual } from '@/contexts';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Collapse, Container, Offcanvas, Row, Stack } from 'react-bootstrap';
+import { useEmpleadorActual } from '../(contexts)/empleador-actual-context';
 import styles from './layout.module.css';
 
 interface LinkNavegacion {

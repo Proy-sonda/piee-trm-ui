@@ -1,7 +1,7 @@
 'use client';
 
+import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
 import { EmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(modelos)/empleador-por-id';
-import { buscarEmpleadorPorId } from '@/app/empleadores/[idempleador]/datos/(servicios)/buscar-empleador-por-id';
 import { useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { FetchError, emptyFetch } from '@/servicios/fetch';

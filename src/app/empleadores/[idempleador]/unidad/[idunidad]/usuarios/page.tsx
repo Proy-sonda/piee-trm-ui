@@ -8,7 +8,7 @@ import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import React, { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { buscarEmpleadorPorId } from '../../../datos/(servicios)/buscar-empleador-por-id';
+import { buscarEmpleadorPorId } from '../../../../(servicios)/buscar-empleador-por-id';
 import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
 import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
