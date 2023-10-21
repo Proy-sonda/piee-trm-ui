@@ -104,13 +104,17 @@ export default function LayoutProps({ children, params: { idempleador } }: Layou
           </Offcanvas.Header>
 
           <Offcanvas.Body>
-            {links.map(({ href, titulo }, index) => (
-              <p key={index}>
-                <Link href={href} onClick={() => setAbrirMenuMovil(false)}>
-                  {titulo}
+            <Stack gap={1}>
+              {links.map((link, index) => (
+                <Link
+                  key={index}
+                  href={link.href}
+                  onClick={() => setAbrirMenuMovil(false)}
+                  className={`btn text-nowrap text-start ${claseLinkActivo(link)}`}>
+                  {link.titulo}
                 </Link>
-              </p>
-            ))}
+              ))}
+            </Stack>
           </Offcanvas.Body>
         </Offcanvas>
       </Container>
