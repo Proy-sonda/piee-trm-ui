@@ -35,7 +35,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
   return (
     <>
       <Titulo url="">
-        Entidad Empleadora - <b>{empleadorActual?.razonSocial ?? ''}</b> / Dirección y Unidades RRHH
+        Entidad Empleadora - <b>{empleadorActual?.razonsocial ?? ''}</b> / Dirección y Unidades RRHH
       </Titulo>
 
       <div className="mt-4 d-flex justify-content-end">
