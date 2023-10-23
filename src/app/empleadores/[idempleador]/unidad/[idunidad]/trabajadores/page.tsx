@@ -26,7 +26,7 @@ import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
 import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
-import { AlertaConfirmacion, AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import exportFromJSON from 'export-from-json';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
@@ -119,11 +119,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       if (data.ok) {
         refrescarComponente();
 
-        return AlertaDeExito.fire({
+        return AlertaExito.fire({
           html: `Persona trabajadora ${rut} fue eliminada con éxito`,
         });
       }
-      AlertaDeError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
+      AlertaError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
     };
     AlertaConfirmacion.fire({
       html: `¿Desea eliminar a la persona trabajadora <b>${rut}</b>?`,
@@ -145,13 +145,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     const ActualizaTrabajador = async () => {
       const data = await actualizarTrabajador(editar);
       if (data.ok) {
-        AlertaDeExito.fire({
+        AlertaExito.fire({
           html: 'Persona Trabajadora modificada con éxito',
         });
         setshow(false);
         refrescarComponente();
       } else {
-        AlertaDeError.fire({ html: 'Se ha producido un error' });
+        AlertaError.fire({ html: 'Se ha producido un error' });
       }
     };
 
@@ -181,7 +181,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     setspinnerCargar(false);
     if (recuento > 0) {
-      AlertaDeExito.fire({
+      AlertaExito.fire({
         html: `Se han eliminado un total de <b>${recuento}</b> personas trabajadoras`,
         didClose: () => {
           setcuentagrabados(0);
@@ -190,7 +190,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         },
       });
     } else {
-      AlertaDeError.fire({
+      AlertaError.fire({
         html: `No se han eliminado las personas trabajadoras`,
         didClose: () => {
           setcuentagrabados(0);
@@ -214,7 +214,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       });
 
       if (data.ok) {
-        AlertaDeExito.fire({ html: 'Persona trabajadora agregada correctamente' });
+        AlertaExito.fire({ html: 'Persona trabajadora agregada correctamente' });
         refrescarComponente();
         setLoading(false);
         setValue('run', '');
@@ -226,7 +226,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         if (msgError.includes('verificador invalido'))
           msgError = '<p>Código verificador invalido</p>';
 
-        AlertaDeError.fire({
+        AlertaError.fire({
           html: 'Existe un problema al momento de grabar ' + (msgError ? msgError : data.text()),
         });
       }
@@ -240,7 +240,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     if (!getValues('file') || getValues('file')?.length === 0) return;
     // if (csvData.length == 0 || csvData == undefined) return;
-    if (error.file) return AlertaDeError.fire({ html: 'Debe cargar solo archivos de tipo "csv"' });
+    if (error.file) return AlertaError.fire({ html: 'Debe cargar solo archivos de tipo "csv"' });
 
     /* El regex verifica que el RUT tenga el formato "<correlativo>-<DV>" o "<correlativo>-<DV>"
      * para descartar los que tienen separadores de miles. Despues `validateRut` hace su magia
@@ -257,7 +257,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     setCsvData(csvData.filter((rut: string) => !validateRut(formatRut(rut, false)) === true));
 
     if (errorEncontrado?.trim() != '' && errorEncontrado != undefined) {
-      return AlertaDeError.fire({
+      return AlertaError.fire({
         html: `
           <p>Existe un error en el formato del RUN <b>${errorEncontrado}</b></p>
           <p class="mb-0 pb-0">
@@ -295,7 +295,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     if (recuento - recuentoError > 0) {
       setspinnerCargar(false);
-      AlertaDeExito.fire({
+      AlertaExito.fire({
         html: `Se ha grabado <b>${
           recuento - recuentoError
         } persona(s) trabajadora(s)</b> con éxito`,

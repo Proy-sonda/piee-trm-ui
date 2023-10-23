@@ -10,7 +10,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -94,13 +94,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
         estadousuario: usuarioEditar.estadousuario,
       });
 
-      AlertaDeExito.fire({
+      AlertaExito.fire({
         text: 'Persona usuaria actualizada con éxito',
       });
 
       onUsuarioEditado();
     } catch (error) {
-      return AlertaDeError.fire({
+      return AlertaError.fire({
         title: 'Error al actualizar persona usuaria',
         text: 'Se ha producido un error desconocido',
       });

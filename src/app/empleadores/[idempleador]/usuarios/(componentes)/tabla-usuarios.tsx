@@ -3,7 +3,7 @@ import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { useWindowSize } from '@/hooks/use-window-size';
-import { AlertaConfirmacion, AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useContext } from 'react';
@@ -57,7 +57,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     try {
       await recuperarContrasena(rut);
 
-      AlertaDeExito.fire({
+      AlertaExito.fire({
         title: 'Clave reenviada',
         html: `Se ha enviado con éxito una nueva clave temporal al correo <b>${email}</b>`,
         timer: 4000,
@@ -69,7 +69,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
         router.replace('/');
       }
     } catch (error: any) {
-      AlertaDeError.fire({
+      AlertaError.fire({
         title: 'Error',
         html: 'La persona usuaria se encuentra deshabilitada',
       });
@@ -93,14 +93,14 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     try {
       await eliminarUsuario(usuario.idusuario);
 
-      AlertaDeExito.fire({
+      AlertaExito.fire({
         html: `Persona usuaria fue eliminada con éxito`,
         timer: 3000,
       });
 
       onUsuarioEliminado();
     } catch (error) {
-      return AlertaDeError.fire({
+      return AlertaError.fire({
         title: 'Error al eliminar persona usuaria',
       });
     }
