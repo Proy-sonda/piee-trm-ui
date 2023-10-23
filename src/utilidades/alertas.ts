@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
  *
  * Por defecto tiene un ícono de éxito
  */
-export const AlertaDeExito = Swal.mixin({
+export const AlertaExito = Swal.mixin({
   icon: 'success',
   timer: 2000,
   showConfirmButton: false,
@@ -16,7 +16,7 @@ export const AlertaDeExito = Swal.mixin({
  *
  * Por defecto tiene un ícono de error.
  */
-export const AlertaDeError = Swal.mixin({
+export const AlertaError = Swal.mixin({
   icon: 'error',
   showConfirmButton: true,
   confirmButtonColor: 'var(--color-blue)',
@@ -26,7 +26,7 @@ export const AlertaDeError = Swal.mixin({
 /**
  * Alerta para hacer una pregunta de `SÍ` o `NO`.
  *
- * Por defecto tiene un ícono de pregunta
+ * Por defecto tiene un ícono de pregunta y usa el botón "Deny" para el "NO".
  */
 export const AlertaConfirmacion = Swal.mixin({
   icon: 'question',

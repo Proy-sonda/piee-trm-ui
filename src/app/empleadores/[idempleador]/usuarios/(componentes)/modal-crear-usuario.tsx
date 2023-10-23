@@ -10,7 +10,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -68,7 +68,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
         ],
       });
 
-      AlertaDeExito.fire({ text: 'Persona usuaria creada con éxito' });
+      AlertaExito.fire({ text: 'Persona usuaria creada con éxito' });
 
       limpiarFormulario();
 
@@ -77,13 +77,13 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
       console.error({ error });
 
       if (error instanceof PersonaUsuariaYaExisteError) {
-        return AlertaDeError.fire({
+        return AlertaError.fire({
           title: 'Error',
           text: 'El RUT de la persona usuaria ya existe',
         });
       }
 
-      return AlertaDeError.fire({
+      return AlertaError.fire({
         title: 'Error al crear usuario',
         text: 'Se ha producido un error desconocido',
       });

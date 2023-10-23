@@ -8,7 +8,7 @@ import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
-import { AlertaConfirmacion, AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
@@ -58,11 +58,11 @@ const EmpleadoresPage = () => {
 
       refrescarPagina();
 
-      AlertaDeExito.fire({
+      AlertaExito.fire({
         html: `Entidad empleadora <b>${empresa}</b> fue desuscrita con éxito`,
       });
     } catch (error) {
-      AlertaDeError.fire({ title: 'Hubo un problema al desadscribir a la entidad empleadora' });
+      AlertaError.fire({ title: 'Hubo un problema al desadscribir a la entidad empleadora' });
     } finally {
       setMostrarSpinner(false);
     }

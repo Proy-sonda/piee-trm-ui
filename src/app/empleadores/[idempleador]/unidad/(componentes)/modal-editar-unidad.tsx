@@ -11,7 +11,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -116,13 +116,13 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
         unidadId: idUnidad,
       });
 
-      AlertaDeExito.fire({ text: 'Unidad fue actualizada con éxito' });
+      AlertaExito.fire({ text: 'Unidad fue actualizada con éxito' });
 
       onUnidadRRHHEditada();
 
       handleCerrarModal();
     } catch (error) {
-      AlertaDeError.fire({
+      AlertaError.fire({
         title: 'Error',
         text: 'Hubo un problema al actualizar la unidad, por favor contactar a un administrador',
       });

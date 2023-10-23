@@ -12,7 +12,7 @@ import {
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -74,7 +74,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
         empleadorId: idEmpleador,
       });
 
-      AlertaDeExito.fire({
+      AlertaExito.fire({
         text: 'Unidad fue creada con éxito',
       });
 
@@ -82,7 +82,7 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
 
       onNuevaUnidadCreada();
     } catch (error) {
-      AlertaDeError.fire({
+      AlertaError.fire({
         title: 'Error',
         text: 'Hubo un problema al crear la unidad, por favor contactar a un administrador',
       });
