@@ -6,11 +6,14 @@ import Titulo from '@/components/titulo/titulo';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
-import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Nav } from 'react-bootstrap';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
 import TablaUnidades from './(componentes)/tabla-unidades';
+import { TIPOS_DE_OPERADORES, TipoOperador } from './(modelos)/tipo-operador';
 
 interface UnidadRRHHPageProps {
   params: {
@@ -21,16 +24,30 @@ interface UnidadRRHHPageProps {
 const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador } }) => {
   const idEmpleadorNumber = Number(idempleador);
 
+  const search = useSearchParams();
+
+  // prettier-ignore
+  const tabOperadorQuery: TipoOperador = TIPOS_DE_OPERADORES.find((x) => x === search.get('operador')) ?? 'imed';
+
+  const [tabOperador, setTabOperador] = useState<TipoOperador>(tabOperadorQuery);
+
   const [idunidad, setIdunidad] = useState<string | undefined>(undefined);
 
   const { empleadorActual } = useEmpleadorActual();
 
-  const [refrescar, refrescarPagina] = useRefrescarPagina();
+  const [refrescar, refrescarUnidades] = useRefrescarPagina();
 
   const [errorCargarUnidad, unidades, cargandoUnidades] = useFetch(
     empleadorActual ? buscarUnidadesDeRRHH(empleadorActual.rutempleador) : emptyFetch(),
-    [refrescar, empleadorActual],
+    [refrescar, empleadorActual, tabOperador],
   );
+
+  // Actualiza URL en cambio de operador
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('operador', tabOperador);
+    window.history.pushState({}, '', url);
+  }, [tabOperador]);
 
   return (
     <>
@@ -38,7 +55,16 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
         Entidad Empleadora - <b>{empleadorActual?.razonsocial ?? ''}</b> / Dirección y Unidades RRHH
       </Titulo>
 
-      <div className="mt-4 d-flex justify-content-end">
+      <Nav variant="tabs" className="mt-4">
+        <Nav.Link active={tabOperador === 'imed'} onClick={() => setTabOperador('imed')}>
+          I-MED
+        </Nav.Link>
+        <Nav.Link active={tabOperador === 'medipass'} onClick={() => setTabOperador('medipass')}>
+          MEDIPASS
+        </Nav.Link>
+      </Nav>
+
+      <div className="mt-3 d-flex justify-content-end">
         <button
           className="btn btn-success btn-sm"
           disabled={cargandoUnidades || !!errorCargarUnidad}
@@ -65,7 +91,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
               idempleador={idEmpleadorNumber}
               unidades={unidades ?? []}
               onEditarUnidad={({ idunidad }) => setIdunidad(idunidad.toString())}
-              onUnidadEliminada={() => refrescarPagina()}
+              onUnidadEliminada={() => refrescarUnidades()}
             />
           </IfContainer>
         </div>
@@ -73,7 +99,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
 
       <ModalNuevaUnidad
         idEmpleador={idEmpleadorNumber}
-        onNuevaUnidadCreada={() => refrescarPagina()}
+        onNuevaUnidadCreada={() => refrescarUnidades()}
       />
 
       {idunidad !== undefined && (
@@ -81,7 +107,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
           idEmpleador={idEmpleadorNumber}
           idUnidad={idunidad}
           onUnidadRRHHEditada={() => {
-            refrescarPagina();
+            refrescarUnidades();
           }}
           onCerrarModal={() => {
             setIdunidad(undefined);
