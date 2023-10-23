@@ -26,6 +26,7 @@ import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
 import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
+import { AlertaConfirmacion, AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
 import exportFromJSON from 'export-from-json';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
@@ -117,24 +118,15 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
       if (data.ok) {
         refrescarComponente();
-        return Swal.fire({
+
+        return AlertaDeExito.fire({
           html: `Persona trabajadora ${rut} fue eliminada con éxito`,
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
         });
       }
-      Swal.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
+      AlertaDeError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
     };
-    Swal.fire({
-      icon: 'question',
+    AlertaConfirmacion.fire({
       html: `¿Desea eliminar a la persona trabajadora <b>${rut}</b>?`,
-      showDenyButton: true,
-      showCancelButton: false,
-      confirmButtonText: 'Si',
-      confirmButtonColor: 'var(--color-blue)',
-      denyButtonColor: 'var(--bs-danger)',
-      denyButtonText: `No`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
     });
@@ -153,16 +145,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     const ActualizaTrabajador = async () => {
       const data = await actualizarTrabajador(editar);
       if (data.ok) {
-        Swal.fire({
+        AlertaDeExito.fire({
           html: 'Persona Trabajadora modificada con éxito',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
         });
         setshow(false);
         refrescarComponente();
       } else {
-        Swal.fire({ html: 'Se ha producido un error', icon: 'error' });
+        AlertaDeError.fire({ html: 'Se ha producido un error' });
       }
     };
 
@@ -171,14 +160,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const handleDeleteAll = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const resp = await Swal.fire({
-      icon: 'question',
+    const resp = await AlertaConfirmacion.fire({
       html: `¿Desea eliminar todos los trabajadores de la unidad "<b>${unidad}</b>"?`,
-      confirmButtonColor: 'var(--color-blue)',
-      confirmButtonText: 'Sí',
-      showDenyButton: true,
-      denyButtonText: 'No',
-      denyButtonColor: 'var(--bs-danger)',
     });
 
     if (resp.isDenied) return;
@@ -198,11 +181,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     setspinnerCargar(false);
     if (recuento > 0) {
-      Swal.fire({
-        icon: 'success',
+      AlertaDeExito.fire({
         html: `Se han eliminado un total de <b>${recuento}</b> personas trabajadoras`,
-        showConfirmButton: false,
-        timer: 2000,
         didClose: () => {
           setcuentagrabados(0);
           settextProgress('');
@@ -210,10 +190,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         },
       });
     } else {
-      Swal.fire({
-        icon: 'error',
+      AlertaDeError.fire({
         html: `No se han eliminado las personas trabajadoras`,
-        confirmButtonColor: 'var(--color-blue)',
         didClose: () => {
           setcuentagrabados(0);
           settextProgress('');
@@ -236,12 +214,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       });
 
       if (data.ok) {
-        Swal.fire({
-          html: 'Persona trabajadora agregada correctamente',
-          icon: 'success',
-          timer: 2000,
-          showConfirmButton: false,
-        });
+        AlertaDeExito.fire({ html: 'Persona trabajadora agregada correctamente' });
         refrescarComponente();
         setLoading(false);
         setValue('run', '');
@@ -253,10 +226,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         if (msgError.includes('verificador invalido'))
           msgError = '<p>Código verificador invalido</p>';
 
-        Swal.fire({
+        AlertaDeError.fire({
           html: 'Existe un problema al momento de grabar ' + (msgError ? msgError : data.text()),
-          icon: 'error',
-          confirmButtonColor: 'var(--color-blue)',
         });
       }
     };
@@ -269,12 +240,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     if (!getValues('file') || getValues('file')?.length === 0) return;
     // if (csvData.length == 0 || csvData == undefined) return;
-    if (error.file)
-      return Swal.fire({
-        icon: 'error',
-        html: 'Debe cargar solo archivos de tipo "csv"',
-        confirmButtonColor: 'var(--color-blue)',
-      });
+    if (error.file) return AlertaDeError.fire({ html: 'Debe cargar solo archivos de tipo "csv"' });
 
     let errorEncontrado = csvData.find(
       (rut: string) =>
@@ -284,10 +250,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     setCsvData(csvData.filter((rut: string) => !validateRut(formatRut(rut, false)) === true));
 
     if (errorEncontrado?.trim() != '' && errorEncontrado != undefined) {
-      return Swal.fire({
-        icon: 'error',
+      return AlertaDeError.fire({
         html: `Existe un error en el formato del RUN <b>${errorEncontrado}</b> <br/> Verifique el documento`,
-        confirmButtonColor: 'var(--color-blue)',
       });
     }
 
@@ -319,28 +283,20 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     if (recuento - recuentoError > 0) {
       setspinnerCargar(false);
-      Swal.fire({
-        icon: 'success',
+      AlertaDeExito.fire({
         html: `Se ha grabado <b>${
           recuento - recuentoError
         } persona(s) trabajadora(s)</b> con éxito`,
-        showConfirmButton: false,
-        timer: 2000,
         didClose: async () => {
           refrescarComponente();
           setcuentagrabados(0);
           settextProgress('');
           setValue('file', null);
           if (!(recuentoError > 0)) return;
-          const resp = await Swal.fire({
+          const resp = await AlertaConfirmacion.fire({
             icon: 'info',
             html: `<p>Existen personas trabajadoras ya registradas en una unidad.</p>
                   <b>¿Desea verificar los RUN ya asociados a otra unidad?</b>`,
-            confirmButtonColor: 'var(--color-blue)',
-            confirmButtonText: 'Sí',
-            showDenyButton: true,
-            denyButtonText: 'No',
-            denyButtonColor: 'var(--bs-danger)',
           });
 
           if (resp.isDenied || resp.isDismissed) return;
@@ -557,15 +513,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                     className="btn btn-primary"
                     onClick={async () => {
                       if (!getValues('file')) return;
-                      const resp = await Swal.fire({
-                        icon: 'question',
+                      const resp = await AlertaConfirmacion.fire({
                         html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name}</b>?`,
-                        confirmButtonText: 'Sí',
-                        confirmButtonColor: 'var(--color-blue)',
-                        showDenyButton: true,
-                        denyButtonText: 'No',
-                        showCancelButton: false,
-                        denyButtonColor: 'var(--bs-danger)',
                       });
                       if (resp.isConfirmed) {
                         setValue('file', null);
