@@ -1,7 +1,7 @@
 import AppFooter from '@/components/footer/footer';
 import AppHeader from '@/components/header/header';
 import Position from '@/components/stage/position';
-import { AuthProvider, InscribeProvider, StepProvider } from '@/contexts';
+import { AuthProvider } from '@/contexts';
 import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -23,7 +23,7 @@ export default function RootLayout(
   dsc: string,
 ) {
   return (
-    <StepProvider>
+    <>
       <Head>
         <title>Portal Tramitación LME - {title} </title>
         <meta name="description" content={dsc} />
@@ -31,27 +31,25 @@ export default function RootLayout(
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <AuthProvider>
-        <InscribeProvider>
-          <html>
-            <body>
-              <AppHeader />
+        <html>
+          <body>
+            <AppHeader />
 
-              <main className="bg-white shadow-sm">
-                <Position />
-                <div>{children}</div>
-              </main>
+            <main className="bg-white shadow-sm">
+              <Position />
+              <div>{children}</div>
+            </main>
 
-              <AppFooter />
-            </body>
+            <AppFooter />
+          </body>
 
-            <script
-              src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-              integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
-              crossOrigin={'anonymous'}
-              async></script>
-          </html>
-        </InscribeProvider>
+          <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+            crossOrigin={'anonymous'}
+            async></script>
+        </html>
       </AuthProvider>
-    </StepProvider>
+    </>
   );
 }

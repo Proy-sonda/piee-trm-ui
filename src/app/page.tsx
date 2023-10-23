@@ -15,19 +15,10 @@ interface HomePageProps {
 }
 
 const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
-  const _adsUrl: string = adsUrl();
-
-  // TODO: Eliminar
-  // const router = useRouter();
-
-  // useEffect(() => {
-  //   if (estaLogueado() && !searchParams.redirectTo) {
-  //     router.push('/tramitacion');
-  //   }
-  // }, []);
+  const urlAdscripcion: string = adsUrl();
 
   return (
-    <div className="bgads">
+    <>
       <Head>
         <title>Portal Tramitación LME</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -52,18 +43,16 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
 
         <div className="col-12 col-md-6">
           <ButtonImage
-            url={`${_adsUrl}/adscripcion`}
+            url={`${urlAdscripcion}/adscripcion`}
             text="Inscribe Entidad Empleadora"
             img={insemp.src}
           />
         </div>
         <div className="col-12 col-md-6">
-          {/* <ButtonImage url='/tramitacion' text='Ingreso al portal' img={redcross.src} /> */}
-
           <LoginComponent />
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
