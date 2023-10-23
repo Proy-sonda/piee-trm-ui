@@ -1,69 +1,79 @@
+import {
+  ComboSimple,
+  InputApellidos,
+  InputEmail,
+  InputNombres,
+  InputRut,
+  InputTelefono,
+} from '@/components/form';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import isEmail from 'validator/es/lib/isEmail';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioEditarUsuario } from '../(modelos)/formulario-editar-usuario';
 import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
 import { buscarUsuarioPorId } from '../(servicios)/buscar-usuario-por-id';
 
 interface ModalEditarUsuarioProps {
-  idUsuario: number;
+  show: boolean;
+  idUsuario?: number;
   onCerrarModal: () => void;
   onUsuarioEditado: () => void;
 }
 
 const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
-  idUsuario: idUsuarioUsuario,
+  show,
+  idUsuario,
   onCerrarModal,
   onUsuarioEditado,
 }) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
-  const [errDatosModal, datosModal, datosPendientes] = useMergeFetchObject({
+  const [errCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     roles: buscarRolesUsuarios(),
-    usuarioEditar: buscarUsuarioPorId(idUsuarioUsuario),
   });
 
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    setValue,
-    setError,
-    formState: { errors },
-  } = useForm<FormularioEditarUsuario>({
-    mode: 'onBlur',
-  });
+  const [errUsuario, usuarioEditar, cargandoUsuario] = useFetch(
+    idUsuario ? buscarUsuarioPorId(idUsuario) : emptyFetch(),
+    [idUsuario],
+  );
+
+  const formulario = useForm<FormularioEditarUsuario>({ mode: 'onBlur' });
 
   // Parchar formulario
   useEffect(() => {
-    if (datosPendientes || errDatosModal.length > 0 || !datosModal) {
+    if (
+      cargandoCombos ||
+      cargandoUsuario ||
+      errCargarCombos.length > 0 ||
+      errUsuario ||
+      !usuarioEditar ||
+      !combos
+    ) {
       return;
     }
 
-    setValue('rut', datosModal.usuarioEditar.rutusuario);
-    setValue('nombres', datosModal.usuarioEditar.nombres);
-    setValue('apellidos', datosModal.usuarioEditar.apellidos);
-    setValue('telefono1', datosModal.usuarioEditar.telefonouno);
-    setValue('telefono2', datosModal.usuarioEditar.telefonodos);
-    setValue('email', datosModal.usuarioEditar.email);
-    setValue('confirmarEmail', datosModal.usuarioEditar.email);
-    setValue('rolId', datosModal.usuarioEditar.rol.idrol);
-  }, [datosModal]);
+    formulario.setValue('rut', usuarioEditar.rutusuario);
+    formulario.setValue('nombres', usuarioEditar.nombres);
+    formulario.setValue('apellidos', usuarioEditar.apellidos);
+    formulario.setValue('telefono1', usuarioEditar.telefonouno);
+    formulario.setValue('telefono2', usuarioEditar.telefonodos);
+    formulario.setValue('email', usuarioEditar.email);
+    formulario.setValue('confirmarEmail', usuarioEditar.email);
+    formulario.setValue('rolId', usuarioEditar.rol.idrol);
+  }, [cargandoUsuario, usuarioEditar, errUsuario]);
 
   const handleActualizarUsuario: SubmitHandler<FormularioEditarUsuario> = async (data) => {
-    const rol = datosModal!.roles.find((rol) => rol.idrol === data.rolId);
+    const rol = combos!.roles.find((rol) => rol.idrol === data.rolId);
     if (!rol) {
       throw new Error('El rol no se ha seleccionado o no existe');
     }
 
-    const usuarioEditar = datosModal?.usuarioEditar;
     if (!usuarioEditar) {
       throw new Error('No se encuentra la persona usuaria para editar');
     }
@@ -100,27 +110,8 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
   };
 
   const handleCerrarModal = () => {
+    formulario.reset();
     onCerrarModal();
-  };
-
-  const validarComboObligatorio = (mensaje?: string) => {
-    return (valor: number | string) => {
-      if (typeof valor === 'number' && valor === -1) {
-        return mensaje ?? 'Este campo es obligatorio';
-      }
-
-      if (typeof valor === 'string' && valor === '') {
-        return mensaje ?? 'Este campo es obligatorio';
-      }
-    };
-  };
-
-  const trimInput = (campo: keyof FormularioEditarUsuario) => {
-    const value = getValues(campo);
-
-    if (typeof value === 'string') {
-      setValue(campo, value.trim(), { shouldValidate: true });
-    }
   };
 
   return (
@@ -129,292 +120,111 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
         <SpinnerPantallaCompleta />
       </IfContainer>
 
-      <Modal backdrop="static" size="xl" centered scrollable show>
+      <Modal backdrop="static" size="xl" centered show={show} keyboard={false}>
         <Modal.Header closeButton onClick={handleCerrarModal}>
-          <Modal.Title>Editar Persona Usuaria</Modal.Title>
+          <Modal.Title className="fs-5">Editar Persona Usuaria</Modal.Title>
         </Modal.Header>
 
-        <Modal.Body>
-          <IfContainer show={errDatosModal.length > 0}>
-            <h4 className="my-5 text-center">Hubo un error al cargar los datos</h4>
-          </IfContainer>
+        <FormProvider {...formulario}>
+          <form onSubmit={formulario.handleSubmit(handleActualizarUsuario)}>
+            <Modal.Body>
+              <IfContainer show={cargandoCombos || cargandoUsuario}>
+                <LoadingSpinner titulo="Cargando..." />
+              </IfContainer>
 
-          <IfContainer show={datosPendientes}>
-            <LoadingSpinner />
-          </IfContainer>
+              <IfContainer
+                show={
+                  !(cargandoCombos || cargandoUsuario) && (errCargarCombos.length > 0 || errUsuario)
+                }>
+                <h4 className="my-5 text-center">Hubo un error al cargar los datos</h4>
+              </IfContainer>
 
-          <IfContainer show={!datosPendientes && errDatosModal.length === 0}>
-            <form onSubmit={handleSubmit(handleActualizarUsuario)}>
-              <div className="row mb-4 g-3 align-items-baseline">
-                <div className="col-12 col-lg-6 col-xl-3 position-relative">
-                  <label className="form-label" htmlFor="rut">
-                    RUT (*)
-                  </label>
-                  <input
-                    id="rut"
-                    type="text"
-                    autoComplete="new-custom-value"
-                    className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
-                    disabled={idUsuarioUsuario !== undefined ? true : false}
-                    {...register('rut', {
-                      required: {
-                        message: 'El RUT es obligatorio',
-                        value: true,
-                      },
-                    })}
+              <IfContainer
+                show={
+                  !(cargandoCombos || cargandoUsuario) &&
+                  errCargarCombos.length === 0 &&
+                  !errUsuario
+                }>
+                <div className="row mb-4 g-3 align-items-baseline">
+                  <InputRut
+                    deshabilitado
+                    name="rut"
+                    label="RUN"
+                    tipo="run"
+                    className="col-12 col-lg-6 col-xl-3"
                   />
-                  <IfContainer show={!!errors.rut}>
-                    <div className="invalid-tooltip">{errors.rut?.message}</div>
-                  </IfContainer>
-                </div>
 
-                <div className="col-12 col-lg-6 col-xl-3 position-relative">
-                  <label className="form-label" htmlFor="nombres">
-                    Nombres (*)
-                  </label>
-                  <input
-                    id="nombres"
-                    type="text"
-                    autoComplete="new-custom-value"
-                    className={`form-control ${errors.nombres ? 'is-invalid' : ''}`}
-                    {...register('nombres', {
-                      required: {
-                        message: 'Este campo es obligatorio',
-                        value: true,
-                      },
-                      minLength: {
-                        value: 4,
-                        message: 'Debe tener al menos 4 caracteres',
-                      },
-                      maxLength: {
-                        value: 80,
-                        message: 'Debe tener a lo más 80 caracteres',
-                      },
-                      onBlur: () => trimInput('nombres'),
-                    })}
+                  <InputNombres
+                    name="nombres"
+                    label="Nombres"
+                    className="col-12 col-lg-6 col-xl-3"
                   />
-                  <IfContainer show={!!errors.nombres}>
-                    <div className="invalid-tooltip">{errors.nombres?.message}</div>
-                  </IfContainer>
-                </div>
 
-                <div className="col-12 col-lg-6 col-xl-3 position-relative">
-                  <label className="form-label" htmlFor="apellidos">
-                    Apellidos (*)
-                  </label>
-                  <input
-                    id="apellidos"
-                    type="text"
-                    autoComplete="new-custom-value"
-                    className={`form-control ${errors.apellidos ? 'is-invalid' : ''}`}
-                    {...register('apellidos', {
-                      required: {
-                        message: 'Este campo es obligatorio',
-                        value: true,
-                      },
-                      minLength: {
-                        value: 4,
-                        message: 'Debe tener al menos 4 caracteres',
-                      },
-                      maxLength: {
-                        value: 80,
-                        message: 'Debe tener a lo más 80 caracteres',
-                      },
-                      onBlur: () => trimInput('apellidos'),
-                    })}
+                  <InputApellidos
+                    name="apellidos"
+                    label="Apellidos"
+                    className="col-12 col-lg-6 col-xl-3"
                   />
-                  <IfContainer show={!!errors.apellidos}>
-                    <div className="invalid-tooltip">{errors.apellidos?.message}</div>
-                  </IfContainer>
-                </div>
 
-                <div className="col-12 col-lg-6 col-xl-3 position-relative">
-                  <label className="form-label" htmlFor="rol">
-                    Rol (*)
-                  </label>
-                  <select
-                    id="rol"
-                    autoComplete="new-custom-value"
-                    className={`form-select ${errors.rolId ? 'is-invalid' : ''}`}
-                    {...register('rolId', {
-                      setValueAs: (v) => parseInt(v, 10),
-                      validate: validarComboObligatorio(),
-                    })}>
-                    <option value={-1}>Seleccionar</option>
-                    {datosModal &&
-                      datosModal.roles.map((rol) => (
-                        <option key={rol.idrol} value={rol.idrol}>
-                          {rol.rol}
-                        </option>
-                      ))}
-                  </select>
-                  <IfContainer show={!!errors.rolId}>
-                    <div className="invalid-tooltip">{errors.rolId?.message}</div>
-                  </IfContainer>
-                </div>
-
-                <div className="col-12 col-lg-6 col-xl-3 position-relative">
-                  <label className="form-label" htmlFor="telefono1">
-                    Teléfono 1
-                  </label>
-                  <div className="input-group mb-2">
-                    <div className="input-group-prepend">
-                      <div className="input-group-text">+56</div>
-                    </div>
-                    <input
-                      id="telefono1"
-                      type="text"
-                      autoComplete="new-custom-value"
-                      className={`form-control ${errors.telefono1 ? 'is-invalid' : ''}`}
-                      {...register('telefono1', {
-                        pattern: {
-                          value: /^[0-9]{9}$/, // Exactamente 9 digitos
-                          message: 'Deben ser solo dígitos',
-                        },
-                        onChange: (event: any) => {
-                          const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
-                          let valorFinal = event.target.value as string;
-
-                          if (regex.test(valorFinal)) {
-                            valorFinal = valorFinal.replaceAll(regex, '');
-                          }
-
-                          if (valorFinal.length > 9) {
-                            valorFinal = valorFinal.substring(0, 9);
-                          }
-
-                          setValue('telefono1', valorFinal);
-                        },
-                      })}
-                    />
-                    <IfContainer show={!!errors.telefono1}>
-                      <div className="invalid-tooltip">{errors.telefono1?.message}</div>
-                    </IfContainer>
-                  </div>
-                </div>
-
-                <div className="col-12 col-lg-6 col-xl-3 position-relative">
-                  <label className="form-label" htmlFor="telefono2">
-                    Teléfono 2
-                  </label>
-                  <div className="input-group mb-2">
-                    <div className="input-group-prepend">
-                      <div className="input-group-text">+56</div>
-                    </div>
-                    <input
-                      id="telefono2"
-                      type="text"
-                      autoComplete="new-custom-value"
-                      className={`form-control ${errors.telefono2 ? 'is-invalid' : ''}`}
-                      {...register('telefono2', {
-                        pattern: {
-                          value: /^[0-9]{9}$/, // Exactamente 9 digitos
-                          message: 'Deben ser solo dígitos',
-                        },
-                        onChange: (event: any) => {
-                          const regex = /[^0-9]/g; // Hace match con cualquier caracter que no sea un numero
-                          let valorFinal = event.target.value as string;
-
-                          if (regex.test(valorFinal)) {
-                            valorFinal = valorFinal.replaceAll(regex, '');
-                          }
-
-                          if (valorFinal.length > 9) {
-                            valorFinal = valorFinal.substring(0, 9);
-                          }
-
-                          setValue('telefono2', valorFinal);
-                        },
-                      })}
-                    />
-                    <IfContainer show={!!errors.telefono2}>
-                      <div className="invalid-tooltip">{errors.telefono2?.message}</div>
-                    </IfContainer>
-                  </div>
-                </div>
-
-                <div className="col-12 col-lg-6 col-xl-3 position-relative">
-                  <label className="form-label" htmlFor="email">
-                    Correo electrónico (*)
-                  </label>
-                  <input
-                    id="email"
-                    type="mail"
-                    autoComplete="new-custom-value"
-                    placeholder="ejemplo@ejemplo.cl"
-                    onPaste={(e) => e.preventDefault()}
-                    onCopy={(e) => e.preventDefault()}
-                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                    {...register('email', {
-                      required: {
-                        value: true,
-                        message: 'Este campo es obligatorio',
-                      },
-                      validate: {
-                        esEmail: (email) => (isEmail(email) ? undefined : 'Correo inválido'),
-                      },
-                      onBlur: (event) => {
-                        const email = event.target.value as string;
-                        if (getValues('confirmarEmail') !== email) {
-                          setError('confirmarEmail', { message: 'Correos no coinciden' });
-                        }
-                      },
-                    })}
+                  <ComboSimple
+                    name="rolId"
+                    label="Rol"
+                    datos={combos?.roles}
+                    idElemento={'idrol'}
+                    descripcion={'rol'}
+                    className="col-12 col-lg-6 col-xl-3"
                   />
-                  <IfContainer show={!!errors.email}>
-                    <div className="invalid-tooltip">{errors.email?.message}</div>
-                  </IfContainer>
-                </div>
 
-                <div className="col-12 col-lg-6 col-xl-3 position-relative">
-                  <label className="form-label" htmlFor="emailConfirma">
-                    Repetir Correo (*)
-                  </label>
-                  <input
-                    id="emailConfirma"
-                    type="mail"
-                    autoComplete="new-custom-value"
-                    placeholder="ejemplo@ejemplo.cl"
-                    onPaste={(e) => e.preventDefault()}
-                    onCopy={(e) => e.preventDefault()}
-                    className={`form-control ${errors.confirmarEmail ? 'is-invalid' : ''}`}
-                    {...register('confirmarEmail', {
-                      required: {
-                        value: true,
-                        message: 'Este campo es obligatorio',
-                      },
-                      validate: {
-                        esEmail: (email) => (isEmail(email) ? undefined : 'Correo inválido'),
-                        emailCoinciden: (emailConfirmar) => {
-                          if (getValues('email') !== emailConfirmar) {
-                            return 'Correos no coinciden';
-                          }
-                        },
-                      },
-                    })}
+                  <InputTelefono
+                    opcional
+                    name="telefono1"
+                    label="Teléfono 1"
+                    className="col-12 col-lg-6 col-xl-3"
                   />
-                  <IfContainer show={!!errors.confirmarEmail}>
-                    <div className="invalid-tooltip">{errors.confirmarEmail?.message}</div>
-                  </IfContainer>
+
+                  <InputTelefono
+                    opcional
+                    name="telefono2"
+                    label="Teléfono 2"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputEmail
+                    name="email"
+                    label="Correo electrónico"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputEmail
+                    name="confirmarEmail"
+                    debeCoincidirCon="email"
+                    label="Correo electrónico"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
                 </div>
+              </IfContainer>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <div className="w-100 d-flex flex-column flex-sm-row-reverse">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={
+                    cargandoCombos || cargandoUsuario || errCargarCombos.length > 0 || !!errUsuario
+                  }>
+                  Grabar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger mt-2 mt-sm-0 me-sm-2"
+                  onClick={handleCerrarModal}>
+                  Volver
+                </button>
               </div>
-
-              <div className="row mt-4">
-                <div className="d-flex flex-column flex-sm-row-reverse">
-                  <button type="submit" className="btn btn-primary" disabled={datosPendientes}>
-                    Guardar
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger mt-2 mt-sm-0 me-sm-2"
-                    onClick={handleCerrarModal}>
-                    Volver
-                  </button>
-                </div>
-              </div>
-            </form>
-          </IfContainer>
-        </Modal.Body>
+            </Modal.Footer>
+          </form>
+        </FormProvider>
       </Modal>
     </>
   );
