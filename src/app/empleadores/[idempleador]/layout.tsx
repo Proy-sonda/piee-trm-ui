@@ -25,7 +25,7 @@ export default function LayoutProps({ children, params: { idempleador } }: Layou
       titulo: 'Datos Entidad Empleadora',
       href: `/empleadores/${idempleador}/datos`,
     },
-    { titulo: 'Unidad de RRHH', href: `/empleadores/${idempleador}/unidad` },
+    { titulo: 'Unidad de RRHH', href: `/empleadores/${idempleador}/unidad?operador=imed` },
     { titulo: 'Usuarios', href: `/empleadores/${idempleador}/usuarios` },
   ];
 
@@ -41,7 +41,9 @@ export default function LayoutProps({ children, params: { idempleador } }: Layou
   useEffect(() => cambiarEmpleador(parseInt(idempleador)), [idempleador]);
 
   const claseLinkActivo = (link: LinkNavegacion) => {
-    return pathname.startsWith(link.href) ? styles['link-activo'] : styles['link'];
+    const [linkPathname] = link.href.split('?');
+
+    return pathname.startsWith(linkPathname) ? styles['link-activo'] : styles['link'];
   };
 
   return (
