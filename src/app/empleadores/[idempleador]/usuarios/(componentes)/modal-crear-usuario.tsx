@@ -2,16 +2,15 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { HttpError } from '@/servicios/fetch';
+import { AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import Swal from 'sweetalert2';
 import isEmail from 'validator/es/lib/isEmail';
 import { FormularioCrearUsuario } from '../(modelos)/formulario-crear-usuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
-import { crearUsuario } from '../(servicios)/crear-usuario';
+import { PersonaUsuariaYaExisteError, crearUsuario } from '../(servicios)/crear-usuario';
 
 interface ModalCrearUsuarioProps {
   idEmpleador: number;
@@ -71,12 +70,8 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
         ],
       });
 
-      Swal.fire({
-        title: 'Persona Usuaria creado con éxito',
-        icon: 'success',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      AlertaDeExito.fire({
+        text: 'Persona usuaria creada con éxito',
       });
 
       limpiarFormulario();
@@ -85,26 +80,16 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     } catch (error) {
       console.error({ error });
 
-      if (error instanceof HttpError) {
-        if (error.body.message === 'Rut Persona Usuaria ya existe') {
-          return Swal.fire({
-            title: 'Error',
-            text: 'El RUT de la perosna usuaria ya existe',
-            icon: 'error',
-            showConfirmButton: true,
-            confirmButtonColor: 'var(--color-blue)',
-            confirmButtonText: 'OK',
-          });
-        }
+      if (error instanceof PersonaUsuariaYaExisteError) {
+        return AlertaDeError.fire({
+          title: 'Error',
+          text: 'El RUT de la persona usuaria ya existe',
+        });
       }
 
-      return Swal.fire({
+      return AlertaDeError.fire({
         title: 'Error al crear usuario',
         text: 'Se ha producido un error desconocido',
-        icon: 'error',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
       });
     } finally {
       setMostrarSpinner(false);
