@@ -8,9 +8,9 @@ import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
+import { AlertaConfirmacion, AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
 import { useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
-import Swal from 'sweetalert2';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
@@ -40,16 +40,11 @@ const EmpleadoresPage = () => {
     const empresa = empleador.razonsocial;
     const rut = empleador.rutempleador;
 
-    const { isConfirmed } = await Swal.fire({
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       title: 'Desadscribir',
-      icon: 'question',
       html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
-      showCancelButton: true,
-      showConfirmButton: true,
-      cancelButtonColor: 'red',
-      cancelButtonText: 'Cancelar',
       confirmButtonText: 'Aceptar',
-      confirmButtonColor: 'var(--color-blue)',
+      denyButtonText: 'Cancelar',
     });
 
     if (!isConfirmed) {
@@ -63,21 +58,11 @@ const EmpleadoresPage = () => {
 
       refrescarPagina();
 
-      Swal.fire({
-        icon: 'success',
-        html: `Entidad empleadora: <b>${empresa}</b> fue desuscrito con éxito`,
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      AlertaDeExito.fire({
+        html: `Entidad empleadora <b>${empresa}</b> fue desuscrita con éxito`,
       });
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Hubo un problema al desadscribir al empleador',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
-      });
+      AlertaDeError.fire({ title: 'Hubo un problema al desadscribir a la entidad empleadora' });
     } finally {
       setMostrarSpinner(false);
     }
