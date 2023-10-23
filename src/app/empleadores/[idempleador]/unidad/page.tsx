@@ -31,9 +31,11 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
 
   const [tabOperador, setTabOperador] = useState<TipoOperador>(tabOperadorQuery);
 
-  const [idunidad, setIdunidad] = useState<string | undefined>(undefined);
+  const [idunidad, setIdUnidad] = useState<number | undefined>(undefined);
 
   const [abrirModalCrearUnidad, setAbrirModalCrearUnidad] = useState(false);
+
+  const [abrirModalEditarUnidad, setAbrirModalEditarUnidad] = useState(false);
 
   const { empleadorActual } = useEmpleadorActual();
 
@@ -91,7 +93,10 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
             <TablaUnidades
               idempleador={idEmpleadorNumber}
               unidades={unidades ?? []}
-              onEditarUnidad={({ idunidad }) => setIdunidad(idunidad.toString())}
+              onEditarUnidad={({ idunidad }) => {
+                setIdUnidad(idunidad);
+                setAbrirModalEditarUnidad(true);
+              }}
               onUnidadEliminada={() => refrescarUnidades()}
             />
           </IfContainer>
@@ -108,18 +113,21 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
         }}
       />
 
-      {idunidad !== undefined && (
+      {
         <ModalEditarUnidad
+          show={abrirModalEditarUnidad}
           idEmpleador={idEmpleadorNumber}
           idUnidad={idunidad}
           onUnidadRRHHEditada={() => {
+            setAbrirModalEditarUnidad(false);
             refrescarUnidades();
           }}
           onCerrarModal={() => {
-            setIdunidad(undefined);
+            setIdUnidad(undefined);
+            setAbrirModalEditarUnidad(false);
           }}
         />
-      )}
+      }
     </>
   );
 };
