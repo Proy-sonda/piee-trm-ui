@@ -21,27 +21,26 @@ interface UsuariosPageProps {
 const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
   const idEmpleadorNumber = parseInt(params.idempleador);
 
-  const {
-    cargandoEmpleador: err,
-    empleadorActual: empleadores,
-    errorCargarEmpleador: pendiente,
-  } = useEmpleadorActual();
+  const { cargandoEmpleador, empleadorActual, errorCargarEmpleador } = useEmpleadorActual();
 
   const [refresh, cargarUsuarios] = useRefrescarPagina();
 
   const [, usuarios] = useFetch(
-    empleadores ? buscarUsuarios(empleadores.rutempleador) : emptyFetch(),
-    [empleadores, refresh],
+    empleadorActual ? buscarUsuarios(empleadorActual.rutempleador) : emptyFetch(),
+    [empleadorActual, refresh],
   );
 
   const [abrirModalCrearUsuario, setAbrirModalCrearUsuario] = useState(false);
+
+  const [abrirModalEditarUsuario, setAbrirModalEditarUsuario] = useState(false);
 
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
 
   return (
     <>
       <Titulo url="">
-        Entidad Empleadora - <b>{empleadores?.razonsocial ?? 'Cargando...'}</b> / Personas Usuarias
+        Entidad Empleadora - <b>{empleadorActual?.razonsocial ?? 'Cargando...'}</b> / Personas
+        Usuarias
       </Titulo>
 
       <div className="mt-4 row">
@@ -56,20 +55,23 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
       <div className="row mt-3">
         <div className="col-md-12">
-          <IfContainer show={!pendiente && err}>
+          <IfContainer show={!cargandoEmpleador && errorCargarEmpleador}>
             <h4 className="mt-4 mb-5 text-center">Error al buscar personas usuarias</h4>
           </IfContainer>
 
-          <IfContainer show={pendiente}>
+          <IfContainer show={cargandoEmpleador}>
             <div className="mb-5">
               <LoadingSpinner titulo="Cargando usuarios..." />
             </div>
           </IfContainer>
 
-          <IfContainer show={!pendiente && !err}>
+          <IfContainer show={!cargandoEmpleador && !errorCargarEmpleador}>
             <TablaUsuarios
               usuarios={usuarios ?? []}
-              onEditarUsuario={(idUsuario) => setIdUsuarioEditar(idUsuario)}
+              onEditarUsuario={(idUsuario) => {
+                setIdUsuarioEditar(idUsuario);
+                setAbrirModalEditarUsuario(true);
+              }}
               onUsuarioEliminado={() => cargarUsuarios()}
             />
           </IfContainer>
@@ -86,16 +88,19 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
         }}
       />
 
-      {idUsuarioEditar && (
-        <ModalEditarUsuario
-          idUsuario={idUsuarioEditar}
-          onCerrarModal={() => setIdUsuarioEditar(undefined)}
-          onUsuarioEditado={() => {
-            setIdUsuarioEditar(undefined);
-            cargarUsuarios();
-          }}
-        />
-      )}
+      <ModalEditarUsuario
+        show={abrirModalEditarUsuario}
+        idUsuario={idUsuarioEditar}
+        onCerrarModal={() => {
+          setIdUsuarioEditar(undefined);
+          setAbrirModalEditarUsuario(false);
+        }}
+        onUsuarioEditado={() => {
+          setIdUsuarioEditar(undefined);
+          setAbrirModalEditarUsuario(false);
+          cargarUsuarios();
+        }}
+      />
     </>
   );
 };
