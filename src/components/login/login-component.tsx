@@ -109,17 +109,17 @@ export const LoginComponent: React.FC<{}> = () => {
           <br />
 
           <InputRut
+            omitirSignoObligatorio
             label="RUN Persona Usuaria"
             name="rut"
             tipo="run"
-            omitirSignoObligatorio
             className="mb-3 mt-3"
           />
 
           <InputClave
+            omitirSignoObligatorio
             label="Clave de acceso"
             name="clave"
-            omitirSignoObligatorio
             className="mb-3"
           />
 
@@ -146,7 +146,11 @@ export const LoginComponent: React.FC<{}> = () => {
         rutUsuario={rutUsuario}
         show={showModalCambiarClave}
         onCerrarModal={() => setShowModalCambiarClave(false)}
-        onClaveCambiada={() => setShowModalCambiarClave(false)}
+        onClaveCambiada={() => {
+          setShowModalCambiarClave(false);
+          formulario.setValue('clave', '', { shouldValidate: false });
+          formulario.setFocus('clave');
+        }}
       />
 
       <ModalRecuperarClave
