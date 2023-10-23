@@ -2,11 +2,11 @@ import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { useWindowSize } from '@/hooks/use-window-size';
+import { AlertaConfirmacion, AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import React from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 import { eliminarUsuario } from '../(servicios)/eliminar-usuario';
 import { recuperarContrasena } from '../(servicios)/recuperar-clave';
@@ -33,16 +33,9 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     const rut = usuario.rutusuario;
     const email = usuario.email;
 
-    const { isConfirmed } = await Swal.fire({
-      icon: 'question',
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       title: 'Restablecer Clave',
       html: `¿Desea enviar una nueva clave temporal al correo <b>${email}</b>?`,
-      showDenyButton: true,
-      showCancelButton: false,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      denyButtonText: `NO`,
-      denyButtonColor: 'var(--bs-danger)',
     });
 
     if (!isConfirmed) {
@@ -51,34 +44,23 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
     try {
       await recuperarContrasena(rut);
-      Swal.fire({
-        icon: 'success',
+
+      AlertaDeExito.fire({
         title: 'Clave reenviada',
         html: `Se ha enviado con éxito una nueva clave temporal al correo <b>${email}</b>`,
         timer: 4000,
-        showConfirmButton: false,
       });
     } catch (error: any) {
-      Swal.fire({
-        icon: 'error',
+      AlertaDeError.fire({
         title: 'Error',
-        html: 'El usuario se encuentra deshabilitado',
-        timer: 2000,
-        showConfirmButton: false,
+        html: 'La persona usuaria se encuentra deshabilitada',
       });
     }
   };
 
   const handleEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
-    const { isConfirmed } = await Swal.fire({
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
-      icon: 'question',
-      showConfirmButton: true,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'NO',
-      cancelButtonColor: 'var(--bs-danger)',
     });
 
     if (!isConfirmed) {
@@ -88,24 +70,15 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     try {
       await eliminarUsuario(usuario.idusuario);
 
-      Swal.fire({
-        title: `${usuario.nombres} ${usuario.apellidos} fue eliminado con éxito`,
-        icon: 'success',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      AlertaDeExito.fire({
+        html: `Persona usuaria fue eliminada con éxito`,
+        timer: 3000,
       });
 
       onUsuarioEliminado();
     } catch (error) {
-      console.error({ error });
-
-      await Swal.fire({
+      return AlertaDeError.fire({
         title: 'Error al eliminar persona usuaria',
-        icon: 'error',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
       });
     }
   };
