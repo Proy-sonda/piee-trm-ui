@@ -1,5 +1,6 @@
 'use client';
 
+import { InputClave, InputRut } from '@/components/form';
 import { AuthContext } from '@/contexts';
 import {
   AutenticacionTransitoriaError,
@@ -9,10 +10,8 @@ import {
 } from '@/servicios/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { formatRut, validateRut } from 'rutlib';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
-import IfContainer from '../if-container';
 import styles from './login.module.css';
 import ModalCambiarClaveTemporal from './modal-cambiar-clave-temporal';
 import ModalClaveEnviada from './modal-clave-enviada';
@@ -24,8 +23,6 @@ interface FormularioLogin {
 }
 
 export const LoginComponent: React.FC<{}> = () => {
-  const [verClave, setVerClave] = useState(false);
-
   const [showModalCambiarClave, setShowModalCambiarClave] = useState(false);
   const [showModalRecuperarClave, setShowModalRecuperarClave] = useState(false);
   const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
@@ -36,27 +33,15 @@ export const LoginComponent: React.FC<{}> = () => {
 
   const { usuario, login } = useContext(AuthContext);
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm<FormularioLogin>({
-    mode: 'onBlur',
-  });
+  const formulario = useForm<FormularioLogin>({ mode: 'onBlur' });
 
-  const rutUsuario = watch('rut');
+  const rutUsuario = formulario.watch('rut');
 
   // Redirigir al usuario si esta logueado
   useEffect(() => {
-    console.log('Redirigiendo desde useEffect ahora');
-
     if (!usuario) {
       return;
     }
-
-    const rutaRedireccion = usuario.tieneRol('admin') ? '/empleadores' : '/tramitacion';
 
     const redirectPath = searchParams.get('redirectTo');
     const redirectTo =
@@ -64,9 +49,7 @@ export const LoginComponent: React.FC<{}> = () => {
         ? null
         : redirectPath;
 
-    console.log(`Mandando usuario a : [${redirectTo ?? rutaRedireccion}]`);
-
-    router.push(redirectTo ?? rutaRedireccion);
+    router.push(redirectTo ?? '/tramitacion');
   }, [usuario]);
 
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
@@ -78,18 +61,6 @@ export const LoginComponent: React.FC<{}> = () => {
         icon: 'success',
         timer: 2000,
         showConfirmButton: false,
-        // TODO: Borrar esto
-        // didClose: () => {
-        //   const rutaRedireccion = usuario.tieneRol('admin') ? '/empleadores' : '/tramitacion';
-
-        //   const redirectPath = searchParams.get('redirectTo');
-        //   const redirectTo =
-        //     !redirectPath || (redirectPath.startsWith('/empleadores') && !usuario.tieneRol('admin'))
-        //       ? null
-        //       : redirectPath;
-
-        //   router.push(redirectTo ?? rutaRedireccion);
-        // },
       });
     } catch (error) {
       let messageError = '';
@@ -119,95 +90,46 @@ export const LoginComponent: React.FC<{}> = () => {
 
   return (
     <>
-      <form onSubmit={handleSubmit(handleLoginUsuario)} className={styles.formlogin}>
-        <label style={{ fontWeight: 'bold' }}>
-          Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
-        </label>
-        <br />
-
-        <div className="mb-3 mt-3 position-relative">
-          <label className="form-label" htmlFor="rutUsuario">
-            RUN Persona Usuaria:
+      <FormProvider {...formulario}>
+        <form onSubmit={formulario.handleSubmit(handleLoginUsuario)} className={styles.formlogin}>
+          <label style={{ fontWeight: 'bold' }}>
+            Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
           </label>
-          <input
-            id="rutUsuario"
-            type="text"
-            className={`form-control ${errors.rut ? 'is-invalid' : ''}`}
-            minLength={9}
-            maxLength={10}
-            {...register('rut', {
-              required: 'El RUN es obligatorio',
-              validate: {
-                esRut: (rut) => (validateRut(rut) ? undefined : 'El RUN es inválido'),
-              },
-              onChange: (event: any) => {
-                const regex = /[^0-9kK\-]/g; // solo números, guiones y la letra K
-                let rut = event.target.value as string;
+          <br />
 
-                if (regex.test(rut)) {
-                  rut = rut.replaceAll(regex, '');
-                }
-
-                setValue('rut', rut.length > 2 ? formatRut(rut, false) : rut);
-              },
-              onBlur: (event) => {
-                const rut = event.target.value;
-                if (validateRut(rut)) {
-                  setValue('rut', formatRut(rut, false));
-                }
-              },
-            })}
+          <InputRut
+            label="RUN Persona Usuaria"
+            name="rut"
+            tipo="run"
+            omitirSignoObligatorio
+            className="mb-3 mt-3"
           />
-          <IfContainer show={errors.rut}>
-            <div className="invalid-tooltip">{errors.rut?.message}</div>
-          </IfContainer>
-        </div>
 
-        <div className="mb-3 position-relative">
-          <label className="form-label" htmlFor="password">
-            Clave de acceso:
-          </label>
-          <div className="input-group mb-3">
-            <input
-              id="password"
-              type={verClave ? 'text' : 'password'}
-              className={`form-control ${errors.clave ? 'is-invalid' : ''}`}
-              {...register('clave', {
-                required: 'La clave es obligatoria',
-              })}
-            />
-            <IfContainer show={errors.clave}>
-              <div className="invalid-tooltip">{errors.clave?.message}</div>
-            </IfContainer>
-            <button
-              className="btn btn-primary"
-              tabIndex={-1}
-              type="button"
-              id="button-addon2"
-              title={verClave ? 'Ocultar clave' : 'Ver clave'}
-              onClick={() => setVerClave((x) => !x)}>
-              <i className={`bi ${verClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
+          <InputClave
+            label="Clave de acceso"
+            name="clave"
+            omitirSignoObligatorio
+            className="mb-3"
+          />
+
+          <div className={'mt-2 ' + styles.btnlogin}>
+            <label
+              style={{
+                cursor: 'pointer',
+                textDecoration: 'underline',
+                color: 'blue',
+                marginRight: '50px',
+              }}
+              onClick={() => setShowModalRecuperarClave(true)}>
+              Recuperar clave de acceso
+            </label>{' '}
+            &nbsp;
+            <button type="submit" className="btn btn-primary">
+              Ingresar
             </button>
           </div>
-        </div>
-
-        <div className={'mt-2 ' + styles.btnlogin}>
-          <label
-            style={{
-              cursor: 'pointer',
-              textDecoration: 'underline',
-              color: 'blue',
-              marginRight: '50px',
-            }}
-            onClick={() => setShowModalRecuperarClave(true)}>
-            Recuperar clave de acceso
-          </label>{' '}
-          &nbsp;
-          <button type="submit" className="btn btn-primary">
-            Ingresar
-          </button>
-        </div>
-      </form>
+        </form>
+      </FormProvider>
 
       <ModalCambiarClaveTemporal
         rutUsuario={rutUsuario}

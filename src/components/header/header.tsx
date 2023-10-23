@@ -1,3 +1,4 @@
+'use client';
 import { AuthContext } from '@/contexts';
 import svg from '@/img/logo-fonasa.svg';
 import Link from 'next/link';

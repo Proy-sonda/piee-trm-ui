@@ -1,5 +1,3 @@
-'use client';
-
 import AppFooter from '@/components/footer/footer';
 import AppHeader from '@/components/header/header';
 import { AuthProvider, InscribeProvider, StepProvider } from '@/contexts';
@@ -9,6 +7,11 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Head from 'next/head';
 import './globals.css';
+
+export const metadata = {
+  title: 'Portal de Tramitación',
+  description: 'Nuevo Portal de Integración',
+};
 
 export default function RootLayout(
   {
@@ -21,19 +24,18 @@ export default function RootLayout(
 ) {
   return (
     <StepProvider>
+      <Head>
+        <title>Portal Tramitación LME - {title} </title>
+        <meta name="description" content={dsc} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <AuthProvider>
         <InscribeProvider>
           <EmpleadorProvider>
             <html>
-              <Head>
-                <title>Portal Tramitación LME - {title} </title>
-                <meta name="description" content={dsc} />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <link rel="icon" href="/favicon.ico" />
-              </Head>
               <body>
                 <AppHeader />
-
                 <main>{children}</main>
 
                 <AppFooter />

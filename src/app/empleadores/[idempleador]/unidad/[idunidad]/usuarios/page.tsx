@@ -175,7 +175,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       });
     } finally {
       refrescarComponente();
-      window.location.href = document.referrer;
+      window.location.href = `/empleadores/${idempleador}/unidad/${idunidad}/usuarios`;
     }
   };
 
