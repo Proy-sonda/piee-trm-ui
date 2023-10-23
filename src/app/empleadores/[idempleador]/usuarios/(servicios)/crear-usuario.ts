@@ -1,6 +1,6 @@
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
-import { runFetchConThrow } from '@/servicios/fetch';
+import { HttpError, runFetchConThrow } from '@/servicios/fetch';
 
 export interface CrearUsuarioRequest {
   rutusuario: string;
@@ -21,13 +21,23 @@ export interface CrearUsuarioRequest {
   }[];
 }
 
-export const crearUsuario = (datosUsuario: CrearUsuarioRequest) => {
-  return runFetchConThrow<void>(`${apiUrl()}/usuario/create`, {
-    method: 'POST',
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify(datosUsuario),
-  });
+export class PersonaUsuariaYaExisteError extends Error {}
+
+export const crearUsuario = async (datosUsuario: CrearUsuarioRequest) => {
+  try {
+    await runFetchConThrow<void>(`${apiUrl()}/usuario/create`, {
+      method: 'POST',
+      headers: {
+        Authorization: obtenerToken(),
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(datosUsuario),
+    });
+  } catch (error) {
+    if (error instanceof HttpError && error.body.message === 'Rut Usuario ya existe') {
+      throw new PersonaUsuariaYaExisteError();
+    }
+
+    throw error;
+  }
 };
