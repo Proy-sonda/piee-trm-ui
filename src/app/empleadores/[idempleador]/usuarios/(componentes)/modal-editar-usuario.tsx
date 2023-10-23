@@ -2,11 +2,10 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { HttpError } from '@/servicios/fetch';
+import { AlertaDeError, AlertaDeExito } from '@/utilidades/alertas';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
 import isEmail from 'validator/es/lib/isEmail';
 import { FormularioEditarUsuario } from '../(modelos)/formulario-editar-usuario';
 import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
@@ -85,39 +84,15 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
         estadousuario: usuarioEditar.estadousuario,
       });
 
-      setMostrarSpinner(false);
-
-      await Swal.fire({
-        title: 'Persona Usuaria actualizado con éxito',
-        icon: 'success',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      AlertaDeExito.fire({
+        text: 'Persona usuaria actualizada con éxito',
       });
 
       onUsuarioEditado();
     } catch (error) {
-      console.error({ error });
-
-      if (error instanceof HttpError) {
-        if (error.body.message === 'Persona Usuaria ya existe') {
-          return Swal.fire({
-            title: 'El usuario ya existe',
-            icon: 'error',
-            showConfirmButton: true,
-            confirmButtonColor: 'var(--color-blue)',
-            confirmButtonText: 'OK',
-          });
-        }
-      }
-
-      return Swal.fire({
+      return AlertaDeError.fire({
         title: 'Error al actualizar persona usuaria',
         text: 'Se ha producido un error desconocido',
-        icon: 'error',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
       });
     } finally {
       setMostrarSpinner(false);
