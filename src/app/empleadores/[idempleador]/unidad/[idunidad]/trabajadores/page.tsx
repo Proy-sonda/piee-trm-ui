@@ -242,16 +242,28 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     // if (csvData.length == 0 || csvData == undefined) return;
     if (error.file) return AlertaDeError.fire({ html: 'Debe cargar solo archivos de tipo "csv"' });
 
-    let errorEncontrado = csvData.find(
-      (rut: string) =>
-        !validateRut(formatRut(rut, false)) ||
-        Number(formatRut(rut, false).split('-')[0]) > 50000000,
-    );
+    /* El regex verifica que el RUT tenga el formato "<correlativo>-<DV>" o "<correlativo>-<DV>"
+     * para descartar los que tienen separadores de miles. Despues `validateRut` hace su magia
+     * y verrifica que el rut sea valido. */
+    let errorEncontrado = csvData
+      .map((x: any) => (typeof x === 'string' ? x.trim() : x))
+      .find(
+        (rut: string) =>
+          !rut.match(/^\d+-?[\dkK]$/g) ||
+          !validateRut(formatRut(rut, false)) ||
+          Number(formatRut(rut, false).split('-')[0]) > 50000000,
+      );
+
     setCsvData(csvData.filter((rut: string) => !validateRut(formatRut(rut, false)) === true));
 
     if (errorEncontrado?.trim() != '' && errorEncontrado != undefined) {
       return AlertaDeError.fire({
-        html: `Existe un error en el formato del RUN <b>${errorEncontrado}</b> <br/> Verifique el documento`,
+        html: `
+          <p>Existe un error en el formato del RUN <b>${errorEncontrado}</b></p>
+          <p class="mb-0 pb-0">
+            Verifique que cada RUN del documento sea válido y no incluya separadores de miles. El 
+            dígito verificador es opcional. Ejemplo: <b>9789016-1</b> o <b>97890161</b>.
+          </p>`,
       });
     }
 
