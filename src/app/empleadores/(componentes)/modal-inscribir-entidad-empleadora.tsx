@@ -265,14 +265,14 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                   <div className="modal-footer">
                     <div className="w-100 d-flex flex-column flex-md-row-reverse">
                       <button type="submit" className="btn btn-primary">
-                        Confirmar Adscripción
+                        Grabar
                       </button>
                       <button
                         type="button"
                         className="btn btn-danger mt-2 mt-md-0 me-md-2"
                         data-bs-dismiss="modal"
                         onClick={onCerrarModal}>
-                        Cancelar
+                        Volver
                       </button>
                     </div>
                   </div>
