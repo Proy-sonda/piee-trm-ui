@@ -33,6 +33,8 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
 
   const [idunidad, setIdunidad] = useState<string | undefined>(undefined);
 
+  const [abrirModalCrearUnidad, setAbrirModalCrearUnidad] = useState(false);
+
   const { empleadorActual } = useEmpleadorActual();
 
   const [refrescar, refrescarUnidades] = useRefrescarPagina();
@@ -68,8 +70,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
         <button
           className="btn btn-success btn-sm"
           disabled={cargandoUnidades || !!errorCargarUnidad}
-          data-bs-toggle="modal"
-          data-bs-target="#AddURHH">
+          onClick={() => setAbrirModalCrearUnidad(true)}>
           + Agregar Unidad RRHH
         </button>
       </div>
@@ -98,8 +99,13 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
       </div>
 
       <ModalNuevaUnidad
+        show={abrirModalCrearUnidad}
         idEmpleador={idEmpleadorNumber}
-        onNuevaUnidadCreada={() => refrescarUnidades()}
+        onCerrarModal={() => setAbrirModalCrearUnidad(false)}
+        onNuevaUnidadCreada={() => {
+          setAbrirModalCrearUnidad(false);
+          refrescarUnidades();
+        }}
       />
 
       {idunidad !== undefined && (
