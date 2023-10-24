@@ -17,6 +17,11 @@
   - [¿Donde poner estilos?](#donde-poner-estilos)
 - [TODO: Scripts](#todo-scripts)
 - [TODO: Branches](#todo-branches)
+- [¿Cómo obtener datos desde los endpoints?](#cómo-obtener-datos-desde-los-endpoints)
+  - [Crear servicio y modelo](#crear-servicio-y-modelo)
+  - [Usar los hooks en los componentes](#usar-los-hooks-en-los-componentes)
+  - [Caso especial: Como refrescar los datos](#caso-especial-como-refrescar-los-datos)
+  - [Caso especial: Como usar el hook con datos que aún no se tienen](#caso-especial-como-usar-el-hook-con-datos-que-aún-no-se-tienen)
 
 ## Instalación
 
@@ -149,3 +154,22 @@ Hay 2 opciones para poner los estilos
 - Convenciones en estructuras de commits
 - Convenciones al momento de integrar cambios (pull requests)
 - etc
+
+## ¿Cómo obtener datos desde los endpoints?
+
+Para obtener datos para cargar combos o para parchar un formulario como obtener la entidad empleadora para editar, existen 3 funciones que estan en el modulo `@/hooks/use-merge-fetch`:
+
+- `useMergeFetchObject`: Unifica los resultados de varias llamadas en un solo objeto.
+- `useMergeFetchArray`: Unifica los resultados de varias llamadas en un solo objeto.
+- `useFetch`: Para obtener los resultados de una sola llamada.
+- `emptyFetch`: Para generar un "fetch vacio" en caso de que alguno de los parametros no este disponible (más adelante más detallado).
+
+A continuación se explican los pasos para usarlos. Para los ejemplos se va a suponer que se está trabajando en una pantalla de la carpeta `src/app/ejemplo/page.tsx`.
+
+### Crear servicio y modelo
+
+### Usar los hooks en los componentes
+
+### Caso especial: Como refrescar los datos
+
+### Caso especial: Como usar el hook con datos que aún no se tienen
