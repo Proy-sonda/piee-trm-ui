@@ -1,12 +1,14 @@
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
+import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { useWindowSize } from '@/hooks/use-window-size';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import React from 'react';
+import { useRouter } from 'next/navigation';
+import React, { useContext } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 import { eliminarUsuario } from '../(servicios)/eliminar-usuario';
 import { recuperarContrasena } from '../(servicios)/recuperar-clave';
@@ -22,6 +24,10 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   onEditarUsuario: handleEditarUsuario,
   onUsuarioEliminado,
 }) => {
+  const { usuario, logout } = useContext(AuthContext);
+
+  const router = useRouter();
+
   const [anchoVentana] = useWindowSize();
 
   const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
@@ -33,16 +39,15 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     const rut = usuario.rutusuario;
     const email = usuario.email;
 
-    const { isConfirmed } = await Swal.fire({
-      icon: 'question',
+    const mensaje = estaReenviandoClaveAUnoMismo(usuario)
+      ? `<p>A continuación se enviará una nueva clave temporal a su correo <b>${email}</b>` +
+        '<p>Una vez enviada la nueva clave temporal su sesión se cerrará automáticamente y deberá reestablecer su clave antes de volver a ingresar.</p>' +
+        '<p class="fw-bold mb-0 pb-0">¿Está segura que desea continuar?</p>'
+      : `¿Desea enviar una nueva clave temporal al correo <b>${email}</b>?`;
+
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       title: 'Restablecer Clave',
-      html: `¿Desea enviar una nueva clave temporal al correo <b>${email}</b>?`,
-      showDenyButton: true,
-      showCancelButton: false,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      denyButtonText: `NO`,
-      denyButtonColor: 'var(--bs-danger)',
+      html: mensaje,
     });
 
     if (!isConfirmed) {
@@ -51,34 +56,34 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
     try {
       await recuperarContrasena(rut);
-      Swal.fire({
-        icon: 'success',
+
+      AlertaExito.fire({
         title: 'Clave reenviada',
         html: `Se ha enviado con éxito una nueva clave temporal al correo <b>${email}</b>`,
         timer: 4000,
-        showConfirmButton: false,
       });
+
+      if (estaReenviandoClaveAUnoMismo(usuario)) {
+        await logout();
+
+        router.replace('/');
+      }
     } catch (error: any) {
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         title: 'Error',
-        html: 'El usuario se encuentra deshabilitado',
-        timer: 2000,
-        showConfirmButton: false,
+        html: 'La persona usuaria se encuentra deshabilitada',
       });
     }
   };
 
+  const estaReenviandoClaveAUnoMismo = (usuarioReenviarClave: UsuarioEntidadEmpleadora) => {
+    // TODO: Reemplazar aqui el ID del usuario en lugar del RUT
+    return usuario && usuario.rut === usuarioReenviarClave.rutusuario;
+  };
+
   const handleEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
-    const { isConfirmed } = await Swal.fire({
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
-      icon: 'question',
-      showConfirmButton: true,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'NO',
-      cancelButtonColor: 'var(--bs-danger)',
     });
 
     if (!isConfirmed) {
@@ -88,24 +93,15 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     try {
       await eliminarUsuario(usuario.idusuario);
 
-      Swal.fire({
-        title: `${usuario.nombres} ${usuario.apellidos} fue eliminado con éxito`,
-        icon: 'success',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      AlertaExito.fire({
+        html: `Persona usuaria fue eliminada con éxito`,
+        timer: 3000,
       });
 
       onUsuarioEliminado();
     } catch (error) {
-      console.error({ error });
-
-      await Swal.fire({
+      return AlertaError.fire({
         title: 'Error al eliminar persona usuaria',
-        icon: 'error',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
       });
     }
   };

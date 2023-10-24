@@ -2,131 +2,133 @@
 
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
-import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
-import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import { Unidadrhh } from '@/modelos/tramitacion';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import NavegacionEntidadEmpleadora from '../../(componentes)/navegacion-entidad-empleadora';
-import { buscarEmpleadorPorId } from '../datos/(servicios)/buscar-empleador-por-id';
+import { Nav } from 'react-bootstrap';
+import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
 import TablaUnidades from './(componentes)/tabla-unidades';
+import { TIPOS_DE_OPERADORES, TipoOperador } from './(modelos)/tipo-operador';
 
 interface UnidadRRHHPageProps {
   params: {
-    idempleador: {
-      id: number;
-    };
+    idempleador: string;
   };
 }
 
-const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params }) => {
-  const router = useRouter();
+const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador } }) => {
+  const idEmpleadorNumber = Number(idempleador);
 
-  const id = Number(params.idempleador);
+  const search = useSearchParams();
 
-  const [rut, setrut] = useState('');
-  const [unidades, setunidades] = useState<Unidadrhh[]>([]);
+  // prettier-ignore
+  const tabOperadorQuery: TipoOperador = TIPOS_DE_OPERADORES.find((x) => x === search.get('operador')) ?? 'imed';
 
-  const [idunidad, setIdunidad] = useState<string | undefined>(undefined);
-  const [razon, setrazon] = useState<string>('');
+  const [tabOperador, setTabOperador] = useState<TipoOperador>(tabOperadorQuery);
 
-  const [refrescar, refrescarPagina] = useRefrescarPagina();
+  const [idunidad, setIdUnidad] = useState<number | undefined>(undefined);
 
-  const [erroresCargarUnidad, [empleadores], cargandoUnidades] = useMergeFetchArray(
-    [buscarEmpleadorPorId(id)],
-    [refrescar],
+  const [abrirModalCrearUnidad, setAbrirModalCrearUnidad] = useState(false);
+
+  const [abrirModalEditarUnidad, setAbrirModalEditarUnidad] = useState(false);
+
+  const { empleadorActual } = useEmpleadorActual();
+
+  const [refrescar, refrescarUnidades] = useRefrescarPagina();
+
+  const [errorCargarUnidad, unidades, cargandoUnidades] = useFetch(
+    empleadorActual ? buscarUnidadesDeRRHH(empleadorActual.rutempleador) : emptyFetch(),
+    [refrescar, empleadorActual, tabOperador],
   );
 
+  // Actualiza URL en cambio de operador
   useEffect(() => {
-    if (empleadores != undefined) {
-      const [unidadesbusqueda] = buscarUnidadesDeRRHH(empleadores?.rutempleador);
-      setrut(empleadores.rutempleador);
-
-      const busquedaUnidades = async () => {
-        const resp = await unidadesbusqueda();
-        setunidades(resp);
-      };
-      busquedaUnidades();
-    }
-  }, [empleadores]);
-
-  useEffect(() => {
-    if (unidades != undefined) {
-      const busquedaEmpleador = async () => {
-        const [resp] = await buscarEmpleadorPorId(Number(id));
-        await setrazon(await resp().then((resp: any) => resp.razonsocial));
-      };
-      busquedaEmpleador();
-    }
-  }, [unidades]);
+    const url = new URL(window.location.href);
+    url.searchParams.set('operador', tabOperador);
+    window.history.pushState({}, '', url);
+  }, [tabOperador]);
 
   return (
-    <div className="bgads">
-      <Position position={4} />
+    <>
+      <Titulo url="">
+        Entidad Empleadora - <b>{empleadorActual?.razonsocial ?? ''}</b> / Dirección y Unidades RRHH
+      </Titulo>
 
-      <div className="pb-3 px-3 px-lg-5">
-        <div className="row">
-          <NavegacionEntidadEmpleadora id={id} />
-        </div>
+      <Nav variant="tabs" className="mt-4">
+        <Nav.Link active={tabOperador === 'imed'} onClick={() => setTabOperador('imed')}>
+          I-MED
+        </Nav.Link>
+        <Nav.Link active={tabOperador === 'medipass'} onClick={() => setTabOperador('medipass')}>
+          MEDIPASS
+        </Nav.Link>
+      </Nav>
 
-        <Titulo url="">
-          Entidad Empleadora - <b>{razon.replaceAll('%20', ' ')}</b> / Dirección y Unidades RRHH
-        </Titulo>
+      <div className="mt-3 d-flex justify-content-end">
+        <button
+          className="btn btn-success btn-sm"
+          disabled={cargandoUnidades || !!errorCargarUnidad}
+          onClick={() => setAbrirModalCrearUnidad(true)}>
+          + Agregar Unidad RRHH
+        </button>
+      </div>
 
-        <div className="mt-2 d-flex justify-content-end">
-          <button
-            className="btn btn-success btn-sm"
-            disabled={cargandoUnidades || erroresCargarUnidad.length > 0}
-            data-bs-toggle="modal"
-            data-bs-target="#AddURHH">
-            + Agregar Unidad RRHH
-          </button>
-        </div>
+      <div className="row mt-2">
+        <div className="col-md-12">
+          <IfContainer show={cargandoUnidades}>
+            <div className="my-4">
+              <LoadingSpinner titulo="Cargando unidades " />
+            </div>
+          </IfContainer>
 
-        <div className="row mt-2">
-          <div className="col-md-12">
-            <IfContainer show={cargandoUnidades}>
-              <div className="my-4">
-                <LoadingSpinner titulo="Cargando unidades " />
-              </div>
-            </IfContainer>
+          <IfContainer show={!cargandoUnidades && errorCargarUnidad}>
+            <h4 className="mt-4 mb-5 text-center">Error al cargar las unidades de RRHH</h4>
+          </IfContainer>
 
-            <IfContainer show={!cargandoUnidades && erroresCargarUnidad.length > 0}>
-              <h4 className="mt-4 mb-5 text-center">Error al cargar las unidades de RRHH</h4>
-            </IfContainer>
-
-            <IfContainer show={!cargandoUnidades && erroresCargarUnidad.length === 0}>
-              <TablaUnidades
-                idempleador={id}
-                unidades={unidades ?? []}
-                onEditarUnidad={({ idunidad }) => setIdunidad(idunidad.toString())}
-                onUnidadEliminada={() => refrescarPagina()}
-              />
-            </IfContainer>
-          </div>
+          <IfContainer show={!cargandoUnidades && !errorCargarUnidad}>
+            <TablaUnidades
+              idempleador={idEmpleadorNumber}
+              unidades={unidades ?? []}
+              onEditarUnidad={({ idunidad }) => {
+                setIdUnidad(idunidad);
+                setAbrirModalEditarUnidad(true);
+              }}
+              onUnidadEliminada={() => refrescarUnidades()}
+            />
+          </IfContainer>
         </div>
       </div>
 
-      <ModalNuevaUnidad idEmpleador={id} onNuevaUnidadCreada={() => refrescarPagina()} />
+      <ModalNuevaUnidad
+        show={abrirModalCrearUnidad}
+        idEmpleador={idEmpleadorNumber}
+        onCerrarModal={() => setAbrirModalCrearUnidad(false)}
+        onNuevaUnidadCreada={() => {
+          setAbrirModalCrearUnidad(false);
+          refrescarUnidades();
+        }}
+      />
 
-      {idunidad !== undefined && (
+      {
         <ModalEditarUnidad
-          idEmpleador={id}
+          show={abrirModalEditarUnidad}
+          idEmpleador={idEmpleadorNumber}
           idUnidad={idunidad}
           onUnidadRRHHEditada={() => {
-            refrescarPagina();
+            setAbrirModalEditarUnidad(false);
+            refrescarUnidades();
           }}
           onCerrarModal={() => {
-            setIdunidad(undefined);
+            setIdUnidad(undefined);
+            setAbrirModalEditarUnidad(false);
           }}
         />
-      )}
-    </div>
+      }
+    </>
   );
 };
 

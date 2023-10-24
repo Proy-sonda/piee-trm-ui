@@ -44,8 +44,12 @@ const Position: React.FC<PositionProps> = ({}) => {
     return pathname.startsWith(tab.href);
   };
 
+  if (!usuario) {
+    return null;
+  }
+
   return (
-    <div className="container-fluid mb-5">
+    <div className="container-fluid px-0">
       <div className="bg-white border-bottom border-1 text-center d-flex flex-column flex-md-row justify-content-center">
         {tabs.map((tab, index) => (
           <div

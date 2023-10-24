@@ -336,175 +336,137 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   }, [combos?.LMEEXISTEZONA2]);
 
   return (
-    <div className="bgads">
+    <>
       <IfContainer show={spinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
+      <Cabecera
+        foliotramitacion={foliolicencia}
+        idoperador={idoperador}
+        step={step}
+        title="Identificación del Régimen Previsional de la Persona Trabajadora y Entidad Pagadora del subsidio"
+        onLinkClickeado={(link) => {
+          formulario.setValue('linkNavegacion', link);
+          formulario.setValue('accion', 'navegar');
+          formulario.handleSubmit(onHandleSubmit)();
+        }}
+      />
+      <IfContainer show={cargandoCombos}>
+        <div className={fadeinOut}>
+          <LoadingSpinner titulo="Cargando datos..." />
+        </div>
+      </IfContainer>
+      <div
+        className="row mt-2 pb-5"
+        style={{
+          display: cargandoCombos || !erroresCargarCombos ? 'none' : 'inline',
+        }}>
+        <FormProvider {...formulario}>
+          <form
+            className="animate__animated animate__fadeIn"
+            onSubmit={formulario.handleSubmit(onHandleSubmit)}>
+            <div className="row">
+              <ComboSimple
+                label="Régimen Previsional"
+                descripcion="regimenprevisional"
+                idElemento="codigoregimenprevisional"
+                name="regimen"
+                datos={combos?.REGIMEN}
+                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+              />
 
-      <div className="ms-5 me-5">
-        <Cabecera
-          foliotramitacion={foliolicencia}
-          idoperador={idoperador}
-          step={step}
-          title="Identificación del Régimen Previsional de la Persona Trabajadora y Entidad Pagadora del subsidio"
-          onLinkClickeado={(link) => {
-            formulario.setValue('linkNavegacion', link);
-            formulario.setValue('accion', 'navegar');
-            formulario.handleSubmit(onHandleSubmit)();
-          }}
-        />
-        <IfContainer show={cargandoCombos}>
-          <div className={fadeinOut}>
-            <LoadingSpinner titulo="Cargando datos..." />
-          </div>
-        </IfContainer>
-        <div
-          className="row mt-2 pb-5"
-          style={{
-            display: cargandoCombos || !erroresCargarCombos ? 'none' : 'inline',
-          }}>
-          <FormProvider {...formulario}>
-            <form
-              className="animate__animated animate__fadeIn"
-              onSubmit={formulario.handleSubmit(onHandleSubmit)}>
-              <div className="row">
-                <ComboSimple
-                  label="Régimen Previsional"
-                  descripcion="regimenprevisional"
-                  idElemento="codigoregimenprevisional"
-                  name="regimen"
-                  datos={combos?.REGIMEN}
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                />
+              <div className="col-lg-3 col-md-4 col-sm-12 mb-2 position-relative">
+                <label className="mb-2">Institución Previsional (*)</label>
+                <select
+                  {...formulario.register('previsional', {
+                    validate: {
+                      comboObligatorio: (valor: number | string) => {
+                        if (Number.isNaN(valor)) {
+                          return 'Este campo es obligatorio';
+                        }
 
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2 position-relative">
-                  <label className="mb-2">Institución Previsional (*)</label>
-                  <select
-                    {...formulario.register('previsional', {
-                      validate: {
-                        comboObligatorio: (valor: number | string) => {
-                          if (Number.isNaN(valor)) {
-                            return 'Este campo es obligatorio';
-                          }
-
-                          if (typeof valor === 'string' && valor === '') {
-                            return 'Este campo es obligatorio';
-                          }
-                        },
+                        if (typeof valor === 'string' && valor === '') {
+                          return 'Este campo es obligatorio';
+                        }
                       },
-                    })}
-                    className={`form-select ${
-                      formulario.formState.errors.previsional && 'is-invalid'
-                    }`}
-                    onChange={(e) => {
-                      if (e.target.value == '')
-                        return formulario.setError('previsional', {
-                          message: 'Este campo es obligatorio',
-                          type: 'onBlur',
-                        });
-                      else formulario.clearErrors('previsional');
+                    },
+                  })}
+                  className={`form-select ${
+                    formulario.formState.errors.previsional && 'is-invalid'
+                  }`}
+                  onChange={(e) => {
+                    if (e.target.value == '')
+                      return formulario.setError('previsional', {
+                        message: 'Este campo es obligatorio',
+                        type: 'onBlur',
+                      });
+                    else formulario.clearErrors('previsional');
 
-                      formulario.setValue('previsional', e.target.value);
-                    }}>
-                    <option value={''}>Seleccionar</option>
-                    {entidadPrevisional.length > 0 ? (
-                      entidadPrevisional.map(
-                        ({
-                          codigoentidadprevisional,
-                          glosa,
-                          letraentidadprevisional,
-                          codigoregimenprevisional,
-                        }) =>
-                          codigoregimenprevisional == 1 ? (
-                            letraentidadprevisional == '-' ? (
-                              <option
-                                value={codigoentidadprevisional + letraentidadprevisional}
-                                key={codigoentidadprevisional + letraentidadprevisional}>
-                                {glosa.toLowerCase().charAt(0).toUpperCase() +
-                                  glosa.slice(1).toLowerCase()}
-                              </option>
-                            ) : (
-                              <option
-                                value={codigoentidadprevisional + letraentidadprevisional}
-                                key={codigoentidadprevisional + letraentidadprevisional}>
-                                [{letraentidadprevisional}]{' '}
-                                {glosa.toLowerCase().charAt(0).toUpperCase() +
-                                  glosa.slice(1).toLowerCase()}
-                              </option>
-                            )
+                    formulario.setValue('previsional', e.target.value);
+                  }}>
+                  <option value={''}>Seleccionar</option>
+                  {entidadPrevisional.length > 0 ? (
+                    entidadPrevisional.map(
+                      ({
+                        codigoentidadprevisional,
+                        glosa,
+                        letraentidadprevisional,
+                        codigoregimenprevisional,
+                      }) =>
+                        codigoregimenprevisional == 1 ? (
+                          letraentidadprevisional == '-' ? (
+                            <option
+                              value={codigoentidadprevisional + letraentidadprevisional}
+                              key={codigoentidadprevisional + letraentidadprevisional}>
+                              {glosa.toLowerCase().charAt(0).toUpperCase() +
+                                glosa.slice(1).toLowerCase()}
+                            </option>
                           ) : (
                             <option
-                              key={codigoentidadprevisional + letraentidadprevisional}
-                              value={codigoentidadprevisional}>
-                              {glosa}
+                              value={codigoentidadprevisional + letraentidadprevisional}
+                              key={codigoentidadprevisional + letraentidadprevisional}>
+                              [{letraentidadprevisional}]{' '}
+                              {glosa.toLowerCase().charAt(0).toUpperCase() +
+                                glosa.slice(1).toLowerCase()}
                             </option>
-                          ),
-                      )
-                    ) : (
-                      <></>
-                    )}
-                  </select>
-                  <IfContainer show={formulario.formState.errors.previsional}>
-                    <div className="invalid-tooltip">Este campo es obligatorio</div>
-                  </IfContainer>
-                </div>
+                          )
+                        ) : (
+                          <option
+                            key={codigoentidadprevisional + letraentidadprevisional}
+                            value={codigoentidadprevisional}>
+                            {glosa}
+                          </option>
+                        ),
+                    )
+                  ) : (
+                    <></>
+                  )}
+                </select>
+                <IfContainer show={formulario.formState.errors.previsional}>
+                  <div className="invalid-tooltip">Este campo es obligatorio</div>
+                </IfContainer>
+              </div>
 
-                <ComboSimple
-                  label="Calidad Persona Trabajadora"
-                  descripcion="calidadtrabajador"
-                  idElemento="idcalidadtrabajador"
-                  name="calidad"
-                  datos={combos?.CALIDADTRABAJADOR}
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                />
+              <ComboSimple
+                label="Calidad Persona Trabajadora"
+                descripcion="calidadtrabajador"
+                idElemento="idcalidadtrabajador"
+                name="calidad"
+                datos={combos?.CALIDADTRABAJADOR}
+                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+              />
 
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <label className="mb-2 animate__animated animate__fadeIn">
-                    Persona Pertenece a AFC{' '}
-                    {esAFC && LMECABECERA?.ocupacion.idocupacion != 18 && '(*)'}
-                  </label>
-                  <IfContainer show={esAFC && LMECABECERA?.ocupacion.idocupacion != 18}>
-                    <InputRadioButtons
-                      className="animate__animated animate__fadeIn"
-                      name="perteneceAFC"
-                      direccion="horizontal"
-                      opcional={!esAFC}
-                      opciones={[
-                        {
-                          value: '1',
-                          label: 'Sí',
-                        },
-                        {
-                          value: '0',
-                          label: 'No',
-                        },
-                      ]}
-                    />
-                  </IfContainer>
-                  <IfContainer show={!esAFC || LMECABECERA!?.ocupacion.idocupacion == 18}>
-                    <p>
-                      <sub className="animate__animated animate__fadeIn">
-                        <IfContainer show={LMECABECERA?.ocupacion.idocupacion == 18}>
-                          <i>
-                            Persona trabajadora con ocupacion 18 (Trabajador de casa particular) No
-                            puede tener seguro cesantia
-                          </i>
-                        </IfContainer>
-                        <IfContainer show={LMECABECERA?.ocupacion.idocupacion !== 18}>
-                          <i>
-                            Persona trabajadora con seguro de cesantía debe tener calidad de
-                            trabajador privado dependiente
-                          </i>
-                        </IfContainer>
-                      </sub>
-                    </p>
-                  </IfContainer>
-                </div>
-                <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
-                  <label className="mb-2">Contrato de duración indefinida</label>
+              <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
+                <label className="mb-2 animate__animated animate__fadeIn">
+                  Persona Pertenece a AFC{' '}
+                  {esAFC && LMECABECERA?.ocupacion.idocupacion != 18 && '(*)'}
+                </label>
+                <IfContainer show={esAFC && LMECABECERA?.ocupacion.idocupacion != 18}>
                   <InputRadioButtons
+                    className="animate__animated animate__fadeIn"
+                    name="perteneceAFC"
                     direccion="horizontal"
-                    name="contratoIndefinido"
+                    opcional={!esAFC}
                     opciones={[
                       {
                         value: '1',
@@ -516,77 +478,112 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                       },
                     ]}
                   />
-                </div>
-
-                <InputFecha
-                  name="fechaafilacionprevisional"
-                  label="Fecha Afiliación Entidad Previsional"
-                  opcional
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                />
-
-                <InputFecha
-                  name="fechacontratotrabajo"
-                  label="Fecha Contrato de trabajo"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                />
-
-                <ComboSimple
-                  idElemento="identidadpagadora"
-                  descripcion="entidadpagadora"
-                  label="Entidad Pagadora Subsidio o Mantener remuneración"
-                  datos={entePagador}
-                  name="entidadremuneradora"
-                  tipoValor="string"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
-                />
-                <InputOtroMotivoDeRechazo
-                  name="nombreentidadpagadorasubsidio"
-                  opcional
-                  label="Nombre Entidad Pagadora Subsidio"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                </IfContainer>
+                <IfContainer show={!esAFC || LMECABECERA!?.ocupacion.idocupacion == 18}>
+                  <p>
+                    <sub className="animate__animated animate__fadeIn">
+                      <IfContainer show={LMECABECERA?.ocupacion.idocupacion == 18}>
+                        <i>
+                          Persona trabajadora con ocupacion 18 (Trabajador de casa particular) No
+                          puede tener seguro cesantia
+                        </i>
+                      </IfContainer>
+                      <IfContainer show={LMECABECERA?.ocupacion.idocupacion !== 18}>
+                        <i>
+                          Persona trabajadora con seguro de cesantía debe tener calidad de
+                          trabajador privado dependiente
+                        </i>
+                      </IfContainer>
+                    </sub>
+                  </p>
+                </IfContainer>
+              </div>
+              <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
+                <label className="mb-2">Contrato de duración indefinida</label>
+                <InputRadioButtons
+                  direccion="horizontal"
+                  name="contratoIndefinido"
+                  opciones={[
+                    {
+                      value: '1',
+                      label: 'Sí',
+                    },
+                    {
+                      value: '0',
+                      label: 'No',
+                    },
+                  ]}
                 />
               </div>
-              <div className="row">
-                <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
-                <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'anterior')}>
-                    Anterior
-                  </button>
-                </div>
-                <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                  <a className="btn btn-danger" href="/tramitacion">
-                    Tramitación
-                  </a>
-                </div>
-                <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-success"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'guardar')}>
-                    Guardar
-                  </button>
-                </div>
-                <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'siguiente')}>
-                    Siguiente
-                  </button>
-                </div>
+
+              <InputFecha
+                name="fechaafilacionprevisional"
+                label="Fecha Afiliación Entidad Previsional"
+                opcional
+                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+              />
+
+              <InputFecha
+                name="fechacontratotrabajo"
+                label="Fecha Contrato de trabajo"
+                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+              />
+
+              <ComboSimple
+                idElemento="identidadpagadora"
+                descripcion="entidadpagadora"
+                label="Entidad Pagadora Subsidio o Mantener remuneración"
+                datos={entePagador}
+                name="entidadremuneradora"
+                tipoValor="string"
+                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+              />
+              <InputOtroMotivoDeRechazo
+                name="nombreentidadpagadorasubsidio"
+                opcional
+                label="Nombre Entidad Pagadora Subsidio"
+                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+              />
+            </div>
+            <div className="row">
+              <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
+              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  {...formulario.register('accion')}
+                  onClick={() => formulario.setValue('accion', 'anterior')}>
+                  Anterior
+                </button>
               </div>
-            </form>
-          </FormProvider>
-        </div>
+              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                <a className="btn btn-danger" href="/tramitacion">
+                  Tramitación
+                </a>
+              </div>
+              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                <button
+                  type="submit"
+                  className="btn btn-success"
+                  {...formulario.register('accion')}
+                  onClick={() => formulario.setValue('accion', 'guardar')}>
+                  Guardar
+                </button>
+              </div>
+              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  {...formulario.register('accion')}
+                  onClick={() => formulario.setValue('accion', 'siguiente')}>
+                  Siguiente
+                </button>
+              </div>
+            </div>
+          </form>
+        </FormProvider>
       </div>
-    </div>
+    </>
   );
 };
 
