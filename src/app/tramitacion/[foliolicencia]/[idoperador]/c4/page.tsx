@@ -434,6 +434,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                       <Th>Total Días</Th>
                       <Th>Desde</Th>
                       <Th>Hasta</Th>
+                      <th></th>
                     </Tr>
                   </Thead>
                   <Tbody>
@@ -481,6 +482,27 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                               fieldArrayName: 'licenciasAnteriores',
                             }}
                           />
+                        </Td>
+                        <Td className="text-center align-middle">
+                          <span
+                            className="text-danger"
+                            onClick={() => {
+                              formulario.setValue(
+                                `licenciasAnteriores.${index}.dias`,
+                                undefined as any,
+                              );
+                              formulario.setValue(
+                                `licenciasAnteriores.${index}.desde`,
+                                undefined as any,
+                              );
+                              formulario.setValue(
+                                `licenciasAnteriores.${index}.hasta`,
+                                undefined as any,
+                              );
+                            }}
+                            style={{ cursor: 'pointer' }}>
+                            <i className="bi bi-trash"></i>
+                          </span>
                         </Td>
                       </Tr>
                     ))}

@@ -118,10 +118,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         operador: '',
       },
       fechacontrato: format(new Date(formulario.getValues('fechacontratotrabajo')), 'yyyy-MM-dd'),
-      fechaafiliacion: format(
-        new Date(formulario.getValues('fechaafilacionprevisional')),
-        'yyyy-MM-dd',
-      ),
+      fechaafiliacion:
+        formulario.getValues('fechaafilacionprevisional') != 'Invalid Date'
+          ? format(new Date(formulario.getValues('fechaafilacionprevisional')), 'yyyy-MM-dd')
+          : '',
       entidadpagadora: {
         identidadpagadora: formulario.getValues('entidadremuneradora'),
         entidadpagadora: '',

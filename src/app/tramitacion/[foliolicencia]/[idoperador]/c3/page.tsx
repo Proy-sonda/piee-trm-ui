@@ -401,6 +401,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       icon: 'success',
       showConfirmButton: false,
       timer: 2000,
+      didClose: () => (window.location.href = `/tramitacion/${foliolicencia}/${idoperador}/c3`),
     });
   };
 
