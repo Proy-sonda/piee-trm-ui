@@ -340,6 +340,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       <IfContainer show={spinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
+
       <div className="ms-5 me-5">
         <Cabecera
           foliotramitacion={foliolicencia}
