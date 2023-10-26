@@ -1,18 +1,18 @@
 'use client';
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { buscarUnidadPorId } from '@/app/empleadores/[idempleador]/unidad/(servicios)/buscar-unidad-por-id';
-import { UsuarioEntidadEmpleadora } from '@/app/empleadores/[idempleador]/usuarios/(modelos)/usuario-entidad-empleadora';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { Usuariosunidad } from '@/modelos/tramitacion';
 import React, { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { buscarEmpleadorPorId } from '../../../../(servicios)/buscar-empleador-por-id';
+import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
 import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
-import { UsuarioEmpleador } from './(modelos)/usuario-asociado';
 import { asociarUnidad } from './(servicios)/asociar-unidad';
 import { buscarUsuariosAsociado } from './(servicios)/buscar-usuario-asociado';
 import { eliminarUsuarioAsociado } from './(servicios)/eliminar-usuario-asociado';
@@ -26,41 +26,39 @@ interface iUsuarios {
 
 const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const { idempleador, idunidad } = params;
-  const [razon, setRazon] = useState('');
+
   const [rut, setrut] = useState('');
   const [unidad, setunidad] = useState('');
   const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
-  const [usuariosAsociados, setusuariosAsociados] = useState<UsuarioEmpleador[]>([]);
+  const [usuariosAsociados, setusuariosAsociados] = useState<Usuariosunidad[]>([]);
+
+  const { empleadorActual } = useEmpleadorActual();
 
   useEffect(() => {
     const busquedaUnidad = async () => {
-      const [resp] = await buscarUnidadPorId(Number(idunidad));
-      setunidad((await resp()).unidad);
+      const [resp] = await buscarUnidadPorId(idunidad);
+      setunidad((await resp())!?.glosaunidadrrhh);
     };
-    const busquedaEmpleador = async () => {
-      const [resp] = await buscarEmpleadorPorId(Number(idempleador));
-      setrut((await resp())?.rutempleador || '');
-      setRazon((await resp())?.razonsocial || '');
-    };
+
     busquedaUnidad();
-    busquedaEmpleador();
+
     refrescarComponente();
   }, []);
 
   useEffect(() => {
     const busquedaUsuarios = async () => {
-      if (rut == '') return;
-      const [resp] = await buscarUsuarios(rut);
+      if (empleadorActual?.rutempleador == '' || empleadorActual == undefined) return;
+      const [resp] = await buscarUsuarios(empleadorActual.rutempleador);
       setusuarios(await resp());
     };
     busquedaUsuarios();
-  }, [rut]);
+  }, [empleadorActual?.rutempleador]);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      usuarioAso: buscarUsuariosAsociado(Number(idunidad)),
+      usuarioAso: buscarUsuariosAsociado(idunidad, empleadorActual!?.rutempleador),
     },
     [refresh],
   );
@@ -74,10 +72,10 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     setusuarios(
       usuarios.filter(
         (usuario) =>
-          usuario.idusuario !==
+          usuario.rutusuario !==
           usuariosAsociados.find(
-            (usuarioAsociado) => usuarioAsociado.usuario.idusuario == usuario.idusuario,
-          )?.usuario.idusuario,
+            (usuarioAsociado) => usuarioAsociado.runusuario == usuario.rutusuario,
+          )?.runusuario,
       ),
     );
   }, [usuariosAsociados]);
@@ -195,8 +193,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
       <div className="row">
         <Titulo manual="Manual" url="">
-          Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b>{unidad}</b> /
-          Personas Usuarias
+          Entidad Empleadora - <b>{empleadorActual?.razonsocial}</b> / Dirección y Unidades RRHH -{' '}
+          <b>{unidad}</b> / Personas Usuarias
         </Titulo>
       </div>
 
@@ -218,15 +216,15 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                 name="idusuario">
                 <option value={''}>Seleccionar</option>
                 {usuarios?.length || 0 > 0 ? (
-                  usuarios.map(({ idusuario, rutusuario, nombres }) => (
-                    <Fragment key={idusuario}>
+                  usuarios.map(({ rutusuario, nombres }) => (
+                    <Fragment key={rutusuario}>
                       {datosPagina?.usuarioAso.find(
-                        (useraso) => useraso.usuario.idusuario === idusuario,
+                        (useraso) => useraso.runusuario === rutusuario,
                       ) ? (
                         <Fragment key={Math.random()}></Fragment>
                       ) : (
                         <>
-                          <option key={Math.random()} value={idusuario} data-tokens={rutusuario}>
+                          <option key={Math.random()} value={rutusuario} data-tokens={rutusuario}>
                             {rutusuario} / {nombres}
                           </option>
                         </>
@@ -265,8 +263,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                   placeholder="...Buscar por RUN"
                   onInput={(e: ChangeEvent<HTMLInputElement>) => {
                     setusuariosAsociados(
-                      datosPagina?.usuarioAso.filter(({ usuario }) =>
-                        usuario.rutusuario.includes(e.target.value),
+                      datosPagina?.usuarioAso.filter(({ runusuario }) =>
+                        runusuario.includes(e.target.value),
                       ) || [],
                     );
                   }}

@@ -2,7 +2,7 @@ import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { Unidadrhh } from '@/modelos/tramitacion';
+import { Unidadesrrhh } from '@/modelos/tramitacion';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
@@ -11,10 +11,10 @@ import Swal from 'sweetalert2';
 import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
 
 interface TablaUnidadesProps {
-  unidades: Unidadrhh[];
+  unidades: Unidadesrrhh[];
   idempleador: number;
-  onEditarUnidad: (unidad: Unidadrhh) => void;
-  onUnidadEliminada: (unidad: Unidadrhh) => void;
+  onEditarUnidad: (unidad: Unidadesrrhh) => void;
+  onUnidadEliminada: (unidad: Unidadesrrhh) => void;
 }
 
 const TablaUnidades = ({
@@ -30,10 +30,10 @@ const TablaUnidades = ({
     tamanoPagina: 10,
   });
 
-  const eliminarUnidadDeRRHH = async (unidad: Unidadrhh) => {
+  const eliminarUnidadDeRRHH = async (unidad: Unidadesrrhh) => {
     const { isConfirmed } = await Swal.fire({
       icon: 'question',
-      html: `¿Desea eliminar la unidad: <b>${unidad.unidad}</b>?`,
+      html: `¿Desea eliminar la unidad: <b>${unidad.glosaunidadrrhh}</b>?`,
       showConfirmButton: true,
       confirmButtonText: 'Sí',
       confirmButtonColor: 'var(--color-blue)',
@@ -49,7 +49,7 @@ const TablaUnidades = ({
     try {
       setMostrarSpinner(true);
 
-      await eliminarUnidad(unidad.idunidad);
+      await eliminarUnidad(parseInt(unidad.codigounidadrrhh));
 
       Swal.fire({
         icon: 'success',
@@ -74,22 +74,22 @@ const TablaUnidades = ({
     }
   };
 
-  const linkTrabajadores = (unidad: Unidadrhh) => {
-    return `/empleadores/${idempleador}/unidad/${unidad.idunidad}/trabajadores/`;
+  const linkTrabajadores = (unidad: Unidadesrrhh) => {
+    return `/empleadores/${idempleador}/unidad/${unidad.codigounidadrrhh}/trabajadores/`;
   };
 
-  const linkUsuarios = (unidad: Unidadrhh) => {
-    return `/empleadores/${idempleador}/unidad/${unidad.idunidad}/usuarios`;
+  const linkUsuarios = (unidad: Unidadesrrhh) => {
+    return `/empleadores/${idempleador}/unidad/${unidad.codigounidadrrhh}/usuarios`;
   };
 
-  const editarUnidadInterno = (unidad: Unidadrhh) => {
+  const editarUnidadInterno = (unidad: Unidadesrrhh) => {
     return (event: any) => {
       event.preventDefault();
       onEditarUnidad(unidad);
     };
   };
 
-  const eliminarUnidadInterno = (unidad: Unidadrhh) => {
+  const eliminarUnidadInterno = (unidad: Unidadesrrhh) => {
     return (event: any) => {
       event.preventDefault();
       eliminarUnidadDeRRHH(unidad);
@@ -109,34 +109,34 @@ const TablaUnidades = ({
               <Th>Código</Th>
               <Th>Nombre</Th>
               <Th>Teléfono</Th>
-              <Th>Correo electrónico</Th>
+
               <Th></Th>
             </Tr>
           </Thead>
           <Tbody className="text-center align-middle">
             {unidadesPaginadas.map((unidad) => (
-              <Tr key={unidad?.idunidad}>
-                <Td>{unidad?.identificador}</Td>
+              <Tr key={unidad?.codigounidadrrhh}>
+                <Td>{unidad?.codigounidadrrhh}</Td>
                 <Td>
                   <span
                     className="text-primary cursor-pointer"
                     onClick={editarUnidadInterno(unidad)}>
-                    {unidad?.unidad}
+                    {unidad?.glosaunidadrrhh}
                   </span>
                 </Td>
                 <Td>{unidad?.telefono}</Td>
-                <Td>{unidad?.email}</Td>
+
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
                     <button
                       className="btn text-primary"
-                      title={`Editar Unidad: ${unidad?.unidad}`}
+                      title={`Editar Unidad: ${unidad?.glosaunidadrrhh}`}
                       onClick={editarUnidadInterno(unidad)}>
                       <i className="bi bi-pencil-square"></i>
                     </button>
                     <button
                       className="btn text-danger"
-                      title={`Eliminar Unidad: ${unidad?.unidad}`}
+                      title={`Eliminar Unidad: ${unidad?.glosaunidadrrhh}`}
                       onClick={eliminarUnidadInterno(unidad)}>
                       <i className="bi bi-trash3"></i>
                     </button>

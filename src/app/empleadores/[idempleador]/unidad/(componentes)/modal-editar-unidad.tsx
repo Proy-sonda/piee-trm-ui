@@ -1,9 +1,9 @@
+import { buscarCalle } from '@/app/tramitacion/[foliolicencia]/[idoperador]/(servicios)/tipo-calle';
 import {
   ComboComuna,
   ComboSimple,
   InputBlockDepartamento,
   InputCalle,
-  InputEmail,
   InputNumero,
   InputTelefono,
 } from '@/components/form';
@@ -26,7 +26,7 @@ import { InputNombreUnidadRRHH } from './input-nombre-unidad-rrhh';
 interface ModalEditarUnidadProps {
   show: boolean;
   idEmpleador: number;
-  idUnidad?: number;
+  idUnidad?: string;
   onUnidadRRHHEditada: () => void;
   onCerrarModal: () => void;
 }
@@ -43,10 +43,11 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     CCREGION: buscarRegiones(),
     CCCOMUNA: buscarComunas(),
+    TIPOCALLE: buscarCalle(),
   });
 
   const [errorCargarUnidad, unidadRRHH, cargandoUnidad] = useFetch(
-    idUnidad ? buscarUnidadPorId(idUnidad) : emptyFetch(),
+    idUnidad ? buscarUnidadPorId(idUnidad.toString()) : emptyFetch(),
     [idUnidad],
   );
 
@@ -68,22 +69,23 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
 
     setMostrarSpinner(true);
 
-    formulario.setValue('nombre', unidadRRHH.unidad);
-    formulario.setValue('regionId', unidadRRHH.direccionunidad.comuna.region.idregion);
-    formulario.setValue('calle', unidadRRHH.direccionunidad.calle);
-    formulario.setValue('numero', unidadRRHH.direccionunidad.numero);
-    formulario.setValue('departamento', unidadRRHH.direccionunidad.depto);
-    formulario.setValue('identificadorUnico', unidadRRHH.identificador);
+    formulario.setValue('nombre', unidadRRHH.glosaunidadrrhh);
+    formulario.setValue('regionId', unidadRRHH.codigoregion);
+    formulario.setValue('calle', unidadRRHH.direccion);
+    formulario.setValue('numero', unidadRRHH.numero);
+    formulario.setValue('departamento', unidadRRHH.blockdepto);
+    formulario.setValue('identificadorUnico', unidadRRHH.codigounidadrrhh);
     formulario.setValue('telefono', unidadRRHH.telefono);
-    formulario.setValue('email', unidadRRHH.email);
-    formulario.setValue('emailConfirma', unidadRRHH.email);
+    formulario.setValue('tipocalle', unidadRRHH.codigotipocalle);
+    // formulario.setValue('email', unidadRRHH.email);
+    // formulario.setValue('emailConfirma', unidadRRHH.email);
 
-    formulario.setValue('comunaId', unidadRRHH.direccionunidad.comuna.idcomuna);
+    formulario.setValue('comunaId', unidadRRHH.codigocomuna);
 
     /* NOTA: Hay que darle un timeout antes de parchar la comuna. Puede ser porque react necesita
      * un tiempo para actualizar el combo de comunas al parchar la region. */
     setTimeout(() => {
-      formulario.setValue('comunaId', unidadRRHH.direccionunidad.comuna.idcomuna);
+      formulario.setValue('comunaId', unidadRRHH.codigocomuna);
       setMostrarSpinner(false);
     }, 1000);
   }, [cargandoCombos, unidadRRHH]);
@@ -113,7 +115,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
         email: data.email,
         emailConfirma: data.emailConfirma,
         empleadorId: idEmpleador,
-        unidadId: idUnidad,
+        unidadId: Number(idUnidad),
       });
 
       AlertaExito.fire({ text: 'Unidad fue actualizada con éxito' });
@@ -173,7 +175,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                 <div className="row mt-2 g-3 align-items-baseline">
                   <InputIdentificadorUnidadRRHH
                     name="identificadorUnico"
-                    label="Identificador Único"
+                    label="Código Unidad"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
@@ -201,6 +203,15 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
+                  <ComboSimple
+                    label="TIpo Calle"
+                    name="tipocalle"
+                    datos={combos?.TIPOCALLE}
+                    descripcion={'tipocalle'}
+                    idElemento={'idtipocalle'}
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
                   <InputCalle name="calle" label="Calle" className="col-12 col-lg-6 col-xl-3" />
 
                   <InputNumero name="numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
@@ -217,7 +228,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  <InputEmail
+                  {/* <InputEmail
                     name="email"
                     label="Correo electrónico unidad RRHH"
                     className="col-12 col-lg-6 col-xl-3"
@@ -228,7 +239,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                     debeCoincidirCon="email"
                     label="Repetir correo electrónico"
                     className="col-12 col-lg-6 col-xl-3"
-                  />
+                  /> */}
                 </div>
               </IfContainer>
             </Modal.Body>

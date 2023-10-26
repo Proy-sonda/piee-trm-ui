@@ -1,102 +1,58 @@
-export interface Unidadrhh {
-  idunidad: number;
-  unidad: string;
-  identificador: string;
-  email: string;
+export interface DatoEmpleadorUnidad {
+  empleadores: Empleadore[];
+  trabajadoresunidadrrhh: Trabajadoresunidadrrhh[];
+  unidadesrrhh: Unidadesrrhh[];
+  usuarios: Usuario[];
+  usuariosunidad: Usuariosunidad[];
+}
+
+export interface Usuariosunidad {
+  runusuario: string;
+  rolusuario: string;
+}
+
+export interface Usuario {
+  runusuario: string;
+  apellidosusuario: string;
+  nombresusuario: string;
+  rolusuario: number;
   telefono: string;
-  empleador: Empleador;
-  estadounidadrrhh: Estadounidadrrhh;
-  direccionunidad: Direccionunidad;
-}
-
-interface Direccionunidad {
-  iddireccionunidad: number;
-  numero: string;
-  depto: string;
-  comuna: Comuna;
-}
-
-interface Comuna {
-  idcomuna: string;
-  nombre: string;
-  region: Region;
-}
-
-interface Region {
-  idregion: string;
-  nombre: string;
-}
-
-interface Empleador {
-  idempleador: number;
-  rutempleador: string;
-  razonsocial: string;
-  nombrefantasia: string;
-  telefonohabitual: string;
   telefonomovil: string;
-  email: string;
-  holding: string;
-  usuarioempleador: Usuarioempleador;
+  correoelectronicousuario: string;
 }
 
-interface Usuarioempleador {}
-
-interface Estadounidadrrhh {
-  idestadounidadrrhh: number;
-  descripcion: string;
-}
-
-export interface ActualizaEmpleador {
-  idempleador: number;
-  rutempleador: string;
-  razonsocial: string;
-  nombrefantasia: string;
-  telefonohabitual: string;
-  telefonomovil: string;
-  email: string;
-  emailconfirma: string;
-  tipoempleador: Tipoempleador;
-  ccaf: Ccaf;
-  actividadlaboral: Actividadlaboral;
-  tamanoempresa: Tamanoempresa;
-  sistemaremuneracion: Sistemaremuneracion;
-  direccionempleador: Direccionempleador;
-}
-
-interface Actividadlaboral {
-  idactividadlaboral: number;
-  actividadlaboral: string;
-}
-
-interface Ccaf {
-  idccaf: number;
-  nombre: string;
-}
-
-interface Direccionempleador {
-  calle: string;
+export interface Unidadesrrhh {
+  codigounidadrrhh: string;
+  glosaunidadrrhh: string;
+  codigoregion: string;
+  codigocomuna: string;
+  codigotipocalle: number;
+  direccion: string;
   numero: string;
-  depto: string;
-  comuna: Comuna2;
+  blockdepto: string;
+  telefono: string;
 }
 
-interface Comuna2 {
-  idcomuna: string;
-  nombre: string;
+export interface Trabajadoresunidadrrhh {
+  runtrabajador: string;
 }
 
-interface Sistemaremuneracion {
-  idsistemaremuneracion: number;
-  descripcion: string;
-}
-
-interface Tamanoempresa {
-  idtamanoempresa: number;
-  nrotrabajadores: number;
-  descripcion: string;
-}
-
-interface Tipoempleador {
-  idtipoempleador: number;
-  tipoempleador: string;
+export interface Empleadore {
+  rutempleador: string;
+  nombrerazonsocial: string;
+  nombrefantasia: string;
+  tipoempleador: number;
+  codigoccaf: number;
+  codigoactividadlaboral: number;
+  codigoregion: string;
+  codigocomuna: string;
+  codigotipocalle: number;
+  direccion: string;
+  numero: string;
+  blockdepto: string;
+  telefono1: string;
+  telefono2: string;
+  correoelectronico: string;
+  codigocantidadtrabajadores: number;
+  codigosistemaremuneraciones: number;
 }

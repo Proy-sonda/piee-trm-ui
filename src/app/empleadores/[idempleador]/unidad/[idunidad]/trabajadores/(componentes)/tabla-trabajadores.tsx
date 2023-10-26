@@ -1,14 +1,14 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
+import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import exportFromJSON from 'export-from-json';
 import Link from 'next/link';
 import { FormEvent } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
-import { Trabajadores } from '../(modelos)/trabajadores';
 
 interface props {
-  trabajadores: Trabajadores[];
+  trabajadores: Trabajadoresunidadrrhh[];
   unidad: string;
   handleEditTrabajador: (idtrabajador: number, idunidad: number, ruttrabajador: string) => void;
   handleDeleteTrabajador: (idtrabajador: number, ruttrabajador: string) => void;
@@ -50,7 +50,7 @@ const TablaTrabajadores: React.FC<props> = ({
     if (resp.isDenied) return;
     if (resp.isDismissed) return;
     let data = trabajadores.map((trabajador) => ({
-      ['']: trabajador.ruttrabajador.replaceAll('-', ''),
+      ['']: trabajador.runtrabajador.replaceAll('-', ''),
     }));
 
     function padZero(num: number): string {
@@ -86,33 +86,36 @@ const TablaTrabajadores: React.FC<props> = ({
         <Thead className="align-middle text-center">
           <Tr>
             <Th>Run</Th>
-            <Th>Fecha Afiliación</Th>
+
             <Th>Acciones</Th>
           </Tr>
         </Thead>
         <Tbody className="align-middle text-center">
           {trabajadoresPaginados.length > 0 ? (
-            trabajadoresPaginados.map(({ ruttrabajador, idtrabajador, fechaafiliacion }) => (
-              <Tr key={ruttrabajador}>
+            trabajadoresPaginados.map(({ runtrabajador }) => (
+              <Tr key={runtrabajador}>
                 <Td>
                   <Link
                     href={''}
-                    onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
-                    {ruttrabajador}
+                    // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
+                  >
+                    {runtrabajador}
                   </Link>
                 </Td>
-                <Td>{new Date(fechaafiliacion).toLocaleDateString('es-CL', options)}</Td>
+
                 <Td>
                   <button
                     className="btn btn-sm btn-primary"
-                    onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
-                    <i title={`editar ${ruttrabajador}`} className={'bi bi-pencil-square'}></i>
+                    // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
+                  >
+                    <i title={`editar ${runtrabajador}`} className={'bi bi-pencil-square'}></i>
                   </button>
                   &nbsp;
                   <button
                     className="btn btn-sm btn-danger"
-                    onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}>
-                    <i title={`eliminar ${ruttrabajador}`} className={'bi bi-trash btn-danger'}></i>
+                    // onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}
+                  >
+                    <i title={`eliminar ${runtrabajador}`} className={'bi bi-trash btn-danger'}></i>
                   </button>
                 </Td>
               </Tr>

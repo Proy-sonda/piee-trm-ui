@@ -7,7 +7,6 @@ import Titulo from '@/components/titulo/titulo';
 import TablaTrabajadores from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
 import {
   Trabajador,
-  Trabajadores,
   UnidadEmpleador,
 } from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(modelos)';
 import {
@@ -25,7 +24,9 @@ import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import Swal from 'sweetalert2';
 
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
+import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import exportFromJSON from 'export-from-json';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
@@ -44,8 +45,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [textProgress, settextProgress] = useState('');
   const [spinnerCargar, setspinnerCargar] = useState(false);
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
-  const [trabajadores, settrabajadores] = useState<Trabajadores[]>([]);
+  const [trabajadores, settrabajadores] = useState<Trabajadoresunidadrrhh[]>([]);
   const [razon, setRazon] = useState('');
+  const { empleadorActual } = useEmpleadorActual();
   const [csvData, setCsvData] = useState<any[]>([]);
   let [loading, setLoading] = useState(false);
   const [error, seterror] = useState({
@@ -70,7 +72,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      trabajadores: buscarTrabajadoresDeUnidad(Number(idunidad)),
+      trabajadores: buscarTrabajadoresDeUnidad(idunidad, empleadorActual!?.rutempleador),
       empleador: buscarEmpleadorPorId(Number(idempleador)),
     },
     [refresh],
@@ -114,7 +116,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const handleDeleteTrabajador = (idtrabajador: number, rut: string) => {
     const EliminarTrabajador = async () => {
-      const data = await eliminarTrabajador(idtrabajador);
+      const data = await eliminarTrabajador(idtrabajador.toString());
 
       if (data.ok) {
         refrescarComponente();
@@ -172,7 +174,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     for (let index = 0; index < datosPagina!?.trabajadores.length; index++) {
       const element = datosPagina?.trabajadores[index];
-      const resp = await eliminarTrabajador(element!?.idtrabajador);
+      const resp = await eliminarTrabajador(element!?.runtrabajador);
       if (resp.ok) {
         recuento = ++recuento;
         setcuentagrabados((recuento / datosPagina!?.trabajadores.length) * 100);
@@ -575,14 +577,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       e.preventDefault();
                       settrabajadores(
                         datosPagina?.trabajadores.filter((trabajador) =>
-                          trabajador.ruttrabajador.includes(e.target.value.toUpperCase()),
-                        ) ||
-                          datosPagina?.trabajadores.filter((trabajador) =>
-                            trabajador.fechaafiliacion
-                              .toString()
-                              .includes(e.target.value.toUpperCase()),
-                          ) ||
-                          [],
+                          trabajador.runtrabajador.includes(e.target.value.toUpperCase()),
+                        ) || [],
                       );
                     }}
                   />

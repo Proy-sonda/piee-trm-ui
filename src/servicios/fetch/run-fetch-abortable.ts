@@ -1,5 +1,7 @@
 import { ErrorFetchDesconocido, HttpError } from './errores';
 
+export type FetchAbortableResponse<T> = [() => Promise<T>, () => void];
+
 /**
  * una llamada a `fetch` con la opción de abortar la llamada.
  *
@@ -26,10 +28,11 @@ import { ErrorFetchDesconocido, HttpError } from './errores';
  *           {@link FetchError}.
  *  - `[1]`: Un callback para abortar la llamada.
  */
+
 export const runFetchAbortable = <T = any>(
   url: RequestInfo | URL,
   init?: RequestInit,
-): [() => Promise<T>, () => void] => {
+): FetchAbortableResponse<T> => {
   const abortController = new AbortController();
 
   const callback = async () => {
