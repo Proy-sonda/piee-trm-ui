@@ -208,6 +208,8 @@ Una vez listos los modelos y servicios, se pueden usar dentro de un componente d
 ```typescript react
 // Archivo: src/app/ejemplo/page.tsx
 
+import { useFetch, useMergeFetchArray, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+
 const EjemploPage: React.FC<{}> = ({}) => {
   // Con useMergeFetchObject
   const [err, datos, cargando] = useMergeFetchObject({
@@ -260,6 +262,7 @@ Cada uno de los hooks aceptan un arreglo de dependencias que se puede usar para 
 ```typescript react
 // Archivo: src/app/ejemplo/page.tsx
 
+import { useFetch, useMergeFetchArray, useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';  // Importar hook
 
 const EjemploPage: React.FC<{}> = ({}) => {
@@ -309,7 +312,8 @@ Para el ejemplo, suponer que el ID del modelo viene como propiedad del component
 ```typescript react
 // Archivo: src/app/ejemplo/page.tsx
 
-import { emptyFetch } from '@/hooks/use-merge-fetch'; // Importar emptyFetch
+import { emptyFetch, useFetch, useMergeFetchArray, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+
 
 // En este caso se pasa el ID del modelo como propiedad, pero este puede ser
 // undefined
@@ -363,6 +367,7 @@ Para el ejemplo, se supone que se quiere transformar del tipo `MiModelo` a otro 
 // Archivo: src/app/ejemplo/(servicios)/buscar-mi-modelo-por-id.ts
 
 import { runFetchAbortable, FetchAbortableResponse } from '@/servicios/fetch';
+import { emptyFetch, useFetch, useMergeFetchArray, useMergeFetchObject } from '@/hooks/use-merge-fetch';
 
 // Se debe anotar usar este tipo para el retorno para que typescript lo considere
 // como una tupla y no como un arreglo
