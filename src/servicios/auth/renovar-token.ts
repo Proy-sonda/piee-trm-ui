@@ -1,7 +1,7 @@
 import { UsuarioToken } from '@/modelos/usuario';
 import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { setCookie } from 'nookies';
+import { setearCookieAutenticacion } from './cookie-autenticacion';
 import { obtenerToken } from './obtener-token';
 
 /**
@@ -21,9 +21,7 @@ export const renovarToken = async (): Promise<UsuarioToken> => {
     },
   );
 
-  const usuario = UsuarioToken.fromToken(token);
+  setearCookieAutenticacion(token);
 
-  setCookie(null, 'token', token, { maxAge: usuario.vigenciaToken(), path: '/' });
-
-  return usuario;
+  return UsuarioToken.fromToken(token);
 };
