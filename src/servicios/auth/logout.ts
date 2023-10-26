@@ -1,6 +1,6 @@
 import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { destroyCookie } from 'nookies';
+import { destruirCookieAutenticacion } from './cookie-autenticacion';
 import { obtenerToken } from './obtener-token';
 
 /**
@@ -19,8 +19,6 @@ export const desloguearUsuario = async () => {
   } catch (error) {
     // Nada que hacer aca
   } finally {
-    destroyCookie({}, 'token', {
-      path: '/',
-    });
+    destruirCookieAutenticacion();
   }
 };

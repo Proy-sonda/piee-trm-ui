@@ -1,7 +1,7 @@
 import { UsuarioToken } from '@/modelos/usuario';
 import { apiUrl } from '@/servicios/environment';
 import { HttpError, runFetchConThrow } from '@/servicios/fetch';
-import { setCookie } from 'nookies';
+import { setearCookieAutenticacion } from './cookie-autenticacion';
 
 export class RutInvalidoError extends Error {}
 
@@ -35,14 +35,9 @@ export const loguearUsuario = async (rut: string, clave: string): Promise<Usuari
       },
     );
 
-    const usuario = UsuarioToken.fromToken(token);
+    setearCookieAutenticacion(token);
 
-    setCookie(null, 'token', token, {
-      maxAge: usuario.vigenciaToken(),
-      path: '/',
-    });
-
-    return usuario;
+    return UsuarioToken.fromToken(token);
   } catch (error) {
     if (error instanceof HttpError) {
       if (error.status === 400 && error.body.message.includes('rutusuario|invalido')) {
