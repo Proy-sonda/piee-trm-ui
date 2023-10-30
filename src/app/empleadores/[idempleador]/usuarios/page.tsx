@@ -5,7 +5,6 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import { AlertaError } from '@/utilidades';
 import React, { useState } from 'react';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
@@ -30,6 +29,8 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
     empleadorActual ? buscarUsuarios(empleadorActual.rutempleador) : emptyFetch(),
     [empleadorActual, refresh],
   );
+
+  const [cantidadActivo, setcantidadActivo] = useState<number>(0);
 
   const [abrirModalCrearUsuario, setAbrirModalCrearUsuario] = useState(false);
 
@@ -76,11 +77,8 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
                   ++contarUsuario;
                 });
 
-                if (contarUsuario == 1) {
-                  return AlertaError.fire({
-                    html: 'Para modificar el usuario, debe tener al menos 2 usuarios activos',
-                  });
-                }
+                setcantidadActivo(contarUsuario);
+
                 setIdUsuarioEditar(idUsuario);
                 setAbrirModalEditarUsuario(true);
               }}
@@ -101,6 +99,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
       />
 
       <ModalEditarUsuario
+        cantidadActivo={cantidadActivo}
         show={abrirModalEditarUsuario}
         idUsuario={idUsuarioEditar}
         onCerrarModal={() => {
