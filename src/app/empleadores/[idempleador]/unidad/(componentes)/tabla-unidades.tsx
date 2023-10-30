@@ -3,11 +3,11 @@ import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Unidadesrrhh } from '@/modelos/tramitacion';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
 import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
 
 interface TablaUnidadesProps {
@@ -31,15 +31,8 @@ const TablaUnidades = ({
   });
 
   const eliminarUnidadDeRRHH = async (unidad: Unidadesrrhh) => {
-    const { isConfirmed } = await Swal.fire({
-      icon: 'question',
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       html: `¿Desea eliminar la unidad: <b>${unidad.glosaunidadrrhh}</b>?`,
-      showConfirmButton: true,
-      confirmButtonText: 'Sí',
-      confirmButtonColor: 'var(--color-blue)',
-      showDenyButton: true,
-      denyButtonColor: 'var(--bs-danger)',
-      denyButtonText: 'NO',
     });
 
     if (!isConfirmed) {
@@ -51,23 +44,15 @@ const TablaUnidades = ({
 
       await eliminarUnidad(parseInt(unidad.codigounidadrrhh));
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Unidad fue eliminada con éxito',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
+      AlertaExito.fire({
+        html: 'Unidad fue eliminada con éxito',
       });
 
       onUnidadEliminada(unidad);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         title: 'Error',
-        text: 'Hubo un problema al eliminar la unidad, por favor contactar a un administrador',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'Hubo un problema al eliminar la unidad, por favor contactar a un administrador',
       });
     } finally {
       setMostrarSpinner(false);

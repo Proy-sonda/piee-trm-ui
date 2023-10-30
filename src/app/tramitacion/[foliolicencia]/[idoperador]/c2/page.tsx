@@ -5,12 +5,12 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { buscarCalidadTrabajador } from '../(servicios)/buscar-calidad-trabajador';
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
@@ -157,12 +157,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           router.push(`/tramitacion/${foliolicencia}/${idoperador}/c1`);
           break;
         case 'guardar':
-          Swal.fire({
-            icon: 'success',
+          AlertaExito.fire({
             html: 'Se ha guardado con éxito',
-            timer: 2000,
-            showConfirmButton: false,
           });
+
           break;
         case 'navegar':
           router.push(formulario.getValues('linkNavegacion'));
@@ -172,7 +170,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       }
     } catch (error) {
       if (error instanceof ErrorCrearLicenciaC2)
-        Swal.fire({ html: 'Ha ocurrido un problema: ' + ErrorCrearLicenciaC2, icon: 'error' });
+        AlertaError.fire({
+          html: `Ha ocurrido un problema: ${ErrorCrearLicenciaC2}`,
+        });
     }
   };
 

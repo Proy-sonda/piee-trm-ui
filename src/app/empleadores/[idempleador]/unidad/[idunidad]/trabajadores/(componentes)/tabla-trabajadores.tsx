@@ -1,11 +1,11 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
+import { AlertaConfirmacion } from '@/utilidades/alertas';
 import exportFromJSON from 'export-from-json';
 import Link from 'next/link';
 import { FormEvent } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
 
 interface props {
   trabajadores: Trabajadoresunidadrrhh[];
@@ -38,13 +38,8 @@ const TablaTrabajadores: React.FC<props> = ({
 
   const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const resp = await Swal.fire({
-      icon: 'question',
+    const resp = await AlertaConfirmacion.fire({
       html: `¿Desea exportar las personas trabajadoras a CSV?`,
-      confirmButtonColor: 'var(--color-blue)',
-      confirmButtonText: 'Sí',
-      showDenyButton: true,
-      denyButtonText: 'No',
     });
 
     if (resp.isDenied) return;

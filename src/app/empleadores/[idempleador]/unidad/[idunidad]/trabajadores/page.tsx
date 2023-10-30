@@ -22,7 +22,6 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import Swal from 'sweetalert2';
 
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
@@ -325,10 +324,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     } else {
       refrescarComponente();
       setspinnerCargar(false);
-      Swal.fire({
+      AlertaError.fire({
         icon: 'info',
         html: 'Las personas trabajadoras ya se encuentran registrados',
-        confirmButtonColor: 'var(--color-blue)',
         didClose: () => {
           settextProgress('');
           setValue('file', null);

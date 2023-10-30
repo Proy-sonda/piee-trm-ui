@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
@@ -30,6 +29,7 @@ import {
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import {
   crearIdEntidadPrevisional,
   glosaCompletaEntidadPrevisional,
@@ -305,25 +305,17 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   }, [zona3]);
 
   const onSubmitForm: SubmitHandler<FormularioC3> = async (datos) => {
-    if (!(await formulario.trigger())) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Hay campos inválidos',
-        text: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
-        confirmButtonColor: 'var(--color-blue)',
+    if (!(await formulario.trigger()))
+      return AlertaError.fire({
+        title: 'Campos Inválidos',
+        html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
-      return;
-    }
 
-    if (!validarCompletitudDeFilas(datos)) {
-      Swal.fire({
-        icon: 'error',
+    if (!validarCompletitudDeFilas(datos))
+      return AlertaError.fire({
         title: 'Remuneraciones Incompletas',
-        text: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
       });
-      return;
-    }
 
     const datosLimpios: FormularioC3 = {
       ...datos,
@@ -362,18 +354,14 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       .concat(datos.remuneracionesMaternidad)
       .map((r) => capitalizar(format(r.periodoRenta, 'MMMM yyyy', { locale: esLocale })));
 
-    const { isConfirmed } = await Swal.fire({
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       html: `
         <p>Antes de seguir, recuerde confirmar que debe ingresar Comprobante de Liquidación mensual para todos los periodos declarados:</p>
         ${periodosDeclarados.map((periodo) => `<li>${periodo}</li>`).join('')}
         <p class="mt-3 fw-bold">¿Está seguro que desea continuar o desea volver a ingresar o revisar la documentación?</p>
         `,
-      showConfirmButton: true,
       confirmButtonText: 'Continuar',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'Volver',
-      cancelButtonColor: 'var(--bs-danger)',
+      denyButtonText: 'Volver',
     });
 
     if (!isConfirmed) {
@@ -396,11 +384,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
     refrescarZona3();
 
-    Swal.fire({
+    AlertaExito.fire({
       html: 'Cambios guardados con éxito',
-      icon: 'success',
-      showConfirmButton: false,
-      timer: 2000,
       didClose: () => (window.location.href = `/tramitacion/${foliolicencia}/${idoperador}/c3`),
     });
   };
@@ -433,11 +418,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         idOperador: parseInt(idoperador),
       });
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         title: 'Error',
-        text: 'No se pudieron guardar los cambios en la licencia',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'No se pudieron guardar los cambios en la licencia',
       });
 
       return false;

@@ -15,10 +15,10 @@ import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import { buscarActividadesLaborales } from '../../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../../(servicios)/buscar-cajas-de-compensacion';
@@ -126,22 +126,16 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
 
       setSpinnerCargar(false);
 
-      await Swal.fire({
-        icon: 'success',
-        title: 'Entidad empleadora fue actualizada con éxito',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
+      await AlertaExito.fire({
+        html: 'Entidad empleadora fue actualizada con éxito',
       });
 
       refrescarEmpleador();
     } catch (error) {
       setSpinnerCargar(false);
 
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al actualizar la entidad empleadora',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
+      AlertaError.fire({
+        html: 'Error al actualizar la entidad empleadora',
       });
     }
   };

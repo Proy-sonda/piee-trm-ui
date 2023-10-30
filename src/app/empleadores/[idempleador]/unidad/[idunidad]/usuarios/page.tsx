@@ -7,8 +7,8 @@ import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { Usuariosunidad } from '@/modelos/tramitacion';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
 import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
@@ -97,16 +97,9 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
   const onHandleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    const respuesta = await Swal.fire({
-      icon: 'question',
+    const respuesta = await AlertaConfirmacion.fire({
       title: 'Asociar Usuario/a',
       html: `¿Desea asociar al usuario a la unidad ${unidad}?`,
-      showConfirmButton: true,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'NO',
-      cancelButtonColor: 'var(--bs-danger)',
     });
 
     if (!respuesta.isConfirmed) return;
@@ -120,10 +113,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       });
 
       setspinner(false);
-      Swal.fire({
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 2000,
+      AlertaExito.fire({
         html: 'Asociación realizada con éxito',
         didClose: () => {
           refrescarComponente();
@@ -131,24 +121,16 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       });
     } catch (error) {
       setspinner(false);
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         html: 'Error en asociación, verifique los datos correctamente',
       });
     }
   };
 
   const handleDelete = async (idusuario: number) => {
-    const respuesta = await Swal.fire({
-      icon: 'question',
+    const respuesta = await AlertaConfirmacion.fire({
       title: 'Eliminar Usuario/a',
       html: `¿Desea eliminar al usuario de la unidad ${unidad}?`,
-      showConfirmButton: true,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'NO',
-      cancelButtonColor: 'var(--bs-danger)',
     });
 
     if (!respuesta.isConfirmed) return;
@@ -158,17 +140,13 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       await eliminarUsuarioAsociado(idusuario);
       setspinner(false);
       refrescarComponente();
-      Swal.fire({
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 2000,
+      AlertaExito.fire({
         html: 'Eliminación realizada con éxito',
         didClose: () => refrescarComponente(),
       });
     } catch (error) {
       setspinner(false);
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         html: 'Error en eliminación, verifique los datos correctamente',
       });
     } finally {
