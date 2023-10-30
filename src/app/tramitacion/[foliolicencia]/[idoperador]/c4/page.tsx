@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import BotonesNavegacion from '../(componentes)/botones-navegacion';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
 import {
@@ -491,41 +492,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
               </Col>
             </Row>
 
-            <div className="row">
-              <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'anterior')}>
-                  Anterior
-                </button>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <a className="btn btn-danger" href="/tramitacion">
-                  Tramitación
-                </a>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-success"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'guardar')}>
-                  Guardar
-                </button>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'tramitar')}>
-                  Tramitar
-                </button>
-              </div>
-            </div>
+            <BotonesNavegacion formulario={formulario} anterior finaliza />
           </form>
         </FormProvider>
       </IfContainer>

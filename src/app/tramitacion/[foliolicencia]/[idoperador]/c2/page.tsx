@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import BotonesNavegacion from '../(componentes)/botones-navegacion';
 import Cabecera from '../(componentes)/cabecera';
 import { buscarCalidadTrabajador } from '../(servicios)/buscar-calidad-trabajador';
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
@@ -545,41 +546,8 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 className="col-lg-3 col-md-4 col-sm-12 mb-2"
               />
             </div>
-            <div className="row">
-              <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'anterior')}>
-                  Anterior
-                </button>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <a className="btn btn-danger" href="/tramitacion">
-                  Tramitación
-                </a>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-success"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'guardar')}>
-                  Guardar
-                </button>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'siguiente')}>
-                  Siguiente
-                </button>
-              </div>
-            </div>
+
+            <BotonesNavegacion formulario={formulario} anterior />
           </form>
         </FormProvider>
       </div>

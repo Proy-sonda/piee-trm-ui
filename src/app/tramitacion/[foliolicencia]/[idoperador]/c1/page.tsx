@@ -29,6 +29,7 @@ import { buscarCalle } from '../(servicios)/tipo-calle';
 
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import format from 'date-fns/format';
+import BotonesNavegacion from '../(componentes)/botones-navegacion';
 import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
@@ -526,32 +527,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   </div>
                 </IfContainer>
               </div>
-              <div className="row">
-                <div className="d-nne d-md-none col-lg-6 d-lg-inline"></div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <a className="btn btn-danger" href="/tramitacion">
-                    Tramitación
-                  </a>
-                </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-success"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'guardar')}>
-                    Guardar
-                  </button>
-                </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'siguiente')}>
-                    Siguiente
-                  </button>
-                </div>
-              </div>
+
+              <BotonesNavegacion formulario={formulario} />
             </form>
           </FormProvider>
         </div>
