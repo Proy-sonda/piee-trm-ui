@@ -5,6 +5,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { AlertaError } from '@/utilidades';
 import React, { useState } from 'react';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
@@ -69,6 +70,17 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
             <TablaUsuarios
               usuarios={usuarios ?? []}
               onEditarUsuario={(idUsuario) => {
+                let contarUsuario = 0;
+                usuarios?.map(({ estadousuario }) => {
+                  if (estadousuario.descripcion == 'Deshabilitado') return;
+                  ++contarUsuario;
+                });
+
+                if (contarUsuario == 1) {
+                  return AlertaError.fire({
+                    html: 'Para modificar el usuario, debe tener al menos 2 usuarios activos',
+                  });
+                }
                 setIdUsuarioEditar(idUsuario);
                 setAbrirModalEditarUsuario(true);
               }}
