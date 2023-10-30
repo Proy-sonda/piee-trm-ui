@@ -1,33 +1,33 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { BaseProps } from './base-props';
+import { useInputReciclable } from './hooks';
 
 interface InputRazonSocialProps extends BaseProps {}
 
-const InputRazonSocial: React.FC<InputRazonSocialProps> = ({
+export const InputRazonSocial: React.FC<InputRazonSocialProps> = ({
   name,
   label,
   className,
   deshabilitado,
 }) => {
-  const idInput = useRandomId('razonSocial');
+  const { register, setValue } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    name,
+    prefijoId: 'razonSocial',
+    label: { texto: label },
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label} (*)`}</Form.Label>
+        <Form.Label>{textoLabel}</Form.Label>
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           disabled={deshabilitado}
           {...register(name, {
             required: {
@@ -53,11 +53,9 @@ const InputRazonSocial: React.FC<InputRazonSocialProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>
   );
 };
-
-export default InputRazonSocial;

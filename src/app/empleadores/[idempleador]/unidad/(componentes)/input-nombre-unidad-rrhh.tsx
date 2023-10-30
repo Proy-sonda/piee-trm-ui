@@ -1,5 +1,5 @@
 import { BaseProps } from '@/components/form';
-import { useRandomId } from '@/hooks/use-random-id';
+import { useInputReciclable } from '@/components/form/hooks';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
@@ -11,22 +11,24 @@ export const InputNombreUnidadRRHH: React.FC<InputNombreUnidadRRHHProps> = ({
   label,
   className,
 }) => {
-  const idInput = useRandomId('nombreUnidadRRHH');
+  const { register, setValue } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    name,
+    prefijoId: 'nombreUnidadRRHH',
+    label: {
+      texto: label,
+    },
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label} (*)`}</Form.Label>
+        <Form.Label>{textoLabel}</Form.Label>
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           {...register(name, {
             required: {
               value: true,
@@ -51,7 +53,7 @@ export const InputNombreUnidadRRHH: React.FC<InputNombreUnidadRRHHProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

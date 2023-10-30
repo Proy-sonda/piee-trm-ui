@@ -1,13 +1,13 @@
-import { BaseProps } from '@/components/form';
-import { useRandomId } from '@/hooks/use-random-id';
+import { BaseProps, UnibleConFormArray } from '@/components/form';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, isAfter, isBefore, parse, startOfDay } from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import IfContainer from '../if-container';
+import { useInputReciclable } from './hooks';
 
-interface InputFechaProps extends Omit<BaseProps, 'label'> {
+interface InputFechaProps extends Omit<BaseProps, 'label'>, UnibleConFormArray {
   label?: string;
 
   opcional?: boolean;
@@ -47,28 +47,6 @@ interface InputFechaProps extends Omit<BaseProps, 'label'> {
   esEmision?: boolean;
 
   deshabilitado?: boolean;
-
-  /**
-   * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
-   *
-   * Si se incluye esta propiedad se obtienen desde el arreglo usado por `useFieldArray`, pero si
-   * no se incluye se van a tratar de obtener los errores desde la propiedad`formState.errors[name]`
-   * que devuelve `useFormContext`.
-   */
-  unirConFieldArray?: {
-    /**
-     * La propiedad `name` usada cuando se creo el field array con `useFieldArray`.
-     * */
-    fieldArrayName: string;
-
-    /** El indice del input. */
-    index: number;
-
-    /**
-     * Nombre de la propiedad de un elemento del field array.
-     */
-    campo: string;
-  };
 }
 
 /**
@@ -87,53 +65,26 @@ export const InputFecha: React.FC<InputFechaProps> = ({
   deshabilitado,
   unirConFieldArray,
 }) => {
-  const idInput = useRandomId('fecha');
+  const { register, getValues } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    getValues,
-  } = useFormContext();
-
-  const determinarLabel = () => {
-    if (label === undefined || label === null) {
-      return '';
-    }
-
-    return opcional ? `${label}` : `${label} (*)`;
-  };
-
-  const tieneError = () => {
-    if (!unirConFieldArray) {
-      return !!errors[name];
-    }
-
-    const { fieldArrayName, index, campo } = unirConFieldArray;
-
-    return !!(errors[fieldArrayName] as any)?.at?.(index)?.[campo];
-  };
-
-  const mensajeDeError = () => {
-    if (!unirConFieldArray) {
-      return errors[name]?.message?.toString();
-    }
-
-    const { fieldArrayName, index, campo } = unirConFieldArray;
-
-    return (errors[fieldArrayName] as any)?.at?.(index)?.[campo]?.message?.toString();
-  };
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'fecha',
+    name,
+    label: { texto: label, opcional },
+    unirConFieldArray,
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
         <IfContainer show={label}>
-          <Form.Label>{determinarLabel()}</Form.Label>
+          <Form.Label>{textoLabel}</Form.Label>
         </IfContainer>
         <Form.Control
           type="date"
           autoComplete="new-custom-value"
           disabled={deshabilitado === true}
-          isInvalid={tieneError()}
+          isInvalid={tieneError}
           {...register(name, {
             setValueAs: (date: string) => {
               /** Situa la fecha con respecto al inicio de hoy */
@@ -228,7 +179,7 @@ export const InputFecha: React.FC<InputFechaProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {mensajeDeError()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

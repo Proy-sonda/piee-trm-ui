@@ -1,8 +1,8 @@
 import { BaseProps } from '@/components/form';
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
+import { useInputReciclable } from './hooks';
 
 export interface OpcionInputRadioButton {
   value: string;
@@ -35,14 +35,16 @@ export const InputRadioButtons: React.FC<InputRadioButtonsProps> = ({
   errores,
   opciones,
 }) => {
-  const idInput = useRandomId('radioButtons');
-
   const {
     register,
     formState: { errors },
   } = useFormContext();
 
-  const mensajeObligatorio = errores?.obligatorio ?? 'Debe elegir una opción';
+  const { idInput, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'radioButtons',
+    name,
+    label: {},
+  });
 
   return (
     <>
@@ -54,13 +56,13 @@ export const InputRadioButtons: React.FC<InputRadioButtonsProps> = ({
               key={index}
               id={`${idInput}_${index}`}
               type="radio"
-              isInvalid={!!errors[name]}
+              isInvalid={tieneError}
               label={opcion.label}
               value={opcion.value}
               {...register(name, {
                 required: {
                   value: !opcional,
-                  message: mensajeObligatorio,
+                  message: errores?.obligatorio ?? 'Debe elegir una opción',
                 },
               })}
             />
@@ -72,7 +74,7 @@ export const InputRadioButtons: React.FC<InputRadioButtonsProps> = ({
           <Form.Control type="hidden" isInvalid={!!errors[name]} />
 
           <Form.Control.Feedback type="invalid" tooltip>
-            {errors[name]?.message?.toString()}
+            {mensajeError}
           </Form.Control.Feedback>
         </FormGroup>
       </div>

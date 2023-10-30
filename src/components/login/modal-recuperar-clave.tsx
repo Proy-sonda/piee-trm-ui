@@ -68,7 +68,7 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
             <Modal.Body>
               <p>Escriba su RUN para solicitar una nueva clave de acceso</p>
               <div className="row">
-                <InputRut omitirLabel name="rut" tipo="run" className="col-md-12" />
+                <InputRut name="rut" tipo="run" className="col-md-12" />
               </div>
             </Modal.Body>
 
