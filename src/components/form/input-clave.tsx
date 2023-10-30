@@ -1,8 +1,10 @@
 'use client';
 
+import { Options, Result, passwordStrength } from 'check-password-strength';
 import React, { useState } from 'react';
-import { Form, FormGroup, InputGroup } from 'react-bootstrap';
+import { Form, FormGroup, InputGroup, ProgressBar } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
+import IfContainer from '../if-container';
 import { BaseProps } from './base-props';
 import { useInputReciclable } from './hooks';
 
@@ -32,7 +34,29 @@ interface InputClaveProps extends BaseProps {
   };
 
   opcional?: boolean;
+
+  validarFortaleza?: boolean;
 }
+
+const TextoBuenoMalo: React.FC<{ estaBueno: any; texto: string }> = ({ estaBueno, texto }) => {
+  const estaWenardo = !!estaBueno;
+
+  return (
+    <div>
+      {estaWenardo ? (
+        <p className="text-success">
+          <i className="bi bi-check2 me-2"></i>
+          <span>{texto}</span>
+        </p>
+      ) : (
+        <p className="text-danger">
+          <i className="bi bi-x-lg me-2"></i>
+          <span>{texto}</span>
+        </p>
+      )}
+    </div>
+  );
+};
 
 export const InputClave: React.FC<InputClaveProps> = ({
   name,
@@ -41,9 +65,21 @@ export const InputClave: React.FC<InputClaveProps> = ({
   className,
   debeCoincidirCon,
   omitirSignoObligatorio,
+  validarFortaleza,
   errores,
 }) => {
+  const opcionesPwd: Options<string> = [
+    { id: 0, value: 'Muy Débil', minDiversity: 0, minLength: 0 },
+    { id: 1, value: 'Débil', minDiversity: 2, minLength: 6 },
+    { id: 2, value: 'Normal', minDiversity: 3, minLength: 8 },
+    { id: 3, value: 'Fuerte', minDiversity: 4, minLength: 10 },
+  ];
+
   const [verClave, setVerClave] = useState(false);
+
+  const [mostrarRequerimientos, setMostrarRequerimientos] = useState(false);
+
+  const [resultadoClave, setResultadoClave] = useState<Result<string> | undefined>();
 
   const { register, getValues } = useFormContext();
 
@@ -53,10 +89,52 @@ export const InputClave: React.FC<InputClaveProps> = ({
     label: { texto: label, opcional, omitirSignoObligatorio },
   });
 
+  const nivelSeguridad = () => {
+    if (!getValues(name)) {
+      return 0;
+    }
+
+    switch (resultadoClave?.id) {
+      case 0:
+        return 25;
+      case 1:
+        return 50;
+      case 2:
+        return 75;
+      case 3:
+        return 100;
+      default:
+        return 0;
+    }
+  };
+
+  const colorSeguridad = () => {
+    switch (resultadoClave?.id) {
+      case 0:
+        return 'danger';
+      case 1:
+        return 'warning';
+      case 2:
+        return 'primary';
+      case 3:
+        return 'success';
+      default:
+        return 'secondary';
+    }
+  };
+
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{textoLabel}</Form.Label>
+        <Form.Label>
+          <span>{textoLabel}</span>
+          <IfContainer show={validarFortaleza}>
+            <i
+              className="ms-2 cursor-pointer text-primary bi bi-info-circle"
+              title="Ver requerimientos"
+              onClick={() => setMostrarRequerimientos((x) => !x)}></i>
+          </IfContainer>
+        </Form.Label>
 
         <InputGroup>
           <Form.Control
@@ -82,6 +160,23 @@ export const InputClave: React.FC<InputClaveProps> = ({
                     return errores?.clavesNoCoinciden ?? 'Las contraseñas no coinciden';
                   }
                 },
+                // validarFortaleza: (clave) => {
+                //   if (!validarFortaleza) {
+                //     return;
+                //   }
+
+                //   const resultado = passwordStrength(clave);
+                //   if (resultado.id < 3) {
+                //     return 'La contraseña es muy débil';
+                //   }
+                // },
+              },
+              onChange: (event) => {
+                if (validarFortaleza) {
+                  const clave: string = event.target.value ?? '';
+
+                  setResultadoClave(passwordStrength(clave, opcionesPwd));
+                }
               },
             })}
           />
@@ -97,6 +192,42 @@ export const InputClave: React.FC<InputClaveProps> = ({
             {mensajeError}
           </Form.Control.Feedback>
         </InputGroup>
+
+        <IfContainer show={validarFortaleza}>
+          <ProgressBar
+            className={`mb-3 ${tieneError ? 'mt-5' : 'mt-3'}`}
+            label={resultadoClave?.value}
+            now={nivelSeguridad()}
+            variant={colorSeguridad()}
+          />
+        </IfContainer>
+
+        <IfContainer show={validarFortaleza && resultadoClave && mostrarRequerimientos}>
+          <TextoBuenoMalo
+            estaBueno={resultadoClave && resultadoClave.length >= 10}
+            texto="Al menos 10 caracteres de largo"
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave?.contains.includes('uppercase')}
+            texto="Al menos una letra mayúscula"
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave?.contains.includes('lowercase')}
+            texto="Al menos una letra minúscula"
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave?.contains.includes('number')}
+            texto="Al menos un número"
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave?.contains.includes('symbol')}
+            texto="Al menos un símbolo"
+          />
+        </IfContainer>
       </FormGroup>
     </>
   );
