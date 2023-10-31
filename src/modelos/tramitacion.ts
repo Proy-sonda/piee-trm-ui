@@ -34,7 +34,9 @@ export interface Unidadesrrhh {
 }
 
 export interface Trabajadoresunidadrrhh {
+  codigounidadrrhh: string;
   runtrabajador: string;
+  fecharegistro: string;
 }
 
 export interface Empleadore {

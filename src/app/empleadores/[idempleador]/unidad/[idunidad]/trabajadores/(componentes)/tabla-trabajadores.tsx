@@ -2,6 +2,7 @@ import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion } from '@/utilidades/alertas';
+import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import Link from 'next/link';
 import { FormEvent } from 'react';
@@ -32,7 +33,7 @@ const TablaTrabajadores: React.FC<props> = ({
   idunidad,
 }) => {
   const [trabajadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
-    datos: trabajadores,
+    datos: trabajadores.filter(({ codigounidadrrhh }) => codigounidadrrhh == idunidad.toString()),
     tamanoPagina: 5,
   });
 
@@ -81,13 +82,14 @@ const TablaTrabajadores: React.FC<props> = ({
         <Thead className="align-middle text-center">
           <Tr>
             <Th>Run</Th>
+            <Th>Fecha Registro</Th>
 
             <Th>Acciones</Th>
           </Tr>
         </Thead>
         <Tbody className="align-middle text-center">
           {trabajadoresPaginados.length > 0 ? (
-            trabajadoresPaginados.map(({ runtrabajador }) => (
+            trabajadoresPaginados.map(({ runtrabajador, fecharegistro, codigounidadrrhh }) => (
               <Tr key={runtrabajador}>
                 <Td>
                   <Link
@@ -97,6 +99,7 @@ const TablaTrabajadores: React.FC<props> = ({
                     {runtrabajador}
                   </Link>
                 </Td>
+                <td>{format(new Date(fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</td>
 
                 <Td>
                   <button
