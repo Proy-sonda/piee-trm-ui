@@ -6,10 +6,12 @@ import { Options, Result, passwordStrength } from 'check-password-strength';
 import React, { useState } from 'react';
 import { Form, FormGroup, InputGroup, ProgressBar } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { InputReciclableBase } from './base-props';
+import { ErroresEditables, InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputClaveProps extends InputReciclableBase {
+interface InputClaveProps
+  extends InputReciclableBase,
+    ErroresEditables<'requerida' | 'clavesNoCoinciden'> {
   /**
    * Propiedad `name` del `InputClave` con el que este input debe coincidir.
    *
@@ -28,11 +30,6 @@ interface InputClaveProps extends InputReciclableBase {
   debeCoincidirCon?: string;
 
   omitirSignoObligatorio?: boolean;
-
-  errores?: {
-    requerida?: string;
-    clavesNoCoinciden?: string;
-  };
 
   validarFortaleza?: boolean;
 }

@@ -1,4 +1,4 @@
-import { InputReciclableBase } from '@/components/form';
+import { ErroresEditables, InputReciclableBase } from '@/components/form';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
@@ -9,18 +9,13 @@ export interface OpcionInputRadioButton {
   label: string;
 }
 
-interface InputRadioButtonsProps extends InputReciclableBase {
+interface InputRadioButtonsProps extends InputReciclableBase, ErroresEditables<'obligatorio'> {
   /**
    * - `vertical`: Para colocar los radios buttons hacia abajo
    * - `horizontal`: Para colocar los radio buttons hacia el lado
    *
    * (default: `vertical`) */
   direccion?: 'vertical' | 'horizontal';
-
-  /** Para sobreescribir los mensajes de error */
-  errores?: {
-    obligatorio?: string;
-  };
 
   opciones: OpcionInputRadioButton[];
 }

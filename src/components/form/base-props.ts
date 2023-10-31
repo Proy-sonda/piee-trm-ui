@@ -42,3 +42,23 @@ export interface UnibleConFormArray {
     campo: string;
   };
 }
+
+/**
+ * Agrega una propiedad `errores`, que es un objeto cuyas propiedades son strings opcionales para
+ * sobreescribir los mensajes de error.
+ *
+ * @example
+ *  ```typescript
+ *  interface MyProps extends ErroresEditables<'requerido' | 'muyCorto'> {}
+ *
+ *  // Luego al momento de usar
+ *  export const NuevoInput = ({ errores }) => {
+ *    // Se puede acceder a los errores sin problemas de tipado
+ *    console.log(errores.requerido);
+ *    console.log(errores.muyCorto);
+ *  }
+ *  ```
+ */
+export interface ErroresEditables<T extends string> {
+  errores?: Partial<Record<T, string>>;
+}

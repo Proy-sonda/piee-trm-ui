@@ -1,14 +1,10 @@
 import React from 'react';
 import { Form, FormGroup, InputGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { InputReciclableBase } from './base-props';
+import { ErroresEditables, InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputTelefonoProps extends InputReciclableBase {
-  errores?: {
-    requerido?: string;
-  };
-}
+interface InputTelefonoProps extends InputReciclableBase, ErroresEditables<'requerido'> {}
 
 export const InputTelefono: React.FC<InputTelefonoProps> = ({
   name,
