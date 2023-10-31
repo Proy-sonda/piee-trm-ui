@@ -1,10 +1,10 @@
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputBlockDepartamentoProps extends BaseProps {}
+interface InputBlockDepartamentoProps extends InputReciclableBase {}
 
 export const InputBlockDepartamento: React.FC<InputBlockDepartamentoProps> = ({
   name,

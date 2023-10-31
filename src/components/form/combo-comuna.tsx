@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
 type Comuna = {
@@ -13,7 +13,7 @@ type Comuna = {
   };
 };
 
-interface ComboComunaProps extends BaseProps {
+interface ComboComunaProps extends InputReciclableBase {
   /** Datos para rellenar el combo */
   comunas?: Comuna[];
 

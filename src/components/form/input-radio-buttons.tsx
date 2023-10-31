@@ -1,4 +1,4 @@
-import { BaseProps } from '@/components/form';
+import { InputReciclableBase } from '@/components/form';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
@@ -9,7 +9,7 @@ export interface OpcionInputRadioButton {
   label: string;
 }
 
-interface InputRadioButtonsProps extends Omit<BaseProps, 'label'> {
+interface InputRadioButtonsProps extends Omit<InputReciclableBase, 'label'> {
   opcional?: boolean;
 
   /**

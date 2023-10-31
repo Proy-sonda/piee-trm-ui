@@ -4,10 +4,10 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputRutProps extends Omit<BaseProps, 'label'> {
+interface InputRutProps extends Omit<InputReciclableBase, 'label'> {
   label?: string;
 
   /** Define si usar RUT o RUN en los mensajes de error (defecto: `rut`) */

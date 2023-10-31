@@ -1,4 +1,4 @@
-import { BaseProps, UnibleConFormArray } from '@/components/form';
+import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, isAfter, isBefore, parse, startOfDay } from 'date-fns';
 import React from 'react';
@@ -7,7 +7,7 @@ import { useFormContext } from 'react-hook-form';
 import IfContainer from '../if-container';
 import { useInputReciclable } from './hooks';
 
-interface InputFechaProps extends Omit<BaseProps, 'label'>, UnibleConFormArray {
+interface InputFechaProps extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
   label?: string;
 
   opcional?: boolean;

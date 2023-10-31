@@ -2,10 +2,10 @@ import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import isEmail from 'validator/lib/isEmail';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputEmailProps extends BaseProps {
+interface InputEmailProps extends InputReciclableBase {
   /**
    * Propiedad `name` del `EmailInput` con el que este input debe coincidir.
    *

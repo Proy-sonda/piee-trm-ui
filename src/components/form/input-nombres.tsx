@@ -1,10 +1,10 @@
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputNombresProps extends BaseProps {}
+interface InputNombresProps extends InputReciclableBase {}
 
 export const InputNombres: React.FC<InputNombresProps> = ({ name, label, className }) => {
   const { register, setValue } = useFormContext();

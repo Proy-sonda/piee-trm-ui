@@ -1,10 +1,10 @@
-import { BaseProps, UnibleConFormArray } from '@/components/form';
+import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { useInputReciclable } from '@/components/form/hooks';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
-interface InputMontoImponibleProps extends Omit<BaseProps, 'label'>, UnibleConFormArray {
+interface InputMontoImponibleProps extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
   opcional?: boolean;
 
   /** (defecto: `0`) */

@@ -1,4 +1,4 @@
-export interface BaseProps {
+export interface InputReciclableBase {
   /**
    * Label para el input.
    *

@@ -6,10 +6,10 @@ import { Options, Result, passwordStrength } from 'check-password-strength';
 import React, { useState } from 'react';
 import { Form, FormGroup, InputGroup, ProgressBar } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputClaveProps extends BaseProps {
+interface InputClaveProps extends InputReciclableBase {
   /**
    * Propiedad `name` del `InputClave` con el que este input debe coincidir.
    *

@@ -1,10 +1,10 @@
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import IfContainer from '../if-container';
-import { BaseProps, UnibleConFormArray } from './base-props';
+import { InputReciclableBase, UnibleConFormArray } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface ComboSimpleProps<T> extends Omit<BaseProps, 'label'>, UnibleConFormArray {
+interface ComboSimpleProps<T> extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
   label?: string;
 
   /** Datos para rellenar el combo */
