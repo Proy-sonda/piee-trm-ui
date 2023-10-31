@@ -1,10 +1,11 @@
 'use client';
 
+import IfContainer from '@/components/if-container';
+import { TextoBuenoMalo } from '@/components/texto-bueno-malo';
 import { Options, Result, passwordStrength } from 'check-password-strength';
 import React, { useState } from 'react';
 import { Form, FormGroup, InputGroup, ProgressBar } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import IfContainer from '../if-container';
 import { BaseProps } from './base-props';
 import { useInputReciclable } from './hooks';
 
@@ -38,26 +39,6 @@ interface InputClaveProps extends BaseProps {
   validarFortaleza?: boolean;
 }
 
-const TextoBuenoMalo: React.FC<{ estaBueno: any; texto: string }> = ({ estaBueno, texto }) => {
-  const estaWenardo = !!estaBueno;
-
-  return (
-    <div>
-      {estaWenardo ? (
-        <p className="text-success">
-          <i className="bi bi-check2 me-2"></i>
-          <span>{texto}</span>
-        </p>
-      ) : (
-        <p className="text-danger">
-          <i className="bi bi-x-lg me-2"></i>
-          <span>{texto}</span>
-        </p>
-      )}
-    </div>
-  );
-};
-
 export const InputClave: React.FC<InputClaveProps> = ({
   name,
   label,
@@ -79,9 +60,13 @@ export const InputClave: React.FC<InputClaveProps> = ({
 
   const [mostrarRequerimientos, setMostrarRequerimientos] = useState(false);
 
-  const [resultadoClave, setResultadoClave] = useState<Result<string> | undefined>();
+  const [resultadoClave, setResultadoClave] = useState<Result<string>>();
 
-  const { register, getValues } = useFormContext();
+  const {
+    register,
+    getValues,
+    formState: { dirtyFields },
+  } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'pwd',
@@ -193,7 +178,7 @@ export const InputClave: React.FC<InputClaveProps> = ({
           </Form.Control.Feedback>
         </InputGroup>
 
-        <IfContainer show={validarFortaleza}>
+        <IfContainer show={validarFortaleza && !!dirtyFields[name]}>
           <ProgressBar
             className={`mb-3 ${tieneError ? 'mt-5' : 'mt-3'}`}
             label={resultadoClave?.value}
