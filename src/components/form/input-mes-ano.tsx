@@ -1,6 +1,8 @@
 import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
+import { capitalizar } from '@/utilidades';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, format, isAfter, isBefore, parse, startOfMonth } from 'date-fns';
+import esLocale from 'date-fns/locale/es';
 import React, { useRef, useState } from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
@@ -12,6 +14,9 @@ interface InputMesAnoProps extends InputReciclableBase, UnibleConFormArray {}
  * El valor del input va a ser un objeto `Date` con la fecha seleccionada. En caso de que la fecha
  * sea invalida el valor del input va a ser `Invalid Date`, que se puede revisar con la funcion
  * `esFechaInvalida` de las utilidades.
+ *
+ * Se tiene que parchar con un string en formato `yyyy-MM` o usar un string vacio `''` para dejarlo
+ * en blanco.
  */
 export const InputMesAno: React.FC<InputMesAnoProps> = ({
   name,
@@ -27,15 +32,17 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const { ref, ...resto } = register(name, {
-    setValueAs: (date: string) => {
+    setValueAs: (dateStr: string) => {
       /** Situa la fecha con respecto al inicio de hoy */
-      const date2 = parse(date, 'yyyy-MM', startOfMonth(new Date()));
+      const date = parse(dateStr, 'yyyy-MM', startOfMonth(new Date()));
 
-      if (!esFechaInvalida(date2)) {
-        setTextoFecha(format(date2, 'MMMM - yyyy'));
-      }
+      setTextoFecha(
+        !dateStr || dateStr.trim() === ''
+          ? ''
+          : capitalizar(format(date, 'MMM yyyy', { locale: esLocale })),
+      );
 
-      return date2;
+      return date;
     },
     required: {
       value: !opcional,
@@ -76,6 +83,7 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
           type="text"
           readOnly
           value={textoFecha}
+          className="position-absolute top-0 start-0 end-0"
           onClick={() => {
             if (inputRef.current) {
               inputRef.current.showPicker();
@@ -85,7 +93,6 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
 
         <Form.Control
           type="month"
-          style={{ display: 'none' }}
           autoComplete="new-custom-value"
           isInvalid={tieneError}
           ref={(e: any) => {

@@ -1,4 +1,5 @@
 'use client';
+
 import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
@@ -494,7 +495,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   ) => {
     formulario.setValue(`${fieldArray}.${index}`, {
       prevision: '',
-      periodoRenta: undefined,
+      periodoRenta: '',
       desgloseHaberes: {},
       dias: undefined,
       diasIncapacidad: undefined,
