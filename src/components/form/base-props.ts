@@ -2,7 +2,7 @@ export interface InputReciclableBase {
   /**
    * Label para el input.
    *
-   * En caso de no incluirse (es `undefined`), el input no va a mostrar el label.
+   * En caso de no incluirse, el input no va a mostrar el label.
    *
    * No se debe agregar `(*)` al final, el input detecta si incluirlo o no en el label dependiendo
    * de si este es obligatorio u opcional.
@@ -15,6 +15,8 @@ export interface InputReciclableBase {
   className?: string;
 
   deshabilitado?: boolean;
+
+  opcional?: boolean;
 }
 
 export interface UnibleConFormArray {

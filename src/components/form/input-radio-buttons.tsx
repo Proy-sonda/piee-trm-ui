@@ -10,8 +10,6 @@ export interface OpcionInputRadioButton {
 }
 
 interface InputRadioButtonsProps extends InputReciclableBase {
-  opcional?: boolean;
-
   /**
    * - `vertical`: Para colocar los radios buttons hacia abajo
    * - `horizontal`: Para colocar los radio buttons hacia el lado

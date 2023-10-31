@@ -5,8 +5,6 @@ import { InputReciclableBase } from '.';
 import { useInputReciclable } from './hooks';
 
 interface InputArchivoProps extends InputReciclableBase {
-  opcional?: boolean;
-
   multiple?: boolean;
 }
 

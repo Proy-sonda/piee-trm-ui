@@ -5,8 +5,6 @@ import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
 interface InputPeriodoRentaProps extends InputReciclableBase, UnibleConFormArray {
-  opcional?: boolean;
-
   readOnly?: boolean;
 }
 

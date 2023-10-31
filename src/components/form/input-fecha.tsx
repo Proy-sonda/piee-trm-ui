@@ -7,8 +7,6 @@ import { useFormContext } from 'react-hook-form';
 import { useInputReciclable } from './hooks';
 
 interface InputFechaProps extends InputReciclableBase, UnibleConFormArray {
-  opcional?: boolean;
-
   /**
    * Propiedad `name` del `InputFecha` tal que la fecha de este input no sea anterior que el input
    * indicado.
@@ -42,8 +40,6 @@ interface InputFechaProps extends InputReciclableBase, UnibleConFormArray {
   noPosteriorA?: string;
 
   esEmision?: boolean;
-
-  deshabilitado?: boolean;
 }
 
 /**

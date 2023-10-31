@@ -32,8 +32,6 @@ interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
    * (default: `number`).
    * */
   tipoValor?: 'number' | 'string';
-
-  opcional?: boolean;
 }
 
 /**

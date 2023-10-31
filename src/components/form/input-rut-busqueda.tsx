@@ -10,7 +10,6 @@ import { useInputReciclable } from './hooks';
 interface InputRutBusquedaProps extends InputReciclableBase {
   /** Define si usar RUT o RUN en los mensajes de error (defecto: `rut`) */
   tipo?: 'rut' | 'run';
-  opcional?: boolean;
 }
 
 /**

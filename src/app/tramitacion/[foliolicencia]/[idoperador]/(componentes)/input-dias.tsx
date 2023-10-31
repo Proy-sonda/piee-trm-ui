@@ -7,15 +7,11 @@ import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
 interface InputDiasProps extends InputReciclableBase, UnibleConFormArray {
-  opcional?: boolean;
-
   /** Número mínimo de días (default: 0) */
   minDias?: number;
 
   /** Numero maximo de dias (default: `31`) */
   maxDias?: number;
-
-  deshabilitado?: boolean;
 
   coincideConRango?: {
     /** Nombre del input en la función `register` para la fecha desde */

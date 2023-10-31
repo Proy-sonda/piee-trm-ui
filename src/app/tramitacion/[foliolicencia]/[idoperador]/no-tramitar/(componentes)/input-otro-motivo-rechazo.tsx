@@ -4,9 +4,7 @@ import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
-interface InputOtroMotivoDeRechazoProps extends InputReciclableBase {
-  opcional?: boolean;
-}
+interface InputOtroMotivoDeRechazoProps extends InputReciclableBase {}
 
 export const InputOtroMotivoDeRechazo: React.FC<InputOtroMotivoDeRechazoProps> = ({
   name,

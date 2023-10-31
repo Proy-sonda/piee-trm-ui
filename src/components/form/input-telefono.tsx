@@ -5,7 +5,6 @@ import { InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
 interface InputTelefonoProps extends InputReciclableBase {
-  opcional?: boolean;
   errores?: {
     requerido?: string;
   };

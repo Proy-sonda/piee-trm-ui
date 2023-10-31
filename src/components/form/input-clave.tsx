@@ -34,8 +34,6 @@ interface InputClaveProps extends InputReciclableBase {
     clavesNoCoinciden?: string;
   };
 
-  opcional?: boolean;
-
   validarFortaleza?: boolean;
 }
 

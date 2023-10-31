@@ -7,8 +7,6 @@ import { DesgloseDeHaberes } from '../(modelos)/desglose-de-haberes';
 import { tieneDesglose } from '../(modelos)/formulario-c3';
 
 interface InputDesgloseDeHaberes extends InputReciclableBase, UnibleConFormArray {
-  opcional?: boolean;
-
   /**
    * Nombre de la propiedad `name` usada en el campo de monto imponible para validar que el
    * desglose coincida con este.

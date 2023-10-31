@@ -11,11 +11,7 @@ interface InputRutProps extends InputReciclableBase {
   /** Define si usar RUT o RUN en los mensajes de error (defecto: `rut`) */
   tipo?: 'rut' | 'run';
 
-  deshabilitado?: boolean;
-
   omitirSignoObligatorio?: boolean;
-
-  opcional?: boolean;
 }
 
 export const InputRut: React.FC<InputRutProps> = ({

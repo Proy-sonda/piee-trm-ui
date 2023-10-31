@@ -6,11 +6,7 @@ import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { useInputReciclable } from './hooks';
 
-interface InputMesAnoProps extends InputReciclableBase, UnibleConFormArray {
-  label?: string;
-
-  opcional?: boolean;
-}
+interface InputMesAnoProps extends InputReciclableBase, UnibleConFormArray {}
 
 /**
  * El valor del input va a ser un objeto `Date` con la fecha seleccionada. En caso de que la fecha

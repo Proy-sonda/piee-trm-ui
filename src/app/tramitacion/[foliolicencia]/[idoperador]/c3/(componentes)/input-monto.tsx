@@ -5,8 +5,6 @@ import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
 interface InputMontoImponibleProps extends InputReciclableBase, UnibleConFormArray {
-  opcional?: boolean;
-
   /** (defecto: `0`) */
   montoMinimo?: number;
 
