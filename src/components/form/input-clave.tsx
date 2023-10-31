@@ -62,11 +62,7 @@ export const InputClave: React.FC<InputClaveProps> = ({
 
   const [resultadoClave, setResultadoClave] = useState<Result<string>>();
 
-  const {
-    register,
-    getValues,
-    formState: { dirtyFields },
-  } = useFormContext();
+  const { register, getValues } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'pwd',
@@ -78,7 +74,7 @@ export const InputClave: React.FC<InputClaveProps> = ({
     },
   });
 
-  const nivelSeguridad = () => {
+  const porcentajeFortaleza = () => {
     if (!getValues(name)) {
       return 0;
     }
@@ -97,7 +93,7 @@ export const InputClave: React.FC<InputClaveProps> = ({
     }
   };
 
-  const colorSeguridad = () => {
+  const colorFortaleza = () => {
     switch (resultadoClave?.id) {
       case 0:
         return 'danger';
@@ -115,22 +111,13 @@ export const InputClave: React.FC<InputClaveProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <IfContainer show={textoLabel}>
-          <Form.Label>
-            <span>{textoLabel}</span>
-            <IfContainer show={validarFortaleza}>
-              <i
-                className="ms-2 cursor-pointer text-primary bi bi-info-circle"
-                title="Ver requerimientos"
-                onClick={() => setMostrarRequerimientos((x) => !x)}></i>
-            </IfContainer>
-          </Form.Label>
-        </IfContainer>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <InputGroup>
           <Form.Control
             type={verClave ? 'text' : 'password'}
             autoComplete="new-custom-value"
+            onFocus={() => setMostrarRequerimientos(!!validarFortaleza)}
             isInvalid={tieneError}
             {...register(name, {
               required: {
@@ -151,16 +138,16 @@ export const InputClave: React.FC<InputClaveProps> = ({
                     return errores?.clavesNoCoinciden ?? 'Las contraseñas no coinciden';
                   }
                 },
-                // validarFortaleza: (clave) => {
-                //   if (!validarFortaleza) {
-                //     return;
-                //   }
+                validarFortaleza: (clave) => {
+                  if (!validarFortaleza) {
+                    return;
+                  }
 
-                //   const resultado = passwordStrength(clave);
-                //   if (resultado.id < 3) {
-                //     return 'La contraseña es muy débil';
-                //   }
-                // },
+                  const resultado = passwordStrength(clave);
+                  if (resultado.id < 3 && resultado.length < 10) {
+                    return 'La contraseña no cumple con los requisitos';
+                  }
+                },
               },
               onChange: (event) => {
                 if (validarFortaleza) {
@@ -168,6 +155,9 @@ export const InputClave: React.FC<InputClaveProps> = ({
 
                   setResultadoClave(passwordStrength(clave, opcionesPwd));
                 }
+              },
+              onBlur: () => {
+                setMostrarRequerimientos(false);
               },
             })}
           />
@@ -184,16 +174,14 @@ export const InputClave: React.FC<InputClaveProps> = ({
           </Form.Control.Feedback>
         </InputGroup>
 
-        <IfContainer show={validarFortaleza && !!dirtyFields[name]}>
+        <IfContainer show={validarFortaleza && mostrarRequerimientos}>
           <ProgressBar
             className={`mb-3 ${tieneError ? 'mt-5' : 'mt-3'}`}
             label={resultadoClave?.value}
-            now={nivelSeguridad()}
-            variant={colorSeguridad()}
+            now={porcentajeFortaleza()}
+            variant={colorFortaleza()}
           />
-        </IfContainer>
 
-        <IfContainer show={validarFortaleza && resultadoClave && mostrarRequerimientos}>
           <TextoBuenoMalo
             estaBueno={resultadoClave && resultadoClave.length >= 10}
             texto="Al menos 10 caracteres de largo"
