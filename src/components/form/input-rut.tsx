@@ -7,9 +7,7 @@ import { formatRut, validateRut } from 'rutlib';
 import { InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputRutProps extends Omit<InputReciclableBase, 'label'> {
-  label?: string;
-
+interface InputRutProps extends InputReciclableBase {
   /** Define si usar RUT o RUN en los mensajes de error (defecto: `rut`) */
   tipo?: 'rut' | 'run';
 

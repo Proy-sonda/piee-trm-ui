@@ -32,7 +32,7 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({
   return (
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
-        <Form.Label>{textoLabel}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
           type="file"

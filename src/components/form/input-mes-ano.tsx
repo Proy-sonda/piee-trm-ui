@@ -6,7 +6,7 @@ import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { useInputReciclable } from './hooks';
 
-interface InputMesAnoProps extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
+interface InputMesAnoProps extends InputReciclableBase, UnibleConFormArray {
   label?: string;
 
   opcional?: boolean;
@@ -36,7 +36,7 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        {label && <Form.Label>{textoLabel}</Form.Label>}
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
           type="month"

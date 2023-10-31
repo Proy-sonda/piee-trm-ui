@@ -2,10 +2,12 @@ export interface InputReciclableBase {
   /**
    * Label para el input.
    *
+   * En caso de no incluirse (es `undefined`), el input no va a mostrar el label.
+   *
    * No se debe agregar `(*)` al final, el input detecta si incluirlo o no en el label dependiendo
-   * de si es obligatorio u opcional.
+   * de si este es obligatorio u opcional.
    */
-  label: string;
+  label?: string;
 
   /** El nombre del input para usar en la función `register` de `react-hook-form`. */
   name: string;

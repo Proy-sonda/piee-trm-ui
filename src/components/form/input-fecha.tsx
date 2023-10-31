@@ -4,12 +4,9 @@ import { endOfDay, isAfter, isBefore, parse, startOfDay } from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import IfContainer from '../if-container';
 import { useInputReciclable } from './hooks';
 
-interface InputFechaProps extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
-  label?: string;
-
+interface InputFechaProps extends InputReciclableBase, UnibleConFormArray {
   opcional?: boolean;
 
   /**
@@ -77,9 +74,8 @@ export const InputFecha: React.FC<InputFechaProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <IfContainer show={label}>
-          <Form.Label>{textoLabel}</Form.Label>
-        </IfContainer>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="date"
           autoComplete="new-custom-value"

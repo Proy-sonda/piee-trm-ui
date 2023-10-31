@@ -20,7 +20,8 @@ export const InputApellidos: React.FC<InputApellidosProps> = ({ name, label, cla
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{textoLabel}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="text"
           autoComplete="new-custom-value"

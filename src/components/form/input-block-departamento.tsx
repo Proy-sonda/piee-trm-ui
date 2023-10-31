@@ -24,7 +24,8 @@ export const InputBlockDepartamento: React.FC<InputBlockDepartamentoProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{textoLabel}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="text"
           autoComplete="new-custom-value"

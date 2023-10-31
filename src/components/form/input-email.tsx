@@ -41,7 +41,8 @@ export const InputEmail: React.FC<InputEmailProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{textoLabel}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="email"
           isInvalid={tieneError}

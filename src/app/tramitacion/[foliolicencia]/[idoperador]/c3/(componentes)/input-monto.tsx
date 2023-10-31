@@ -4,7 +4,7 @@ import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
-interface InputMontoImponibleProps extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
+interface InputMontoImponibleProps extends InputReciclableBase, UnibleConFormArray {
   opcional?: boolean;
 
   /** (defecto: `0`) */
@@ -16,6 +16,7 @@ interface InputMontoImponibleProps extends Omit<InputReciclableBase, 'label'>, U
 
 export const InputMonto: React.FC<InputMontoImponibleProps> = ({
   name,
+  label,
   className,
   opcional,
   montoMinimo,
@@ -27,16 +28,18 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
 
   const { register, setValue } = useFormContext();
 
-  const { idInput, tieneError, mensajeError } = useInputReciclable({
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     name,
     prefijoId: 'combo',
-    label: {},
+    label: { texto: label },
     unirConFieldArray,
   });
 
   return (
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="number"
           inputMode="numeric"

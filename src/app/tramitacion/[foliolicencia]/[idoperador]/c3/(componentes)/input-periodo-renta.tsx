@@ -4,7 +4,7 @@ import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
-interface InputPeriodoRentaProps extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
+interface InputPeriodoRentaProps extends InputReciclableBase, UnibleConFormArray {
   opcional?: boolean;
 
   readOnly?: boolean;
@@ -12,6 +12,7 @@ interface InputPeriodoRentaProps extends Omit<InputReciclableBase, 'label'>, Uni
 
 const InputPeriodoRenta: React.FC<InputPeriodoRentaProps> = ({
   name,
+  label,
   className,
   opcional,
   readOnly,
@@ -19,16 +20,18 @@ const InputPeriodoRenta: React.FC<InputPeriodoRentaProps> = ({
 }) => {
   const { register, setValue } = useFormContext();
 
-  const { idInput, tieneError, mensajeError } = useInputReciclable({
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     name,
     prefijoId: 'periodoRenta',
-    label: {},
+    label: { texto: label },
     unirConFieldArray,
   });
 
   return (
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="text"
           readOnly={readOnly !== undefined && readOnly}

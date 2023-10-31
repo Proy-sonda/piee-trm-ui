@@ -18,7 +18,8 @@ export const InputCalle: React.FC<InputCalleProps> = ({ name, label, className }
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{textoLabel}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="text"
           autoComplete="new-custom-value"

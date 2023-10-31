@@ -44,7 +44,7 @@ export const ComboComuna: React.FC<ComboComunaProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{textoLabel}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Select
           autoComplete="new-custom-value"

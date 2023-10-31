@@ -71,7 +71,11 @@ export const InputClave: React.FC<InputClaveProps> = ({
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'pwd',
     name,
-    label: { texto: label, opcional, omitirSignoObligatorio },
+    label: {
+      texto: label,
+      opcional,
+      omitirSignoObligatorio,
+    },
   });
 
   const nivelSeguridad = () => {
@@ -111,15 +115,17 @@ export const InputClave: React.FC<InputClaveProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>
-          <span>{textoLabel}</span>
-          <IfContainer show={validarFortaleza}>
-            <i
-              className="ms-2 cursor-pointer text-primary bi bi-info-circle"
-              title="Ver requerimientos"
-              onClick={() => setMostrarRequerimientos((x) => !x)}></i>
-          </IfContainer>
-        </Form.Label>
+        <IfContainer show={textoLabel}>
+          <Form.Label>
+            <span>{textoLabel}</span>
+            <IfContainer show={validarFortaleza}>
+              <i
+                className="ms-2 cursor-pointer text-primary bi bi-info-circle"
+                title="Ver requerimientos"
+                onClick={() => setMostrarRequerimientos((x) => !x)}></i>
+            </IfContainer>
+          </Form.Label>
+        </IfContainer>
 
         <InputGroup>
           <Form.Control

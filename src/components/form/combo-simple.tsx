@@ -1,22 +1,27 @@
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import IfContainer from '../if-container';
 import { InputReciclableBase, UnibleConFormArray } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface ComboSimpleProps<T> extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
-  label?: string;
-
+interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
   /** Datos para rellenar el combo */
   datos?: T[];
 
   /**
    * Propiedad de un elemento de los datos para usar en las propiedades `key` y `value` del tag
    * `<option>`.
+   *
+   * Se puede usar un callback para generar el ID a partir de un elemento del elemento en caso de
+   * que no se pueda usar una sola propiedad.
    */
   idElemento: keyof T | ((elemento: T) => number | string);
 
-  /** Propiedad de un elemento de los datos para usar como texto de tag `<option />` */
+  /**
+   * Propiedad de un elemento de los datos para usar como texto de tag `<option />`
+   *
+   * Se puede usar un callback para generar la descripcion a partir de un elemento del elemento en
+   * caso de  que no se pueda usar una sola propiedad.
+   */
   descripcion: keyof T | ((elemento: T) => string);
 
   /** Texto para incluir como la opción nula (default: `'Seleccionar'`). */
@@ -71,9 +76,7 @@ export const ComboSimple = <T extends Record<string, any>>({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <IfContainer show={textoLabel}>
-          <Form.Label>{textoLabel}</Form.Label>
-        </IfContainer>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Select
           autoComplete="new-custom-value"

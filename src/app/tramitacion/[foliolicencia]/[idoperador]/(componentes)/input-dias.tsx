@@ -6,7 +6,7 @@ import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
-interface InputDiasProps extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
+interface InputDiasProps extends InputReciclableBase, UnibleConFormArray {
   opcional?: boolean;
 
   /** Número mínimo de días (default: 0) */
@@ -28,6 +28,7 @@ interface InputDiasProps extends Omit<InputReciclableBase, 'label'>, UnibleConFo
 
 export const InputDias: React.FC<InputDiasProps> = ({
   name,
+  label,
   className,
   opcional,
   minDias,
@@ -41,16 +42,18 @@ export const InputDias: React.FC<InputDiasProps> = ({
 
   const { register, setValue, getValues } = useFormContext();
 
-  const { idInput, tieneError, mensajeError } = useInputReciclable({
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     name,
     prefijoId: 'dias',
-    label: {},
+    label: { texto: label },
     unirConFieldArray,
   });
 
   return (
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="number"
           inputMode="numeric"

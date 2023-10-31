@@ -6,7 +6,7 @@ import { useFormContext } from 'react-hook-form';
 import { DesgloseDeHaberes } from '../(modelos)/desglose-de-haberes';
 import { tieneDesglose } from '../(modelos)/formulario-c3';
 
-interface InputDesgloseDeHaberes extends Omit<InputReciclableBase, 'label'>, UnibleConFormArray {
+interface InputDesgloseDeHaberes extends InputReciclableBase, UnibleConFormArray {
   opcional?: boolean;
 
   /**

@@ -9,7 +9,7 @@ export interface OpcionInputRadioButton {
   label: string;
 }
 
-interface InputRadioButtonsProps extends Omit<InputReciclableBase, 'label'> {
+interface InputRadioButtonsProps extends InputReciclableBase {
   opcional?: boolean;
 
   /**
@@ -69,7 +69,7 @@ export const InputRadioButtons: React.FC<InputRadioButtonsProps> = ({
           ))}
         </FormGroup>
 
-        {/* Sirve para que se muestre el en los radio buttons */}
+        {/* Sirve para que se muestre el tooltip en los radio buttons */}
         <FormGroup className="mt-1 position-relative">
           <Form.Control type="hidden" isInvalid={!!errors[name]} />
 

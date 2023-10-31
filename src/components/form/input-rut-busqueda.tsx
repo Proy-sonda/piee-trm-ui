@@ -42,7 +42,7 @@ export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
   return (
     <>
       <Form.Group className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{textoLabel}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
           type="text"

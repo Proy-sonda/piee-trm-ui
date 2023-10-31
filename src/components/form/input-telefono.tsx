@@ -40,7 +40,7 @@ export const InputTelefono: React.FC<InputTelefonoProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{textoLabel}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <InputGroup>
           <InputGroup.Text>+56</InputGroup.Text>
