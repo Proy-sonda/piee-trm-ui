@@ -38,7 +38,7 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
 
       setTextoFecha(
         !dateStr || dateStr.trim() === ''
-          ? ''
+          ? '--- ----'
           : capitalizar(format(date, 'MMM yyyy', { locale: esLocale })),
       );
 
