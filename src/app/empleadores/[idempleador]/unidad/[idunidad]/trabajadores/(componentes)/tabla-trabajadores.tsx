@@ -83,7 +83,6 @@ const TablaTrabajadores: React.FC<props> = ({
           <Tr>
             <Th>Run</Th>
             <Th>Fecha Registro</Th>
-
             <Th>Acciones</Th>
           </Tr>
         </Thead>
