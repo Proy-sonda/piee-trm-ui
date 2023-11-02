@@ -13,6 +13,7 @@ import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fet
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
+
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioEditarUsuario } from '../(modelos)/formulario-editar-usuario';
 import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
@@ -22,6 +23,7 @@ import { buscarUsuarioPorId } from '../(servicios)/buscar-usuario-por-id';
 interface ModalEditarUsuarioProps {
   show: boolean;
   idUsuario?: number;
+  cantidadActivo: number;
   onCerrarModal: () => void;
   onUsuarioEditado: () => void;
 }
@@ -29,10 +31,12 @@ interface ModalEditarUsuarioProps {
 const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
   show,
   idUsuario,
+  cantidadActivo,
   onCerrarModal,
   onUsuarioEditado,
 }) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const [rol, setRol] = useState('Cargando...');
 
   const [errCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     roles: buscarRolesUsuarios(),
@@ -66,6 +70,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
     formulario.setValue('email', usuarioEditar.email);
     formulario.setValue('confirmarEmail', usuarioEditar.email);
     formulario.setValue('rolId', usuarioEditar.rol.idrol);
+    setRol(combos?.roles.find((value) => value.idrol == formulario.getValues('rolId'))?.rol || '');
   }, [cargandoUsuario, usuarioEditar, errUsuario]);
 
   const handleActualizarUsuario: SubmitHandler<FormularioEditarUsuario> = async (data) => {
@@ -166,14 +171,21 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  <ComboSimple
-                    name="rolId"
-                    label="Rol"
-                    datos={combos?.roles}
-                    idElemento={'idrol'}
-                    descripcion={'rol'}
-                    className="col-12 col-lg-6 col-xl-3"
-                  />
+                  {cantidadActivo != 1 ? (
+                    <ComboSimple
+                      name="rolId"
+                      label="Rol"
+                      datos={combos?.roles}
+                      idElemento={'idrol'}
+                      descripcion={'rol'}
+                      className="col-12 col-lg-6 col-xl-3"
+                    />
+                  ) : (
+                    <div className="col-12 col-lg-6 col-xl-3">
+                      <label className="mb-2">Rol</label>
+                      <input type="text" className="form-control" value={rol} disabled />
+                    </div>
+                  )}
 
                   <InputTelefono
                     opcional

@@ -30,6 +30,8 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
     [empleadorActual, refresh],
   );
 
+  const [cantidadActivo, setcantidadActivo] = useState<number>(0);
+
   const [abrirModalCrearUsuario, setAbrirModalCrearUsuario] = useState(false);
 
   const [abrirModalEditarUsuario, setAbrirModalEditarUsuario] = useState(false);
@@ -69,6 +71,14 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
             <TablaUsuarios
               usuarios={usuarios ?? []}
               onEditarUsuario={(idUsuario) => {
+                let contarUsuario = 0;
+                usuarios?.map(({ estadousuario }) => {
+                  if (estadousuario.descripcion == 'Deshabilitado') return;
+                  ++contarUsuario;
+                });
+
+                setcantidadActivo(contarUsuario);
+
                 setIdUsuarioEditar(idUsuario);
                 setAbrirModalEditarUsuario(true);
               }}
@@ -89,6 +99,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
       />
 
       <ModalEditarUsuario
+        cantidadActivo={cantidadActivo}
         show={abrirModalEditarUsuario}
         idUsuario={idUsuarioEditar}
         onCerrarModal={() => {
