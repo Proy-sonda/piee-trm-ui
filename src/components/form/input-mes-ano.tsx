@@ -4,7 +4,7 @@ import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, format, isAfter, isBefore, parse, startOfMonth } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
 import React, { useRef, useState } from 'react';
-import { Form, FormGroup } from 'react-bootstrap';
+import { Form, FormGroup, InputGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { useInputReciclable } from './hooks';
 
@@ -79,17 +79,34 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
         {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
-        <Form.Control
-          type="text"
-          readOnly
-          value={textoFecha}
+        <InputGroup
           className="position-absolute top-0 start-0 end-0"
           onClick={() => {
             if (inputRef.current) {
               inputRef.current.showPicker();
             }
-          }}
-        />
+          }}>
+          <Form.Control
+            type="text"
+            readOnly
+            isInvalid={tieneError}
+            value={textoFecha}
+            className="cursor-pointer border border-end-0"
+            style={{ minWidth: '100px' }}
+          />
+          <InputGroup.Text className="bg-white border border-start-0 border-top border-end border-bottom">
+            <Form.Control
+              type="month"
+              tabIndex={-1}
+              className="p-0 m-0 cursor-pointer border border-0"
+              style={{
+                width: '20px',
+                height: '100%',
+              }}
+              onClick={(e) => e.preventDefault()}
+            />
+          </InputGroup.Text>
+        </InputGroup>
 
         <Form.Control
           type="month"
