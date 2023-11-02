@@ -4,7 +4,7 @@ import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { capitalizar } from '@/utilidades';
-import { format, subMonths } from 'date-fns';
+import { format, parse, startOfMonth, subMonths } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -181,7 +181,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneraciones.append({
             prevision: renta.idPrevision,
-            periodoRenta: renta.periodo as any,
+            periodoRenta: parse(renta.periodo, 'yyyy-MM', startOfMonth(new Date())),
             dias: renta.dias,
             montoImponible: renta.montoImponible,
             totalRemuneracion: renta.totalRemuneracion,
@@ -195,7 +195,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const periodosNormalesEsperados = esTrabajadorIndependiente(zona2) ? 12 : 3;
         let filasRestantes = periodosNormalesEsperados - zona3.rentas.length;
         while (filasRestantes-- > 0) {
-          remuneraciones.append({ desgloseHaberes: {} } as any);
+          remuneraciones.append({ periodoRenta: null, desgloseHaberes: {} } as any);
         }
       }
 
@@ -237,7 +237,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneraciones.append({
             prevision: crearIdEntidadPrevisional(zona2.entidadprevisional),
-            periodoRenta: format(mesRenta, 'yyyy-MM') as any,
+            periodoRenta: mesRenta,
+            // periodoRenta: parse(renta.periodo, 'yyyy-MM', startOfMonth(new Date())) format(mesRenta, 'yyyy-MM') as any,
             desgloseHaberes: {},
           } as any);
         }
@@ -262,9 +263,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       // Parchar lo que venga desde la API
       for (let index = 0; index < zona3.rentas.length; index++) {
         const renta = zona3.rentas[index];
+        console.log('HERE');
 
         formulario.setValue(`remuneraciones.${index}.prevision`, renta.idPrevision);
-        formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo as any);
+        formulario.setValue(
+          `remuneraciones.${index}.periodoRenta`,
+          parse(renta.periodo, 'yyyy-MM', startOfMonth(new Date())) as any,
+        );
         formulario.setValue(`remuneraciones.${index}.dias`, renta.dias);
         formulario.setValue(`remuneraciones.${index}.montoImponible`, renta.montoImponible);
         formulario.setValue(`remuneraciones.${index}.totalRemuneracion`, renta.totalRemuneracion);
