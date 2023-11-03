@@ -3,7 +3,7 @@ import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, isAfter, isBefore } from 'date-fns';
 import { default as es } from 'date-fns/locale/es';
 import React from 'react';
-import { Form, FormGroup } from 'react-bootstrap';
+import { Form, InputGroup } from 'react-bootstrap';
 import DatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -77,13 +77,11 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
 
   return (
     <>
-      <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
+      <div className={`${className ?? ''} `}>
         {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
-        {tieneError && <div className="invalid-feedback">{mensajeError}</div>}
-
         {/* <InputGroup className="flex-nowrap" style={{ minWidth: '100px' }}> */}
-        <div style={{ minWidth: '100px' }}>
+        <InputGroup style={{ minWidth: '100px' }}>
           <Controller
             control={control}
             name={name}
@@ -113,8 +111,8 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
             render={({ field: { onChange, onBlur, value } }) => (
               <DatePicker
                 id={idInput}
-                className={`form-control cursor-pointer position-relative ${
-                  tieneError ? 'is-invalid' : ''
+                className={`form-control cursor-pointer position-relative border rounded-end-0 border-end-0  ${
+                  tieneError ? 'is-invalid border-danger' : ''
                 }`}
                 showMonthYearPicker
                 showFullMonthYearPicker
@@ -126,60 +124,22 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
               />
             )}
           />
-        </div>
-      </FormGroup>
-      {/* <InputGroup.Text className="bg-white border border-start-0 border-top border-end border-bottom">
+          <InputGroup.Text
+            className={`bg-white border border-start-0 border-top border-end border-bottom ${
+              tieneError ? 'border-danger' : ''
+            }`}>
             <i className="bi bi-calendar" style={{ fontSize: '14px' }}></i>
           </InputGroup.Text>
-        </InputGroup> */}
+        </InputGroup>
 
-      {/* <InputGroup
-  className="position-absolute top-0 start-0 end-0"
-  onClick={() => {
-    if (inputRef.current) {
-      inputRef.current.showPicker();
-    }
-  }}>
-  <Form.Control
-    type="text"
-    readOnly
-    isInvalid={tieneError()}
-    value={textoFecha}
-    className="cursor-pointer border border-end-0"
-    style={{ minWidth: '100px' }}
-  />
-  <InputGroup.Text className="bg-white border border-start-0 border-top border-end border-bottom">
-    <Form.Control
-      type="month"
-      tabIndex={-1}
-      className="p-0 m-0 cursor-pointer border border-0"
-      style={{
-        width: '20px',
-        height: '100%',
-      }}
-      onClick={(e) => e.preventDefault()}
-    />
-  </InputGroup.Text>
-</InputGroup>
-
-<Form.Control
-  type="month"
-  ref={(e: any) => {
-    ref(e);
-    inputRef.current = e;
-  }}
-  {...resto}
-/> */}
-      <IfContainer show={tieneError}>
-        <div className="position-relative">
-          <div className="form-control is-invalid"></div>
-          <div className="invalid-tooltip">{mensajeError}</div>
-        </div>
-      </IfContainer>
-
-      {/* <Form.Control.Feedback type="invalid" tooltip>
-          {mensajeDeError()}
-        </Form.Control.Feedback> */}
+        <IfContainer show={tieneError}>
+          {/* Parece que para mostrar el error, bootstrap necesita un form-control invalido al mismo nivel que el tooltip. */}
+          <div className="position-relative">
+            <div className="d-none form-control is-invalid"></div>
+            <div className="invalid-tooltip">{mensajeError}</div>
+          </div>
+        </IfContainer>
+      </div>
     </>
   );
 };
