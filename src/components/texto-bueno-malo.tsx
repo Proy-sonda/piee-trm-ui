@@ -10,12 +10,12 @@ export const TextoBuenoMalo: React.FC<TextoBuenoMaloProps> = ({ estaBueno, texto
   return (
     <div>
       {estaBuenoBoolean ? (
-        <p className="text-success">
+        <p className="mb-2 text-success">
           <i className="bi bi-check2 me-2"></i>
           <span>{texto}</span>
         </p>
       ) : (
-        <p className="text-danger">
+        <p className="mb-2 text-danger">
           <i className="bi bi-x-lg me-2"></i>
           <span>{texto}</span>
         </p>
