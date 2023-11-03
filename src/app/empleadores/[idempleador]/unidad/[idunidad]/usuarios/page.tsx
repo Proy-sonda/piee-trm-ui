@@ -5,11 +5,11 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
-import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { Usuariosunidad } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
-import React, { ChangeEvent, FormEvent, Fragment, useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
+import { useRol } from '../../../(hooks)/use-Rol';
 import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
@@ -27,15 +27,12 @@ interface iUsuarios {
 
 const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const { idempleador, idunidad } = params;
-
-  const [rut, setrut] = useState('');
-  const { usuario } = useContext(AuthContext);
   const [unidad, setunidad] = useState('');
   const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
   const [usuariosAsociados, setusuariosAsociados] = useState<Usuariosunidad[]>([]);
-
+  const { RolUsuario } = useRol();
   const { empleadorActual } = useEmpleadorActual();
 
   useEffect(() => {
@@ -178,7 +175,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         </Titulo>
       </div>
 
-      {usuario?.tieneRol('admin') && (
+      {RolUsuario == 'Administrador' && (
         <>
           <div className="row mt-4">
             <h5>Cargar Personas Usuarias</h5>

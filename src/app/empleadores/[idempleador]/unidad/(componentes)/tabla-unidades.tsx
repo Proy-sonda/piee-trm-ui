@@ -1,4 +1,3 @@
-import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -6,11 +5,11 @@ import { usePaginacion } from '@/hooks/use-paginacion';
 import { Unidadesrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useContext, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
-import { EmpleadoresPorUsuarioContext } from '../../(contexts)/empleadores-por-usuario';
+import { useRol } from '../../(hooks)/use-Rol';
 
 interface TablaUnidadesProps {
   unidades: Unidadesrrhh[];
@@ -27,20 +26,7 @@ const TablaUnidades = ({
 }: TablaUnidadesProps) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
-  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
-
-  const { empleadorActual } = useEmpleadorActual();
-
-  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
-
-  useEffect(() => {
-    if (empleadorActual == undefined) return;
-    const BusquedaRol = async () => {
-      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
-      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
-    };
-    BusquedaRol();
-  }, [empleadorActual]);
+  const { RolUsuario } = useRol();
 
   const [unidadesPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: unidades,
@@ -121,7 +107,7 @@ const TablaUnidades = ({
                 <Td>{unidad?.codigounidadrrhh}</Td>
                 <Td>
                   {}
-                  {rolUsuario == 'Administrador' ? (
+                  {RolUsuario == 'Administrador' ? (
                     <span
                       className="text-primary cursor-pointer"
                       onClick={editarUnidadInterno(unidad)}>
@@ -135,7 +121,7 @@ const TablaUnidades = ({
 
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
-                    {rolUsuario == 'Administrador' && (
+                    {RolUsuario == 'Administrador' && (
                       <>
                         <button
                           className="btn text-primary"
@@ -167,7 +153,7 @@ const TablaUnidades = ({
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        {rolUsuario == 'Administrador' && (
+                        {RolUsuario == 'Administrador' && (
                           <>
                             <Dropdown.Item onClick={editarUnidadInterno(unidad)}>
                               Editar unidad

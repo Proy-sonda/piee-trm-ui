@@ -5,8 +5,8 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import React, { useContext, useEffect, useState } from 'react';
-import { EmpleadoresPorUsuarioContext } from '../(contexts)/empleadores-por-usuario';
+import React, { useState } from 'react';
+import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
 import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
@@ -26,18 +26,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
   const [refresh, cargarUsuarios] = useRefrescarPagina();
 
-  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
-
-  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
-
-  useEffect(() => {
-    if (empleadorActual == undefined) return;
-    const BusquedaRol = async () => {
-      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
-      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
-    };
-    BusquedaRol();
-  }, [empleadorActual]);
+  const { RolUsuario } = useRol();
 
   const [, usuarios] = useFetch(
     empleadorActual ? buscarUsuarios(empleadorActual.rutempleador) : emptyFetch(),
@@ -57,7 +46,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
         Usuarias
       </Titulo>
 
-      {rolUsuario == 'Administrador' && (
+      {RolUsuario == 'Administrador' && (
         <div className="mt-4 row">
           <div className="d-flex justify-content-end">
             <button

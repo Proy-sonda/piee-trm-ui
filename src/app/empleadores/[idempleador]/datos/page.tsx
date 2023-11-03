@@ -17,9 +17,9 @@ import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { EmpleadoresPorUsuarioContext } from '../(contexts)/empleadores-por-usuario';
+import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import { buscarActividadesLaborales } from '../../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../../(servicios)/buscar-cajas-de-compensacion';
@@ -59,18 +59,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
 
   const regionSeleccionada = formulario.watch('regionId');
 
-  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
-
-  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
-
-  useEffect(() => {
-    if (empleadorActual == undefined) return;
-    const BusquedaRol = async () => {
-      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
-      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
-    };
-    BusquedaRol();
-  }, [empleadorActual]);
+  const { RolUsuario } = useRol();
 
   // Parchar fomulario
   useEffect(() => {
@@ -298,7 +287,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
             </div>
             <div className="row mt-5">
               <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
-                {rolUsuario == 'Administrador' && (
+                {RolUsuario == 'Administrador' && (
                   <button type="submit" className="btn btn-primary">
                     Grabar
                   </button>

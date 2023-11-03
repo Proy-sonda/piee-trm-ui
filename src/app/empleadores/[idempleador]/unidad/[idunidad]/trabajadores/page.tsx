@@ -18,17 +18,17 @@ import {
 } from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(servicios)';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
-import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
-import { AuthContext } from '@/contexts';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import exportFromJSON from 'export-from-json';
+import { useRol } from '../../../(hooks)/use-Rol';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
 
@@ -47,7 +47,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
   const [trabajadores, settrabajadores] = useState<Trabajadoresunidadrrhh[]>([]);
   const [razon, setRazon] = useState('');
-  const { usuario } = useContext(AuthContext);
+  const { RolUsuario } = useRol();
   const { empleadorActual } = useEmpleadorActual();
   const [csvData, setCsvData] = useState<any[]>([]);
   let [loading, setLoading] = useState(false);
@@ -350,7 +350,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           </Titulo>
         </div>
 
-        {usuario?.tieneRol('admin') && (
+        {RolUsuario == 'Administrador' && (
           <div className="row mt-4">
             <div className="col-md-12 col-xs-12 col-lg-5">
               <h5>Cargar Personas Trabajadoras</h5>
@@ -551,7 +551,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="col-md-12">
             <div className="row">
               <h5 className="text-center">Personas Trabajadoras</h5>
-              {usuario?.tieneRol('admin') && (
+              { RolUsuario == 'Administrador' && (
                 <span
                   className="text-end animate animate__fadeIn"
                   style={{

@@ -1,4 +1,3 @@
-import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
@@ -7,13 +6,13 @@ import { useWindowSize } from '@/hooks/use-window-size';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 import { eliminarUsuario } from '../(servicios)/eliminar-usuario';
 import { recuperarContrasena } from '../(servicios)/recuperar-clave';
-import { EmpleadoresPorUsuarioContext } from '../../(contexts)/empleadores-por-usuario';
+import { useRol } from '../../(hooks)/use-Rol';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
@@ -28,20 +27,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 }) => {
   const { usuario, logout } = useContext(AuthContext);
 
-  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
-
-  const { empleadorActual } = useEmpleadorActual();
-
-  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
-
-  useEffect(() => {
-    if (empleadorActual == undefined) return;
-    const BusquedaRol = async () => {
-      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
-      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
-    };
-    BusquedaRol();
-  }, [empleadorActual]);
+  const { RolUsuario } = useRol();
 
   const router = useRouter();
 
@@ -140,19 +126,23 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
             </IfContainer>
             <Th>Rol</Th>
             <Th>Estado</Th>
-            {rolUsuario == 'Administrador' && <Th></Th>}
+            {RolUsuario == 'Administrador' && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
             <Tr key={usuario.idusuario}>
               <Td>
-                <span
-                  className="text-primary cursor-pointer"
-                  title="Editar persona usuaria"
-                  onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                  {usuario.rutusuario}
-                </span>
+                {RolUsuario == 'Administrador' ? (
+                  <span
+                    className="text-primary cursor-pointer"
+                    title="Editar persona usuaria"
+                    onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                    {usuario.rutusuario}
+                  </span>
+                ) : (
+                  <>{usuario.rutusuario}</>
+                )}
               </Td>
               <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
               <IfContainer show={noEsTablet()}>
@@ -165,7 +155,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 </select>
               </Td>
               <Td>{usuario.estadousuario.descripcion}</Td>
-              {rolUsuario == 'Administrador' && (
+              {RolUsuario == 'Administrador' && (
                 <Td>
                   <div className="d-none d-lg-inline-block">
                     <button

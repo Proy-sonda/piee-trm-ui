@@ -1,5 +1,4 @@
-import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
-import { EmpleadoresPorUsuarioContext } from '@/app/empleadores/[idempleador]/(contexts)/empleadores-por-usuario';
+import { useRol } from '@/app/empleadores/[idempleador]/(hooks)/use-Rol';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
@@ -7,7 +6,7 @@ import { AlertaConfirmacion } from '@/utilidades/alertas';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import Link from 'next/link';
-import { FormEvent, useContext, useEffect, useState } from 'react';
+import { FormEvent } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 interface props {
@@ -30,20 +29,7 @@ const TablaTrabajadores: React.FC<props> = ({
     tamanoPagina: 5,
   });
 
-  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
-
-  const { empleadorActual } = useEmpleadorActual();
-
-  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
-
-  useEffect(() => {
-    if (empleadorActual == undefined) return;
-    const BusquedaRol = async () => {
-      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
-      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
-    };
-    BusquedaRol();
-  }, [empleadorActual]);
+  const { RolUsuario } = useRol();
 
   const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -91,7 +77,7 @@ const TablaTrabajadores: React.FC<props> = ({
           <Tr>
             <Th>Run</Th>
             <Th>Fecha Registro</Th>
-            {rolUsuario == 'Administrador' && <Th>Acciones</Th>}
+            {RolUsuario == 'Administrador' && <Th>Acciones</Th>}
           </Tr>
         </Thead>
         <Tbody className="align-middle text-center">
@@ -108,7 +94,7 @@ const TablaTrabajadores: React.FC<props> = ({
                 </Td>
                 <td>{format(new Date(fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</td>
 
-                {rolUsuario == 'Administrador' && (
+                {RolUsuario == 'Administrador' && (
                   <Td>
                     <button
                       className="btn btn-sm btn-primary"
@@ -133,7 +119,7 @@ const TablaTrabajadores: React.FC<props> = ({
             <Tr>
               <Td>-</Td>
               <Td>-</Td>
-              {rolUsuario == 'Administrador' && <Td>-</Td>}
+              {RolUsuario == 'Administrador' && <Td>-</Td>}
             </Tr>
           )}
         </Tbody>
