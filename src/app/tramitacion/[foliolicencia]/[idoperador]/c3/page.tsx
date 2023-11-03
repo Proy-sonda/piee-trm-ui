@@ -4,7 +4,7 @@ import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { capitalizar } from '@/utilidades';
-import { format, parse, startOfMonth, subMonths } from 'date-fns';
+import { format, subMonths } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -181,7 +181,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneraciones.append({
             prevision: renta.idPrevision,
-            periodoRenta: parse(renta.periodo, 'yyyy-MM', startOfMonth(new Date())),
+            periodoRenta: renta.periodo,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
             totalRemuneracion: renta.totalRemuneracion,
@@ -207,7 +207,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneracionesMaternidad.append({
             prevision: renta.idPrevision,
-            periodoRenta: renta.periodo as any,
+            periodoRenta: renta.periodo,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
             totalRemuneracion: renta.totalRemuneracion,
@@ -221,7 +221,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const periodosMaternidadEsperados = 3;
         let filasRestantesMaternidad = periodosMaternidadEsperados - zona3.rentasMaternidad.length;
         while (filasRestantesMaternidad-- > 0) {
-          remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
+          remuneracionesMaternidad.append({ periodoRenta: null, desgloseHaberes: {} } as any);
         }
       }
     }
@@ -238,7 +238,6 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           remuneraciones.append({
             prevision: crearIdEntidadPrevisional(zona2.entidadprevisional),
             periodoRenta: mesRenta,
-            // periodoRenta: parse(renta.periodo, 'yyyy-MM', startOfMonth(new Date())) format(mesRenta, 'yyyy-MM') as any,
             desgloseHaberes: {},
           } as any);
         }
@@ -263,13 +262,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       // Parchar lo que venga desde la API
       for (let index = 0; index < zona3.rentas.length; index++) {
         const renta = zona3.rentas[index];
-        console.log('HERE');
 
         formulario.setValue(`remuneraciones.${index}.prevision`, renta.idPrevision);
-        formulario.setValue(
-          `remuneraciones.${index}.periodoRenta`,
-          parse(renta.periodo, 'yyyy-MM', startOfMonth(new Date())) as any,
-        );
+        formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo);
         formulario.setValue(`remuneraciones.${index}.dias`, renta.dias);
         formulario.setValue(`remuneraciones.${index}.montoImponible`, renta.montoImponible);
         formulario.setValue(`remuneraciones.${index}.totalRemuneracion`, renta.totalRemuneracion);
@@ -285,7 +280,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const renta = zona3.rentasMaternidad[index];
 
         formulario.setValue(`remuneracionesMaternidad.${index}.prevision`, renta.idPrevision);
-        formulario.setValue(`remuneracionesMaternidad.${index}.periodoRenta`, renta.periodo as any);
+        formulario.setValue(`remuneracionesMaternidad.${index}.periodoRenta`, renta.periodo);
         formulario.setValue(`remuneracionesMaternidad.${index}.dias`, renta.dias);
         formulario.setValue(
           `remuneracionesMaternidad.${index}.montoImponible`,
@@ -500,7 +495,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   ) => {
     formulario.setValue(`${fieldArray}.${index}`, {
       prevision: '',
-      periodoRenta: '',
+      periodoRenta: null,
       desgloseHaberes: {},
       dias: undefined,
       diasIncapacidad: undefined,
