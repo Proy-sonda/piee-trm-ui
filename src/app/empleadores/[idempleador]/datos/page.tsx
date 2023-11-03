@@ -17,8 +17,9 @@ import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { EmpleadoresPorUsuarioContext } from '../(contexts)/empleadores-por-usuario';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import { buscarActividadesLaborales } from '../../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../../(servicios)/buscar-cajas-de-compensacion';
@@ -57,6 +58,19 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
   const formulario = useForm<CamposFormularioEmpleador>({ mode: 'onBlur' });
 
   const regionSeleccionada = formulario.watch('regionId');
+
+  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
+
+  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
+
+  useEffect(() => {
+    if (empleadorActual == undefined) return;
+    const BusquedaRol = async () => {
+      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
+      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
+    };
+    BusquedaRol();
+  }, [empleadorActual]);
 
   // Parchar fomulario
   useEffect(() => {
@@ -284,9 +298,12 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
             </div>
             <div className="row mt-5">
               <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
-                <button type="submit" className="btn btn-primary">
-                  Grabar
-                </button>
+                {rolUsuario == 'Administrador' && (
+                  <button type="submit" className="btn btn-primary">
+                    Grabar
+                  </button>
+                )}
+
                 <Link className="btn btn-danger mt-2 mt-sm-0 me-0 me-sm-2" href={'/empleadores'}>
                   Volver
                 </Link>

@@ -5,7 +5,8 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { EmpleadoresPorUsuarioContext } from '../(contexts)/empleadores-por-usuario';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
 import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
@@ -25,6 +26,19 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
   const [refresh, cargarUsuarios] = useRefrescarPagina();
 
+  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
+
+  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
+
+  useEffect(() => {
+    if (empleadorActual == undefined) return;
+    const BusquedaRol = async () => {
+      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
+      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
+    };
+    BusquedaRol();
+  }, [empleadorActual]);
+
   const [, usuarios] = useFetch(
     empleadorActual ? buscarUsuarios(empleadorActual.rutempleador) : emptyFetch(),
     [empleadorActual, refresh],
@@ -43,15 +57,17 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
         Usuarias
       </Titulo>
 
-      <div className="mt-4 row">
-        <div className="d-flex justify-content-end">
-          <button
-            className="btn btn-success btn-sm"
-            onClick={() => setAbrirModalCrearUsuario(true)}>
-            + Agregar Usuario
-          </button>
+      {rolUsuario == 'Administrador' && (
+        <div className="mt-4 row">
+          <div className="d-flex justify-content-end">
+            <button
+              className="btn btn-success btn-sm"
+              onClick={() => setAbrirModalCrearUsuario(true)}>
+              + Agregar Usuario
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="row mt-3">
         <div className="col-md-12">

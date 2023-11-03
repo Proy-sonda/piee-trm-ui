@@ -1,3 +1,5 @@
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
+import { EmpleadoresPorUsuarioContext } from '@/app/empleadores/[idempleador]/(contexts)/empleadores-por-usuario';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
@@ -5,7 +7,7 @@ import { AlertaConfirmacion } from '@/utilidades/alertas';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import Link from 'next/link';
-import { FormEvent } from 'react';
+import { FormEvent, useContext, useEffect, useState } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 interface props {
@@ -15,15 +17,6 @@ interface props {
   handleDeleteTrabajador: (idtrabajador: number, ruttrabajador: string) => void;
   idunidad: number;
 }
-const options: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-  hour12: false, // Para usar formato de 24 horas
-};
 
 const TablaTrabajadores: React.FC<props> = ({
   trabajadores,
@@ -36,6 +29,21 @@ const TablaTrabajadores: React.FC<props> = ({
     datos: trabajadores.filter(({ codigounidadrrhh }) => codigounidadrrhh == idunidad.toString()),
     tamanoPagina: 5,
   });
+
+  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
+
+  const { empleadorActual } = useEmpleadorActual();
+
+  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
+
+  useEffect(() => {
+    if (empleadorActual == undefined) return;
+    const BusquedaRol = async () => {
+      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
+      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
+    };
+    BusquedaRol();
+  }, [empleadorActual]);
 
   const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -83,7 +91,7 @@ const TablaTrabajadores: React.FC<props> = ({
           <Tr>
             <Th>Run</Th>
             <Th>Fecha Registro</Th>
-            <Th>Acciones</Th>
+            {rolUsuario == 'Administrador' && <Th>Acciones</Th>}
           </Tr>
         </Thead>
         <Tbody className="align-middle text-center">
@@ -100,27 +108,32 @@ const TablaTrabajadores: React.FC<props> = ({
                 </Td>
                 <td>{format(new Date(fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</td>
 
-                <Td>
-                  <button
-                    className="btn btn-sm btn-primary"
-                    // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
-                  >
-                    <i title={`editar ${runtrabajador}`} className={'bi bi-pencil-square'}></i>
-                  </button>
-                  &nbsp;
-                  <button
-                    className="btn btn-sm btn-danger"
-                    // onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}
-                  >
-                    <i title={`eliminar ${runtrabajador}`} className={'bi bi-trash btn-danger'}></i>
-                  </button>
-                </Td>
+                {rolUsuario == 'Administrador' && (
+                  <Td>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
+                    >
+                      <i title={`editar ${runtrabajador}`} className={'bi bi-pencil-square'}></i>
+                    </button>
+                    &nbsp;
+                    <button
+                      className="btn btn-sm btn-danger"
+                      // onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}
+                    >
+                      <i
+                        title={`eliminar ${runtrabajador}`}
+                        className={'bi bi-trash btn-danger'}></i>
+                    </button>
+                  </Td>
+                )}
               </Tr>
             ))
           ) : (
             <Tr>
               <Td>-</Td>
               <Td>-</Td>
+              {rolUsuario == 'Administrador' && <Td>-</Td>}
             </Tr>
           )}
         </Tbody>

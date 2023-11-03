@@ -31,11 +31,8 @@ const Position: React.FC<PositionProps> = ({}) => {
       { href: '/tramitacion', titulo: 'Bandeja de Tramitación' },
       { href: '/licencias-tramitadas', titulo: 'Licencias Tramitadas' },
       { href: '/consultas', titulo: 'Consultas' },
+      { href: '/empleadores', titulo: 'Entidades Empleadoras' },
     ];
-
-    if (usuario && usuario.tieneRol('admin')) {
-      tabsUsuario.push({ href: '/empleadores', titulo: 'Entidades Empleadoras' });
-    }
 
     setTabs(tabsUsuario);
   }, [usuario]);

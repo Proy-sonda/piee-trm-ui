@@ -4,7 +4,6 @@ import { TokenAutenticacion } from './token-autenticacion';
 
 export class UsuarioToken {
   private constructor(private tokenAuth: TokenAutenticacion) {}
-
   static fromToken(token: string) {
     return new UsuarioToken(jwt_decode<TokenAutenticacion>(token));
   }

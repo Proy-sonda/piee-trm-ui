@@ -7,8 +7,9 @@ import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Nav } from 'react-bootstrap';
+import { EmpleadoresPorUsuarioContext } from '../(contexts)/empleadores-por-usuario';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
@@ -37,7 +38,20 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
 
   const [abrirModalEditarUnidad, setAbrirModalEditarUnidad] = useState(false);
 
+  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
+
   const { empleadorActual } = useEmpleadorActual();
+
+  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
+
+  useEffect(() => {
+    if (empleadorActual == undefined) return;
+    const BusquedaRol = async () => {
+      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
+      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
+    };
+    BusquedaRol();
+  }, [empleadorActual]);
 
   const [refrescar, refrescarUnidades] = useRefrescarPagina();
 
@@ -68,14 +82,16 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
         </Nav.Link>
       </Nav>
 
-      <div className="mt-3 d-flex justify-content-end">
-        <button
-          className="btn btn-success btn-sm"
-          disabled={cargandoUnidades || !!errorCargarUnidad}
-          onClick={() => setAbrirModalCrearUnidad(true)}>
-          + Agregar Unidad RRHH
-        </button>
-      </div>
+      {rolUsuario == 'Administrador' && (
+        <div className="mt-3 d-flex justify-content-end">
+          <button
+            className="btn btn-success btn-sm"
+            disabled={cargandoUnidades || !!errorCargarUnidad}
+            onClick={() => setAbrirModalCrearUnidad(true)}>
+            + Agregar Unidad RRHH
+          </button>
+        </div>
+      )}
 
       <div className="row mt-2">
         <div className="col-md-12">

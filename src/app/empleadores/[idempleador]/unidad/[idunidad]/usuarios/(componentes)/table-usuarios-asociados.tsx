@@ -1,6 +1,8 @@
 import Paginacion from '@/components/paginacion';
+import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Usuariosunidad } from '@/modelos/tramitacion';
+import { useContext } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 type props = {
@@ -9,6 +11,7 @@ type props = {
 };
 
 export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handleDelete }) => {
+  const { usuario } = useContext(AuthContext);
   const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: usuarioAsociado,
     tamanoPagina: 5,
@@ -20,8 +23,7 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
         <Thead>
           <Tr>
             <Th>Run</Th>
-
-            <Th>Acciones</Th>
+            {usuario?.tieneRol('admin') && <Th>Acciones</Th>}
           </Tr>
         </Thead>
         <Tbody>
@@ -30,23 +32,25 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
               <Tr key={runusuario}>
                 <Td>{runusuario}</Td>
 
-                <Td>
-                  <button
-                    // title={`Eliminar ${rutusuario}`}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      // handleDelete(idusuarioempleador);
-                    }}
-                    className="btn btn-danger btn-sm">
-                    <i className="bi bi-trash3"></i>
-                  </button>
-                </Td>
+                {usuario?.tieneRol('admin') && (
+                  <Td>
+                    <button
+                      // title={`Eliminar ${rutusuario}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        // handleDelete(idusuarioempleador);
+                      }}
+                      className="btn btn-danger btn-sm">
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                  </Td>
+                )}
               </Tr>
             ))
           ) : (
             <Tr>
               <Td>-</Td>
-              <Td>-</Td>
+              {usuario?.tieneRol('admin') && <Td>-</Td>}
             </Tr>
           )}
         </Tbody>

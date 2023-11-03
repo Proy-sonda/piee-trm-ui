@@ -1,3 +1,4 @@
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -5,10 +6,11 @@ import { usePaginacion } from '@/hooks/use-paginacion';
 import { Unidadesrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
+import { EmpleadoresPorUsuarioContext } from '../../(contexts)/empleadores-por-usuario';
 
 interface TablaUnidadesProps {
   unidades: Unidadesrrhh[];
@@ -24,6 +26,21 @@ const TablaUnidades = ({
   idempleador,
 }: TablaUnidadesProps) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+
+  const [rolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
+
+  const { empleadorActual } = useEmpleadorActual();
+
+  const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
+
+  useEffect(() => {
+    if (empleadorActual == undefined) return;
+    const BusquedaRol = async () => {
+      const resp = await BuscarRolUsuarioEmpleador(empleadorActual!?.rutempleador);
+      setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
+    };
+    BusquedaRol();
+  }, [empleadorActual]);
 
   const [unidadesPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: unidades,
@@ -103,28 +120,38 @@ const TablaUnidades = ({
               <Tr key={unidad?.codigounidadrrhh}>
                 <Td>{unidad?.codigounidadrrhh}</Td>
                 <Td>
-                  <span
-                    className="text-primary cursor-pointer"
-                    onClick={editarUnidadInterno(unidad)}>
-                    {unidad?.glosaunidadrrhh}
-                  </span>
+                  {}
+                  {rolUsuario == 'Administrador' ? (
+                    <span
+                      className="text-primary cursor-pointer"
+                      onClick={editarUnidadInterno(unidad)}>
+                      {unidad?.glosaunidadrrhh}
+                    </span>
+                  ) : (
+                    <>{unidad?.glosaunidadrrhh}</>
+                  )}
                 </Td>
                 <Td>{unidad?.telefono}</Td>
 
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
-                    <button
-                      className="btn text-primary"
-                      title={`Editar Unidad: ${unidad?.glosaunidadrrhh}`}
-                      onClick={editarUnidadInterno(unidad)}>
-                      <i className="bi bi-pencil-square"></i>
-                    </button>
-                    <button
-                      className="btn text-danger"
-                      title={`Eliminar Unidad: ${unidad?.glosaunidadrrhh}`}
-                      onClick={eliminarUnidadInterno(unidad)}>
-                      <i className="bi bi-trash3"></i>
-                    </button>
+                    {rolUsuario == 'Administrador' && (
+                      <>
+                        <button
+                          className="btn text-primary"
+                          title={`Editar Unidad: ${unidad?.glosaunidadrrhh}`}
+                          onClick={editarUnidadInterno(unidad)}>
+                          <i className="bi bi-pencil-square"></i>
+                        </button>
+                        <button
+                          className="btn text-danger"
+                          title={`Eliminar Unidad: ${unidad?.glosaunidadrrhh}`}
+                          onClick={eliminarUnidadInterno(unidad)}>
+                          <i className="bi bi-trash3"></i>
+                        </button>
+                      </>
+                    )}
+
                     <Link href={linkTrabajadores(unidad)} className="btn btn-success btn-sm ms-2">
                       Trabajadores
                     </Link>
@@ -140,12 +167,17 @@ const TablaUnidades = ({
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        <Dropdown.Item onClick={editarUnidadInterno(unidad)}>
-                          Editar unidad
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={eliminarUnidadInterno(unidad)}>
-                          Eliminar Unidad
-                        </Dropdown.Item>
+                        {rolUsuario == 'Administrador' && (
+                          <>
+                            <Dropdown.Item onClick={editarUnidadInterno(unidad)}>
+                              Editar unidad
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={eliminarUnidadInterno(unidad)}>
+                              Eliminar Unidad
+                            </Dropdown.Item>
+                          </>
+                        )}
+
                         <Dropdown.Item href={linkTrabajadores(unidad)}>Trabajadores</Dropdown.Item>
                         <Dropdown.Item href={linkUsuarios(unidad)}>Usuarios</Dropdown.Item>
                       </Dropdown.Menu>
