@@ -42,6 +42,17 @@ table tbody tr td div button {
   background-color: var(--color-blue) !important;
 }
 
+/***************************** react-date-picker ******************************/
+.react-datepicker__header {
+  background-color: var(--color-blue) !important;
+}
+
+.react-datepicker-popper[data-placement^='bottom'] .react-datepicker__triangle::before,
+.react-datepicker-popper[data-placement^='bottom'] .react-datepicker__triangle::after {
+  border-bottom-color: var(--color-blue) !important;
+}
+/*************************** END react-date-picker ****************************/
+
 /********************************* UTILIDADES *********************************/
 .cursor-pointer {
   cursor: pointer !important;

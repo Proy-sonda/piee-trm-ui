@@ -1,6 +1,6 @@
 import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
-import { endOfDay, isAfter, isBefore } from 'date-fns';
+import { endOfDay, getYear, isAfter, isBefore } from 'date-fns';
 import { default as es } from 'date-fns/locale/es';
 import React from 'react';
 import { Form, InputGroup } from 'react-bootstrap';
@@ -115,12 +115,46 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
                   tieneError ? 'is-invalid border-danger' : ''
                 }`}
                 showMonthYearPicker
-                showFullMonthYearPicker
                 showFourColumnMonthYearPicker
                 dateFormat="MMM yyyy"
                 onChange={onChange}
                 onBlur={onBlur}
                 selected={value}
+                renderCustomHeader={({
+                  date,
+                  decreaseYear,
+                  increaseYear,
+                  prevMonthButtonDisabled,
+                  nextMonthButtonDisabled,
+                }) => (
+                  <div
+                    className="d-flex justify-content-between align-items-center"
+                    style={{ backgroundColor: 'var(--color-blue)', color: 'white' }}>
+                    <button
+                      type="button"
+                      onClick={decreaseYear}
+                      disabled={prevMonthButtonDisabled}
+                      className="btn btn-primary border-0 rounded-circle">
+                      <i className="bi bi-chevron-left" style={{ fontSize: '14px' }}></i>
+                    </button>
+
+                    <div className="fs-6">{getYear(date)}</div>
+
+                    <button
+                      type="button"
+                      onClick={increaseYear}
+                      disabled={nextMonthButtonDisabled}
+                      className="btn btn-primary border-0 rounded-circle">
+                      <i className="bi bi-chevron-right" style={{ fontSize: '14px' }}></i>
+                    </button>
+                  </div>
+                )}
+                renderMonthContent={(_, shortMonthText, fullMonthText) => (
+                  <span style={{ fontSize: '14px' }} title={fullMonthText}>
+                    {shortMonthText}
+                  </span>
+                )}
+                monthClassName={() => 'p-1'}
               />
             )}
           />
