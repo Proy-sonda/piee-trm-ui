@@ -13,7 +13,7 @@ interface props {
   trabajadores: Trabajadoresunidadrrhh[];
   unidad: string;
   handleEditTrabajador: (idtrabajador: number, idunidad: number, ruttrabajador: string) => void;
-  handleDeleteTrabajador: (idtrabajador: number, ruttrabajador: string) => void;
+  handleDeleteTrabajador: (trabajador: Trabajadoresunidadrrhh) => void;
   idunidad: number;
 }
 
@@ -82,17 +82,17 @@ const TablaTrabajadores: React.FC<props> = ({
         </Thead>
         <Tbody className="align-middle text-center">
           {trabajadoresPaginados.length > 0 ? (
-            trabajadoresPaginados.map(({ runtrabajador, fecharegistro, codigounidadrrhh }) => (
-              <Tr key={runtrabajador}>
+            trabajadoresPaginados.map((trabajador) => (
+              <Tr key={trabajador.runtrabajador}>
                 <Td>
                   <Link
                     href={''}
                     // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
                   >
-                    {runtrabajador}
+                    {trabajador.runtrabajador}
                   </Link>
                 </Td>
-                <td>{format(new Date(fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</td>
+                <td>{format(new Date(trabajador.fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</td>
 
                 {RolUsuario == 'Administrador' && (
                   <Td>
@@ -100,15 +100,16 @@ const TablaTrabajadores: React.FC<props> = ({
                       className="btn btn-sm btn-primary"
                       // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
                     >
-                      <i title={`editar ${runtrabajador}`} className={'bi bi-pencil-square'}></i>
+                      <i
+                        title={`editar ${trabajador.runtrabajador}`}
+                        className={'bi bi-pencil-square'}></i>
                     </button>
                     &nbsp;
                     <button
                       className="btn btn-sm btn-danger"
-                      // onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}
-                    >
+                      onClick={() => handleDeleteTrabajador(trabajador)}>
                       <i
-                        title={`eliminar ${runtrabajador}`}
+                        title={`eliminar ${trabajador.runtrabajador}`}
                         className={'bi bi-trash btn-danger'}></i>
                     </button>
                   </Td>

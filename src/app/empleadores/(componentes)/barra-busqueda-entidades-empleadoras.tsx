@@ -68,15 +68,14 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
               }}>
               Buscar
             </button>
-            {usuario?.tieneRol('admin') && (
-              <button
-                type="button"
-                className="btn btn-success mt-3 mt-md-0"
-                data-bs-toggle="modal"
-                data-bs-target="#Addsempresa">
-                Inscribe Entidad Empleadora
-              </button>
-            )}
+
+            <button
+              type="button"
+              className="btn btn-success mt-3 mt-md-0"
+              data-bs-toggle="modal"
+              data-bs-target="#Addsempresa">
+              Inscribe Entidad Empleadora
+            </button>
           </div>
         </div>
       </form>

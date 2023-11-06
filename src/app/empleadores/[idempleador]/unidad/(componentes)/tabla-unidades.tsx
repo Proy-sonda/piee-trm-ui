@@ -1,13 +1,16 @@
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Unidadesrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import { Unidadesrrhh as UnidadAccion } from '../(modelos)/payload-unidades';
 import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
 import { useRol } from '../../(hooks)/use-Rol';
 
@@ -27,13 +30,15 @@ const TablaUnidades = ({
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   const { RolUsuario } = useRol();
+  const { empleadorActual } = useEmpleadorActual();
+  const { usuario } = useContext(AuthContext);
 
   const [unidadesPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: unidades,
     tamanoPagina: 10,
   });
 
-  const eliminarUnidadDeRRHH = async (unidad: Unidadesrrhh) => {
+  const eliminarUnidadDeRRHH = async (unidad: UnidadAccion) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
       html: `¿Desea eliminar la unidad: <b>${unidad.glosaunidadrrhh}</b>?`,
     });
@@ -45,7 +50,9 @@ const TablaUnidades = ({
     try {
       setMostrarSpinner(true);
 
-      await eliminarUnidad(parseInt(unidad.codigounidadrrhh));
+      if (empleadorActual == undefined || usuario == undefined) return;
+
+      await eliminarUnidad(unidad, empleadorActual?.rutempleador, usuario?.rut);
 
       AlertaExito.fire({
         html: 'Unidad fue eliminada con éxito',
@@ -80,7 +87,11 @@ const TablaUnidades = ({
   const eliminarUnidadInterno = (unidad: Unidadesrrhh) => {
     return (event: any) => {
       event.preventDefault();
-      eliminarUnidadDeRRHH(unidad);
+      const AccionUnidad: UnidadAccion = {
+        accionrrhh: 3,
+        ...unidad,
+      };
+      eliminarUnidadDeRRHH(AccionUnidad);
     };
   };
 

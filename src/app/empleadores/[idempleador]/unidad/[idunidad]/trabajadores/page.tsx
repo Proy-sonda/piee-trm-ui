@@ -18,16 +18,18 @@ import {
 } from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(servicios)';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
+import { AuthContext } from '@/contexts';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import exportFromJSON from 'export-from-json';
+import { Trabajadoresxrrhh } from '../../(modelos)/payload-unidades';
 import { useRol } from '../../../(hooks)/use-Rol';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
@@ -115,21 +117,31 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const handleClose = () => setshow(false);
 
-  const handleDeleteTrabajador = (idtrabajador: number, rut: string) => {
+  const handleDeleteTrabajador = (trabajadores: Trabajadoresunidadrrhh) => {
     const EliminarTrabajador = async () => {
-      const data = await eliminarTrabajador(idtrabajador.toString());
+      const TrabajadorAEliminar: Trabajadoresxrrhh = {
+        acciontraxrrhh: 3,
+        codigounidadrrhh: trabajadores.codigounidadrrhh,
+        runtrabajador: trabajadores.runtrabajador,
+      };
+      if (empleadorActual == undefined || usuario == undefined) return;
+      const data = await eliminarTrabajador(
+        TrabajadorAEliminar,
+        usuario?.rut,
+        empleadorActual?.rutempleador,
+      );
 
       if (data.ok) {
         refrescarComponente();
 
         return AlertaExito.fire({
-          html: `Persona trabajadora ${rut} fue eliminada con éxito`,
+          html: `Persona trabajadora ${trabajadores.runtrabajador} fue eliminada con éxito`,
         });
       }
       AlertaError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
     };
     AlertaConfirmacion.fire({
-      html: `¿Desea eliminar a la persona trabajadora <b>${rut}</b>?`,
+      html: `¿Desea eliminar a la persona trabajadora <b>${trabajadores.runtrabajador}</b>?`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
     });
@@ -175,7 +187,19 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     for (let index = 0; index < datosPagina!?.trabajadores.length; index++) {
       const element = datosPagina?.trabajadores[index];
-      const resp = await eliminarTrabajador(element!?.runtrabajador);
+      if (element == undefined) return;
+      const TrabajadorAEliminar: Trabajadoresxrrhh = {
+        acciontraxrrhh: 3,
+        codigounidadrrhh: element.codigounidadrrhh,
+        runtrabajador: element.runtrabajador,
+      };
+      if (empleadorActual == undefined || usuario == undefined) return;
+
+      const resp = await eliminarTrabajador(
+        TrabajadorAEliminar,
+        usuario?.rut,
+        empleadorActual?.rutempleador,
+      );
       if (resp.ok) {
         recuento = ++recuento;
         setcuentagrabados((recuento / datosPagina!?.trabajadores.length) * 100);
@@ -204,17 +228,21 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
   };
 
+  const { usuario } = useContext(AuthContext);
+
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
     if (error.run) return;
 
     const crearTrabajadorAux = async () => {
-      const data = await crearTrabajador({
-        ruttrabajador: getValues('run'),
-        unidad: {
-          idunidad: Number(idunidad),
-        },
-      });
+      const trabajador: Trabajadoresxrrhh = {
+        acciontraxrrhh: 1,
+        codigounidadrrhh: idunidad,
+        runtrabajador: getValues('run'),
+      };
+
+      if (empleadorActual == undefined || usuario == undefined) return;
+      const data = await crearTrabajador(trabajador, empleadorActual?.rutempleador, usuario?.rut);
 
       if (data.ok) {
         AlertaExito.fire({ html: 'Persona trabajadora agregada correctamente' });
@@ -280,12 +308,14 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       const element = csvData[index];
       recuento = ++recuento;
       if (element.trim() != '') {
-        const data = await crearTrabajador({
-          ruttrabajador: formatRut(element, false),
-          unidad: {
-            idunidad: Number(idunidad),
-          },
-        });
+        const trabajador: Trabajadoresxrrhh = {
+          acciontraxrrhh: 1,
+          codigounidadrrhh: idunidad,
+          runtrabajador: formatRut(element, false),
+        };
+
+        if (empleadorActual == undefined || usuario == undefined) return;
+        const data = await crearTrabajador(trabajador, usuario.rut, empleadorActual.rutempleador);
         if (data.ok) {
           setcuentagrabados((recuento / csvData.length) * 100);
         } else {
@@ -551,7 +581,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="col-md-12">
             <div className="row">
               <h5 className="text-center">Personas Trabajadoras</h5>
-              { RolUsuario == 'Administrador' && (
+              {RolUsuario == 'Administrador' && (
                 <span
                   className="text-end animate animate__fadeIn"
                   style={{
