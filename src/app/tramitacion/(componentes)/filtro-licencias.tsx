@@ -88,8 +88,8 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
               name="idUnidadRRHH"
               label="Unidad RRHH"
               datos={unidadesRRHH}
-              idElemento="idunidad"
-              descripcion="unidad"
+              idElemento="codigounidadrrhh"
+              descripcion="glosaunidadrrhh"
               className="col-12 col-md-6 col-lg-3"
             />
           </div>

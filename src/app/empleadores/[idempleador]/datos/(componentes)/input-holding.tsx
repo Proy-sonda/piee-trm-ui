@@ -1,28 +1,28 @@
-import { BaseProps } from '@/components/form';
-import { useRandomId } from '@/hooks/use-random-id';
+import { InputReciclableBase } from '@/components/form';
+import { useInputReciclable } from '@/components/form/hooks';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
-interface InputHoldingProps extends BaseProps {}
+interface InputHoldingProps extends InputReciclableBase {}
 
 const InputHolding: React.FC<InputHoldingProps> = ({ name, label, className }) => {
-  const idInput = useRandomId('holding');
+  const { register, setValue } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    name,
+    prefijoId: 'holding',
+    label: { texto: label, opcional: true },
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label}`}</Form.Label>
+        <Form.Label>{textoLabel}</Form.Label>
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           {...register(name, {
             maxLength: {
               value: 50,
@@ -39,7 +39,7 @@ const InputHolding: React.FC<InputHoldingProps> = ({ name, label, className }) =
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

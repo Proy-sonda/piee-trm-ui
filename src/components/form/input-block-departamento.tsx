@@ -1,32 +1,35 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface InputBlockDepartamentoProps extends BaseProps {}
+interface InputBlockDepartamentoProps extends InputReciclableBase {}
 
 export const InputBlockDepartamento: React.FC<InputBlockDepartamentoProps> = ({
   name,
   label,
   className,
 }) => {
-  const idInput = useRandomId('block');
+  const { register, setValue } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'deptoBlock',
+    name,
+    label: {
+      texto: label,
+    },
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{label}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           {...register(name, {
             maxLength: {
               value: 20,
@@ -47,7 +50,7 @@ export const InputBlockDepartamento: React.FC<InputBlockDepartamentoProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

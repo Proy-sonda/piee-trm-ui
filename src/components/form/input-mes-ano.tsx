@@ -1,39 +1,12 @@
-import { BaseProps } from '@/components/form';
-import { useRandomId } from '@/hooks/use-random-id';
+import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, isAfter, isBefore, parse, startOfMonth } from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import IfContainer from '../if-container';
+import { useInputReciclable } from './hooks';
 
-interface InputMesAnoProps extends Omit<BaseProps, 'label'> {
-  label?: string;
-
-  opcional?: boolean;
-
-  /**
-   * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
-   *
-   * Si se incluye esta propiedad se obtienen desde el arreglo usado por `useFieldArray`, pero si
-   * no se incluye se van a tratar de obtener los errores desde la propiedad`formState.errors[name]`
-   * que devuelve `useFormContext`.
-   */
-  unirConFieldArray?: {
-    /**
-     * La propiedad `name` usada cuando se creo el field array con `useFieldArray`.
-     * */
-    fieldArrayName: string;
-
-    /** El indice del input. */
-    index: number;
-
-    /**
-     * Nombre de la propiedad de un elemento del field array.
-     */
-    campo: string;
-  };
-}
+interface InputMesAnoProps extends InputReciclableBase, UnibleConFormArray {}
 
 /**
  * El valor del input va a ser un objeto `Date` con la fecha seleccionada. En caso de que la fecha
@@ -47,52 +20,24 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
   opcional,
   unirConFieldArray,
 }) => {
-  const idInput = useRandomId('fecha');
+  const { register } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
-  const determinarLabel = () => {
-    if (label === undefined || label === null) {
-      return '';
-    }
-
-    return opcional ? `${label}` : `${label} (*)`;
-  };
-
-  const tieneError = () => {
-    if (!unirConFieldArray) {
-      return !!errors[name];
-    }
-
-    const { fieldArrayName, index, campo } = unirConFieldArray;
-
-    return !!(errors[fieldArrayName] as any)?.at?.(index)?.[campo];
-  };
-
-  const mensajeDeError = () => {
-    if (!unirConFieldArray) {
-      return errors[name]?.message?.toString();
-    }
-
-    const { fieldArrayName, index, campo } = unirConFieldArray;
-
-    return (errors[fieldArrayName] as any)?.at?.(index)?.[campo]?.message?.toString();
-  };
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'mesano',
+    name,
+    label: { texto: label, opcional },
+    unirConFieldArray,
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <IfContainer show={label !== undefined}>
-          <Form.Label>{determinarLabel()}</Form.Label>
-        </IfContainer>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
           type="month"
           autoComplete="new-custom-value"
-          isInvalid={tieneError()}
+          isInvalid={tieneError}
           {...register(name, {
             setValueAs: (date: string) => {
               /** Situa la fecha con respecto al inicio de hoy */
@@ -123,7 +68,7 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {mensajeDeError()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

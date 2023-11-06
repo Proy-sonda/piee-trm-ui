@@ -1,15 +1,10 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup, InputGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { ErroresEditables, InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface InputTelefonoProps extends BaseProps {
-  opcional?: boolean;
-  errores?: {
-    requerido?: string;
-  };
-}
+interface InputTelefonoProps extends InputReciclableBase, ErroresEditables<'requerido'> {}
 
 export const InputTelefono: React.FC<InputTelefonoProps> = ({
   name,
@@ -18,14 +13,16 @@ export const InputTelefono: React.FC<InputTelefonoProps> = ({
   opcional,
   errores,
 }) => {
-  const idInput = useRandomId('telefono');
+  const { register, setValue, getValues } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-    getValues,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    name,
+    prefijoId: 'combo',
+    label: {
+      texto: label,
+      opcional,
+    },
+  });
 
   const trimInput = () => {
     const value = getValues(name);
@@ -38,7 +35,7 @@ export const InputTelefono: React.FC<InputTelefonoProps> = ({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label}${!opcional ? ' (*)' : ''}`}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <InputGroup>
           <InputGroup.Text>+56</InputGroup.Text>
@@ -46,7 +43,7 @@ export const InputTelefono: React.FC<InputTelefonoProps> = ({
           <Form.Control
             type="text"
             autoComplete="new-custom-value"
-            isInvalid={!!errors[name]}
+            isInvalid={tieneError}
             {...register(name, {
               required: {
                 value: !opcional,
@@ -74,7 +71,7 @@ export const InputTelefono: React.FC<InputTelefonoProps> = ({
             })}
           />
           <Form.Control.Feedback type="invalid" tooltip>
-            {errors[name]?.message?.toString()}
+            {mensajeError}
           </Form.Control.Feedback>
         </InputGroup>
       </FormGroup>

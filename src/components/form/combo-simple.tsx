@@ -1,22 +1,27 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import IfContainer from '../if-container';
-import { BaseProps } from './base-props';
+import { InputReciclableBase, UnibleConFormArray } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface ComboSimpleProps<T> extends Omit<BaseProps, 'label'> {
-  label?: string;
-
+interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
   /** Datos para rellenar el combo */
   datos?: T[];
 
   /**
    * Propiedad de un elemento de los datos para usar en las propiedades `key` y `value` del tag
    * `<option>`.
+   *
+   * Se puede usar un callback para generar el ID a partir de un elemento del elemento en caso de
+   * que no se pueda usar una sola propiedad.
    */
   idElemento: keyof T | ((elemento: T) => number | string);
 
-  /** Propiedad de un elemento de los datos para usar como texto de tag `<option />` */
+  /**
+   * Propiedad de un elemento de los datos para usar como texto de tag `<option />`
+   *
+   * Se puede usar un callback para generar la descripcion a partir de un elemento del elemento en
+   * caso de  que no se pueda usar una sola propiedad.
+   */
   descripcion: keyof T | ((elemento: T) => string);
 
   /** Texto para incluir como la opción nula (default: `'Seleccionar'`). */
@@ -27,34 +32,10 @@ interface ComboSimpleProps<T> extends Omit<BaseProps, 'label'> {
    * (default: `number`).
    * */
   tipoValor?: 'number' | 'string';
-
-  opcional?: boolean;
-
-  /**
-   * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
-   *
-   * Si se incluye esta propiedad se obtienen desde el arreglo usado por `useFieldArray`, pero si
-   * no se incluye se van a tratar de obtener los errores desde la propiedad`formState.errors[name]`
-   * que devuelve `useFormContext`.
-   */
-  unirConFieldArray?: {
-    /**
-     * La propiedad `name` usada cuando se creo el field array con `useFieldArray`.
-     * */
-    fieldArrayName: string;
-
-    /** El indice del input. */
-    index: number;
-
-    /**
-     * Nombre de la propiedad de un elemento del field array.
-     */
-    campo: string;
-  };
 }
 
 /**
- * El valor en caso de ser opcional es un string vacío cuando el combo es tipo `string` o `isNan`
+ * El valor en caso de ser opcional es un string vacío cuando el combo es tipo `string` o `NaN`
  * cuando es un combo tipo `number`.
  */
 export const ComboSimple = <T extends Record<string, any>>({
@@ -69,40 +50,18 @@ export const ComboSimple = <T extends Record<string, any>>({
   opcional,
   unirConFieldArray,
 }: ComboSimpleProps<T>) => {
-  const idInput = useRandomId('combo');
+  const { register } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
-
-  const determinarLabel = () => {
-    if (label === undefined || label === null) {
-      return '';
-    }
-
-    return opcional ? `${label}` : `${label} (*)`;
-  };
-
-  const tieneError = () => {
-    if (!unirConFieldArray) {
-      return !!errors[name];
-    }
-
-    const { fieldArrayName, index, campo } = unirConFieldArray;
-
-    return !!(errors[fieldArrayName] as any)?.at?.(index)?.[campo];
-  };
-
-  const mensajeDeError = () => {
-    if (!unirConFieldArray) {
-      return errors[name]?.message?.toString();
-    }
-
-    const { fieldArrayName, index, campo } = unirConFieldArray;
-
-    return (errors[fieldArrayName] as any)?.at?.(index)?.[campo]?.message?.toString();
-  };
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    name,
+    prefijoId: 'combo',
+    label: {
+      texto: label,
+      opcional,
+      omitirSignoObligatorio: false,
+    },
+    unirConFieldArray,
+  });
 
   const calcularId = (x: T) => {
     return typeof idElemento === 'function' ? idElemento(x) : (x[idElemento] as any);
@@ -115,13 +74,11 @@ export const ComboSimple = <T extends Record<string, any>>({
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <IfContainer show={label !== undefined}>
-          <Form.Label>{determinarLabel()}</Form.Label>
-        </IfContainer>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Select
           autoComplete="new-custom-value"
-          isInvalid={tieneError()}
+          isInvalid={tieneError}
           {...register(name, {
             setValueAs: (value) => {
               if (!tipoValor || tipoValor === 'number') {
@@ -155,7 +112,7 @@ export const ComboSimple = <T extends Record<string, any>>({
         </Form.Select>
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {mensajeDeError()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>
