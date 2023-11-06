@@ -1,6 +1,7 @@
 import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
+import { parse, startOfMonth } from 'date-fns';
 import { desgloseFromGlosas } from '../(modelos)/desglose-de-haberes';
 import { LicenciaC3, RentaC3 } from '../(modelos)/licencia-c3';
 import { LicenciaC3API, RentaAPI } from '../(modelos)/licencia-c3-api';
@@ -63,9 +64,9 @@ function parsearRenta(renta: RentaAPI): RentaC3 {
   };
 }
 
-function parsearPeriodo(periodorenta: number): string {
+function parsearPeriodo(periodorenta: number): Date {
   const ano = `${periodorenta}`.substring(0, 4);
   const mes = `${periodorenta}`.substring(4, 6);
 
-  return `${ano}-${mes}`;
+  return parse(`${ano}-${mes}`, 'yyyy-MM', startOfMonth(new Date()));
 }

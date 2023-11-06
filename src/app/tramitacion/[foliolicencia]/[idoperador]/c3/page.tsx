@@ -1,4 +1,5 @@
 'use client';
+
 import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
@@ -180,7 +181,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneraciones.append({
             prevision: renta.idPrevision,
-            periodoRenta: renta.periodo as any,
+            periodoRenta: renta.periodo,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
             totalRemuneracion: renta.totalRemuneracion,
@@ -194,7 +195,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const periodosNormalesEsperados = esTrabajadorIndependiente(zona2) ? 12 : 3;
         let filasRestantes = periodosNormalesEsperados - zona3.rentas.length;
         while (filasRestantes-- > 0) {
-          remuneraciones.append({ desgloseHaberes: {} } as any);
+          remuneraciones.append({ periodoRenta: null, desgloseHaberes: {} } as any);
         }
       }
 
@@ -206,7 +207,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneracionesMaternidad.append({
             prevision: renta.idPrevision,
-            periodoRenta: renta.periodo as any,
+            periodoRenta: renta.periodo,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
             totalRemuneracion: renta.totalRemuneracion,
@@ -220,7 +221,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const periodosMaternidadEsperados = 3;
         let filasRestantesMaternidad = periodosMaternidadEsperados - zona3.rentasMaternidad.length;
         while (filasRestantesMaternidad-- > 0) {
-          remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
+          remuneracionesMaternidad.append({ periodoRenta: null, desgloseHaberes: {} } as any);
         }
       }
     }
@@ -236,7 +237,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneraciones.append({
             prevision: crearIdEntidadPrevisional(zona2.entidadprevisional),
-            periodoRenta: format(mesRenta, 'yyyy-MM') as any,
+            periodoRenta: mesRenta,
             desgloseHaberes: {},
           } as any);
         }
@@ -263,7 +264,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const renta = zona3.rentas[index];
 
         formulario.setValue(`remuneraciones.${index}.prevision`, renta.idPrevision);
-        formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo as any);
+        formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo);
         formulario.setValue(`remuneraciones.${index}.dias`, renta.dias);
         formulario.setValue(`remuneraciones.${index}.montoImponible`, renta.montoImponible);
         formulario.setValue(`remuneraciones.${index}.totalRemuneracion`, renta.totalRemuneracion);
@@ -279,7 +280,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const renta = zona3.rentasMaternidad[index];
 
         formulario.setValue(`remuneracionesMaternidad.${index}.prevision`, renta.idPrevision);
-        formulario.setValue(`remuneracionesMaternidad.${index}.periodoRenta`, renta.periodo as any);
+        formulario.setValue(`remuneracionesMaternidad.${index}.periodoRenta`, renta.periodo);
         formulario.setValue(`remuneracionesMaternidad.${index}.dias`, renta.dias);
         formulario.setValue(
           `remuneracionesMaternidad.${index}.montoImponible`,
@@ -494,7 +495,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   ) => {
     formulario.setValue(`${fieldArray}.${index}`, {
       prevision: '',
-      periodoRenta: undefined,
+      periodoRenta: null,
       desgloseHaberes: {},
       dias: undefined,
       diasIncapacidad: undefined,
