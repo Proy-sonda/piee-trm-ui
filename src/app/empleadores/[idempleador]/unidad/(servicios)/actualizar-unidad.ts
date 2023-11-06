@@ -1,34 +1,21 @@
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl } from '@/servicios/environment';
+import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { ActualizarUnidadRequest } from '../(modelos)/datos-actualizar-unidad';
+import { EmpleadorUnidad, Unidadesrrhh } from '../(modelos)/payload-unidades';
 
-export const actualizarUnidad = (request: ActualizarUnidadRequest) => {
-  const payload = {
-    idunidad: request.unidadId,
-    unidad: request.nombre,
-    identificador: request.identificadorUnico,
-    email: request.email,
-    telefono: request.telefono,
-    direccionunidad: {
-      calle: request.calle,
-      comuna: {
-        idcomuna: request.comunaId,
-        nombre: ' ',
-      },
-      depto: request.departamento,
-      numero: request.numero,
-    },
-    estadounidadrrhh: {
-      idestadounidadrrhh: 1,
-      descripcion: 'SUSCRITO',
-    },
-    empleador: {
-      idempleador: request.empleadorId,
-    },
+export const actualizarUnidad = (
+  request: Unidadesrrhh,
+  rutEmpleador: string,
+  runUsuario: string,
+) => {
+  request.accionrrhh = 2;
+  const payload: EmpleadorUnidad = {
+    RunUsuario: runUsuario,
+    RutEmpleador: rutEmpleador,
+    unidadesrrhh: request,
   };
 
-  return runFetchConThrow<void>(`${apiUrl()}/unidad/update`, {
+  return runFetchConThrow<void>(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {
     method: 'PUT',
     headers: {
       Authorization: obtenerToken(),

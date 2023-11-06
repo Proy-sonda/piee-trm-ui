@@ -1,20 +1,24 @@
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { Unidadrhh } from '@/modelos/tramitacion';
+import { Unidadesrrhh } from '@/modelos/tramitacion';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
+import { Unidadesrrhh as UnidadAccion } from '../(modelos)/payload-unidades';
 import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
+import { useRol } from '../../(hooks)/use-Rol';
 
 interface TablaUnidadesProps {
-  unidades: Unidadrhh[];
+  unidades: Unidadesrrhh[];
   idempleador: number;
-  onEditarUnidad: (unidad: Unidadrhh) => void;
-  onUnidadEliminada: (unidad: Unidadrhh) => void;
+  onEditarUnidad: (unidad: Unidadesrrhh) => void;
+  onUnidadEliminada: (unidad: Unidadesrrhh) => void;
 }
 
 const TablaUnidades = ({
@@ -25,21 +29,18 @@ const TablaUnidades = ({
 }: TablaUnidadesProps) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
+  const { RolUsuario } = useRol();
+  const { empleadorActual } = useEmpleadorActual();
+  const { usuario } = useContext(AuthContext);
+
   const [unidadesPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: unidades,
     tamanoPagina: 10,
   });
 
-  const eliminarUnidadDeRRHH = async (unidad: Unidadrhh) => {
-    const { isConfirmed } = await Swal.fire({
-      icon: 'question',
-      html: `¿Desea eliminar la unidad: <b>${unidad.unidad}</b>?`,
-      showConfirmButton: true,
-      confirmButtonText: 'Sí',
-      confirmButtonColor: 'var(--color-blue)',
-      showDenyButton: true,
-      denyButtonColor: 'var(--bs-danger)',
-      denyButtonText: 'NO',
+  const eliminarUnidadDeRRHH = async (unidad: UnidadAccion) => {
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      html: `¿Desea eliminar la unidad: <b>${unidad.glosaunidadrrhh}</b>?`,
     });
 
     if (!isConfirmed) {
@@ -49,50 +50,48 @@ const TablaUnidades = ({
     try {
       setMostrarSpinner(true);
 
-      await eliminarUnidad(unidad.idunidad);
+      if (empleadorActual == undefined || usuario == undefined) return;
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Unidad fue eliminada con éxito',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
+      await eliminarUnidad(unidad, empleadorActual?.rutempleador, usuario?.rut);
+
+      AlertaExito.fire({
+        html: 'Unidad fue eliminada con éxito',
       });
 
       onUnidadEliminada(unidad);
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         title: 'Error',
-        text: 'Hubo un problema al eliminar la unidad, por favor contactar a un administrador',
-        showConfirmButton: true,
-        confirmButtonText: 'OK',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'Hubo un problema al eliminar la unidad, por favor contactar a un administrador',
       });
     } finally {
       setMostrarSpinner(false);
     }
   };
 
-  const linkTrabajadores = (unidad: Unidadrhh) => {
-    return `/empleadores/${idempleador}/unidad/${unidad.idunidad}/trabajadores/`;
+  const linkTrabajadores = (unidad: Unidadesrrhh) => {
+    return `/empleadores/${idempleador}/unidad/${unidad.codigounidadrrhh}/trabajadores/`;
   };
 
-  const linkUsuarios = (unidad: Unidadrhh) => {
-    return `/empleadores/${idempleador}/unidad/${unidad.idunidad}/usuarios`;
+  const linkUsuarios = (unidad: Unidadesrrhh) => {
+    return `/empleadores/${idempleador}/unidad/${unidad.codigounidadrrhh}/usuarios`;
   };
 
-  const editarUnidadInterno = (unidad: Unidadrhh) => {
+  const editarUnidadInterno = (unidad: Unidadesrrhh) => {
     return (event: any) => {
       event.preventDefault();
       onEditarUnidad(unidad);
     };
   };
 
-  const eliminarUnidadInterno = (unidad: Unidadrhh) => {
+  const eliminarUnidadInterno = (unidad: Unidadesrrhh) => {
     return (event: any) => {
       event.preventDefault();
-      eliminarUnidadDeRRHH(unidad);
+      const AccionUnidad: UnidadAccion = {
+        accionrrhh: 3,
+        ...unidad,
+      };
+      eliminarUnidadDeRRHH(AccionUnidad);
     };
   };
 
@@ -109,37 +108,47 @@ const TablaUnidades = ({
               <Th>Código</Th>
               <Th>Nombre</Th>
               <Th>Teléfono</Th>
-              <Th>Correo electrónico</Th>
+
               <Th></Th>
             </Tr>
           </Thead>
           <Tbody className="text-center align-middle">
             {unidadesPaginadas.map((unidad) => (
-              <Tr key={unidad?.idunidad}>
-                <Td>{unidad?.identificador}</Td>
+              <Tr key={unidad?.codigounidadrrhh}>
+                <Td>{unidad?.codigounidadrrhh}</Td>
                 <Td>
-                  <span
-                    className="text-primary cursor-pointer"
-                    onClick={editarUnidadInterno(unidad)}>
-                    {unidad?.unidad}
-                  </span>
+                  {}
+                  {RolUsuario == 'Administrador' ? (
+                    <span
+                      className="text-primary cursor-pointer"
+                      onClick={editarUnidadInterno(unidad)}>
+                      {unidad?.glosaunidadrrhh}
+                    </span>
+                  ) : (
+                    <>{unidad?.glosaunidadrrhh}</>
+                  )}
                 </Td>
                 <Td>{unidad?.telefono}</Td>
-                <Td>{unidad?.email}</Td>
+
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
-                    <button
-                      className="btn text-primary"
-                      title={`Editar Unidad: ${unidad?.unidad}`}
-                      onClick={editarUnidadInterno(unidad)}>
-                      <i className="bi bi-pencil-square"></i>
-                    </button>
-                    <button
-                      className="btn text-danger"
-                      title={`Eliminar Unidad: ${unidad?.unidad}`}
-                      onClick={eliminarUnidadInterno(unidad)}>
-                      <i className="bi bi-trash3"></i>
-                    </button>
+                    {RolUsuario == 'Administrador' && (
+                      <>
+                        <button
+                          className="btn text-primary"
+                          title={`Editar Unidad: ${unidad?.glosaunidadrrhh}`}
+                          onClick={editarUnidadInterno(unidad)}>
+                          <i className="bi bi-pencil-square"></i>
+                        </button>
+                        <button
+                          className="btn text-danger"
+                          title={`Eliminar Unidad: ${unidad?.glosaunidadrrhh}`}
+                          onClick={eliminarUnidadInterno(unidad)}>
+                          <i className="bi bi-trash3"></i>
+                        </button>
+                      </>
+                    )}
+
                     <Link href={linkTrabajadores(unidad)} className="btn btn-success btn-sm ms-2">
                       Trabajadores
                     </Link>
@@ -155,12 +164,17 @@ const TablaUnidades = ({
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        <Dropdown.Item onClick={editarUnidadInterno(unidad)}>
-                          Editar unidad
-                        </Dropdown.Item>
-                        <Dropdown.Item onClick={eliminarUnidadInterno(unidad)}>
-                          Eliminar Unidad
-                        </Dropdown.Item>
+                        {RolUsuario == 'Administrador' && (
+                          <>
+                            <Dropdown.Item onClick={editarUnidadInterno(unidad)}>
+                              Editar unidad
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={eliminarUnidadInterno(unidad)}>
+                              Eliminar Unidad
+                            </Dropdown.Item>
+                          </>
+                        )}
+
                         <Dropdown.Item href={linkTrabajadores(unidad)}>Trabajadores</Dropdown.Item>
                         <Dropdown.Item href={linkUsuarios(unidad)}>Usuarios</Dropdown.Item>
                       </Dropdown.Menu>

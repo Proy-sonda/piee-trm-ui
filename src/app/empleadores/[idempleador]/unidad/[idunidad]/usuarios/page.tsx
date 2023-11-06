@@ -1,18 +1,19 @@
 'use client';
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { buscarUnidadPorId } from '@/app/empleadores/[idempleador]/unidad/(servicios)/buscar-unidad-por-id';
-import { UsuarioEntidadEmpleadora } from '@/app/empleadores/[idempleador]/usuarios/(modelos)/usuario-entidad-empleadora';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { Usuariosunidad } from '@/modelos/tramitacion';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
-import { buscarEmpleadorPorId } from '../../../../(servicios)/buscar-empleador-por-id';
+import { useRol } from '../../../(hooks)/use-Rol';
+import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
 import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
-import { UsuarioEmpleador } from './(modelos)/usuario-asociado';
 import { asociarUnidad } from './(servicios)/asociar-unidad';
 import { buscarUsuariosAsociado } from './(servicios)/buscar-usuario-asociado';
 import { eliminarUsuarioAsociado } from './(servicios)/eliminar-usuario-asociado';
@@ -26,41 +27,37 @@ interface iUsuarios {
 
 const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const { idempleador, idunidad } = params;
-  const [razon, setRazon] = useState('');
-  const [rut, setrut] = useState('');
   const [unidad, setunidad] = useState('');
   const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
-  const [usuariosAsociados, setusuariosAsociados] = useState<UsuarioEmpleador[]>([]);
+  const [usuariosAsociados, setusuariosAsociados] = useState<Usuariosunidad[]>([]);
+  const { RolUsuario } = useRol();
+  const { empleadorActual } = useEmpleadorActual();
 
   useEffect(() => {
     const busquedaUnidad = async () => {
-      const [resp] = await buscarUnidadPorId(Number(idunidad));
-      setunidad((await resp()).unidad);
+      const [resp] = await buscarUnidadPorId(idunidad);
+      setunidad((await resp())!?.glosaunidadrrhh);
     };
-    const busquedaEmpleador = async () => {
-      const [resp] = await buscarEmpleadorPorId(Number(idempleador));
-      setrut((await resp())?.rutempleador || '');
-      setRazon((await resp())?.razonsocial || '');
-    };
+
     busquedaUnidad();
-    busquedaEmpleador();
+
     refrescarComponente();
   }, []);
 
   useEffect(() => {
     const busquedaUsuarios = async () => {
-      if (rut == '') return;
-      const [resp] = await buscarUsuarios(rut);
+      if (empleadorActual?.rutempleador == '' || empleadorActual == undefined) return;
+      const [resp] = await buscarUsuarios(empleadorActual.rutempleador);
       setusuarios(await resp());
     };
     busquedaUsuarios();
-  }, [rut]);
+  }, [empleadorActual?.rutempleador]);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      usuarioAso: buscarUsuariosAsociado(Number(idunidad)),
+      usuarioAso: buscarUsuariosAsociado(idunidad, empleadorActual!?.rutempleador),
     },
     [refresh],
   );
@@ -74,10 +71,10 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     setusuarios(
       usuarios.filter(
         (usuario) =>
-          usuario.idusuario !==
+          usuario.rutusuario !==
           usuariosAsociados.find(
-            (usuarioAsociado) => usuarioAsociado.usuario.idusuario == usuario.idusuario,
-          )?.usuario.idusuario,
+            (usuarioAsociado) => usuarioAsociado.runusuario == usuario.rutusuario,
+          )?.runusuario,
       ),
     );
   }, [usuariosAsociados]);
@@ -99,16 +96,9 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
   const onHandleSubmit = async (event: FormEvent) => {
     event.preventDefault();
-    const respuesta = await Swal.fire({
-      icon: 'question',
+    const respuesta = await AlertaConfirmacion.fire({
       title: 'Asociar Usuario/a',
       html: `¿Desea asociar al usuario a la unidad ${unidad}?`,
-      showConfirmButton: true,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'NO',
-      cancelButtonColor: 'var(--bs-danger)',
     });
 
     if (!respuesta.isConfirmed) return;
@@ -122,10 +112,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       });
 
       setspinner(false);
-      Swal.fire({
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 2000,
+      AlertaExito.fire({
         html: 'Asociación realizada con éxito',
         didClose: () => {
           refrescarComponente();
@@ -133,24 +120,16 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       });
     } catch (error) {
       setspinner(false);
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         html: 'Error en asociación, verifique los datos correctamente',
       });
     }
   };
 
   const handleDelete = async (idusuario: number) => {
-    const respuesta = await Swal.fire({
-      icon: 'question',
+    const respuesta = await AlertaConfirmacion.fire({
       title: 'Eliminar Usuario/a',
       html: `¿Desea eliminar al usuario de la unidad ${unidad}?`,
-      showConfirmButton: true,
-      confirmButtonText: 'SÍ',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'NO',
-      cancelButtonColor: 'var(--bs-danger)',
     });
 
     if (!respuesta.isConfirmed) return;
@@ -160,17 +139,13 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       await eliminarUsuarioAsociado(idusuario);
       setspinner(false);
       refrescarComponente();
-      Swal.fire({
-        icon: 'success',
-        showConfirmButton: false,
-        timer: 2000,
+      AlertaExito.fire({
         html: 'Eliminación realizada con éxito',
         didClose: () => refrescarComponente(),
       });
     } catch (error) {
       setspinner(false);
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         html: 'Error en eliminación, verifique los datos correctamente',
       });
     } finally {
@@ -195,57 +170,64 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
       <div className="row">
         <Titulo manual="Manual" url="">
-          Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b>{unidad}</b> /
-          Personas Usuarias
+          Entidad Empleadora - <b>{empleadorActual?.razonsocial}</b> / Dirección y Unidades RRHH -{' '}
+          <b>{unidad}</b> / Personas Usuarias
         </Titulo>
       </div>
 
-      <div className="row mt-4">
-        <h5>Cargar Personas Usuarias</h5>
-        <sub className={styles['sub-title']}>Agregar RUN Persona Usuaria</sub>
-      </div>
-
-      <form className="row mt-3" onSubmit={onHandleSubmit}>
-        <div className="col-md-8 col-sm-12 col-xl-6">
-          <div className="row">
-            <div className="col-md-6">
-              <select
-                className="form-select js-example-basic-single"
-                data-live-search="true"
-                required
-                onChange={onChangeSelect}
-                value={formIni?.idusuario}
-                name="idusuario">
-                <option value={''}>Seleccionar</option>
-                {usuarios?.length || 0 > 0 ? (
-                  usuarios.map(({ idusuario, rutusuario, nombres }) => (
-                    <Fragment key={idusuario}>
-                      {datosPagina?.usuarioAso.find(
-                        (useraso) => useraso.usuario.idusuario === idusuario,
-                      ) ? (
-                        <Fragment key={Math.random()}></Fragment>
-                      ) : (
-                        <>
-                          <option key={Math.random()} value={idusuario} data-tokens={rutusuario}>
-                            {rutusuario} / {nombres}
-                          </option>
-                        </>
-                      )}
-                    </Fragment>
-                  ))
-                ) : (
-                  <></>
-                )}
-              </select>
-            </div>
-            <div className="col-md-6 align-self-end">
-              <button type="submit" className="btn btn-success">
-                Agregar
-              </button>
-            </div>
+      {RolUsuario == 'Administrador' && (
+        <>
+          <div className="row mt-4">
+            <h5>Cargar Personas Usuarias</h5>
+            <sub className={styles['sub-title']}>Agregar RUN Persona Usuaria</sub>
           </div>
-        </div>
-      </form>
+
+          <form className="row mt-3" onSubmit={onHandleSubmit}>
+            <div className="col-md-8 col-sm-12 col-xl-6">
+              <div className="row">
+                <div className="col-md-6">
+                  <select
+                    className="form-select js-example-basic-single"
+                    data-live-search="true"
+                    required
+                    onChange={onChangeSelect}
+                    value={formIni?.idusuario}
+                    name="idusuario">
+                    <option value={''}>Seleccionar</option>
+                    {usuarios?.length || 0 > 0 ? (
+                      usuarios.map(({ rutusuario, nombres }) => (
+                        <Fragment key={rutusuario}>
+                          {datosPagina?.usuarioAso.find(
+                            (useraso) => useraso.runusuario === rutusuario,
+                          ) ? (
+                            <Fragment key={Math.random()}></Fragment>
+                          ) : (
+                            <>
+                              <option
+                                key={Math.random()}
+                                value={rutusuario}
+                                data-tokens={rutusuario}>
+                                {rutusuario} / {nombres}
+                              </option>
+                            </>
+                          )}
+                        </Fragment>
+                      ))
+                    ) : (
+                      <></>
+                    )}
+                  </select>
+                </div>
+                <div className="col-md-6 align-self-end">
+                  <button type="submit" className="btn btn-success">
+                    Agregar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </>
+      )}
 
       <div className="row mt-3 text-center">
         <h5>Personas Usuarias</h5>
@@ -265,8 +247,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                   placeholder="...Buscar por RUN"
                   onInput={(e: ChangeEvent<HTMLInputElement>) => {
                     setusuariosAsociados(
-                      datosPagina?.usuarioAso.filter(({ usuario }) =>
-                        usuario.rutusuario.includes(e.target.value),
+                      datosPagina?.usuarioAso.filter(({ runusuario }) =>
+                        runusuario.includes(e.target.value),
                       ) || [],
                     );
                   }}

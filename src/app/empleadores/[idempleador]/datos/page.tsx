@@ -15,10 +15,11 @@ import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
+import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import { buscarActividadesLaborales } from '../../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../../(servicios)/buscar-cajas-de-compensacion';
@@ -57,6 +58,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
   const formulario = useForm<CamposFormularioEmpleador>({ mode: 'onBlur' });
 
   const regionSeleccionada = formulario.watch('regionId');
+
+  const { RolUsuario } = useRol();
 
   // Parchar fomulario
   useEffect(() => {
@@ -126,22 +129,16 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
 
       setSpinnerCargar(false);
 
-      await Swal.fire({
-        icon: 'success',
-        title: 'Entidad empleadora fue actualizada con éxito',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
+      await AlertaExito.fire({
+        html: 'Entidad empleadora fue actualizada con éxito',
       });
 
       refrescarEmpleador();
     } catch (error) {
       setSpinnerCargar(false);
 
-      Swal.fire({
-        icon: 'error',
-        title: 'Error al actualizar la entidad empleadora',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
+      AlertaError.fire({
+        html: 'Error al actualizar la entidad empleadora',
       });
     }
   };
@@ -290,9 +287,12 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
             </div>
             <div className="row mt-5">
               <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
-                <button type="submit" className="btn btn-primary">
-                  Grabar
-                </button>
+                {RolUsuario == 'Administrador' && (
+                  <button type="submit" className="btn btn-primary">
+                    Grabar
+                  </button>
+                )}
+
                 <Link className="btn btn-danger mt-2 mt-sm-0 me-0 me-sm-2" href={'/empleadores'}>
                   Volver
                 </Link>

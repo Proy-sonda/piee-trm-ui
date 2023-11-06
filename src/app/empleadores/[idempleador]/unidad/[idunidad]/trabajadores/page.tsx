@@ -7,7 +7,6 @@ import Titulo from '@/components/titulo/titulo';
 import TablaTrabajadores from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
 import {
   Trabajador,
-  Trabajadores,
   UnidadEmpleador,
 } from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(modelos)';
 import {
@@ -19,15 +18,19 @@ import {
 } from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(servicios)';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
-import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import Swal from 'sweetalert2';
 
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
+import { AuthContext } from '@/contexts';
+import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import exportFromJSON from 'export-from-json';
+import { Trabajadoresxrrhh } from '../../(modelos)/payload-unidades';
+import { useRol } from '../../../(hooks)/use-Rol';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
 
@@ -44,8 +47,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [textProgress, settextProgress] = useState('');
   const [spinnerCargar, setspinnerCargar] = useState(false);
   const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
-  const [trabajadores, settrabajadores] = useState<Trabajadores[]>([]);
+  const [trabajadores, settrabajadores] = useState<Trabajadoresunidadrrhh[]>([]);
   const [razon, setRazon] = useState('');
+  const { RolUsuario } = useRol();
+  const { empleadorActual } = useEmpleadorActual();
   const [csvData, setCsvData] = useState<any[]>([]);
   let [loading, setLoading] = useState(false);
   const [error, seterror] = useState({
@@ -70,7 +75,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      trabajadores: buscarTrabajadoresDeUnidad(Number(idunidad)),
+      trabajadores: buscarTrabajadoresDeUnidad(idunidad, empleadorActual!?.rutempleador),
       empleador: buscarEmpleadorPorId(Number(idempleador)),
     },
     [refresh],
@@ -112,21 +117,31 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const handleClose = () => setshow(false);
 
-  const handleDeleteTrabajador = (idtrabajador: number, rut: string) => {
+  const handleDeleteTrabajador = (trabajadores: Trabajadoresunidadrrhh) => {
     const EliminarTrabajador = async () => {
-      const data = await eliminarTrabajador(idtrabajador);
+      const TrabajadorAEliminar: Trabajadoresxrrhh = {
+        acciontraxrrhh: 3,
+        codigounidadrrhh: trabajadores.codigounidadrrhh,
+        runtrabajador: trabajadores.runtrabajador,
+      };
+      if (empleadorActual == undefined || usuario == undefined) return;
+      const data = await eliminarTrabajador(
+        TrabajadorAEliminar,
+        usuario?.rut,
+        empleadorActual?.rutempleador,
+      );
 
       if (data.ok) {
         refrescarComponente();
 
         return AlertaExito.fire({
-          html: `Persona trabajadora ${rut} fue eliminada con éxito`,
+          html: `Persona trabajadora ${trabajadores.runtrabajador} fue eliminada con éxito`,
         });
       }
       AlertaError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
     };
     AlertaConfirmacion.fire({
-      html: `¿Desea eliminar a la persona trabajadora <b>${rut}</b>?`,
+      html: `¿Desea eliminar a la persona trabajadora <b>${trabajadores.runtrabajador}</b>?`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
     });
@@ -172,7 +187,19 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     for (let index = 0; index < datosPagina!?.trabajadores.length; index++) {
       const element = datosPagina?.trabajadores[index];
-      const resp = await eliminarTrabajador(element!?.idtrabajador);
+      if (element == undefined) return;
+      const TrabajadorAEliminar: Trabajadoresxrrhh = {
+        acciontraxrrhh: 3,
+        codigounidadrrhh: element.codigounidadrrhh,
+        runtrabajador: element.runtrabajador,
+      };
+      if (empleadorActual == undefined || usuario == undefined) return;
+
+      const resp = await eliminarTrabajador(
+        TrabajadorAEliminar,
+        usuario?.rut,
+        empleadorActual?.rutempleador,
+      );
       if (resp.ok) {
         recuento = ++recuento;
         setcuentagrabados((recuento / datosPagina!?.trabajadores.length) * 100);
@@ -201,17 +228,21 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
   };
 
+  const { usuario } = useContext(AuthContext);
+
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
     if (error.run) return;
 
     const crearTrabajadorAux = async () => {
-      const data = await crearTrabajador({
-        ruttrabajador: getValues('run'),
-        unidad: {
-          idunidad: Number(idunidad),
-        },
-      });
+      const trabajador: Trabajadoresxrrhh = {
+        acciontraxrrhh: 1,
+        codigounidadrrhh: idunidad,
+        runtrabajador: getValues('run'),
+      };
+
+      if (empleadorActual == undefined || usuario == undefined) return;
+      const data = await crearTrabajador(trabajador, empleadorActual?.rutempleador, usuario?.rut);
 
       if (data.ok) {
         AlertaExito.fire({ html: 'Persona trabajadora agregada correctamente' });
@@ -277,12 +308,14 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       const element = csvData[index];
       recuento = ++recuento;
       if (element.trim() != '') {
-        const data = await crearTrabajador({
-          ruttrabajador: formatRut(element, false),
-          unidad: {
-            idunidad: Number(idunidad),
-          },
-        });
+        const trabajador: Trabajadoresxrrhh = {
+          acciontraxrrhh: 1,
+          codigounidadrrhh: idunidad,
+          runtrabajador: formatRut(element, false),
+        };
+
+        if (empleadorActual == undefined || usuario == undefined) return;
+        const data = await crearTrabajador(trabajador, usuario.rut, empleadorActual.rutempleador);
         if (data.ok) {
           setcuentagrabados((recuento / csvData.length) * 100);
         } else {
@@ -323,10 +356,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     } else {
       refrescarComponente();
       setspinnerCargar(false);
-      Swal.fire({
+      AlertaError.fire({
         icon: 'info',
         html: 'Las personas trabajadoras ya se encuentran registrados',
-        confirmButtonColor: 'var(--color-blue)',
         didClose: () => {
           settextProgress('');
           setValue('file', null);
@@ -348,212 +380,218 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           </Titulo>
         </div>
 
-        <div className="row mt-4">
-          <div className="col-md-12 col-xs-12 col-lg-5">
-            <h5>Cargar Personas Trabajadoras</h5>
-            <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
-            <br />
-            <br />
+        {RolUsuario == 'Administrador' && (
+          <div className="row mt-4">
+            <div className="col-md-12 col-xs-12 col-lg-5">
+              <h5>Cargar Personas Trabajadoras</h5>
+              <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
+              <br />
+              <br />
 
-            <form onSubmit={handleAddTrabajador}>
-              <div className="row mt-1">
-                <div className="col-md-8 position-relative">
+              <form onSubmit={handleAddTrabajador}>
+                <div className="row mt-1">
+                  <div className="col-md-8 position-relative">
+                    <input
+                      id="run"
+                      type="text"
+                      className={error.run ? 'form-control is-invalid' : 'form-control'}
+                      minLength={4}
+                      maxLength={11}
+                      {...register('run', {
+                        required: {
+                          value: true,
+                          message: 'Este campo es obligatorio',
+                        },
+                        onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                          if (event.target.value.trim() == '') {
+                            return seterror({ ...error, run: false });
+                          }
+                          if (Number(event.target.value.split('-')[0]) > 50000000)
+                            return seterror({ ...error, run: true });
+                          const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
+                          let rut = event.target.value as string;
+
+                          if (regex.test(rut)) {
+                            rut = rut.replaceAll(regex, '');
+                          }
+
+                          seterror({ ...error, run: !validateRut(formatRut(rut)) });
+
+                          setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
+                        },
+                        onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                          if (event.target.value.trim() == '') {
+                            return seterror({ ...error, run: false });
+                          }
+                          if (Number(event.target.value.split('-')[0]) > 50000000)
+                            return seterror({ ...error, run: true });
+                          const rut = event.target.value as string;
+
+                          seterror({ ...error, run: !validateRut(formatRut(rut)) });
+
+                          setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
+                        },
+                      })}
+                    />
+                    <IfContainer show={error.run}>
+                      <div className="invalid-tooltip">Debe ingresar un RUN valido</div>
+                    </IfContainer>
+                  </div>
+                  <div className="d-block d-sm-none d-md-none d-xs-block">
+                    <div className="col-md-12">
+                      <br />
+                    </div>
+                  </div>
+                  <div
+                    className="col-md-4"
+                    style={{
+                      alignSelf: 'end',
+                    }}>
+                    <div className="d-grid gap-2 d-md-flex">
+                      <button type="submit" className="btn btn-success">
+                        Agregar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div className="d-block d-sm-none d-md-none">
+              <div className="col-md-12">
+                <br />
+              </div>
+            </div>
+
+            <div className="d-none d-md-inline d-lg-none col-md-12">
+              <div className="col-md-12">
+                <br />
+              </div>
+            </div>
+
+            <div className="col-md-12 col-xs-12 col-lg-7">
+              <h5>Cargar Nómina</h5>
+              <sub className="d-inline d-sm-none d-xl-inline">
+                Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo tiene
+                que seleccionar un archivo (formato CSV) según el{' '}
+                <a
+                  className={styles['span-link']}
+                  download="formato.csv"
+                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                  siguiente formato
+                </a>
+              </sub>
+              <sub className="d-none d-sm-inline d-xl-none">
+                Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
+                <a
+                  className={styles['span-link']}
+                  download="formato.csv"
+                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                  siguiente formato
+                </a>
+              </sub>
+              <div className="row mt-4">
+                <div className="col-md-6 position-relative">
                   <input
-                    id="run"
-                    type="text"
-                    className={error.run ? 'form-control is-invalid' : 'form-control'}
-                    minLength={4}
-                    maxLength={11}
-                    {...register('run', {
-                      required: {
-                        value: true,
-                        message: 'Este campo es obligatorio',
-                      },
+                    type="file"
+                    accept=".csv"
+                    className={error.file ? 'form-control is-invalid' : 'form-control'}
+                    {...register('file', {
                       onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                        if (event.target.value.trim() == '') {
-                          return seterror({ ...error, run: false });
+                        if (event.target.files?.length == 0) return setValue('file', null);
+                        if (!event.target.files) setValue('file', event.target.files);
+                        if (!getValues('file')![0].name.includes('csv')) {
+                          seterror({ ...error, file: true });
+                        } else {
+                          seterror({ ...error, file: false });
+                          const file = event.target.files![0];
+                          const reader = new FileReader();
+                          reader.onload = (e: any) => {
+                            const content = e.target.result.trim();
+                            const lines = content.split('\n');
+                            setCsvData(lines);
+                          };
+
+                          reader.readAsText(file);
                         }
-                        if (Number(event.target.value.split('-')[0]) > 50000000)
-                          return seterror({ ...error, run: true });
-                        const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
-                        let rut = event.target.value as string;
-
-                        if (regex.test(rut)) {
-                          rut = rut.replaceAll(regex, '');
-                        }
-
-                        seterror({ ...error, run: !validateRut(formatRut(rut)) });
-
-                        setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
                       },
                       onBlur: (event: ChangeEvent<HTMLInputElement>) => {
-                        if (event.target.value.trim() == '') {
-                          return seterror({ ...error, run: false });
+                        if (event.target.files?.length == 0) return setValue('file', null);
+                        if (!event.target.files) setValue('file', event.target.files);
+                        if (!getValues('file')![0].name.includes('csv')) {
+                          seterror({ ...error, file: true });
+                        } else {
+                          seterror({ ...error, file: false });
+                          const file = event.target.files![0];
+                          const reader = new FileReader();
+                          reader.onload = (e: any) => {
+                            const content = e.target.result.trim();
+                            const lines = content.split('\n');
+                            setCsvData(lines);
+                          };
+
+                          reader.readAsText(file);
                         }
-                        if (Number(event.target.value.split('-')[0]) > 50000000)
-                          return seterror({ ...error, run: true });
-                        const rut = event.target.value as string;
-
-                        seterror({ ...error, run: !validateRut(formatRut(rut)) });
-
-                        setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
                       },
                     })}
                   />
-                  <IfContainer show={error.run}>
-                    <div className="invalid-tooltip">Debe ingresar un RUN valido</div>
+                  <IfContainer show={error.file}>
+                    <div className="invalid-tooltip">Debe ingresar un archivo con formato .csv</div>
                   </IfContainer>
                 </div>
-                <div className="d-block d-sm-none d-md-none d-xs-block">
+                <div className="d-block d-sm-none d-md-none">
                   <div className="col-md-12">
                     <br />
                   </div>
                 </div>
-                <div
-                  className="col-md-4"
-                  style={{
-                    alignSelf: 'end',
-                  }}>
+                <div className="col-md-6 col-xs-6">
                   <div className="d-grid gap-2 d-md-flex">
-                    <button type="submit" className="btn btn-success">
-                      Agregar
+                    <button
+                      disabled={
+                        getValues('file')?.length === 0 || !getValues('file') ? true : false
+                      }
+                      className="btn btn-success"
+                      onClick={handleClickNomina}>
+                      Cargar
+                    </button>
+                    <button
+                      disabled={
+                        getValues('file')?.length === 0 || getValues('file') === null ? true : false
+                      }
+                      className="btn btn-primary"
+                      onClick={async () => {
+                        if (!getValues('file')) return;
+                        const resp = await AlertaConfirmacion.fire({
+                          html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name}</b>?`,
+                        });
+                        if (resp.isConfirmed) {
+                          setValue('file', null);
+                          refrescarComponente();
+                        }
+                      }}>
+                      Limpiar
                     </button>
                   </div>
                 </div>
               </div>
-            </form>
-          </div>
-          <div className="d-block d-sm-none d-md-none">
-            <div className="col-md-12">
-              <br />
             </div>
           </div>
-
-          <div className="d-none d-md-inline d-lg-none col-md-12">
-            <div className="col-md-12">
-              <br />
-            </div>
-          </div>
-
-          <div className="col-md-12 col-xs-12 col-lg-7">
-            <h5>Cargar Nómina</h5>
-            <sub className="d-inline d-sm-none d-xl-inline">
-              Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo tiene
-              que seleccionar un archivo (formato CSV) según el{' '}
-              <a
-                className={styles['span-link']}
-                download="formato.csv"
-                href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                siguiente formato
-              </a>
-            </sub>
-            <sub className="d-none d-sm-inline d-xl-none">
-              Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
-              <a
-                className={styles['span-link']}
-                download="formato.csv"
-                href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                siguiente formato
-              </a>
-            </sub>
-            <div className="row mt-4">
-              <div className="col-md-6 position-relative">
-                <input
-                  type="file"
-                  accept=".csv"
-                  className={error.file ? 'form-control is-invalid' : 'form-control'}
-                  {...register('file', {
-                    onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                      if (event.target.files?.length == 0) return setValue('file', null);
-                      if (!event.target.files) setValue('file', event.target.files);
-                      if (!getValues('file')![0].name.includes('csv')) {
-                        seterror({ ...error, file: true });
-                      } else {
-                        seterror({ ...error, file: false });
-                        const file = event.target.files![0];
-                        const reader = new FileReader();
-                        reader.onload = (e: any) => {
-                          const content = e.target.result.trim();
-                          const lines = content.split('\n');
-                          setCsvData(lines);
-                        };
-
-                        reader.readAsText(file);
-                      }
-                    },
-                    onBlur: (event: ChangeEvent<HTMLInputElement>) => {
-                      if (event.target.files?.length == 0) return setValue('file', null);
-                      if (!event.target.files) setValue('file', event.target.files);
-                      if (!getValues('file')![0].name.includes('csv')) {
-                        seterror({ ...error, file: true });
-                      } else {
-                        seterror({ ...error, file: false });
-                        const file = event.target.files![0];
-                        const reader = new FileReader();
-                        reader.onload = (e: any) => {
-                          const content = e.target.result.trim();
-                          const lines = content.split('\n');
-                          setCsvData(lines);
-                        };
-
-                        reader.readAsText(file);
-                      }
-                    },
-                  })}
-                />
-                <IfContainer show={error.file}>
-                  <div className="invalid-tooltip">Debe ingresar un archivo con formato .csv</div>
-                </IfContainer>
-              </div>
-              <div className="d-block d-sm-none d-md-none">
-                <div className="col-md-12">
-                  <br />
-                </div>
-              </div>
-              <div className="col-md-6 col-xs-6">
-                <div className="d-grid gap-2 d-md-flex">
-                  <button
-                    disabled={getValues('file')?.length === 0 || !getValues('file') ? true : false}
-                    className="btn btn-success"
-                    onClick={handleClickNomina}>
-                    Cargar
-                  </button>
-                  <button
-                    disabled={
-                      getValues('file')?.length === 0 || getValues('file') === null ? true : false
-                    }
-                    className="btn btn-primary"
-                    onClick={async () => {
-                      if (!getValues('file')) return;
-                      const resp = await AlertaConfirmacion.fire({
-                        html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name}</b>?`,
-                      });
-                      if (resp.isConfirmed) {
-                        setValue('file', null);
-                        refrescarComponente();
-                      }
-                    }}>
-                    Limpiar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
 
         <div className="row mt-5">
           <div className="col-md-12">
             <div className="row">
               <h5 className="text-center">Personas Trabajadoras</h5>
-              <span
-                className="text-end animate animate__fadeIn"
-                style={{
-                  display: datosPagina!?.trabajadores.length > 1 ? 'block' : 'none',
-                }}>
-                <button className="btn btn-danger btn-sm" onClick={handleDeleteAll}>
-                  Borrar todo
-                </button>
-              </span>
+              {RolUsuario == 'Administrador' && (
+                <span
+                  className="text-end animate animate__fadeIn"
+                  style={{
+                    display: datosPagina!?.trabajadores.length > 1 ? 'block' : 'none',
+                  }}>
+                  <button className="btn btn-danger btn-sm" onClick={handleDeleteAll}>
+                    Borrar todo
+                  </button>
+                </span>
+              )}
             </div>
 
             <hr />
@@ -575,14 +613,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       e.preventDefault();
                       settrabajadores(
                         datosPagina?.trabajadores.filter((trabajador) =>
-                          trabajador.ruttrabajador.includes(e.target.value.toUpperCase()),
-                        ) ||
-                          datosPagina?.trabajadores.filter((trabajador) =>
-                            trabajador.fechaafiliacion
-                              .toString()
-                              .includes(e.target.value.toUpperCase()),
-                          ) ||
-                          [],
+                          trabajador.runtrabajador.includes(e.target.value.toUpperCase()),
+                        ) || [],
                       );
                     }}
                   />

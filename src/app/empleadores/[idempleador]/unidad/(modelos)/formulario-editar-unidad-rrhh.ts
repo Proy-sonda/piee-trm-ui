@@ -9,4 +9,5 @@ export interface FormularioEditarUnidadRRHH {
   telefono: string;
   email: string;
   emailConfirma: string;
+  tipocalle: number;
 }

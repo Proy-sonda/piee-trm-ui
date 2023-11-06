@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Collapse, Container, Offcanvas, Row, Stack } from 'react-bootstrap';
 import { useEmpleadorActual } from '../(contexts)/empleador-actual-context';
+import { EmpleadorPorUsuarioProvider } from './(contexts)/empleadores-por-usuario';
 import styles from './layout.module.css';
 
 interface LinkNavegacion {
@@ -47,7 +48,7 @@ export default function LayoutProps({ children, params: { idempleador } }: Layou
   };
 
   return (
-    <>
+    <EmpleadorPorUsuarioProvider>
       {/* MENU DE ESCRITORIO */}
       <div className="w-100 d-none d-lg-flex">
         <div
@@ -120,6 +121,6 @@ export default function LayoutProps({ children, params: { idempleador } }: Layou
           </Offcanvas.Body>
         </Offcanvas>
       </Container>
-    </>
+    </EmpleadorPorUsuarioProvider>
   );
 }

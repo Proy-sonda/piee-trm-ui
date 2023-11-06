@@ -27,8 +27,9 @@ import { buscarOcupacion } from '../(servicios)/buscar-ocupacion';
 import { buscarRegiones } from '../(servicios)/buscar-regiones';
 import { buscarCalle } from '../(servicios)/tipo-calle';
 
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import format from 'date-fns/format';
-import Swal from 'sweetalert2';
+import BotonesNavegacion from '../(componentes)/botones-navegacion';
 import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
@@ -216,15 +217,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   );
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
-    if (!(await formulario.trigger())) {
-      Swal.fire({
-        icon: 'error',
+    if (!(await formulario.trigger()))
+      return AlertaError.fire({
         title: 'Hay campos inválidos',
-        text: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
-      return;
-    }
 
     const guardadoExitoso = await GuardarZ0Z1();
     if (!guardadoExitoso) {
@@ -255,10 +252,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       licencia?.LMEZONAC2.codigoseguroafc == 1 &&
       formulario.getValues('ocupacion') == '18'
     ) {
-      Swal.fire({
+      AlertaError.fire({
         icon: 'info',
         html: '<b>Persona trabajadora de casa particular</b> no puede pertenecer a AFC, favor verificar <b>"Previsión persona trabajadora"</b>',
-        confirmButtonColor: 'var(--color-blue)',
       });
       return false;
     }
@@ -323,11 +319,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
           break;
 
         case 'guardar':
-          Swal.fire({
-            icon: 'success',
+          AlertaExito.fire({
             html: 'Se ha guardado con éxito',
-            timer: 2000,
-            showConfirmButton: false,
           });
           break;
       }
@@ -336,26 +329,16 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     } catch (error) {
       if (error instanceof ErrorCrearLicencia) {
         respuesta = false;
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Existe un problema al guardar los datos',
-          showConfirmButton: true,
-          confirmButtonColor: 'var(--color-blue)',
-          confirmButtonText: 'OK',
+        AlertaError.fire({
+          html: 'Existe un problema al guardar los datos',
         });
-
         return respuesta;
       }
 
       if (error instanceof ErrorCrearLicenciaC1) {
         respuesta = false;
-        Swal.fire({
-          icon: 'error',
-          title: 'Existe un problema al guardar los datos',
-          showConfirmButton: true,
-          confirmButtonColor: 'var(--color-blue)',
-          confirmButtonText: 'OK',
+        AlertaError.fire({
+          html: 'Existe un problema al guardar los datos',
         });
 
         return respuesta;
@@ -544,32 +527,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   </div>
                 </IfContainer>
               </div>
-              <div className="row">
-                <div className="d-nne d-md-none col-lg-6 d-lg-inline"></div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <a className="btn btn-danger" href="/tramitacion">
-                    Tramitación
-                  </a>
-                </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-success"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'guardar')}>
-                    Guardar
-                  </button>
-                </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'siguiente')}>
-                    Siguiente
-                  </button>
-                </div>
-              </div>
+
+              <BotonesNavegacion formulario={formulario} />
             </form>
           </FormProvider>
         </div>

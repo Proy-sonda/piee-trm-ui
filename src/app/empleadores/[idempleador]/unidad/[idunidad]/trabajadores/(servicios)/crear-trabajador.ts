@@ -1,15 +1,26 @@
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl } from '@/servicios/environment';
-import { DatosNuevoTrabajador } from '../(modelos)/datos-nuevo-trabajador';
+import { urlBackendTramitacion } from '@/servicios/environment';
 
-export const crearTrabajador = async (trabajador: DatosNuevoTrabajador) => {
-  const data = await fetch(`${apiUrl()}/trabajador/create`, {
-    method: 'POST',
+import { EmpleadorUnidad, Trabajadoresxrrhh } from '../../../(modelos)/payload-unidades';
+
+export const crearTrabajador = async (
+  trabajadoresxrrhh: Trabajadoresxrrhh,
+  RunUsuario: string,
+  RutEmpleador: string,
+) => {
+  trabajadoresxrrhh.acciontraxrrhh = 1;
+  const payload: EmpleadorUnidad = {
+    RunUsuario,
+    RutEmpleador,
+    trabajadoresxrrhh,
+  };
+  const data = await fetch(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {
+    method: 'PUT',
     headers: {
       Authorization: obtenerToken(),
       'Content-type': 'application/json',
     },
-    body: JSON.stringify(trabajador),
+    body: JSON.stringify(payload),
   });
 
   return data;

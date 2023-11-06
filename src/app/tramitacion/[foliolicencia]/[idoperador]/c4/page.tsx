@@ -6,12 +6,13 @@ import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
+import BotonesNavegacion from '../(componentes)/botones-navegacion';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
 import {
@@ -174,25 +175,17 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
     const licenciasInformadas = obtenerLicenciasInformadas(datos);
 
-    if (!(await formulario.trigger())) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Hay campos inválidos',
-        text: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
-        confirmButtonColor: 'var(--color-blue)',
+    if (!(await formulario.trigger()))
+      return AlertaError.fire({
+        title: 'Campos Inválidos',
+        html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
-      return;
-    }
 
-    if (!validarQueFilasEstenCompletas(datos)) {
-      Swal.fire({
-        icon: 'error',
+    if (!validarQueFilasEstenCompletas(datos))
+      return AlertaError.fire({
         title: 'Filas Incompletas',
-        text: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
       });
-      return;
-    }
 
     const datosLimpios: FormularioC4 = {
       ...datos,
@@ -237,11 +230,8 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
     refrescarZona4();
 
-    Swal.fire({
-      icon: 'success',
+    AlertaExito.fire({
       html: 'Cambios guardados con éxito',
-      showConfirmButton: false,
-      timer: 2000,
     });
   };
 
@@ -273,13 +263,10 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         idOperador: idOperadorNumber,
       });
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         title: 'Error',
-        text: 'No se pudieron guardar los cambios',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'No se pudieron guardar los cambios',
       });
-
       return false;
     } finally {
       setMostrarSpinner(false);
@@ -322,20 +309,14 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
       await tramitarLicenciaMedica(foliolicencia, idOperadorNumber);
 
-      Swal.fire({
-        icon: 'success',
+      AlertaExito.fire({
         html: 'Licencia tramitada con éxito',
-        showConfirmButton: false,
-        timer: 2000,
       });
-
       router.push('/tramitacion');
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         title: 'Error',
-        text: 'No se pudo tramitar la licencia',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'No se pudo tramitar la licencia',
       });
     } finally {
       setMostrarSpinner(false);
@@ -511,41 +492,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
               </Col>
             </Row>
 
-            <div className="row">
-              <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'anterior')}>
-                  Anterior
-                </button>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <a className="btn btn-danger" href="/tramitacion">
-                  Tramitación
-                </a>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-success"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'guardar')}>
-                  Guardar
-                </button>
-              </div>
-              <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  {...formulario.register('accion')}
-                  onClick={() => formulario.setValue('accion', 'tramitar')}>
-                  Tramitar
-                </button>
-              </div>
-            </div>
+            <BotonesNavegacion formulario={formulario} anterior finaliza />
           </form>
         </FormProvider>
       </IfContainer>

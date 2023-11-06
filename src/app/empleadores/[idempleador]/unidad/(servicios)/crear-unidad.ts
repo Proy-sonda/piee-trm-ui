@@ -1,34 +1,19 @@
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl } from '@/servicios/environment';
+import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { CrearUnidadRRHHRequest } from '../(modelos)/crear-unidad-rrhh-request';
 
-export const crearUnidad = (request: CrearUnidadRRHHRequest) => {
-  const payload = {
-    unidad: request.nombre,
-    identificador: request.identificadorUnico,
-    email: request.email,
-    telefono: request.telefono,
-    direccionunidad: {
-      calle: request.calle,
-      comuna: {
-        idcomuna: request.comunaId,
-        nombre: ' ',
-      },
-      depto: request.departamento,
-      numero: request.numero,
-    },
-    estadounidadrrhh: {
-      idestadounidadrrhh: 1,
-      descripcion: 'SUSCRITO',
-    },
-    empleador: {
-      idempleador: request.empleadorId,
-    },
+import { EmpleadorUnidad, Unidadesrrhh } from '../(modelos)/payload-unidades';
+
+export const crearUnidad = (request: Unidadesrrhh, rutEmpleador: string, runUsuario: string) => {
+  request.accionrrhh = 1;
+  const payload: EmpleadorUnidad = {
+    RunUsuario: runUsuario,
+    RutEmpleador: rutEmpleador,
+    unidadesrrhh: request,
   };
 
-  return runFetchConThrow<void>(`${apiUrl()}/unidad/create`, {
-    method: 'POST',
+  return runFetchConThrow<void>(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {
+    method: 'PUT',
     headers: {
       Authorization: obtenerToken(),
       'Content-type': 'application/json',

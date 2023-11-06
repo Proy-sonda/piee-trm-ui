@@ -9,6 +9,7 @@ import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Nav } from 'react-bootstrap';
+import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
@@ -31,11 +32,13 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
 
   const [tabOperador, setTabOperador] = useState<TipoOperador>(tabOperadorQuery);
 
-  const [idunidad, setIdUnidad] = useState<number | undefined>(undefined);
+  const [idunidad, setIdUnidad] = useState<string | undefined>(undefined);
 
   const [abrirModalCrearUnidad, setAbrirModalCrearUnidad] = useState(false);
 
   const [abrirModalEditarUnidad, setAbrirModalEditarUnidad] = useState(false);
+
+  const { RolUsuario } = useRol();
 
   const { empleadorActual } = useEmpleadorActual();
 
@@ -68,14 +71,16 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
         </Nav.Link>
       </Nav>
 
-      <div className="mt-3 d-flex justify-content-end">
-        <button
-          className="btn btn-success btn-sm"
-          disabled={cargandoUnidades || !!errorCargarUnidad}
-          onClick={() => setAbrirModalCrearUnidad(true)}>
-          + Agregar Unidad RRHH
-        </button>
-      </div>
+      {RolUsuario == 'Administrador' && (
+        <div className="mt-3 d-flex justify-content-end">
+          <button
+            className="btn btn-success btn-sm"
+            disabled={cargandoUnidades || !!errorCargarUnidad}
+            onClick={() => setAbrirModalCrearUnidad(true)}>
+            + Agregar Unidad RRHH
+          </button>
+        </div>
+      )}
 
       <div className="row mt-2">
         <div className="col-md-12">
@@ -93,8 +98,8 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
             <TablaUnidades
               idempleador={idEmpleadorNumber}
               unidades={unidades ?? []}
-              onEditarUnidad={({ idunidad }) => {
-                setIdUnidad(idunidad);
+              onEditarUnidad={({ codigounidadrrhh }) => {
+                setIdUnidad(codigounidadrrhh);
                 setAbrirModalEditarUnidad(true);
               }}
               onUnidadEliminada={() => refrescarUnidades()}

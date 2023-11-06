@@ -1,14 +1,17 @@
 import Paginacion from '@/components/paginacion';
+import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
+import { Usuariosunidad } from '@/modelos/tramitacion';
+import { useContext } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { UsuarioEmpleador } from '../(modelos)/usuario-asociado';
 
 type props = {
-  usuarioAsociado: UsuarioEmpleador[];
+  usuarioAsociado: Usuariosunidad[];
   handleDelete: (idusuario: number) => void;
 };
 
 export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handleDelete }) => {
+  const { usuario } = useContext(AuthContext);
   const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: usuarioAsociado,
     tamanoPagina: 5,
@@ -20,42 +23,34 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
         <Thead>
           <Tr>
             <Th>Run</Th>
-            <Th>Nombre</Th>
-            <Th>Apellido</Th>
-            <Th>Correo</Th>
-            <Th>Acciones</Th>
+            {usuario?.tieneRol('admin') && <Th>Acciones</Th>}
           </Tr>
         </Thead>
         <Tbody>
           {usuariosPaginados.length || 0 > 0 ? (
-            usuariosPaginados.map(
-              ({ usuario: { rutusuario, nombres, apellidos, email }, idusuarioempleador }) => (
-                <Tr key={rutusuario}>
-                  <Td>{rutusuario}</Td>
-                  <Td>{nombres}</Td>
-                  <Td>{apellidos}</Td>
-                  <Td>{email}</Td>
+            usuariosPaginados.map(({ runusuario, rolusuario }) => (
+              <Tr key={runusuario}>
+                <Td>{runusuario}</Td>
+
+                {usuario?.tieneRol('admin') && (
                   <Td>
                     <button
-                      title={`Eliminar ${rutusuario}`}
+                      // title={`Eliminar ${rutusuario}`}
                       onClick={(e) => {
                         e.preventDefault();
-                        handleDelete(idusuarioempleador);
+                        // handleDelete(idusuarioempleador);
                       }}
                       className="btn btn-danger btn-sm">
                       <i className="bi bi-trash3"></i>
                     </button>
                   </Td>
-                </Tr>
-              ),
-            )
+                )}
+              </Tr>
+            ))
           ) : (
             <Tr>
               <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
+              {usuario?.tieneRol('admin') && <Td>-</Td>}
             </Tr>
           )}
         </Tbody>

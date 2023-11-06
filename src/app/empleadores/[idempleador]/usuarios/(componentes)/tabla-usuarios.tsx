@@ -6,12 +6,13 @@ import { useWindowSize } from '@/hooks/use-window-size';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { Dropdown, DropdownButton } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 import { eliminarUsuario } from '../(servicios)/eliminar-usuario';
 import { recuperarContrasena } from '../(servicios)/recuperar-clave';
+import { useRol } from '../../(hooks)/use-Rol';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
@@ -25,6 +26,8 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   onUsuarioEliminado,
 }) => {
   const { usuario, logout } = useContext(AuthContext);
+
+  const { RolUsuario } = useRol();
 
   const router = useRouter();
 
@@ -123,19 +126,23 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
             </IfContainer>
             <Th>Rol</Th>
             <Th>Estado</Th>
-            <Th></Th>
+            {RolUsuario == 'Administrador' && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
             <Tr key={usuario.idusuario}>
               <Td>
-                <span
-                  className="text-primary cursor-pointer"
-                  title="Editar persona usuaria"
-                  onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                  {usuario.rutusuario}
-                </span>
+                {RolUsuario == 'Administrador' ? (
+                  <span
+                    className="text-primary cursor-pointer"
+                    title="Editar persona usuaria"
+                    onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                    {usuario.rutusuario}
+                  </span>
+                ) : (
+                  <>{usuario.rutusuario}</>
+                )}
               </Td>
               <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
               <IfContainer show={noEsTablet()}>
@@ -148,42 +155,44 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 </select>
               </Td>
               <Td>{usuario.estadousuario.descripcion}</Td>
-              <Td>
-                <div className="d-none d-lg-inline-block">
-                  <button
-                    className="btn text-primary"
-                    title="Editar usuario"
-                    onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                    <i className="bi bi-pencil-square"></i>
-                  </button>
-                  <button
-                    className="btn text-primary"
-                    title="Eliminar persona usuaria"
-                    onClick={() => handleEliminarUsuario(usuario)}>
-                    <i className="bi bi-trash3"></i>
-                  </button>
-                  <button
-                    className="btn text-primary"
-                    title="Restablecer clave"
-                    onClick={() => reenviarContrasena(usuario)}>
-                    <i className="bi bi-key"></i>
-                  </button>
-                </div>
+              {RolUsuario == 'Administrador' && (
+                <Td>
+                  <div className="d-none d-lg-inline-block">
+                    <button
+                      className="btn text-primary"
+                      title="Editar usuario"
+                      onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+                    <button
+                      className="btn text-primary"
+                      title="Eliminar persona usuaria"
+                      onClick={() => handleEliminarUsuario(usuario)}>
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                    <button
+                      className="btn text-primary"
+                      title="Restablecer clave"
+                      onClick={() => reenviarContrasena(usuario)}>
+                      <i className="bi bi-key"></i>
+                    </button>
+                  </div>
 
-                <div className="d-lg-none">
-                  <DropdownButton title="Acciones" size="sm" variant="success">
-                    <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                      Editar persona usuaria
-                    </Dropdown.Item>
-                    <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
-                      Eliminar persona usuaria
-                    </Dropdown.Item>
-                    <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
-                      Restablecer clave
-                    </Dropdown.Item>
-                  </DropdownButton>
-                </div>
-              </Td>
+                  <div className="d-lg-none">
+                    <DropdownButton title="Acciones" size="sm" variant="success">
+                      <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                        Editar persona usuaria
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
+                        Eliminar persona usuaria
+                      </Dropdown.Item>
+                      <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
+                        Restablecer clave
+                      </Dropdown.Item>
+                    </DropdownButton>
+                  </div>
+                </Td>
+              )}
             </Tr>
           ))}
         </Tbody>

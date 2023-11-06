@@ -22,11 +22,12 @@ export const InputIdentificadorUnidadRRHH: React.FC<InputIdentificadorUnidadRRHH
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label} (*)`}</Form.Label>
+        <Form.Label>{`${label}`}</Form.Label>
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
           isInvalid={!!errors[name]}
+          disabled
           {...register(name, {
             required: {
               value: true,

@@ -1,19 +1,41 @@
+import { PayloadTramitacion } from '@/modelos/payload-tramitacion';
+import { DatoEmpleadorUnidad, Unidadesrrhh } from '@/modelos/tramitacion';
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl } from '@/servicios/environment';
+import { apiUrl, urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
-import { UnidadRRHH } from '../(modelos)/unidad-rrhh';
 
-export const buscarUnidadPorId = (idUnidad: number) => {
-  return runFetchAbortable<UnidadRRHH>(`${apiUrl()}/unidad/idunidad`, {
-    method: 'POST',
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
+export const buscarUnidadPorId = (
+  idUnidad: string,
+): [() => Promise<Unidadesrrhh | undefined>, () => void] => {
+  const payLoad: PayloadTramitacion = {
+    Accion: 2,
+    RunTrabajador: '',
+    CodigoUnidadRRHH: idUnidad,
+    RunUsuario: '',
+    RutEmpleador: '',
+  };
+  const [resp, abort] = runFetchAbortable<DatoEmpleadorUnidad>(
+    `${urlBackendTramitacion()}/operadores/all/obtieneempleadorrrhhusu`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: obtenerToken(),
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(payLoad),
     },
-    body: JSON.stringify({
-      idunidad: idUnidad,
-    }),
-  });
+  );
+
+  const buscarUnidadCodigo = async () => {
+    const Unidad: Unidadesrrhh | undefined = (await resp())!?.unidadesrrhh.find(
+      (value) => value.codigounidadrrhh == idUnidad,
+    );
+    console.log(Unidad);
+
+    return Unidad;
+  };
+
+  return [buscarUnidadCodigo, abort];
 };
 
 /**

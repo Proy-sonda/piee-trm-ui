@@ -1,3 +1,4 @@
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { buscarComunas } from '@/app/empleadores/(servicios)/buscar-comunas';
 import { buscarRegiones } from '@/app/empleadores/(servicios)/buscar-regiones';
 import {
@@ -5,20 +6,20 @@ import {
   ComboSimple,
   InputBlockDepartamento,
   InputCalle,
-  InputEmail,
   InputNumero,
   InputTelefono,
 } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { FormularioCrearUnidadRRHH } from '../(modelos)/formulario-crear-unidad-rrhh';
+import { Unidadesrrhh } from '../(modelos)/payload-unidades';
 import { crearUnidad } from '../(servicios)/crear-unidad';
-import { InputIdentificadorUnidadRRHH } from './input-identificador-unidad-rrhh';
+import { buscarCalle } from '../../../../tramitacion/[foliolicencia]/[idoperador]/(servicios)/tipo-calle';
 import { InputNombreUnidadRRHH } from './input-nombre-unidad-rrhh';
 
 interface ModalNuevaUnidadProps {
@@ -35,17 +36,20 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
   onNuevaUnidadCreada,
 }) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const { empleadorActual } = useEmpleadorActual();
+  const { usuario } = useContext(AuthContext);
 
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     CCREGION: buscarRegiones(),
     CCCOMUNA: buscarComunas(),
+    CCTIPOCALLE: buscarCalle(),
   });
 
-  const formulario = useForm<FormularioCrearUnidadRRHH>({
+  const formulario = useForm<Unidadesrrhh>({
     mode: 'onBlur',
   });
 
-  const regionSeleccionada = formulario.watch('regionId');
+  const regionSeleccionada = formulario.watch('codigoregion');
 
   const resetearFormulario = () => {
     formulario.reset();
@@ -56,23 +60,13 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
     onCerrarModal();
   };
 
-  const crearUnidadDeRRHH: SubmitHandler<FormularioCrearUnidadRRHH> = async (data) => {
+  const crearUnidadDeRRHH: SubmitHandler<Unidadesrrhh> = async (data) => {
     try {
       setMostrarSpinner(true);
 
-      await crearUnidad({
-        nombre: data.nombre,
-        regionId: data.regionId,
-        comunaId: data.comunaId,
-        calle: data.calle,
-        numero: data.numero,
-        departamento: data.departamento,
-        identificadorUnico: data.identificadorUnico,
-        telefono: data.telefono,
-        email: data.email,
-        emailConfirma: data.emailConfirma,
-        empleadorId: idEmpleador,
-      });
+      if (empleadorActual == undefined || usuario == undefined) return;
+
+      await crearUnidad(data, empleadorActual?.rutempleador, usuario?.rut);
 
       AlertaExito.fire({
         text: 'Unidad fue creada con éxito',
@@ -113,20 +107,20 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
 
               <IfContainer show={erroresCargarCombos.length === 0}>
                 <div className="row mt-2 g-3 align-items-baseline">
-                  <InputIdentificadorUnidadRRHH
-                    name="identificadorUnico"
-                    label="Identificador Único"
+                  <InputNombreUnidadRRHH
+                    label="Código Unidad"
                     className="col-12 col-lg-6 col-xl-3"
+                    name="codigounidadrrhh"
                   />
 
                   <InputNombreUnidadRRHH
-                    name="nombre"
-                    label="Nombre"
+                    name="glosaunidadrrhh"
+                    label="Nombre Unidad"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
                   <ComboSimple
-                    name="regionId"
+                    name="codigoregion"
                     label="Región"
                     datos={combos?.CCREGION}
                     idElemento="idregion"
@@ -137,18 +131,26 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
 
                   <ComboComuna
                     label="Comuna"
-                    name="comunaId"
+                    name="codigocomuna"
                     comunas={combos?.CCCOMUNA}
                     regionSeleccionada={regionSeleccionada}
                     className="col-12 col-lg-6 col-xl-3"
                   />
+                  <ComboSimple
+                    label="Tipo de Calle"
+                    name="codigotipocalle"
+                    datos={combos?.CCTIPOCALLE}
+                    idElemento={'idtipocalle'}
+                    descripcion={'tipocalle'}
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
 
-                  <InputCalle label="Calle" name="calle" className="col-12 col-lg-6 col-xl-3" />
+                  <InputCalle label="Calle" name="direccion" className="col-12 col-lg-6 col-xl-3" />
 
                   <InputNumero name="numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
 
                   <InputBlockDepartamento
-                    name="departamento"
+                    name="blockdepto"
                     label="Departamento"
                     className="col-12 col-lg-6 col-xl-3"
                   />
@@ -156,19 +158,6 @@ const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                   <InputTelefono
                     name="telefono"
                     label="Teléfono"
-                    className="col-12 col-lg-6 col-xl-3"
-                  />
-
-                  <InputEmail
-                    name="email"
-                    label="Correo electrónico unidad RRHH"
-                    className="col-12 col-lg-6 col-xl-3"
-                  />
-
-                  <InputEmail
-                    name="emailConfirma"
-                    debeCoincidirCon="email"
-                    label="Repetir correo electrónico"
                     className="col-12 col-lg-6 col-xl-3"
                   />
                 </div>

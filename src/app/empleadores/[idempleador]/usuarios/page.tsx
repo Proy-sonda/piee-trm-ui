@@ -6,6 +6,7 @@ import Titulo from '@/components/titulo/titulo';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import React, { useState } from 'react';
+import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
 import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
@@ -24,6 +25,8 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
   const { cargandoEmpleador, empleadorActual, errorCargarEmpleador } = useEmpleadorActual();
 
   const [refresh, cargarUsuarios] = useRefrescarPagina();
+
+  const { RolUsuario } = useRol();
 
   const [, usuarios] = useFetch(
     empleadorActual ? buscarUsuarios(empleadorActual.rutempleador) : emptyFetch(),
@@ -45,15 +48,17 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
         Usuarias
       </Titulo>
 
-      <div className="mt-4 row">
-        <div className="d-flex justify-content-end">
-          <button
-            className="btn btn-success btn-sm"
-            onClick={() => setAbrirModalCrearUsuario(true)}>
-            + Agregar Usuario
-          </button>
+      {RolUsuario == 'Administrador' && (
+        <div className="mt-4 row">
+          <div className="d-flex justify-content-end">
+            <button
+              className="btn btn-success btn-sm"
+              onClick={() => setAbrirModalCrearUsuario(true)}>
+              + Agregar Usuario
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="row mt-3">
         <div className="col-md-12">

@@ -1,28 +1,21 @@
+import { useRol } from '@/app/empleadores/[idempleador]/(hooks)/use-Rol';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
+import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
+import { AlertaConfirmacion } from '@/utilidades/alertas';
+import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import Link from 'next/link';
 import { FormEvent } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
-import { Trabajadores } from '../(modelos)/trabajadores';
 
 interface props {
-  trabajadores: Trabajadores[];
+  trabajadores: Trabajadoresunidadrrhh[];
   unidad: string;
   handleEditTrabajador: (idtrabajador: number, idunidad: number, ruttrabajador: string) => void;
-  handleDeleteTrabajador: (idtrabajador: number, ruttrabajador: string) => void;
+  handleDeleteTrabajador: (trabajador: Trabajadoresunidadrrhh) => void;
   idunidad: number;
 }
-const options: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: 'numeric',
-  second: 'numeric',
-  hour12: false, // Para usar formato de 24 horas
-};
 
 const TablaTrabajadores: React.FC<props> = ({
   trabajadores,
@@ -32,25 +25,22 @@ const TablaTrabajadores: React.FC<props> = ({
   idunidad,
 }) => {
   const [trabajadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
-    datos: trabajadores,
+    datos: trabajadores.filter(({ codigounidadrrhh }) => codigounidadrrhh == idunidad.toString()),
     tamanoPagina: 5,
   });
 
+  const { RolUsuario } = useRol();
+
   const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    const resp = await Swal.fire({
-      icon: 'question',
+    const resp = await AlertaConfirmacion.fire({
       html: `¿Desea exportar las personas trabajadoras a CSV?`,
-      confirmButtonColor: 'var(--color-blue)',
-      confirmButtonText: 'Sí',
-      showDenyButton: true,
-      denyButtonText: 'No',
     });
 
     if (resp.isDenied) return;
     if (resp.isDismissed) return;
     let data = trabajadores.map((trabajador) => ({
-      ['']: trabajador.ruttrabajador.replaceAll('-', ''),
+      ['']: trabajador.runtrabajador.replaceAll('-', ''),
     }));
 
     function padZero(num: number): string {
@@ -86,41 +76,51 @@ const TablaTrabajadores: React.FC<props> = ({
         <Thead className="align-middle text-center">
           <Tr>
             <Th>Run</Th>
-            <Th>Fecha Afiliación</Th>
-            <Th>Acciones</Th>
+            <Th>Fecha Registro</Th>
+            {RolUsuario == 'Administrador' && <Th>Acciones</Th>}
           </Tr>
         </Thead>
         <Tbody className="align-middle text-center">
           {trabajadoresPaginados.length > 0 ? (
-            trabajadoresPaginados.map(({ ruttrabajador, idtrabajador, fechaafiliacion }) => (
-              <Tr key={ruttrabajador}>
+            trabajadoresPaginados.map((trabajador) => (
+              <Tr key={trabajador.runtrabajador}>
                 <Td>
                   <Link
                     href={''}
-                    onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
-                    {ruttrabajador}
+                    // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
+                  >
+                    {trabajador.runtrabajador}
                   </Link>
                 </Td>
-                <Td>{new Date(fechaafiliacion).toLocaleDateString('es-CL', options)}</Td>
-                <Td>
-                  <button
-                    className="btn btn-sm btn-primary"
-                    onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}>
-                    <i title={`editar ${ruttrabajador}`} className={'bi bi-pencil-square'}></i>
-                  </button>
-                  &nbsp;
-                  <button
-                    className="btn btn-sm btn-danger"
-                    onClick={() => handleDeleteTrabajador(idtrabajador, ruttrabajador)}>
-                    <i title={`eliminar ${ruttrabajador}`} className={'bi bi-trash btn-danger'}></i>
-                  </button>
-                </Td>
+                <td>{format(new Date(trabajador.fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</td>
+
+                {RolUsuario == 'Administrador' && (
+                  <Td>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
+                    >
+                      <i
+                        title={`editar ${trabajador.runtrabajador}`}
+                        className={'bi bi-pencil-square'}></i>
+                    </button>
+                    &nbsp;
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => handleDeleteTrabajador(trabajador)}>
+                      <i
+                        title={`eliminar ${trabajador.runtrabajador}`}
+                        className={'bi bi-trash btn-danger'}></i>
+                    </button>
+                  </Td>
+                )}
               </Tr>
             ))
           ) : (
             <Tr>
               <Td>-</Td>
               <Td>-</Td>
+              {RolUsuario == 'Administrador' && <Td>-</Td>}
             </Tr>
           )}
         </Tbody>

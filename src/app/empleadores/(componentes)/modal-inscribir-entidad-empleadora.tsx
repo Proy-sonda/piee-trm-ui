@@ -12,9 +12,9 @@ import InputRazonSocial from '@/components/form/input-razon-social';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
 import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
 import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
@@ -66,32 +66,19 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
 
       resetearFormulario();
 
-      Swal.fire({
-        icon: 'success',
-        title: 'La nueva entidad empleadora fue inscrita con éxito',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      AlertaExito.fire({
+        html: 'La nueva entidad empleadora fue inscrita con éxito',
       });
 
       onEntidadEmpleadoraCreada();
     } catch (error) {
       if (error instanceof EmpleadorYaExisteError) {
-        return Swal.fire({
-          icon: 'error',
-          title: 'RUT del empleador ya existe',
-          showConfirmButton: true,
-          confirmButtonColor: 'var(--color-blue)',
-          confirmButtonText: 'OK',
+        return AlertaError.fire({
+          html: 'RUT del empleador ya existe',
         });
       }
-
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error al inscribir empleador',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      return AlertaError.fire({
+        html: 'Error al inscribir empleador',
       });
     } finally {
       setMostrarSpinner(false);
