@@ -3,7 +3,7 @@ import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, getYear, isAfter, isBefore } from 'date-fns';
 import { default as es } from 'date-fns/locale/es';
 import React from 'react';
-import { Form, InputGroup } from 'react-bootstrap';
+import { Form, FormGroup, InputGroup } from 'react-bootstrap';
 import DatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Controller, useFormContext } from 'react-hook-form';
@@ -17,11 +17,7 @@ interface InputMesAnoProps extends InputReciclableBase, UnibleConFormArray {}
 
 /**
  * El valor del input va a ser un objeto `Date` con la fecha seleccionada. En caso de que la fecha
- * sea invalida el valor del input va a ser `Invalid Date`, que se puede revisar con la funcion
- * `esFechaInvalida` de las utilidades.
- *
- * Se tiene que parchar con un string en formato `yyyy-MM` o usar un string vacio `''` para dejarlo
- * en blanco.
+ * sea invalida el valor del input va a ser `null`. Se tiene que parchar con un objeto `Date`.
  */
 export const InputMesAno: React.FC<InputMesAnoProps> = ({
   name,
@@ -30,43 +26,7 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
   opcional,
   unirConFieldArray,
 }) => {
-  const { register, control } = useFormContext();
-
-  // const { ref, ...resto } = register(name, {
-  //   setValueAs: (dateStr: string) => {
-  //     /** Situa la fecha con respecto al inicio de hoy */
-  //     const date = parse(dateStr, 'yyyy-MM', startOfMonth(new Date()));
-
-  //     setTextoFecha(
-  //       !dateStr || dateStr.trim() === ''
-  //         ? '--- ----'
-  //         : capitalizar(format(date, 'MMM yyyy', { locale: esLocale })),
-  //     );
-
-  //     return date;
-  //   },
-  //   required: {
-  //     value: !opcional,
-  //     message: 'La fecha es obligatoria',
-  //   },
-  //   validate: {
-  //     esFechaValida: (fecha: Date) => {
-  //       if (!opcional && esFechaInvalida(fecha)) {
-  //         return 'La fecha es inválida';
-  //       }
-  //     },
-  //     despuesDe1920: (fecha: Date) => {
-  //       if (isBefore(fecha, new Date(1920, 11, 31))) {
-  //         return 'Debe ser mayor o igual a enero de 1921';
-  //       }
-  //     },
-  //     noMayorQueHoy: (fecha: Date) => {
-  //       if (isAfter(fecha, endOfDay(Date.now()))) {
-  //         return 'No puede ser posterior a hoy';
-  //       }
-  //     },
-  //   },
-  // });
+  const { control } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'mesano',
@@ -77,11 +37,10 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
 
   return (
     <>
-      <div className={`${className ?? ''} `}>
+      <FormGroup className={className}>
         {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
-        {/* <InputGroup className="flex-nowrap" style={{ minWidth: '100px' }}> */}
-        <InputGroup style={{ minWidth: '100px' }}>
+        <InputGroup className="flex-nowrap" style={{ minWidth: '120px' }}>
           <Controller
             control={control}
             name={name}
@@ -115,7 +74,7 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
                   tieneError ? 'is-invalid border-danger' : ''
                 }`}
                 showMonthYearPicker
-                showFourColumnMonthYearPicker
+                showTwoColumnMonthYearPicker
                 dateFormat="MMM yyyy"
                 onChange={onChange}
                 onBlur={onBlur}
@@ -173,7 +132,7 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
             <div className="invalid-tooltip">{mensajeError}</div>
           </div>
         </IfContainer>
-      </div>
+      </FormGroup>
     </>
   );
 };
