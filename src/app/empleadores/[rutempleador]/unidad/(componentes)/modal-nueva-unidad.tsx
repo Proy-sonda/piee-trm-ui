@@ -24,14 +24,14 @@ import { InputNombreUnidadRRHH } from './input-nombre-unidad-rrhh';
 
 interface ModalNuevaUnidadProps {
   show: boolean;
-  idEmpleador: number;
+  rutempleador: string;
   onCerrarModal: () => void;
   onNuevaUnidadCreada: () => void;
 }
 
 const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
   show,
-  idEmpleador,
+  rutempleador,
   onCerrarModal,
   onNuevaUnidadCreada,
 }) => {

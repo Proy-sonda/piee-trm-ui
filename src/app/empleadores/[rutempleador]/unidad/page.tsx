@@ -18,13 +18,11 @@ import { TIPOS_DE_OPERADORES, TipoOperador } from './(modelos)/tipo-operador';
 
 interface UnidadRRHHPageProps {
   params: {
-    idempleador: string;
+    rutempleador: string;
   };
 }
 
-const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador } }) => {
-  const idEmpleadorNumber = Number(idempleador);
-
+const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador } }) => {
   const search = useSearchParams();
 
   // prettier-ignore
@@ -96,7 +94,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
 
           <IfContainer show={!cargandoUnidades && !errorCargarUnidad}>
             <TablaUnidades
-              idempleador={idEmpleadorNumber}
+              rutempleador={rutempleador}
               unidades={unidades ?? []}
               onEditarUnidad={({ codigounidadrrhh }) => {
                 setIdUnidad(codigounidadrrhh);
@@ -110,7 +108,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
 
       <ModalNuevaUnidad
         show={abrirModalCrearUnidad}
-        idEmpleador={idEmpleadorNumber}
+        rutempleador={rutempleador}
         onCerrarModal={() => setAbrirModalCrearUnidad(false)}
         onNuevaUnidadCreada={() => {
           setAbrirModalCrearUnidad(false);
@@ -121,7 +119,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { idempleador }
       {
         <ModalEditarUnidad
           show={abrirModalEditarUnidad}
-          idEmpleador={idEmpleadorNumber}
+          rutempleador={rutempleador}
           idUnidad={idunidad}
           onUnidadRRHHEditada={() => {
             setAbrirModalEditarUnidad(false);

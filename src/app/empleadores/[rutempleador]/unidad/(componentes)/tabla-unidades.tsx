@@ -16,7 +16,7 @@ import { useRol } from '../../(hooks)/use-Rol';
 
 interface TablaUnidadesProps {
   unidades: Unidadesrrhh[];
-  idempleador: number;
+  rutempleador: string;
   onEditarUnidad: (unidad: Unidadesrrhh) => void;
   onUnidadEliminada: (unidad: Unidadesrrhh) => void;
 }
@@ -25,7 +25,7 @@ const TablaUnidades = ({
   unidades,
   onEditarUnidad,
   onUnidadEliminada,
-  idempleador,
+  rutempleador,
 }: TablaUnidadesProps) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
@@ -70,11 +70,11 @@ const TablaUnidades = ({
   };
 
   const linkTrabajadores = (unidad: Unidadesrrhh) => {
-    return `/empleadores/${idempleador}/unidad/${unidad.codigounidadrrhh}/trabajadores/`;
+    return `/empleadores/${rutempleador}/unidad/${unidad.codigounidadrrhh}/trabajadores/`;
   };
 
   const linkUsuarios = (unidad: Unidadesrrhh) => {
-    return `/empleadores/${idempleador}/unidad/${unidad.codigounidadrrhh}/usuarios`;
+    return `/empleadores/${rutempleador}/unidad/${unidad.codigounidadrrhh}/usuarios`;
   };
 
   const editarUnidadInterno = (unidad: Unidadesrrhh) => {

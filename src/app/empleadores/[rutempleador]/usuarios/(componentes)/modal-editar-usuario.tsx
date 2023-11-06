@@ -101,6 +101,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
       AlertaExito.fire({
         text: 'Persona usuaria actualizada con éxito',
+        didClose: () => (window.location.href = window.location.href),
       });
 
       onUsuarioEditado();

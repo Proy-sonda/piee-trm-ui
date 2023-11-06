@@ -4,18 +4,18 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 
-import TablaTrabajadores from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
+import TablaTrabajadores from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
 import {
   Trabajador,
   UnidadEmpleador,
-} from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(modelos)';
+} from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(modelos)';
 import {
   actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
   buscarUnidadesDeEmpleador,
   crearTrabajador,
   eliminarTrabajador,
-} from '@/app/empleadores/[idempleador]/unidad/[idunidad]/trabajadores/(servicios)';
+} from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(servicios)';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import 'animate.css';
 import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react';

@@ -5,8 +5,8 @@ import { Empleador } from '@/modelos/empleador';
 import Link from 'next/link';
 import { useContext } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { UsuarioEntidadEmpleadora } from '../[idempleador]/usuarios/(modelos)/usuario-entidad-empleadora';
-import { buscarUsuarios } from '../[idempleador]/usuarios/(servicios)/buscar-usuarios';
+import { UsuarioEntidadEmpleadora } from '../[rutempleador]/usuarios/(modelos)/usuario-entidad-empleadora';
+import { buscarUsuarios } from '../[rutempleador]/usuarios/(servicios)/buscar-usuarios';
 
 interface TablaEntidadesEmpleadorasProps {
   empleadores: Empleador[];
@@ -55,7 +55,7 @@ export default function TablaEntidadesEmpleadoras({
               <Tr key={empleador.rutempleador} className="align-middle">
                 <Td>
                   <Link
-                    href={`/empleadores/${empleador.idempleador}/datos`}
+                    href={`/empleadores/${empleador.rutempleador}/datos`}
                     className="text-decoration-none">
                     {empleador.rutempleador}
                   </Link>

@@ -27,7 +27,7 @@ import { InputNombreUnidadRRHH } from './input-nombre-unidad-rrhh';
 
 interface ModalEditarUnidadProps {
   show: boolean;
-  idEmpleador: number;
+  rutempleador: string;
   idUnidad?: string;
   onUnidadRRHHEditada: () => void;
   onCerrarModal: () => void;
@@ -35,7 +35,7 @@ interface ModalEditarUnidadProps {
 
 const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
   show,
-  idEmpleador,
+  rutempleador,
   idUnidad,
   onUnidadRRHHEditada,
   onCerrarModal,

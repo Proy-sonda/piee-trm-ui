@@ -1,6 +1,6 @@
 'use client';
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
-import { buscarUnidadPorId } from '@/app/empleadores/[idempleador]/unidad/(servicios)/buscar-unidad-por-id';
+import { buscarUnidadPorId } from '@/app/empleadores/[rutempleador]/unidad/(servicios)/buscar-unidad-por-id';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -57,7 +57,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      usuarioAso: buscarUsuariosAsociado(idunidad, empleadorActual!?.rutempleador),
+      usuarioAso: buscarUsuariosAsociado(idunidad, idempleador),
     },
     [refresh],
   );
