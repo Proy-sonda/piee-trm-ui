@@ -20,7 +20,7 @@ import { PersonaUsuariaYaExisteError, crearUsuario } from '../(servicios)/crear-
 
 interface ModalCrearUsuarioProps {
   show: boolean;
-  idEmpleador: number;
+  idEmpleador?: number;
   onCerrarModal: () => void;
   onUsuarioCreado: () => void;
 }
@@ -43,6 +43,10 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
 
   const handleCrearUsuario: SubmitHandler<FormularioCrearUsuario> = async (data) => {
     try {
+      if (!idEmpleador) {
+        throw new Error('NO EXISTE EL ID DEL EMPLEADOR');
+      }
+
       setMostrarSpinner(true);
 
       await crearUsuario({

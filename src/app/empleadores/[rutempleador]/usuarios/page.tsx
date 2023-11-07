@@ -13,15 +13,9 @@ import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
 import TablaUsuarios from './(componentes)/tabla-usuarios';
 import { buscarUsuarios } from './(servicios)/buscar-usuarios';
 
-interface UsuariosPageProps {
-  params: {
-    idempleador: string;
-  };
-}
+interface UsuariosPageProps {}
 
-const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
-  const idEmpleadorNumber = parseInt(params.idempleador);
-
+const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
   const { cargandoEmpleador, empleadorActual, errorCargarEmpleador } = useEmpleadorActual();
 
   const [refresh, cargarUsuarios] = useRefrescarPagina();
@@ -95,7 +89,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
       <ModalCrearUsuario
         show={abrirModalCrearUsuario}
-        idEmpleador={idEmpleadorNumber}
+        idEmpleador={empleadorActual?.idempleador}
         onCerrarModal={() => setAbrirModalCrearUsuario(false)}
         onUsuarioCreado={() => {
           cargarUsuarios();
