@@ -135,13 +135,13 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               <Td>
                 {RolUsuario == 'Administrador' ? (
                   <span
-                    className="text-primary cursor-pointer"
+                    className="text-primary cursor-pointer text-nowrap"
                     title="Editar persona usuaria"
                     onClick={() => handleEditarUsuario(usuario.idusuario)}>
                     {usuario.rutusuario}
                   </span>
                 ) : (
-                  <>{usuario.rutusuario}</>
+                  <span className="text-nowrap">{usuario.rutusuario}</span>
                 )}
               </Td>
               <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
