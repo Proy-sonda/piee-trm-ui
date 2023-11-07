@@ -5,10 +5,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 
 import TablaTrabajadores from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
-import {
-  Trabajador,
-  UnidadEmpleador,
-} from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(modelos)';
+import { Trabajador } from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(modelos)';
 import {
   actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
@@ -24,19 +21,19 @@ import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
-import { buscarEmpleadorPorId } from '@/app/empleadores/(servicios)/buscar-empleador-por-id';
 import { AuthContext } from '@/contexts';
-import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
+import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import exportFromJSON from 'export-from-json';
 import { Trabajadoresxrrhh } from '../../(modelos)/payload-unidades';
+import { buscarUnidadPorId } from '../../(servicios)/buscar-unidad-por-id';
 import { useRol } from '../../../(hooks)/use-Rol';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
 
 interface TrabajadoresPageProps {
   params: {
-    idempleador: string;
+    rutempleador: string;
     idunidad: string;
   };
 }
@@ -46,9 +43,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [cuentagrabados, setcuentagrabados] = useState<number>(0);
   const [textProgress, settextProgress] = useState('');
   const [spinnerCargar, setspinnerCargar] = useState(false);
-  const [unidadEmpleador, setunidadEmpleador] = useState<UnidadEmpleador[]>([]);
+  const [unidadEmpleador, setunidadEmpleador] = useState<Unidadesrrhh[] | undefined>();
   const [trabajadores, settrabajadores] = useState<Trabajadoresunidadrrhh[]>([]);
-  const [razon, setRazon] = useState('');
+
   const { RolUsuario } = useRol();
   const { empleadorActual } = useEmpleadorActual();
   const [csvData, setCsvData] = useState<any[]>([]);
@@ -58,12 +55,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     file: false,
     lecturarut: false,
   });
-  const { idempleador, idunidad } = params;
+  const { rutempleador, idunidad } = params;
 
   const [editar, seteditar] = useState<Trabajador>({
-    idtrabajador: 0,
+    runtrabajador: '',
     unidad: {
-      idunidad: 0,
+      codigounidad: '',
     },
   });
   const { register, setValue, getValues } = useForm<{ run: string; file: FileList | null }>({
@@ -75,42 +72,37 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      trabajadores: buscarTrabajadoresDeUnidad(idunidad, empleadorActual!?.rutempleador),
-      empleador: buscarEmpleadorPorId(Number(idempleador)),
+      trabajadores: buscarTrabajadoresDeUnidad(idunidad, rutempleador),
     },
     [refresh],
   );
 
   useEffect(() => {
-    if (datosPagina?.empleador != undefined) {
-      const busquedaUnidadEmpleador = async () => {
-        const [resp] = await buscarUnidadesDeEmpleador(datosPagina.empleador?.rutempleador || '');
-        setunidadEmpleador(await resp());
-        resp().then((value: UnidadEmpleador[]) => {
-          setunidad(value.find((value) => value.idunidad === Number(idunidad))?.unidad || '');
-        });
-      };
-      busquedaUnidadEmpleador();
-    }
-  }, [datosPagina?.empleador || refresh]);
+    const busquedaUnidadEmpleador = async () => {
+      const [resp] = await buscarUnidadesDeEmpleador(rutempleador, idunidad);
+      const [unidadNombre] = await buscarUnidadPorId(idunidad);
+      setunidad((await unidadNombre())!?.glosaunidadrrhh);
+      setunidadEmpleador(await resp());
+    };
+    busquedaUnidadEmpleador();
+  }, [trabajadores]);
 
   useEffect(() => {
     if (datosPagina?.trabajadores != undefined) {
       settrabajadores(datosPagina!?.trabajadores);
-      setRazon(datosPagina!?.empleador!?.razonsocial);
     }
   }, [datosPagina?.trabajadores || refresh]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 
-  const handleEditTrabajador = (idtrabajador: number, idunidad: number, ruttrabajador: string) => {
+  const handleEditTrabajador = (codigounidad: string, runtrabajador: string) => {
     seteditar({
-      idtrabajador: idtrabajador,
+      runtrabajador,
       unidad: {
-        idunidad: idunidad,
+        codigounidad,
       },
     });
-    setrutedit(ruttrabajador);
+    setrutedit(runtrabajador);
     refrescarComponente();
     setshow(true);
   };
@@ -149,16 +141,17 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const handleChangeUnidad = (event: ChangeEvent<HTMLSelectElement>) => {
     seteditar({
-      idtrabajador: editar?.idtrabajador,
+      runtrabajador: editar?.runtrabajador,
       unidad: {
-        idunidad: Number(event.target.value),
+        codigounidad: event.target.value,
       },
     });
   };
 
   const handleSubmitEdit = () => {
     const ActualizaTrabajador = async () => {
-      const data = await actualizarTrabajador(editar);
+      if (usuario == undefined || empleadorActual == undefined) return;
+      const data = await actualizarTrabajador(editar, usuario!?.rut, empleadorActual?.rutempleador);
       if (data.ok) {
         AlertaExito.fire({
           html: 'Persona Trabajadora modificada con éxito',
@@ -375,8 +368,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       <div className="animate__animate animate__fadeIn">
         <div className="row">
           <Titulo url="">
-            Entidad Empleadora - <b>{razon}</b> / Dirección y Unidades RRHH - <b> {unidad} </b>/
-            Personas Trabajadoras
+            Entidad Empleadora - <b>{empleadorActual!?.razonsocial}</b> / Dirección y Unidades RRHH
+            - <b> {unidad} </b>/ Personas Trabajadoras
           </Titulo>
         </div>
 
@@ -674,13 +667,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               <label>Unidad</label>
               <select
                 className="form-select"
-                value={editar?.unidad.idunidad}
+                value={editar?.unidad.codigounidad}
                 onChange={handleChangeUnidad}>
                 <option value={''}>Seleccionar</option>
-                {unidadEmpleador.length || 0 > 0 ? (
-                  unidadEmpleador.map(({ idunidad, unidad }) => (
-                    <option key={idunidad} value={idunidad}>
-                      {unidad}
+                {unidadEmpleador!?.length || 0 > 0 ? (
+                  unidadEmpleador!?.map(({ codigounidadrrhh, glosaunidadrrhh }) => (
+                    <option key={codigounidadrrhh} value={codigounidadrrhh}>
+                      {glosaunidadrrhh}
                     </option>
                   ))
                 ) : (

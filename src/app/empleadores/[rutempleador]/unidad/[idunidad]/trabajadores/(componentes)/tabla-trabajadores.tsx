@@ -1,4 +1,4 @@
-import { useRol } from '@/app/empleadores/[idempleador]/(hooks)/use-Rol';
+import { useRol } from '@/app/empleadores/[rutempleador]/(hooks)/use-Rol';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
@@ -12,7 +12,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 interface props {
   trabajadores: Trabajadoresunidadrrhh[];
   unidad: string;
-  handleEditTrabajador: (idtrabajador: number, idunidad: number, ruttrabajador: string) => void;
+  handleEditTrabajador: (codigounidad: string, runtrabajador: string) => void;
   handleDeleteTrabajador: (trabajador: Trabajadoresunidadrrhh) => void;
   idunidad: number;
 }
@@ -71,7 +71,6 @@ const TablaTrabajadores: React.FC<props> = ({
           </button>
         </div>
       </div>
-
       <Table className="table table-striped">
         <Thead className="align-middle text-center">
           <Tr>
@@ -87,8 +86,9 @@ const TablaTrabajadores: React.FC<props> = ({
                 <Td>
                   <Link
                     href={''}
-                    // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
-                  >
+                    onClick={() =>
+                      handleEditTrabajador(trabajador.codigounidadrrhh, trabajador.runtrabajador)
+                    }>
                     {trabajador.runtrabajador}
                   </Link>
                 </Td>
@@ -98,8 +98,9 @@ const TablaTrabajadores: React.FC<props> = ({
                   <Td>
                     <button
                       className="btn btn-sm btn-primary"
-                      // onClick={() => handleEditTrabajador(idtrabajador, idunidad, ruttrabajador)}
-                    >
+                      onClick={() =>
+                        handleEditTrabajador(trabajador.codigounidadrrhh, trabajador.runtrabajador)
+                      }>
                       <i
                         title={`editar ${trabajador.runtrabajador}`}
                         className={'bi bi-pencil-square'}></i>

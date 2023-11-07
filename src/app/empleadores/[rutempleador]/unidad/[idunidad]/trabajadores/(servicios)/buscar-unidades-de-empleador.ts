@@ -1,17 +1,37 @@
+import { PayloadTramitacion } from '@/modelos/payload-tramitacion';
+import { DatoEmpleadorUnidad, Unidadesrrhh } from '@/modelos/tramitacion';
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl } from '@/servicios/environment';
+import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
-import { UnidadEmpleador } from '../(modelos)';
 
-export const buscarUnidadesDeEmpleador = (rutempleador: string) => {
-  return runFetchAbortable<UnidadEmpleador[]>(`${apiUrl()}/unidad/rutempleador`, {
-    method: 'POST',
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
+export const buscarUnidadesDeEmpleador = (
+  RutEmpleador: string,
+  CodigoUnidadRRHH: string,
+): [() => Promise<Unidadesrrhh[] | undefined>, () => void] => {
+  const payload: PayloadTramitacion = {
+    Accion: 2,
+    RutEmpleador,
+    CodigoUnidadRRHH,
+    RunTrabajador: '',
+    RunUsuario: '',
+  };
+  console.log(payload);
+  const [resp, abort] = runFetchAbortable<DatoEmpleadorUnidad>(
+    `${urlBackendTramitacion()}/operadores/all/obtieneempleadorrrhhusu`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: obtenerToken(),
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify({
-      rutempleador: rutempleador,
-    }),
-  });
+  );
+
+  const buscarUnidad = async () => {
+    const unidadrrhh: Unidadesrrhh[] | undefined = (await resp()).unidadesrrhh;
+    return unidadrrhh;
+  };
+
+  return [buscarUnidad, abort];
 };

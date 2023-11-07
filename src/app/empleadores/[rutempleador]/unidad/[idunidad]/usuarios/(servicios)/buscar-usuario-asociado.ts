@@ -9,13 +9,12 @@ export const buscarUsuariosAsociado = (
   rutEmpleador: string,
 ): [() => Promise<Usuariosunidad[]>, () => void] => {
   const payLoad: PayloadTramitacion = {
-    Accion: 3,
+    Accion: 5,
     CodigoUnidadRRHH: idunidad,
     RunTrabajador: '',
     RutEmpleador: rutEmpleador,
     RunUsuario: '',
   };
-  console.log(payLoad);
 
   const [resp, abort] = runFetchAbortable<DatoEmpleadorUnidad>(
     `${urlBackendTramitacion()}/operadores/all/obtieneempleadorrrhhusu`,
@@ -31,7 +30,7 @@ export const buscarUsuariosAsociado = (
 
   const BuscarUsuarioUnidad = async () => {
     const Usuarios: Usuariosunidad[] = (await resp()).usuariosunidad;
-    console.log(Usuarios);
+
     return Usuarios;
   };
 

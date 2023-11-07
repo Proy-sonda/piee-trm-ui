@@ -5,28 +5,37 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
+import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { Usuariosunidad } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
-import React, { ChangeEvent, FormEvent, Fragment, useEffect, useState } from 'react';
+import React, { ChangeEvent, Fragment, useContext, useEffect, useState } from 'react';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { Usuarioxrrhh } from '../../(modelos)/payload-unidades';
 import { useRol } from '../../../(hooks)/use-Rol';
 import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
-import { formUsrUnd } from './(modelos)/formulario-usuario-unidad';
 import { asociarUnidad } from './(servicios)/asociar-unidad';
 import { buscarUsuariosAsociado } from './(servicios)/buscar-usuario-asociado';
 import { eliminarUsuarioAsociado } from './(servicios)/eliminar-usuario-asociado';
 import styles from './usuarios.module.css';
 interface iUsuarios {
   params: {
-    idempleador: string;
+    rutempleador: string;
     idunidad: string;
   };
 }
 
+interface Formulario {
+  acccionusuxrrhh: number;
+  codigounidadrrhh: string;
+  runusuario: string;
+  rolusuario: number;
+}
+
 const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
-  const { idempleador, idunidad } = params;
+  const { rutempleador, idunidad } = params;
   const [unidad, setunidad] = useState('');
   const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
@@ -34,6 +43,17 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const [usuariosAsociados, setusuariosAsociados] = useState<Usuariosunidad[]>([]);
   const { RolUsuario } = useRol();
   const { empleadorActual } = useEmpleadorActual();
+  const { usuario } = useContext(AuthContext);
+
+  const formulario = useForm<Formulario>({
+    mode: 'onSubmit',
+    defaultValues: {
+      acccionusuxrrhh: 1,
+      codigounidadrrhh: '',
+      rolusuario: 0,
+      runusuario: '',
+    },
+  });
 
   useEffect(() => {
     const busquedaUnidad = async () => {
@@ -57,7 +77,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      usuarioAso: buscarUsuariosAsociado(idunidad, idempleador),
+      usuarioAso: buscarUsuariosAsociado(idunidad, rutempleador),
     },
     [refresh],
   );
@@ -79,38 +99,28 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     );
   }, [usuariosAsociados]);
 
-  const [formIni, setformIni] = useState<formUsrUnd>({
-    idempleador: 0,
-    idunidad: 0,
-    idusuario: 0,
-  });
-
-  useEffect(() => {
-    setformIni({
-      ...formIni,
-      idempleador: Number(idempleador),
-    });
-  }, [usuarios]);
-
   const refrescarComponente = () => setRefresh(Math.random());
 
-  const onHandleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
+  const onHandleSubmit: SubmitHandler<Formulario> = async (data) => {
     const respuesta = await AlertaConfirmacion.fire({
       title: 'Asociar Usuario/a',
-      html: `¿Desea asociar al usuario a la unidad ${unidad}?`,
+      html: `¿Desea asociar al usuario ${usuarios!?.find(
+        ({ rutusuario }) => rutusuario == data.runusuario,
+      )?.nombres} a la unidad ${unidad}?`,
     });
+
+    const usuarioaasociar: Usuarioxrrhh = {
+      acccionusuxrrhh: 1,
+      rolusuario: usuarios.find(({ rutusuario }) => rutusuario == data.runusuario)?.rol.idrol ?? 0,
+      codigounidadrrhh: idunidad,
+      runusuario: data.runusuario,
+    };
 
     if (!respuesta.isConfirmed) return;
     setspinner(true);
     try {
-      await asociarUnidad(formIni);
-
-      setformIni({
-        ...formIni,
-        idusuario: '',
-      });
-
+      if (usuario == undefined) return;
+      await asociarUnidad(usuarioaasociar, usuario?.rut, rutempleador);
       setspinner(false);
       AlertaExito.fire({
         html: 'Asociación realizada con éxito',
@@ -126,7 +136,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     }
   };
 
-  const handleDelete = async (idusuario: number) => {
+  const handleDelete = async (runusuarioeliminar: string) => {
     const respuesta = await AlertaConfirmacion.fire({
       title: 'Eliminar Usuario/a',
       html: `¿Desea eliminar al usuario de la unidad ${unidad}?`,
@@ -136,7 +146,16 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
     setspinner(true);
     try {
-      await eliminarUsuarioAsociado(idusuario);
+      const usuarioEliminar: Usuarioxrrhh = {
+        acccionusuxrrhh: 3,
+        codigounidadrrhh: idunidad,
+        rolusuario: Number(
+          usuariosAsociados.find(({ runusuario }) => runusuario == runusuarioeliminar)?.rolusuario,
+        ),
+        runusuario: runusuarioeliminar,
+      };
+      if (usuario == undefined) return;
+      await eliminarUsuarioAsociado(usuarioEliminar, usuario?.rut, rutempleador);
       setspinner(false);
       refrescarComponente();
       AlertaExito.fire({
@@ -150,16 +169,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       });
     } finally {
       refrescarComponente();
-      window.location.href = `/empleadores/${idempleador}/unidad/${idunidad}/usuarios`;
+      window.location.href = window.location.href;
     }
-  };
-
-  const onChangeSelect = (event: ChangeEvent<HTMLSelectElement>) => {
-    setformIni({
-      ...formIni,
-      idusuario: Number(event.currentTarget.value),
-      idunidad: Number(idunidad),
-    });
   };
 
   return (
@@ -181,51 +192,53 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
             <h5>Cargar Personas Usuarias</h5>
             <sub className={styles['sub-title']}>Agregar RUN Persona Usuaria</sub>
           </div>
-
-          <form className="row mt-3" onSubmit={onHandleSubmit}>
-            <div className="col-md-8 col-sm-12 col-xl-6">
-              <div className="row">
-                <div className="col-md-6">
-                  <select
-                    className="form-select js-example-basic-single"
-                    data-live-search="true"
-                    required
-                    onChange={onChangeSelect}
-                    value={formIni?.idusuario}
-                    name="idusuario">
-                    <option value={''}>Seleccionar</option>
-                    {usuarios?.length || 0 > 0 ? (
-                      usuarios.map(({ rutusuario, nombres }) => (
-                        <Fragment key={rutusuario}>
-                          {datosPagina?.usuarioAso.find(
-                            (useraso) => useraso.runusuario === rutusuario,
-                          ) ? (
-                            <Fragment key={Math.random()}></Fragment>
-                          ) : (
-                            <>
-                              <option
-                                key={Math.random()}
-                                value={rutusuario}
-                                data-tokens={rutusuario}>
-                                {rutusuario} / {nombres}
-                              </option>
-                            </>
-                          )}
-                        </Fragment>
-                      ))
-                    ) : (
-                      <></>
-                    )}
-                  </select>
-                </div>
-                <div className="col-md-6 align-self-end">
-                  <button type="submit" className="btn btn-success">
-                    Agregar
-                  </button>
+          <FormProvider {...formulario}>
+            <form className="row mt-3" onSubmit={formulario.handleSubmit(onHandleSubmit)}>
+              <div className="col-md-8 col-sm-12 col-xl-6">
+                <div className="row">
+                  <div className="col-md-6">
+                    <select
+                      className="form-select js-example-basic-single"
+                      data-live-search="true"
+                      required
+                      onChange={(e) => {
+                        formulario.setValue('runusuario', e.target.value);
+                      }}
+                      name="runusuario">
+                      <option value={''}>Seleccionar</option>
+                      {usuarios?.length || 0 > 0 ? (
+                        usuarios.map(({ rutusuario, nombres }) => (
+                          <Fragment key={rutusuario}>
+                            {datosPagina?.usuarioAso.find(
+                              (useraso) => useraso.runusuario === rutusuario,
+                            ) ? (
+                              <Fragment key={Math.random()}></Fragment>
+                            ) : (
+                              <>
+                                <option
+                                  key={Math.random()}
+                                  value={rutusuario}
+                                  data-tokens={rutusuario}>
+                                  {rutusuario} / {nombres}
+                                </option>
+                              </>
+                            )}
+                          </Fragment>
+                        ))
+                      ) : (
+                        <></>
+                      )}
+                    </select>
+                  </div>
+                  <div className="col-md-6 align-self-end">
+                    <button type="submit" className="btn btn-success">
+                      Agregar
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </form>
+            </form>
+          </FormProvider>
         </>
       )}
 

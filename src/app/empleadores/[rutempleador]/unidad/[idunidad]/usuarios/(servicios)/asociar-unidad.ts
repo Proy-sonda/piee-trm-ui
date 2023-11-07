@@ -1,15 +1,24 @@
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl } from '@/servicios/environment';
+import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { formUsrUnd } from '../(modelos)/formulario-usuario-unidad';
+import { EmpleadorUnidad, Usuarioxrrhh } from '../../../(modelos)/payload-unidades';
 
-export const asociarUnidad = (usuario: formUsrUnd) => {
-  return runFetchConThrow<void>(`${apiUrl()}/usuarioempleador/create`, {
-    method: 'POST',
+export const asociarUnidad = (
+  usuarioxrrhh: Usuarioxrrhh,
+  RunUsuario: string,
+  RutEmpleador: string,
+) => {
+  const payload: EmpleadorUnidad = {
+    RunUsuario,
+    RutEmpleador,
+    usuarioxrrhh,
+  };
+  return runFetchConThrow<void>(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {
+    method: 'PUT',
     headers: {
       Authorization: obtenerToken(),
       'Content-type': 'application/json',
     },
-    body: JSON.stringify(usuario),
+    body: JSON.stringify(payload),
   });
 };

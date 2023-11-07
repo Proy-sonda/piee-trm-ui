@@ -12,7 +12,7 @@ export interface Trabajadoresxrrhh {
   runtrabajador: string;
 }
 
-interface Usuarioxrrhh {
+export interface Usuarioxrrhh {
   acccionusuxrrhh: number;
   codigounidadrrhh: string;
   runusuario: string;

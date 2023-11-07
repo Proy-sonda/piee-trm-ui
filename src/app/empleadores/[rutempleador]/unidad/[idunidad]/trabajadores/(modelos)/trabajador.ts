@@ -1,8 +1,8 @@
 export interface Trabajador {
-  idtrabajador: number;
+  runtrabajador: string;
   unidad: Unidad;
 }
 
 interface Unidad {
-  idunidad: number;
+  codigounidad: string;
 }

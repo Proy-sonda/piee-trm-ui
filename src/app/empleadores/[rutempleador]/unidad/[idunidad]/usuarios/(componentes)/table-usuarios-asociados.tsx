@@ -7,7 +7,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 type props = {
   usuarioAsociado: Usuariosunidad[];
-  handleDelete: (idusuario: number) => void;
+  handleDelete: (runusuario: string) => void;
 };
 
 export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handleDelete }) => {
@@ -28,17 +28,17 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
         </Thead>
         <Tbody>
           {usuariosPaginados.length || 0 > 0 ? (
-            usuariosPaginados.map(({ runusuario, rolusuario }) => (
+            usuariosPaginados.map(({ runusuario }) => (
               <Tr key={runusuario}>
                 <Td>{runusuario}</Td>
 
                 {usuario?.tieneRol('admin') && (
                   <Td>
                     <button
-                      // title={`Eliminar ${rutusuario}`}
+                      title={`Eliminar ${runusuario}`}
                       onClick={(e) => {
                         e.preventDefault();
-                        // handleDelete(idusuarioempleador);
+                        handleDelete(runusuario);
                       }}
                       className="btn btn-danger btn-sm">
                       <i className="bi bi-trash3"></i>
