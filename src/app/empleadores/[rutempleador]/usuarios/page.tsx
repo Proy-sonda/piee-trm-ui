@@ -89,7 +89,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
 
       <ModalCrearUsuario
         show={abrirModalCrearUsuario}
-        idEmpleador={empleadorActual?.idempleador}
+        empleador={empleadorActual}
         onCerrarModal={() => setAbrirModalCrearUsuario(false)}
         onUsuarioCreado={() => {
           cargarUsuarios();

@@ -1,3 +1,4 @@
+import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
 import {
   ComboSimple,
   InputApellidos,
@@ -10,6 +11,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
@@ -20,14 +22,14 @@ import { PersonaUsuariaYaExisteError, crearUsuario } from '../(servicios)/crear-
 
 interface ModalCrearUsuarioProps {
   show: boolean;
-  idEmpleador?: number;
+  empleador?: EmpleadorPorId;
   onCerrarModal: () => void;
   onUsuarioCreado: () => void;
 }
 
 const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
   show,
-  idEmpleador,
+  empleador,
   onCerrarModal,
   onUsuarioCreado,
 }) => {
@@ -43,15 +45,16 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
 
   const handleCrearUsuario: SubmitHandler<FormularioCrearUsuario> = async (data) => {
     try {
-      if (!idEmpleador) {
-        throw new Error('NO EXISTE EL ID DEL EMPLEADOR');
+      if (!empleador) {
+        throw new Error('NO EXISTE EL EL EMPLEADOR');
       }
 
       setMostrarSpinner(true);
 
       await crearUsuario({
         ...data,
-        idEmpleador,
+        idEmpleador: empleador.idempleador,
+        rutEmpleador: empleador.rutempleador,
       });
 
       AlertaExito.fire({ text: 'Persona usuaria creada con éxito' });
@@ -60,12 +63,17 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
 
       onUsuarioCreado();
     } catch (error) {
-      console.error({ error });
-
       if (error instanceof PersonaUsuariaYaExisteError) {
         return AlertaError.fire({
           title: 'Error',
           text: 'El RUT de la persona usuaria ya existe',
+        });
+      }
+
+      if (error instanceof WebServiceOperadoresError) {
+        return AlertaError.fire({
+          title: 'Error',
+          text: 'Hubo un error al crear a la persona usuaria en el operador',
         });
       }
 
