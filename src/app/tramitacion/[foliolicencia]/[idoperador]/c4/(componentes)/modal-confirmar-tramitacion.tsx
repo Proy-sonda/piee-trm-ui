@@ -6,7 +6,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { emptyFetch, useFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { capitalizar } from '@/utilidades';
-import { addDays, format, parse, startOfMonth } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Modal, Row } from 'react-bootstrap';
@@ -126,11 +126,8 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
     return formatearFecha(fechaFin.toISOString());
   };
 
-  /** Espera un periodo en formato `yyyy-MM` */
-  const obtenerPeriodoRenta = (periodoStr: string) => {
-    const periodoDate = parse(periodoStr, 'yyyy-MM', startOfMonth(new Date()));
-
-    return capitalizar(format(periodoDate, "MMMM 'de' yyyy", { locale: esLocale }));
+  const obtenerPeriodoRenta = (periodo: Date) => {
+    return capitalizar(format(periodo, "MMMM 'de' yyyy", { locale: esLocale }));
   };
 
   /** @param idEntidad Creada con la funcion crearIdEntidadPrevisional  */

@@ -7,10 +7,10 @@ import {
   InputCalle,
   InputFecha,
   InputNumero,
+  InputRazonSocial,
   InputRut,
   InputTelefono,
 } from '@/components/form';
-import InputRazonSocial from '@/components/form/input-razon-social';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';

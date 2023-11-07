@@ -1,41 +1,44 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import IfContainer from '../if-container';
+import { InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface InputNumeroProps extends BaseProps {}
+interface InputNumeroProps extends InputReciclableBase {}
 
 export const InputNumero: React.FC<InputNumeroProps> = ({ name, label, className }) => {
-  const idInput = useRandomId('numero');
+  const { register, setValue } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'numero',
+    name,
+    label: { texto: label },
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>
-          <span> {`${label} (*)`}</span>
-          <OverlayTrigger
-            placement="top"
-            delay={{ show: 250, hide: 400 }}
-            overlay={(props) => (
-              <Tooltip id="button-tooltip" {...props}>
-                {'Ingresar "S/N" si no tiene número'}
-              </Tooltip>
-            )}>
-            <i className="ms-2 text-primary bi bi-info-circle" style={{ fontSize: '16px' }}></i>
-          </OverlayTrigger>
-        </Form.Label>
+        <IfContainer show={textoLabel}>
+          <Form.Label>
+            <span> {textoLabel}</span>
+            <OverlayTrigger
+              placement="top"
+              delay={{ show: 250, hide: 400 }}
+              overlay={(props) => (
+                <Tooltip id="button-tooltip" {...props}>
+                  {'Ingresar "S/N" si no tiene número'}
+                </Tooltip>
+              )}>
+              <i className="ms-2 text-primary bi bi-info-circle" style={{ fontSize: '16px' }}></i>
+            </OverlayTrigger>
+          </Form.Label>
+        </IfContainer>
 
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           {...register(name, {
             required: {
               message: 'Este campo es obligatorio',
@@ -65,7 +68,7 @@ export const InputNumero: React.FC<InputNumeroProps> = ({ name, label, className
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

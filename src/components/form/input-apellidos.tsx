@@ -1,28 +1,31 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface InputApellidosProps extends BaseProps {}
+interface InputApellidosProps extends InputReciclableBase {}
 
 export const InputApellidos: React.FC<InputApellidosProps> = ({ name, label, className }) => {
-  const idInput = useRandomId('apellidos');
+  const { register, setValue } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'apellidos',
+    name,
+    label: {
+      texto: label,
+    },
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label} (*)`}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           {...register(name, {
             required: {
               message: 'Este campo es obligatorio',
@@ -47,7 +50,7 @@ export const InputApellidos: React.FC<InputApellidosProps> = ({ name, label, cla
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

@@ -26,6 +26,12 @@
     - [Como trabajar con la respuesta dentro de `runFetchAbortable`](#como-trabajar-con-la-respuesta-dentro-de-runfetchabortable)
     - [Como parchar formularios una vez que se tengan los datos](#como-parchar-formularios-una-vez-que-se-tengan-los-datos)
 - [Llamar a endpoints que hacen cambios](#llamar-a-endpoints-que-hacen-cambios)
+- [Crear inputs reciclables](#crear-inputs-reciclables)
+  - [Crear un nuevo input](#crear-un-nuevo-input)
+  - [Preguntas frecuentes](#preguntas-frecuentes-1)
+    - [¿Cómo sobreescribir los mensajes de error?](#cómo-sobreescribir-los-mensajes-de-error)
+    - [¿Cómo unir input con field array de `react-hook-form`?](#cómo-unir-input-con-field-array-de-react-hook-form)
+    - [¿Donde colocar los inputs?](#donde-colocar-los-inputs)
 - [TODO: Scripts](#todo-scripts)
 - [TODO: Branches](#todo-branches)
 
@@ -463,6 +469,278 @@ const AlgunComponente: React.FC<{}> = ({ }) => {
   return (...);
 }
 ```
+
+# Crear inputs reciclables
+
+## Crear un nuevo input
+
+Para el ejemplo se va a crear un nuevo input reciclable llamado `NuevoInput` en el archivo `src/components/form/nuevo-input.tsx`. En este archivo se debe agregar lo siguiente
+
+```typescript react
+// Archivo: src/components/form/nuevo-input.tsx
+
+import React from 'react';
+import { Form, FormGroup } from 'react-bootstrap';
+import { useFormContext } from 'react-hook-form';
+import { InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
+
+// Crear una interfaz para las propiedades del nuevo input que extienda la
+// interfaz base. Esta interfaz base incluye propiedades comunes a todos los
+// inputs
+interface NuevoInputProps extends InputReciclableBase {}
+
+// Exportar directamente el nuevo input, NO USAR "export default" para facilitar
+// la re exportación en el index.ts
+export const NuevoInput: React.FC<NuevoInputProps> = ({
+  name, // <= Con esta propiedad se une con react-hook-form
+  label,
+  className,
+}) => {
+  // Lo mínimo es usar esta función para poder registrar el componente con react-hook-form
+  const { register } = useFormContext();
+
+  // Este hook permite administrar más facilmente las propiedades comunes. Incluye
+  // un id para el input, el label con (*) incluido de ser necesario y los
+  // mensajes de error
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'nuevoInput',
+    name,
+    label: {
+      texto: label,
+      opcional: false, // <= Estas son opcionales
+      omitirSignoObligatorio: true, // <= Estas son opcionales
+    },
+  });
+
+  // Aquí se debe definir la UI del input. Se recomienda usar react-bootstrap
+  // para que quede más limpio el código
+  return (
+    <>
+      <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
+        {/* Aquí se definen las reglas de validación, mensajes, etc */}
+        <Form.Control
+          type="text"
+          autoComplete="new-custom-value"
+          isInvalid={tieneError}
+          {...register(name, {
+            required: {
+              message: 'Este campo es obligatorio',
+              value: true,
+            },
+            minLength: {
+              value: 4,
+              message: 'Debe tener al menos 4 caracteres',
+            },
+            maxLength: {
+              value: 80,
+              message: 'Debe tener a lo más 80 caracteres',
+            },
+          })}
+        />
+
+        <Form.Control.Feedback type="invalid" tooltip>
+          {mensajeError}
+        </Form.Control.Feedback>
+      </FormGroup>
+    </>
+  );
+};
+```
+
+> IMPORTANTE: Ver [aquí](#¿donde-colocar-los-inputs) para saber donde colocar los inputs.
+
+Una vez creado el input se debe re exportar desde el siguiente archivo
+
+```typescript
+// Archivo: src\components\form\index.ts
+
+// ... Otras re exportaciones
+export * from './nuevo-input.tsx';
+```
+
+Finalmente, en algún otro componente se puede reutilizar este nuevo input.
+
+```typescript react
+import { FormProvider, useForm } from 'react-hook-form'; // Usar react-hook-form
+
+// Definir interfaz para el formulario. Este deberia ir en un archivo separado
+interface AlgunFormulario {
+  nuevoInput: string;
+}
+
+export const AlgunComponente = () => {
+  // Declarar el formulario para usar con react-hook-form
+  const formulario = useForm<AlgunFormulario>();
+
+  return (
+    <>
+      // Importante usar el nuevo input al interior de un FormProvider, sino // va a tirar un error
+      <FormProvider {...formulario}>
+        <NuevoInput
+          // El valor de "name" debe ser alguna de las propiedades declaradas
+          // en la interfaz AlgunFormulario
+          name="nuevoInput"
+          label="Mi nuevo input"
+        />
+      </FormProvider>
+    </>
+  );
+};
+```
+
+## Preguntas frecuentes
+
+### ¿Cómo sobreescribir los mensajes de error?
+
+El input define interiormente los mensajes de error por defecto. Si se quiere sobreescribir algún mensaje extender las propiedades de la siguiente forma
+
+```typescript react
+// Archivo: src/components/form/nuevo-input.tsx
+
+import { InputReciclableBase, ErroresEditables } from '@/components/form'
+
+// Los errores que se pueden sobreescribir se declaran como un tipo union de strings
+interface NuevoInputProps
+  extends InputReciclableBase,
+          ErroresEditables<'requerido' | 'muyCorto'>  { }
+
+export const NuevoInput: React.FC<NuevoInputProps> = ({
+  name,
+  label,
+  className,
+  errores, // <= Usar la nueva propiedad de errores
+}) => {
+
+  return (
+    <>
+      // ...
+      <Form.Control
+        type="text"
+        autoComplete="new-custom-value"
+        isInvalid={tieneError}
+        {...register(name, {
+          required: {
+            value: true,
+            {/* Finalmente aquí se le da prioridad al mensaje de error sobreescrito
+              y se usa algún mensaje por defecto en caso de que no se incluya */}
+            message: errores?.requerido ?? 'Este campo es obligatorio',
+          },
+          minLength: {
+            value: 4,
+            message: errores?.muyCorto ?? 'Debe tener al menos 4 caracteres',
+          },
+          maxLength: {
+            value: 80,
+            message: 'Debe tener a lo más 80 caracteres',
+          },
+        })}
+      />
+    </>
+  );
+};
+```
+
+Por último, en el componente que usa el input se definen solamente los mensajes de error
+
+```typescript react
+export const AlgunComponente = () => {
+  // ...
+
+  return (
+    <>
+      <FormProvider {...formulario}>
+        <NuevoInput
+          name="nuevoInput"
+          label="Mi nuevo input"
+          // Se sobreescriben solo los mensajes necesarios
+          errores={{
+            muyCorto: 'Ponle más caracteres',
+          }}
+        />
+      </FormProvider>
+    </>
+  );
+};
+```
+
+### ¿Cómo unir input con field array de `react-hook-form`?
+
+Para usar el input con un [useFieldArary de react-hook-form](<[https://](https://www.react-hook-form.com/api/usefieldarray/)>) se debe hacer lo siguiente
+
+```typescript react
+// Archivo: src/components/form/nuevo-input.tsx
+
+import { InputReciclableBase, UnibleConFormArray } from '@/components/form'
+
+// Extender la interfaz de propiedades base
+interface NuevoInputProps extends InputReciclableBase, UnibleConFormArray { }
+
+export const NuevoInput: React.FC<NuevoInputProps> = ({
+  unirConFieldArray, // <= Deestructurar la siguiente propiedad nueva
+}) => {
+  // Este hook permite administrar más facilmente las propiedades comunes. Incluye
+  // un id para el input, el label con (*) incluido de ser necesario y los
+  // mensajes de error
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'nuevoInput',
+    name,
+    label: { texto: label },
+    // Pasar la nueva propiedad al hook para que pueda leer los mensajes de error
+    unirConFieldArray,
+  });
+```
+
+Por último en el componetne que utiliza el input
+
+```typescript react
+// Tipear el formulario
+interface AlgunFormulario {
+  nuevoInput: string;
+  miArreglo: ItemArreglo[];
+}
+
+interface ItemArreglo {
+  uncampo: string;
+}
+
+export const AlgunComponente = () => {
+  // ...
+
+  const algunFieldArray = useFieldArray({
+    name: 'miArreglo',
+    // ...otras propiedades
+  });
+
+  return (
+    <>
+      <FormProvider {...formulario}>
+        {algunFieldArray.fields.map((field, index) => (
+          <div key={field.id}>
+            <NuevoInput
+              name="nuevoInput"
+              label="Mi nuevo input"
+              unirConFieldArray={{
+                index,
+                //  La propiedad de la interfaz ItemArreglo
+                campo: 'uncampo',
+                // La propiedad de AlgunFormulario que representa el arreglo
+                fieldArrayName: 'miArreglo',
+              }}
+            />
+          </div>
+        ))}
+      </FormProvider>
+    </>
+  );
+};
+```
+
+### ¿Donde colocar los inputs?
+
+En la carpeta `src\component\form` si se va a usar en más de un componente, sino en la carpeta `(components)` de la pantalla que se esta implementando (Ver sección [estructura de carpetas](#estructura-de-carpetas)).
 
 # TODO: Scripts
 
