@@ -101,6 +101,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
         cantidadActivo={cantidadActivo}
         show={abrirModalEditarUsuario}
         idUsuario={idUsuarioEditar}
+        empleador={empleadorActual}
         onCerrarModal={() => {
           setIdUsuarioEditar(undefined);
           setAbrirModalEditarUsuario(false);
