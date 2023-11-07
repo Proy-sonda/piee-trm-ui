@@ -42,30 +42,12 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
   const limpiarFormulario = formulario.reset;
 
   const handleCrearUsuario: SubmitHandler<FormularioCrearUsuario> = async (data) => {
-    const rol = datosModal!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
-    if (!rol) {
-      throw new Error('El rol no se ha seleccionado o no existe');
-    }
-
     try {
       setMostrarSpinner(true);
 
       await crearUsuario({
-        rutusuario: data.rut,
-        nombres: data.nombres,
-        apellidos: data.apellidos,
-        email: data.email,
-        emailconfirma: data.confirmarEmail,
-        telefonouno: data.telefono1,
-        telefonodos: data.telefono2,
-        rol: rol,
-        usuarioempleador: [
-          {
-            empleador: {
-              idempleador: idEmpleador,
-            },
-          },
-        ],
+        ...data,
+        idEmpleador,
       });
 
       AlertaExito.fire({ text: 'Persona usuaria creada con éxito' });
