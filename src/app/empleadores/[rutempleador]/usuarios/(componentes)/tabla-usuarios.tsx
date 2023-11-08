@@ -142,71 +142,82 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
           </Tr>
         </Thead>
         <Tbody className="text-center align-middle">
-          {usuariosPaginados.map((usuario) => (
-            <Tr key={usuario.idusuario}>
-              <Td>
-                {rolUsuario === 'Administrador' ? (
-                  <span
-                    className="text-primary cursor-pointer text-nowrap"
-                    title="Editar persona usuaria"
-                    onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                    {usuario.rutusuario}
-                  </span>
-                ) : (
-                  <span className="text-nowrap">{usuario.rutusuario}</span>
-                )}
-              </Td>
-              <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
-              <IfContainer show={noEsTablet()}>
-                <Td>{usuario.telefonouno.trim() || ' '}</Td>
-                <Td>{usuario.email}</Td>
-              </IfContainer>
-              <Td>{usuario.rol.rol}</Td>
-              <Td>{usuario.estadousuario.descripcion}</Td>
-              {rolUsuario == 'Administrador' && (
+          {usuariosPaginados.length > 0 ? (
+            usuariosPaginados.map((usuario) => (
+              <Tr key={usuario.idusuario}>
                 <Td>
-                  <div className="d-none d-lg-inline-block">
-                    <button
-                      className="btn text-primary"
-                      title="Editar usuario"
+                  {rolUsuario === 'Administrador' ? (
+                    <span
+                      className="text-primary cursor-pointer text-nowrap"
+                      title="Editar persona usuaria"
                       onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                      <i className="bi bi-pencil-square"></i>
-                    </button>
-                    <IfContainer show={cantidadAdministradoresActivos > 1}>
+                      {usuario.rutusuario}
+                    </span>
+                  ) : (
+                    <span className="text-nowrap">{usuario.rutusuario}</span>
+                  )}
+                </Td>
+                <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
+                <IfContainer show={noEsTablet()}>
+                  <Td>{usuario.telefonouno.trim() || ' '}</Td>
+                  <Td>{usuario.email}</Td>
+                </IfContainer>
+                <Td>{usuario.rol.rol}</Td>
+                <Td>{usuario.estadousuario.descripcion}</Td>
+                {rolUsuario == 'Administrador' && (
+                  <Td>
+                    <div className="d-none d-lg-inline-block">
                       <button
                         className="btn text-primary"
-                        title="Eliminar persona usuaria"
-                        onClick={() => handleEliminarUsuario(usuario)}>
-                        <i className="bi bi-trash3"></i>
+                        title="Editar usuario"
+                        onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                        <i className="bi bi-pencil-square"></i>
                       </button>
-                    </IfContainer>
-                    <button
-                      className="btn text-primary"
-                      title="Restablecer clave"
-                      onClick={() => reenviarContrasena(usuario)}>
-                      <i className="bi bi-key"></i>
-                    </button>
-                  </div>
-
-                  <div className="d-lg-none">
-                    <DropdownButton title="Acciones" size="sm" variant="success">
-                      <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
-                        Editar persona usuaria
-                      </Dropdown.Item>
-                      <IfContainer show={usuarios.length > 1}>
-                        <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
-                          Eliminar persona usuaria
-                        </Dropdown.Item>
+                      <IfContainer show={cantidadAdministradoresActivos > 1}>
+                        <button
+                          className="btn text-primary"
+                          title="Eliminar persona usuaria"
+                          onClick={() => handleEliminarUsuario(usuario)}>
+                          <i className="bi bi-trash3"></i>
+                        </button>
                       </IfContainer>
-                      <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
-                        Restablecer clave
-                      </Dropdown.Item>
-                    </DropdownButton>
-                  </div>
-                </Td>
-              )}
+                      <button
+                        className="btn text-primary"
+                        title="Restablecer clave"
+                        onClick={() => reenviarContrasena(usuario)}>
+                        <i className="bi bi-key"></i>
+                      </button>
+                    </div>
+
+                    <div className="d-lg-none">
+                      <DropdownButton title="Acciones" size="sm" variant="success">
+                        <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
+                          Editar persona usuaria
+                        </Dropdown.Item>
+                        <IfContainer show={usuarios.length > 1}>
+                          <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
+                            Eliminar persona usuaria
+                          </Dropdown.Item>
+                        </IfContainer>
+                        <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
+                          Restablecer clave
+                        </Dropdown.Item>
+                      </DropdownButton>
+                    </div>
+                  </Td>
+                )}
+              </Tr>
+            ))
+          ) : (
+            <Tr>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td>-</Td>
+              <Td>-</Td>
             </Tr>
-          ))}
+          )}
         </Tbody>
       </Table>
 
