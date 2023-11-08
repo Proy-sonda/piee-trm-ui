@@ -13,7 +13,10 @@ import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
 import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
 import TablaUsuarios from './(componentes)/tabla-usuarios';
-import { UsuarioEntidadEmpleadora } from './(modelos)/usuario-entidad-empleadora';
+import {
+  UsuarioEntidadEmpleadora,
+  esUsuarioAdminHabilitado,
+} from './(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from './(servicios)/buscar-usuarios';
 
 interface UsuariosPageProps {}
@@ -23,14 +26,14 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
 
   const [refresh, cargarUsuarios] = useRefrescarPagina();
 
-  const { RolUsuario } = useRol();
+  const { RolUsuario, actualizarRol } = useRol();
 
   const [, usuarios] = useFetch(
     empleadorActual ? buscarUsuarios(empleadorActual.rutempleador) : emptyFetch(),
     [empleadorActual, refresh],
   );
 
-  const [cantidadActivo, setcantidadActivo] = useState<number>(0);
+  const [cantidadUsuariosAdmin, setCantidadUsuariosAdmin] = useState<number>(0);
 
   const [abrirModalCrearUsuario, setAbrirModalCrearUsuario] = useState(false);
 
@@ -42,16 +45,14 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
 
   const [usuariosFiltrados, setUsuariosFiltrados] = useState<UsuarioEntidadEmpleadora[]>([]);
 
-  // Actualizar la cuenta de usuarios activos
+  // Actualizar la cantidad de usuarios activos y administradores
   useEffect(() => {
     if (!usuarios) {
-      setcantidadActivo(0);
+      setCantidadUsuariosAdmin(0);
       return;
     }
 
-    setcantidadActivo(
-      usuarios.filter(({ estadousuario }) => estadousuario.descripcion !== 'Deshabilitado').length,
-    );
+    setCantidadUsuariosAdmin(usuarios.filter(esUsuarioAdminHabilitado).length);
   }, [usuarios]);
 
   // Filtrar usuarios
@@ -122,6 +123,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
           <IfContainer show={!cargandoEmpleador && !errorCargarEmpleador}>
             <TablaUsuarios
               usuarios={usuariosFiltrados}
+              rolUsuario={RolUsuario}
               onEditarUsuario={(idUsuario) => {
                 setIdUsuarioEditar(idUsuario);
                 setAbrirModalEditarUsuario(true);
@@ -143,7 +145,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
       />
 
       <ModalEditarUsuario
-        cantidadActivo={cantidadActivo}
+        cantidadUsuariosAdminActivos={cantidadUsuariosAdmin}
         show={abrirModalEditarUsuario}
         idUsuario={idUsuarioEditar}
         empleador={empleadorActual}
@@ -155,6 +157,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
           setIdUsuarioEditar(undefined);
           setAbrirModalEditarUsuario(false);
           cargarUsuarios();
+          actualizarRol();
         }}
       />
     </>

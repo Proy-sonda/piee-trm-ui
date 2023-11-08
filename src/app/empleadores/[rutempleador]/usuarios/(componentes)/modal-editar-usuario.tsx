@@ -17,6 +17,7 @@ import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioEditarUsuario } from '../(modelos)/formulario-editar-usuario';
+import { esUsuarioAdministrador } from '../(modelos)/usuario-entidad-empleadora';
 import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
 import { buscarUsuarioPorId } from '../(servicios)/buscar-usuario-por-id';
@@ -24,7 +25,7 @@ import { buscarUsuarioPorId } from '../(servicios)/buscar-usuario-por-id';
 interface ModalEditarUsuarioProps {
   show: boolean;
   idUsuario?: number;
-  cantidadActivo: number;
+  cantidadUsuariosAdminActivos: number;
   empleador?: EmpleadorPorId;
   onCerrarModal: () => void;
   onUsuarioEditado: () => void;
@@ -33,13 +34,12 @@ interface ModalEditarUsuarioProps {
 const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
   show,
   idUsuario,
-  cantidadActivo,
+  cantidadUsuariosAdminActivos,
   empleador,
   onCerrarModal,
   onUsuarioEditado,
 }) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
-  const [rol, setRol] = useState('Cargando...');
 
   const [errCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     roles: buscarRolesUsuarios(),
@@ -73,7 +73,6 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
     formulario.setValue('email', usuarioEditar.email);
     formulario.setValue('confirmarEmail', usuarioEditar.email);
     formulario.setValue('rolId', usuarioEditar.rol.idrol);
-    setRol(combos?.roles.find((value) => value.idrol == formulario.getValues('rolId'))?.rol || '');
   }, [cargandoUsuario, usuarioEditar, errUsuario]);
 
   const handleActualizarUsuario: SubmitHandler<FormularioEditarUsuario> = async (data) => {
@@ -172,7 +171,8 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  {cantidadActivo != 1 ? (
+                  {cantidadUsuariosAdminActivos > 1 ||
+                  (usuarioEditar && !esUsuarioAdministrador(usuarioEditar)) ? (
                     <ComboSimple
                       name="rolId"
                       label="Rol"
@@ -184,7 +184,12 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   ) : (
                     <div className="col-12 col-lg-6 col-xl-3">
                       <label className="form-label mb-2">Rol (*)</label>
-                      <input type="text" className="form-control" value={rol} disabled />
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={usuarioEditar?.rol.rol ?? ''}
+                        disabled
+                      />
                     </div>
                   )}
 

@@ -1,10 +1,18 @@
+import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { useContext, useEffect, useState } from 'react';
 import { EmpleadoresPorUsuarioContext } from '../(contexts)/empleadores-por-usuario';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 
+export type RolUsuarioHook = 'Administrador' | 'Asistente' | '';
+
+/**
+ * _**ADVERTENCIA**_: Al usar la funcion `actualizarRol` solo va a actualizar el rol en el
+ * *componente* que invoca al hook, no el de otros componentes.
+ */
 export const useRol = () => {
   const { empleadorActual } = useEmpleadorActual();
-  const [RolUsuario, setRolUsuario] = useState<'Administrador' | 'Asistente' | ''>('');
+  const [refresh, actualizarRol] = useRefrescarPagina();
+  const [RolUsuario, setRolUsuario] = useState<RolUsuarioHook>('');
   const { BuscarRolUsuarioEmpleador } = useContext(EmpleadoresPorUsuarioContext);
 
   useEffect(() => {
@@ -14,9 +22,10 @@ export const useRol = () => {
       setRolUsuario(resp == 'Administrador' ? 'Administrador' : 'Asistente');
     };
     BusquedaRol();
-  }, [empleadorActual]);
+  }, [empleadorActual, refresh]);
 
   return {
     RolUsuario,
+    actualizarRol,
   };
 };

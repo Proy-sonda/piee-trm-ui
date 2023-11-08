@@ -13,24 +13,24 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 import { eliminarUsuario } from '../(servicios)/eliminar-usuario';
 import { recuperarContrasena } from '../(servicios)/recuperar-clave';
-import { useRol } from '../../(hooks)/use-Rol';
+import { RolUsuarioHook } from '../../(hooks)/use-Rol';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
+  rolUsuario: RolUsuarioHook;
   onEditarUsuario: (usuarioId: number) => void;
   onUsuarioEliminado: () => void | Promise<void>;
 }
 
 const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   usuarios,
+  rolUsuario: RolUsuario,
   onEditarUsuario: handleEditarUsuario,
   onUsuarioEliminado,
 }) => {
   const { usuario, logout } = useContext(AuthContext);
 
   const { empleadorActual } = useEmpleadorActual();
-
-  const { RolUsuario } = useRol();
 
   const router = useRouter();
 
@@ -143,7 +143,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
           {usuariosPaginados.map((usuario) => (
             <Tr key={usuario.idusuario}>
               <Td>
-                {RolUsuario == 'Administrador' ? (
+                {RolUsuario === 'Administrador' ? (
                   <span
                     className="text-primary cursor-pointer text-nowrap"
                     title="Editar persona usuaria"
