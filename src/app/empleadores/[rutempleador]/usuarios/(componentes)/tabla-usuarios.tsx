@@ -170,12 +170,14 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                       onClick={() => handleEditarUsuario(usuario.idusuario)}>
                       <i className="bi bi-pencil-square"></i>
                     </button>
-                    <button
-                      className="btn text-primary"
-                      title="Eliminar persona usuaria"
-                      onClick={() => handleEliminarUsuario(usuario)}>
-                      <i className="bi bi-trash3"></i>
-                    </button>
+                    <IfContainer show={usuarios.length > 1}>
+                      <button
+                        className="btn text-primary"
+                        title="Eliminar persona usuaria"
+                        onClick={() => handleEliminarUsuario(usuario)}>
+                        <i className="bi bi-trash3"></i>
+                      </button>
+                    </IfContainer>
                     <button
                       className="btn text-primary"
                       title="Restablecer clave"
@@ -189,9 +191,11 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                       <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
                         Editar persona usuaria
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
-                        Eliminar persona usuaria
-                      </Dropdown.Item>
+                      <IfContainer show={usuarios.length > 1}>
+                        <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
+                          Eliminar persona usuaria
+                        </Dropdown.Item>
+                      </IfContainer>
                       <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
                         Restablecer clave
                       </Dropdown.Item>
