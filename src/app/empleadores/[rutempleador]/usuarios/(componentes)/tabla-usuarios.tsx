@@ -13,24 +13,26 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 import { eliminarUsuario } from '../(servicios)/eliminar-usuario';
 import { recuperarContrasena } from '../(servicios)/recuperar-clave';
-import { useRol } from '../../(hooks)/use-Rol';
+import { RolUsuarioHook } from '../../(hooks)/use-Rol';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
+  rolUsuario: RolUsuarioHook;
+  cantidadAdministradoresActivos: number;
   onEditarUsuario: (usuarioId: number) => void;
   onUsuarioEliminado: () => void | Promise<void>;
 }
 
 const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   usuarios,
+  rolUsuario,
+  cantidadAdministradoresActivos,
   onEditarUsuario: handleEditarUsuario,
   onUsuarioEliminado,
 }) => {
   const { usuario, logout } = useContext(AuthContext);
 
   const { empleadorActual } = useEmpleadorActual();
-
-  const { RolUsuario } = useRol();
 
   const router = useRouter();
 
@@ -128,7 +130,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
       <Table className="table table-hover">
         <Thead className="text-center align-middle">
           <Tr>
-            <Th>RUT</Th>
+            <Th>RUN</Th>
             <Th>Nombre</Th>
             <IfContainer show={noEsTablet()}>
               <Th>Teléfono</Th>
@@ -136,14 +138,14 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
             </IfContainer>
             <Th>Rol</Th>
             <Th>Estado</Th>
-            {RolUsuario == 'Administrador' && <Th></Th>}
+            {rolUsuario == 'Administrador' && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
             <Tr key={usuario.idusuario}>
               <Td>
-                {RolUsuario == 'Administrador' ? (
+                {rolUsuario === 'Administrador' ? (
                   <span
                     className="text-primary cursor-pointer text-nowrap"
                     title="Editar persona usuaria"
@@ -161,7 +163,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               </IfContainer>
               <Td>{usuario.rol.rol}</Td>
               <Td>{usuario.estadousuario.descripcion}</Td>
-              {RolUsuario == 'Administrador' && (
+              {rolUsuario == 'Administrador' && (
                 <Td>
                   <div className="d-none d-lg-inline-block">
                     <button
@@ -170,12 +172,14 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                       onClick={() => handleEditarUsuario(usuario.idusuario)}>
                       <i className="bi bi-pencil-square"></i>
                     </button>
-                    <button
-                      className="btn text-primary"
-                      title="Eliminar persona usuaria"
-                      onClick={() => handleEliminarUsuario(usuario)}>
-                      <i className="bi bi-trash3"></i>
-                    </button>
+                    <IfContainer show={cantidadAdministradoresActivos > 1}>
+                      <button
+                        className="btn text-primary"
+                        title="Eliminar persona usuaria"
+                        onClick={() => handleEliminarUsuario(usuario)}>
+                        <i className="bi bi-trash3"></i>
+                      </button>
+                    </IfContainer>
                     <button
                       className="btn text-primary"
                       title="Restablecer clave"
@@ -189,9 +193,11 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                       <Dropdown.Item onClick={() => handleEditarUsuario(usuario.idusuario)}>
                         Editar persona usuaria
                       </Dropdown.Item>
-                      <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
-                        Eliminar persona usuaria
-                      </Dropdown.Item>
+                      <IfContainer show={usuarios.length > 1}>
+                        <Dropdown.Item onClick={() => handleEliminarUsuario(usuario)}>
+                          Eliminar persona usuaria
+                        </Dropdown.Item>
+                      </IfContainer>
                       <Dropdown.Item onClick={() => reenviarContrasena(usuario)}>
                         Restablecer clave
                       </Dropdown.Item>

@@ -66,7 +66,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
       if (error instanceof PersonaUsuariaYaExisteError) {
         return AlertaError.fire({
           title: 'Error',
-          text: 'El RUT de la persona usuaria ya existe',
+          text: 'El RUN de la persona usuaria ya existe',
         });
       }
 
@@ -117,8 +117,8 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                 <div className="row mb-4 g-3 align-items-baseline">
                   <InputRut
                     name="rut"
-                    label="RUT"
-                    tipo="rut"
+                    label="RUN"
+                    tipo="run"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
@@ -166,7 +166,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                   <InputEmail
                     name="confirmarEmail"
                     debeCoincidirCon="email"
-                    label="Correo electrónico"
+                    label="Confirmar correo electrónico"
                     className="col-12 col-lg-6 col-xl-3"
                   />
                 </div>

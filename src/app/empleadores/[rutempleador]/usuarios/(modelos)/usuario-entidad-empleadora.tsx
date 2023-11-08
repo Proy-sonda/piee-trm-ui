@@ -12,3 +12,11 @@ export interface UsuarioEntidadEmpleadora {
   rol: RolUsuario;
   estadousuario: EstadoUsuario;
 }
+
+export const esUsuarioAdministrador = (usuario: UsuarioEntidadEmpleadora) => {
+  return usuario.rol.idrol === 1;
+};
+
+export const esUsuarioAdminHabilitado = (usuario: UsuarioEntidadEmpleadora) => {
+  return esUsuarioAdministrador(usuario) && usuario.estadousuario.descripcion === 'Habilitado';
+};
