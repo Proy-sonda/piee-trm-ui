@@ -73,7 +73,7 @@ const TablaTrabajadores: React.FC<props> = ({
       <Table className="table table-striped">
         <Thead className="align-middle text-center">
           <Tr>
-            <Th>Run</Th>
+            <Th>RUN</Th>
             <Th>Fecha Registro</Th>
             {RolUsuario == 'Administrador' && <Th>Acciones</Th>}
           </Tr>

@@ -601,7 +601,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="...Búsqueda por Run"
+                    placeholder="Búsqueda por RUN..."
                     onInput={(e: ChangeEvent<HTMLInputElement>) => {
                       e.preventDefault();
                       settrabajadores(

@@ -257,7 +257,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="...Buscar por RUN"
+                  placeholder="Búsqueda por RUN..."
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setusuariosAsociados(
                       datosPagina?.usuarioAso.filter(({ runusuario }) =>

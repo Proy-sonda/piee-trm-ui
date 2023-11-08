@@ -105,7 +105,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="...Busqueda"
+                  placeholder="Búsqueda por código unidad o RUN..."
                   onChange={(e) => {
                     setunidadesFiltradas(
                       unidades?.filter(
