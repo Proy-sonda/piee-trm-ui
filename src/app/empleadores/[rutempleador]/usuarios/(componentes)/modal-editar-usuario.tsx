@@ -211,7 +211,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   <InputEmail
                     name="confirmarEmail"
                     debeCoincidirCon="email"
-                    label="Correo electrónico"
+                    label="Confirmar correo electrónico"
                     className="col-12 col-lg-6 col-xl-3"
                   />
                 </div>
