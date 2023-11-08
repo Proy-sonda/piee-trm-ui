@@ -1,3 +1,4 @@
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
@@ -26,6 +27,8 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   onUsuarioEliminado,
 }) => {
   const { usuario, logout } = useContext(AuthContext);
+
+  const { empleadorActual } = useEmpleadorActual();
 
   const { RolUsuario } = useRol();
 
@@ -94,7 +97,14 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     }
 
     try {
-      await eliminarUsuario(usuario.idusuario);
+      if (!empleadorActual) {
+        throw new Error('NO EXISTE EL EMPLEADOR AUN');
+      }
+
+      await eliminarUsuario({
+        ...usuario,
+        rutEmpleador: empleadorActual.rutempleador,
+      });
 
       AlertaExito.fire({
         html: `Persona usuaria fue eliminada con éxito`,
