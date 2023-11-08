@@ -95,10 +95,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
         rutEmpleador: empleador.rutempleador,
       });
 
-      AlertaExito.fire({
-        text: 'Persona usuaria actualizada con éxito',
-        didClose: () => (window.location.href = window.location.href),
-      });
+      AlertaExito.fire({ text: 'Persona usuaria actualizada con éxito' });
 
       onUsuarioEditado();
     } catch (error) {
@@ -186,7 +183,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                     />
                   ) : (
                     <div className="col-12 col-lg-6 col-xl-3">
-                      <label className="mb-2">Rol</label>
+                      <label className="form-label mb-2">Rol (*)</label>
                       <input type="text" className="form-control" value={rol} disabled />
                     </div>
                   )}
