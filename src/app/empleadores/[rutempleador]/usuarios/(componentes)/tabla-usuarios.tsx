@@ -159,11 +159,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 <Td>{usuario.telefonouno.trim() || ' '}</Td>
                 <Td>{usuario.email}</Td>
               </IfContainer>
-              <Td>
-                <select className="form-select form-select-sm" disabled>
-                  <option>{usuario.rol.rol}</option>
-                </select>
-              </Td>
+              <Td>{usuario.rol.rol}</Td>
               <Td>{usuario.estadousuario.descripcion}</Td>
               {RolUsuario == 'Administrador' && (
                 <Td>
