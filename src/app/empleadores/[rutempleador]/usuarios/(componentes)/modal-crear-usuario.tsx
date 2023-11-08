@@ -18,6 +18,7 @@ import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioCrearUsuario } from '../(modelos)/formulario-crear-usuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
+import { buscarUsuarioPorRut } from '../(servicios)/buscar-usuario-por-rut';
 import { PersonaUsuariaYaExisteError, crearUsuario } from '../(servicios)/crear-usuario';
 
 interface ModalCrearUsuarioProps {
@@ -39,9 +40,14 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     roles: buscarRolesUsuarios(),
   });
 
+  const [bloquearRut, setBloquearRut] = useState(false);
+
   const formulario = useForm<FormularioCrearUsuario>({ mode: 'onBlur' });
 
-  const limpiarFormulario = formulario.reset;
+  const limpiarFormulario = () => {
+    formulario.reset();
+    setBloquearRut(false);
+  };
 
   const handleCrearUsuario: SubmitHandler<FormularioCrearUsuario> = async (data) => {
     try {
@@ -91,6 +97,34 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     onCerrarModal();
   };
 
+  const parcharConRut = async (rut: string) => {
+    const [req] = buscarUsuarioPorRut(rut);
+
+    try {
+      setMostrarSpinner(true);
+
+      const usuario = await req();
+
+      if (usuario) {
+        formulario.setValue('rut', usuario.rutusuario);
+        formulario.setValue('nombres', usuario.nombres);
+        formulario.setValue('apellidos', usuario.apellidos);
+        formulario.setValue('telefono1', usuario.telefonouno);
+        formulario.setValue('telefono2', usuario.telefonodos);
+        formulario.setValue('email', usuario.email);
+        formulario.setValue('confirmarEmail', usuario.email);
+
+        formulario.clearErrors();
+
+        setBloquearRut(true);
+      }
+    } catch (error) {
+      // Nada que hacer si hay un error
+    } finally {
+      setMostrarSpinner(false);
+    }
+  };
+
   return (
     <>
       <IfContainer show={mostrarSpinner}>
@@ -119,6 +153,8 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                     name="rut"
                     label="RUN"
                     tipo="run"
+                    deshabilitado={bloquearRut}
+                    onBlur={parcharConRut}
                     className="col-12 col-lg-6 col-xl-3"
                   />
 

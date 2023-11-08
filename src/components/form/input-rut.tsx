@@ -12,6 +12,9 @@ interface InputRutProps extends InputReciclableBase {
   tipo?: 'rut' | 'run';
 
   omitirSignoObligatorio?: boolean;
+
+  /** Solo se va a llamar si el RUT es valido */
+  onBlur?: (rut: string) => Promise<void> | void;
 }
 
 export const InputRut: React.FC<InputRutProps> = ({
@@ -22,6 +25,7 @@ export const InputRut: React.FC<InputRutProps> = ({
   deshabilitado,
   opcional,
   omitirSignoObligatorio,
+  onBlur: onBlurInterno,
 }) => {
   const { register, setValue } = useFormContext();
 
@@ -78,9 +82,11 @@ export const InputRut: React.FC<InputRutProps> = ({
               setValue(name, rut.length > 2 ? formatRut(rut, false) : rut);
             },
             onBlur: (event) => {
-              const rut = event.target.value;
+              const rut = event.target.value ?? '';
+
               if (validateRut(rut)) {
                 setValue(name, formatRut(rut, false));
+                onBlurInterno?.(rut);
               }
             },
           })}
