@@ -200,6 +200,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       />
 
                       <InputBlockDepartamento
+                        opcional
                         name="departamento"
                         className="col-12 col-lg-6 col-xl-3"
                         label="Block / Departamento"
