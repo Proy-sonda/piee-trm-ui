@@ -478,6 +478,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 />
 
                 <InputBlockDepartamento
+                  opcional
                   label="Departamento"
                   name="departamento"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"

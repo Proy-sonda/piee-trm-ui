@@ -9,6 +9,7 @@ interface InputBlockDepartamentoProps extends InputReciclableBase {}
 export const InputBlockDepartamento: React.FC<InputBlockDepartamentoProps> = ({
   name,
   label,
+  opcional,
   className,
 }) => {
   const { register, setValue } = useFormContext();
@@ -18,6 +19,7 @@ export const InputBlockDepartamento: React.FC<InputBlockDepartamentoProps> = ({
     name,
     label: {
       texto: label,
+      opcional: opcional,
     },
   });
 
@@ -31,6 +33,10 @@ export const InputBlockDepartamento: React.FC<InputBlockDepartamentoProps> = ({
           autoComplete="new-custom-value"
           isInvalid={tieneError}
           {...register(name, {
+            required: {
+              value: !opcional,
+              message: 'Este campo es obligatoio',
+            },
             maxLength: {
               value: 20,
               message: 'No puede tener más de 20 carcateres',

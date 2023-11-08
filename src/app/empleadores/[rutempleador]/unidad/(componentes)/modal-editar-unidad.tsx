@@ -209,6 +209,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                   <InputNumero name="numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
 
                   <InputBlockDepartamento
+                    opcional
                     name="blockdepto"
                     label="Departamento"
                     className="col-12 col-lg-6 col-xl-3"

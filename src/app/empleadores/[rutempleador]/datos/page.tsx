@@ -258,6 +258,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
               <InputNumero name="numero" label="Número" className="col-12 col-md-6 col-lg-4" />
 
               <InputBlockDepartamento
+                opcional
                 name="departamento"
                 label="Block / Departamento"
                 className="col-12 col-md-6 col-lg-4"
