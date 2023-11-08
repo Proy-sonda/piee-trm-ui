@@ -128,7 +128,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
       <Table className="table table-hover">
         <Thead className="text-center align-middle">
           <Tr>
-            <Th>RUT</Th>
+            <Th>RUN</Th>
             <Th>Nombre</Th>
             <IfContainer show={noEsTablet()}>
               <Th>Teléfono</Th>
