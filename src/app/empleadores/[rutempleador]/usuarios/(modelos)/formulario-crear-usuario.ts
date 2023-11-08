@@ -6,5 +6,5 @@ export interface FormularioCrearUsuario {
   telefono2: string;
   email: string;
   confirmarEmail: string;
-  rolId: string;
+  rolId: number;
 }

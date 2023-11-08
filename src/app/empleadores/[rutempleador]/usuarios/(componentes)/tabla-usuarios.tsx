@@ -1,3 +1,4 @@
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
@@ -26,6 +27,8 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   onUsuarioEliminado,
 }) => {
   const { usuario, logout } = useContext(AuthContext);
+
+  const { empleadorActual } = useEmpleadorActual();
 
   const { RolUsuario } = useRol();
 
@@ -94,7 +97,14 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     }
 
     try {
-      await eliminarUsuario(usuario.idusuario);
+      if (!empleadorActual) {
+        throw new Error('NO EXISTE EL EMPLEADOR AUN');
+      }
+
+      await eliminarUsuario({
+        ...usuario,
+        rutEmpleador: empleadorActual.rutempleador,
+      });
 
       AlertaExito.fire({
         html: `Persona usuaria fue eliminada con éxito`,
@@ -135,13 +145,13 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               <Td>
                 {RolUsuario == 'Administrador' ? (
                   <span
-                    className="text-primary cursor-pointer"
+                    className="text-primary cursor-pointer text-nowrap"
                     title="Editar persona usuaria"
                     onClick={() => handleEditarUsuario(usuario.idusuario)}>
                     {usuario.rutusuario}
                   </span>
                 ) : (
-                  <>{usuario.rutusuario}</>
+                  <span className="text-nowrap">{usuario.rutusuario}</span>
                 )}
               </Td>
               <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
@@ -149,11 +159,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 <Td>{usuario.telefonouno.trim() || ' '}</Td>
                 <Td>{usuario.email}</Td>
               </IfContainer>
-              <Td>
-                <select className="form-select form-select-sm" disabled>
-                  <option>{usuario.rol.rol}</option>
-                </select>
-              </Td>
+              <Td>{usuario.rol.rol}</Td>
               <Td>{usuario.estadousuario.descripcion}</Td>
               {RolUsuario == 'Administrador' && (
                 <Td>

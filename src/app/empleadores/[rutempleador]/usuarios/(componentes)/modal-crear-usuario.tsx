@@ -1,3 +1,4 @@
+import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
 import {
   ComboSimple,
   InputApellidos,
@@ -10,6 +11,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
@@ -20,14 +22,14 @@ import { PersonaUsuariaYaExisteError, crearUsuario } from '../(servicios)/crear-
 
 interface ModalCrearUsuarioProps {
   show: boolean;
-  idEmpleador: number;
+  empleador?: EmpleadorPorId;
   onCerrarModal: () => void;
   onUsuarioCreado: () => void;
 }
 
 const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
   show,
-  idEmpleador,
+  empleador,
   onCerrarModal,
   onUsuarioCreado,
 }) => {
@@ -42,30 +44,17 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
   const limpiarFormulario = formulario.reset;
 
   const handleCrearUsuario: SubmitHandler<FormularioCrearUsuario> = async (data) => {
-    const rol = datosModal!.roles.find((rol) => rol.idrol === parseInt(data.rolId));
-    if (!rol) {
-      throw new Error('El rol no se ha seleccionado o no existe');
-    }
-
     try {
+      if (!empleador) {
+        throw new Error('NO EXISTE EL EL EMPLEADOR');
+      }
+
       setMostrarSpinner(true);
 
       await crearUsuario({
-        rutusuario: data.rut,
-        nombres: data.nombres,
-        apellidos: data.apellidos,
-        email: data.email,
-        emailconfirma: data.confirmarEmail,
-        telefonouno: data.telefono1,
-        telefonodos: data.telefono2,
-        rol: rol,
-        usuarioempleador: [
-          {
-            empleador: {
-              idempleador: idEmpleador,
-            },
-          },
-        ],
+        ...data,
+        idEmpleador: empleador.idempleador,
+        rutEmpleador: empleador.rutempleador,
       });
 
       AlertaExito.fire({ text: 'Persona usuaria creada con éxito' });
@@ -74,12 +63,17 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
 
       onUsuarioCreado();
     } catch (error) {
-      console.error({ error });
-
       if (error instanceof PersonaUsuariaYaExisteError) {
         return AlertaError.fire({
           title: 'Error',
           text: 'El RUT de la persona usuaria ya existe',
+        });
+      }
+
+      if (error instanceof WebServiceOperadoresError) {
+        return AlertaError.fire({
+          title: 'Error',
+          text: 'Hubo un error al crear a la persona usuaria en el operador',
         });
       }
 

@@ -5,23 +5,20 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import React, { useState } from 'react';
+import { strIncluye } from '@/utilidades';
+import React, { useEffect, useState } from 'react';
+import { Col, Form, Row } from 'react-bootstrap';
 import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
 import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
 import TablaUsuarios from './(componentes)/tabla-usuarios';
+import { UsuarioEntidadEmpleadora } from './(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from './(servicios)/buscar-usuarios';
 
-interface UsuariosPageProps {
-  params: {
-    idempleador: string;
-  };
-}
+interface UsuariosPageProps {}
 
-const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
-  const idEmpleadorNumber = parseInt(params.idempleador);
-
+const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
   const { cargandoEmpleador, empleadorActual, errorCargarEmpleador } = useEmpleadorActual();
 
   const [refresh, cargarUsuarios] = useRefrescarPagina();
@@ -41,6 +38,31 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
   const [idUsuarioEditar, setIdUsuarioEditar] = useState<number | undefined>(undefined);
 
+  const [textoBusqueda, setTextoBusqueda] = useState('');
+
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState<UsuarioEntidadEmpleadora[]>([]);
+
+  // Filtrar usuarios
+  useEffect(() => {
+    if (!usuarios) {
+      setUsuariosFiltrados([]);
+      return;
+    }
+
+    const filtrados = usuarios.filter((usuario) => {
+      return (
+        strIncluye(usuario.rutusuario, textoBusqueda) ||
+        strIncluye(`${usuario.nombres} ${usuario.apellidos}`, textoBusqueda) ||
+        strIncluye(usuario.email, textoBusqueda) ||
+        strIncluye(usuario.telefonouno, textoBusqueda) ||
+        strIncluye(usuario.rol.rol, textoBusqueda) ||
+        strIncluye(usuario.estadousuario.descripcion, textoBusqueda)
+      );
+    });
+
+    setUsuariosFiltrados(filtrados);
+  }, [usuarios, textoBusqueda]);
+
   return (
     <>
       <Titulo url="">
@@ -48,17 +70,30 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
         Usuarias
       </Titulo>
 
-      {RolUsuario == 'Administrador' && (
-        <div className="mt-4 row">
-          <div className="d-flex justify-content-end">
-            <button
-              className="btn btn-success btn-sm"
-              onClick={() => setAbrirModalCrearUsuario(true)}>
+      <Row className="my-4 g-3">
+        <Col xs={12} sm={8} md={6} lg={5} xxl={4}>
+          <Form.Control
+            type="search"
+            placeholder="Buscar persona usuaria..."
+            value={textoBusqueda}
+            onChange={(event) => setTextoBusqueda(event.target.value ?? '')}
+          />
+        </Col>
+
+        <IfContainer show={RolUsuario === 'Administrador'}>
+          <Col
+            xs={12}
+            sm={4}
+            md={6}
+            lg={7}
+            xxl={8}
+            className="d-flex flex-column flex-md-row justify-content-sm-end">
+            <button className="btn btn-success" onClick={() => setAbrirModalCrearUsuario(true)}>
               + Agregar Usuario
             </button>
-          </div>
-        </div>
-      )}
+          </Col>
+        </IfContainer>
+      </Row>
 
       <div className="row mt-3">
         <div className="col-md-12">
@@ -74,7 +109,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
           <IfContainer show={!cargandoEmpleador && !errorCargarEmpleador}>
             <TablaUsuarios
-              usuarios={usuarios ?? []}
+              usuarios={usuariosFiltrados}
               onEditarUsuario={(idUsuario) => {
                 let contarUsuario = 0;
                 usuarios?.map(({ estadousuario }) => {
@@ -95,7 +130,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
 
       <ModalCrearUsuario
         show={abrirModalCrearUsuario}
-        idEmpleador={idEmpleadorNumber}
+        empleador={empleadorActual}
         onCerrarModal={() => setAbrirModalCrearUsuario(false)}
         onUsuarioCreado={() => {
           cargarUsuarios();
@@ -107,6 +142,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({ params }) => {
         cantidadActivo={cantidadActivo}
         show={abrirModalEditarUsuario}
         idUsuario={idUsuarioEditar}
+        empleador={empleadorActual}
         onCerrarModal={() => {
           setIdUsuarioEditar(undefined);
           setAbrirModalEditarUsuario(false);

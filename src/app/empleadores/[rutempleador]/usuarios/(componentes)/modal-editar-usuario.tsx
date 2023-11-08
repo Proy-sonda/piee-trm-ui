@@ -1,3 +1,4 @@
+import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
 import {
   ComboSimple,
   InputApellidos,
@@ -10,10 +11,10 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
-
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioEditarUsuario } from '../(modelos)/formulario-editar-usuario';
 import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
@@ -24,6 +25,7 @@ interface ModalEditarUsuarioProps {
   show: boolean;
   idUsuario?: number;
   cantidadActivo: number;
+  empleador?: EmpleadorPorId;
   onCerrarModal: () => void;
   onUsuarioEditado: () => void;
 }
@@ -32,6 +34,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
   show,
   idUsuario,
   cantidadActivo,
+  empleador,
   onCerrarModal,
   onUsuarioEditado,
 }) => {
@@ -74,29 +77,22 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
   }, [cargandoUsuario, usuarioEditar, errUsuario]);
 
   const handleActualizarUsuario: SubmitHandler<FormularioEditarUsuario> = async (data) => {
-    const rol = combos!.roles.find((rol) => rol.idrol === data.rolId);
-    if (!rol) {
-      throw new Error('El rol no se ha seleccionado o no existe');
-    }
-
-    if (!usuarioEditar) {
-      throw new Error('No se encuentra la persona usuaria para editar');
-    }
-
     try {
+      if (!empleador) {
+        throw new Error('NO EXISTE EL EMPLEADOR');
+      }
+
+      if (!usuarioEditar) {
+        throw new Error('No se encuentra la persona usuaria para editar');
+      }
+
       setMostrarSpinner(true);
 
       await actualizarUsuario({
-        idusuario: usuarioEditar.idusuario,
-        rutusuario: data.rut,
-        nombres: data.nombres,
-        apellidos: data.apellidos,
-        email: data.email,
-        emailconfirma: data.confirmarEmail,
-        telefonouno: data.telefono1,
-        telefonodos: data.telefono2,
-        rol: rol,
-        estadousuario: usuarioEditar.estadousuario,
+        ...data,
+        idUsuario: usuarioEditar.idusuario,
+        estadoUsuarioId: usuarioEditar.estadousuario.idestadousuario,
+        rutEmpleador: empleador.rutempleador,
       });
 
       AlertaExito.fire({
@@ -106,6 +102,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
       onUsuarioEditado();
     } catch (error) {
+      if (error instanceof WebServiceOperadoresError) {
+        return AlertaError.fire({
+          title: 'Error',
+          text: 'Hubo un error al actualizar a la persona usuaria en el operador',
+        });
+      }
+
       return AlertaError.fire({
         title: 'Error al actualizar persona usuaria',
         text: 'Se ha producido un error desconocido',
