@@ -213,7 +213,6 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                     name="blockdepto"
                     label="Departamento"
                     className="col-12 col-lg-6 col-xl-3"
-                    opcional
                   />
 
                   <InputTelefono
