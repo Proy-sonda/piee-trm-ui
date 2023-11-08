@@ -4,7 +4,7 @@ import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-erro
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl, urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { PayloadOperadores } from '../(modelos)/payload-operadores';
+import { PayloadCambiarUsuarioOperadores } from '../(modelos)/payload-cambiar-usuario-operadores';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 
 type EliminarUsuarioRequest = UsuarioEntidadEmpleadora & {
@@ -41,7 +41,7 @@ async function eliminarUsuarioInterno(idUsuario: number) {
 async function eliminarUsuarioConWS(request: EliminarUsuarioRequest) {
   const token = obtenerToken();
 
-  const payloadOperadores: PayloadOperadores = {
+  const payloadOperadores: PayloadCambiarUsuarioOperadores = {
     RunUsuario: UsuarioToken.fromToken(token).rut,
     usuario: {
       accion: 3,

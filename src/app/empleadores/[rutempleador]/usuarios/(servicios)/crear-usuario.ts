@@ -5,7 +5,7 @@ import { obtenerToken } from '@/servicios/auth';
 import { apiUrl, urlBackendTramitacion } from '@/servicios/environment';
 import { HttpError, runFetchConThrow } from '@/servicios/fetch';
 import { FormularioCrearUsuario } from '../(modelos)/formulario-crear-usuario';
-import { PayloadOperadores } from '../(modelos)/payload-operadores';
+import { PayloadCambiarUsuarioOperadores } from '../(modelos)/payload-cambiar-usuario-operadores';
 
 interface CrearUsuarioRequest extends FormularioCrearUsuario {
   idEmpleador: number;
@@ -68,7 +68,7 @@ async function crearUsuarioConWS(request: CrearUsuarioRequest) {
   const token = obtenerToken();
   const usuario = UsuarioToken.fromToken(token);
 
-  const payloadOperadores: PayloadOperadores = {
+  const payloadOperadores: PayloadCambiarUsuarioOperadores = {
     RunUsuario: usuario.rut,
     usuario: {
       accion: 1,
