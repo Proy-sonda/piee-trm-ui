@@ -42,6 +42,18 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
 
   const [usuariosFiltrados, setUsuariosFiltrados] = useState<UsuarioEntidadEmpleadora[]>([]);
 
+  // Actualizar la cuenta de usuarios activos
+  useEffect(() => {
+    if (!usuarios) {
+      setcantidadActivo(0);
+      return;
+    }
+
+    setcantidadActivo(
+      usuarios.filter(({ estadousuario }) => estadousuario.descripcion !== 'Deshabilitado').length,
+    );
+  }, [usuarios]);
+
   // Filtrar usuarios
   useEffect(() => {
     if (!usuarios) {
@@ -111,14 +123,6 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
             <TablaUsuarios
               usuarios={usuariosFiltrados}
               onEditarUsuario={(idUsuario) => {
-                let contarUsuario = 0;
-                usuarios?.map(({ estadousuario }) => {
-                  if (estadousuario.descripcion == 'Deshabilitado') return;
-                  ++contarUsuario;
-                });
-
-                setcantidadActivo(contarUsuario);
-
                 setIdUsuarioEditar(idUsuario);
                 setAbrirModalEditarUsuario(true);
               }}
