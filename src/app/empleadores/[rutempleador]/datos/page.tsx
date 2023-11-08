@@ -14,10 +14,11 @@ import {
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
+import { AuthContext } from '@/contexts';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
@@ -40,6 +41,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
     useEmpleadorActual();
 
   const [spinnerCargar, setSpinnerCargar] = useState(false);
+
+  const { usuario } = useContext(AuthContext);
 
   const [
     errorCombos,
@@ -106,26 +109,31 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
     try {
       setSpinnerCargar(true);
 
-      await actualizarEmpleador({
-        idEmpleador: empleadorActual.idempleador,
-        rutEmpleador: data.rut,
-        razonSocial: data.razonSocial,
-        nombreFantasia: data.nombreFantasia,
-        email: data.email,
-        emailconfirma: data.emailConfirma,
-        holding: data.holding,
-        telefono1: data.telefono1,
-        telefono2: data.telefono2,
-        calle: data.calle,
-        depto: data.departamento,
-        numero: data.numero,
-        comunaId: data.comunaId,
-        sistemaRemuneracionId: data.sistemaRemuneracionId,
-        tamanoEmpresaId: data.tamanoEmpresaId,
-        tipoEmpleadorId: data.tipoEntidadEmpleadoraId,
-        actividadLaboralId: data.actividadLaboralId,
-        cajaCompensacionId: data.cajaCompensacionId,
-      });
+      if (usuario == undefined) return;
+
+      await actualizarEmpleador(
+        {
+          idEmpleador: empleadorActual.idempleador,
+          rutEmpleador: data.rut,
+          razonSocial: data.razonSocial,
+          nombreFantasia: data.nombreFantasia,
+          email: data.email,
+          emailconfirma: data.emailConfirma,
+          holding: data.holding,
+          telefono1: data.telefono1,
+          telefono2: data.telefono2,
+          calle: data.calle,
+          depto: data.departamento,
+          numero: data.numero,
+          comunaId: data.comunaId,
+          sistemaRemuneracionId: data.sistemaRemuneracionId,
+          tamanoEmpresaId: data.tamanoEmpresaId,
+          tipoEmpleadorId: data.tipoEntidadEmpleadoraId,
+          actividadLaboralId: data.actividadLaboralId,
+          cajaCompensacionId: data.cajaCompensacionId,
+        },
+        usuario?.rut,
+      );
 
       setSpinnerCargar(false);
 

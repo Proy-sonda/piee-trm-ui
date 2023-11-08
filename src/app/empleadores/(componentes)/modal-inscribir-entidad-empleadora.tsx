@@ -11,9 +11,10 @@ import {
 } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
 import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
@@ -33,6 +34,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
   onEntidadEmpleadoraCreada,
 }) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const { usuario } = useContext(AuthContext);
 
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     tipoEmpleadores: buscarTiposDeEmpleadores(),
@@ -61,8 +63,8 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
   const crearNuevaEntidad: SubmitHandler<FormularioInscribirEntidadEmpleadora> = async (data) => {
     try {
       setMostrarSpinner(true);
-
-      await inscribirEmpleador(data);
+      if (usuario == undefined) return;
+      await inscribirEmpleador(data, usuario?.rut);
 
       resetearFormulario();
 
@@ -178,6 +180,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                         idElemento={'idregion'}
                         descripcion={'nombre'}
                         label="Región"
+                        tipoValor="string"
                       />
 
                       <ComboComuna
