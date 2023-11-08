@@ -18,13 +18,15 @@ import { RolUsuarioHook } from '../../(hooks)/use-Rol';
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
   rolUsuario: RolUsuarioHook;
+  cantidadAdministradoresActivos: number;
   onEditarUsuario: (usuarioId: number) => void;
   onUsuarioEliminado: () => void | Promise<void>;
 }
 
 const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   usuarios,
-  rolUsuario: RolUsuario,
+  rolUsuario,
+  cantidadAdministradoresActivos,
   onEditarUsuario: handleEditarUsuario,
   onUsuarioEliminado,
 }) => {
@@ -136,14 +138,14 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
             </IfContainer>
             <Th>Rol</Th>
             <Th>Estado</Th>
-            {RolUsuario == 'Administrador' && <Th></Th>}
+            {rolUsuario == 'Administrador' && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody className="text-center align-middle">
           {usuariosPaginados.map((usuario) => (
             <Tr key={usuario.idusuario}>
               <Td>
-                {RolUsuario === 'Administrador' ? (
+                {rolUsuario === 'Administrador' ? (
                   <span
                     className="text-primary cursor-pointer text-nowrap"
                     title="Editar persona usuaria"
@@ -161,7 +163,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               </IfContainer>
               <Td>{usuario.rol.rol}</Td>
               <Td>{usuario.estadousuario.descripcion}</Td>
-              {RolUsuario == 'Administrador' && (
+              {rolUsuario == 'Administrador' && (
                 <Td>
                   <div className="d-none d-lg-inline-block">
                     <button
@@ -170,7 +172,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                       onClick={() => handleEditarUsuario(usuario.idusuario)}>
                       <i className="bi bi-pencil-square"></i>
                     </button>
-                    <IfContainer show={usuarios.length > 1}>
+                    <IfContainer show={cantidadAdministradoresActivos > 1}>
                       <button
                         className="btn text-primary"
                         title="Eliminar persona usuaria"

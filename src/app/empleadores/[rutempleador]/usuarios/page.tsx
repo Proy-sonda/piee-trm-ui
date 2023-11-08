@@ -123,6 +123,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
           <IfContainer show={!cargandoEmpleador && !errorCargarEmpleador}>
             <TablaUsuarios
               usuarios={usuariosFiltrados}
+              cantidadAdministradoresActivos={cantidadUsuariosAdmin}
               rolUsuario={RolUsuario}
               onEditarUsuario={(idUsuario) => {
                 setIdUsuarioEditar(idUsuario);
