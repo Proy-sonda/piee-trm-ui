@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 type props = {
-  usuarioAsociado: Usuariosunidad[];
+  usuarioAsociado: Usuariosunidad[] | undefined;
   handleDelete: (runusuario: string) => void;
 };
 

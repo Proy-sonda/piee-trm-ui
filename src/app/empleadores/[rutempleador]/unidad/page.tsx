@@ -5,6 +5,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { Unidadesrrhh } from '@/modelos/tramitacion';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -40,6 +41,8 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
 
   const { empleadorActual } = useEmpleadorActual();
 
+  const [unidadesFiltradas, setunidadesFiltradas] = useState<Unidadesrrhh[] | undefined>([]);
+
   const [refrescar, refrescarUnidades] = useRefrescarPagina();
 
   const [errorCargarUnidad, unidades, cargandoUnidades] = useFetch(
@@ -53,6 +56,10 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
     url.searchParams.set('operador', tabOperador);
     window.history.pushState({}, '', url);
   }, [tabOperador]);
+
+  useEffect(() => {
+    setunidadesFiltradas(unidades);
+  }, [unidades]);
 
   return (
     <>
@@ -93,9 +100,25 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
           </IfContainer>
 
           <IfContainer show={!cargandoUnidades && !errorCargarUnidad}>
+            <div className="row mt-2">
+              <div className="col-5">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="... Buscar nombre unidad"
+                  onChange={(e) => {
+                    setunidadesFiltradas(
+                      unidades?.filter(({ glosaunidadrrhh }) =>
+                        glosaunidadrrhh.toUpperCase().includes(e.target.value.toUpperCase()),
+                      ),
+                    );
+                  }}
+                />
+              </div>
+            </div>
             <TablaUnidades
               rutempleador={rutempleador}
-              unidades={unidades ?? []}
+              unidades={unidadesFiltradas ?? []}
               onEditarUnidad={({ codigounidadrrhh }) => {
                 setIdUnidad(codigounidadrrhh);
                 setAbrirModalEditarUnidad(true);

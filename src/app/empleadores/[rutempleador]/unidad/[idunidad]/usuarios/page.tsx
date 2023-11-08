@@ -40,7 +40,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const [spinner, setspinner] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
-  const [usuariosAsociados, setusuariosAsociados] = useState<Usuariosunidad[]>([]);
+  const [usuariosAsociados, setusuariosAsociados] = useState<Usuariosunidad[] | undefined>([]);
   const { RolUsuario } = useRol();
   const { empleadorActual } = useEmpleadorActual();
   const { usuario } = useContext(AuthContext);
@@ -85,14 +85,14 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   useEffect(() => {
     if (datosPagina?.usuarioAso == undefined) return;
     setusuariosAsociados(datosPagina!?.usuarioAso);
-  }, [datosPagina?.usuarioAso]);
+  }, [datosPagina]);
 
   useEffect(() => {
     setusuarios(
       usuarios.filter(
         (usuario) =>
           usuario.rutusuario !==
-          usuariosAsociados.find(
+          usuariosAsociados?.find(
             (usuarioAsociado) => usuarioAsociado.runusuario == usuario.rutusuario,
           )?.runusuario,
       ),
@@ -150,7 +150,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         acccionusuxrrhh: 3,
         codigounidadrrhh: idunidad,
         rolusuario: Number(
-          usuariosAsociados.find(({ runusuario }) => runusuario == runusuarioeliminar)?.rolusuario,
+          usuariosAsociados?.find(({ runusuario }) => runusuario == runusuarioeliminar)?.rolusuario,
         ),
         runusuario: runusuarioeliminar,
       };
@@ -258,18 +258,18 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                   type="text"
                   className="form-control"
                   placeholder="...Buscar por RUN"
-                  onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                  onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setusuariosAsociados(
                       datosPagina?.usuarioAso.filter(({ runusuario }) =>
                         runusuario.includes(e.target.value),
-                      ) || [],
+                      ),
                     );
                   }}
                 />
               </div>
             </div>
             <TableUsuariosAsociados
-              usuarioAsociado={usuariosAsociados ?? []}
+              usuarioAsociado={usuariosAsociados}
               handleDelete={handleDelete}
             />
           </IfContainer>
