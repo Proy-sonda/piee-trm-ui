@@ -79,7 +79,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
     formulario.setValue('direccion', unidadRRHH.direccion);
     formulario.setValue('numero', unidadRRHH.numero);
     formulario.setValue('blockdepto', unidadRRHH.blockdepto);
-    formulario.setValue('codigounidadrrhh', unidadRRHH.codigounidadrrhh);
+    formulario.setValue('codigounidadrrhh', idUnidad ?? unidadRRHH.codigounidadrrhh);
     formulario.setValue('telefono', unidadRRHH.telefono);
     formulario.setValue('codigotipocalle', unidadRRHH.codigotipocalle);
     formulario.setValue('codigocomuna', unidadRRHH.codigocomuna);
@@ -168,6 +168,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                     name="codigounidadrrhh"
                     label="Código Unidad"
                     className="col-12 col-lg-6 col-xl-3"
+                    deshabilitado
                   />
 
                   <InputNombreUnidadRRHH
@@ -211,6 +212,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                     name="blockdepto"
                     label="Departamento"
                     className="col-12 col-lg-6 col-xl-3"
+                    opcional
                   />
 
                   <InputTelefono

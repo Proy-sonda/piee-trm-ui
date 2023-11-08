@@ -10,6 +10,7 @@ export const InputIdentificadorUnidadRRHH: React.FC<InputIdentificadorUnidadRRHH
   name,
   label,
   className,
+  deshabilitado,
 }) => {
   const { register, setValue } = useFormContext();
 
@@ -27,6 +28,7 @@ export const InputIdentificadorUnidadRRHH: React.FC<InputIdentificadorUnidadRRHH
           type="text"
           autoComplete="new-custom-value"
           isInvalid={tieneError}
+          disabled={deshabilitado}
           {...register(name, {
             required: {
               value: true,

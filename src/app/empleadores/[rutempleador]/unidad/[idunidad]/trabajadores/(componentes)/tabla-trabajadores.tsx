@@ -5,7 +5,6 @@ import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import { AlertaConfirmacion } from '@/utilidades/alertas';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
-import Link from 'next/link';
 import { FormEvent } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
@@ -84,19 +83,19 @@ const TablaTrabajadores: React.FC<props> = ({
             trabajadoresPaginados.map((trabajador) => (
               <Tr key={trabajador.runtrabajador}>
                 <Td>
-                  <Link
+                  {/* <Link
                     href={''}
                     onClick={() =>
                       handleEditTrabajador(trabajador.codigounidadrrhh, trabajador.runtrabajador)
-                    }>
-                    {trabajador.runtrabajador}
-                  </Link>
+                    }> */}
+                  {trabajador.runtrabajador}
+                  {/* </Link> */}
                 </Td>
                 <td>{format(new Date(trabajador.fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</td>
 
                 {RolUsuario == 'Administrador' && (
                   <Td>
-                    <button
+                    {/* <button
                       className="btn btn-sm btn-primary"
                       onClick={() =>
                         handleEditTrabajador(trabajador.codigounidadrrhh, trabajador.runtrabajador)
@@ -105,7 +104,7 @@ const TablaTrabajadores: React.FC<props> = ({
                         title={`editar ${trabajador.runtrabajador}`}
                         className={'bi bi-pencil-square'}></i>
                     </button>
-                    &nbsp;
+                    &nbsp; */}
                     <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleDeleteTrabajador(trabajador)}>
