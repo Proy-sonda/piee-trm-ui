@@ -97,7 +97,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
           )?.runusuario,
       ),
     );
-  }, [usuariosAsociados]);
+  }, [datosPagina?.usuarioAso]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 

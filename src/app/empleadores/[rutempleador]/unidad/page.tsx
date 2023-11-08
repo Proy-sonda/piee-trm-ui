@@ -105,11 +105,13 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
                 <input
                   type="text"
                   className="form-control"
-                  placeholder="... Buscar nombre unidad"
+                  placeholder="...Busqueda"
                   onChange={(e) => {
                     setunidadesFiltradas(
-                      unidades?.filter(({ glosaunidadrrhh }) =>
-                        glosaunidadrrhh.toUpperCase().includes(e.target.value.toUpperCase()),
+                      unidades?.filter(
+                        ({ glosaunidadrrhh, codigounidadrrhh }) =>
+                          glosaunidadrrhh.toUpperCase().includes(e.target.value.toUpperCase()) ||
+                          codigounidadrrhh.includes(e.target.value),
                       ),
                     );
                   }}
