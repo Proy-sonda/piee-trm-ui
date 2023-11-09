@@ -1,16 +1,15 @@
 'use client';
 
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface InputRutBusquedaProps extends BaseProps {
+interface InputRutBusquedaProps extends InputReciclableBase {
   /** Define si usar RUT o RUN en los mensajes de error (defecto: `rut`) */
   tipo?: 'rut' | 'run';
-  opcional?: boolean;
 }
 
 /**
@@ -25,25 +24,29 @@ export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
 }) => {
   const largoRutValidar = 8;
 
-  const idInput = useRandomId('rut');
+  const { register, setValue } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    name,
+    prefijoId: 'rutBusqueda',
+    label: {
+      texto: label,
+      opcional,
+      omitirSignoObligatorio: false,
+    },
+  });
 
   const tipoInput = () => (!tipo || tipo === 'rut' ? 'RUT' : 'RUN');
 
   return (
     <>
       <Form.Group className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label}${!opcional ? ' (*)' : ''}`}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           {...register(name, {
             required: {
               value: !opcional,
@@ -84,7 +87,7 @@ export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </Form.Group>
     </>

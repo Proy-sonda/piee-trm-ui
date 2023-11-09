@@ -1,11 +1,11 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import isEmail from 'validator/lib/isEmail';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface InputEmailProps extends BaseProps {
+interface InputEmailProps extends InputReciclableBase {
   /**
    * Propiedad `name` del `EmailInput` con el que este input debe coincidir.
    *
@@ -30,21 +30,22 @@ export const InputEmail: React.FC<InputEmailProps> = ({
   className,
   debeCoincidirCon,
 }) => {
-  const idInput = useRandomId('email');
+  const { register, getValues } = useFormContext();
 
-  const {
-    register,
-    getValues,
-    formState: { errors },
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'email',
+    name,
+    label: { texto: label },
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label} (*)`}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="email"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           autoComplete="new-custom-value"
           placeholder="ejemplo@ejemplo.cl"
           onPaste={(e) => e.preventDefault()}
@@ -75,7 +76,7 @@ export const InputEmail: React.FC<InputEmailProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

@@ -42,72 +42,16 @@ table tbody tr td div button {
   background-color: var(--color-blue) !important;
 }
 
-/* ELIMINABLE */
-/* .font-sm {
-  font-size: 11.5px !important;
-} */
-
-/* ELIMINABLE */
-/* .disabledbutton {
-  pointer-events: none;
-} */
-
-/* ELIMINABLE */
-/* .col-md-3 a label {
-  color: red;
-} */
-
-/* ELIMINABLE */
-/* .spannum {
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  background-color: #e7f2ff;
-  color: var(--color-blue);
-  text-align: center;
-  font-size: 36px;
-  margin-top: 14px;
-  margin-bottom: 14px;
-  display: inline-block;
-} */
-
-.bgads {
-  background-color: white;
-  box-shadow: 100px;
-  margin-bottom: 10px;
-  /* padding-left: 10px; */
-  /* margin-right: 5%; */
-  /* padding-right: 10px; */
-  /* height: 400px; */
+/***************************** react-date-picker ******************************/
+.react-datepicker__header {
+  background-color: var(--color-blue) !important;
 }
 
-/* ELIMINABLE */
-/* .spantext {
-  margin-left: 20px;
-  margin-bottom: 30px;
-  color: var(--color-blue);
-  font-size: 24px;
-} */
-
-/* ELIMINABLE */
-/* .btngob {
-  border: 1px solid var(--color-blue);
-  background-color: var(--color-blue);
-  color: white;
-  width: 100%;
-  height: 100%;
-  border-radius: 2%;
-} */
-
-/* ELIMINABLE */
-/* .parr {
-  text-align: justify !important;
-} */
-
-/* ELIMINABLE */
-/* .blur {
-  filter: blur(5px);
-} */
+.react-datepicker-popper[data-placement^='bottom'] .react-datepicker__triangle::before,
+.react-datepicker-popper[data-placement^='bottom'] .react-datepicker__triangle::after {
+  border-bottom-color: var(--color-blue) !important;
+}
+/*************************** END react-date-picker ****************************/
 
 /********************************* UTILIDADES *********************************/
 .cursor-pointer {

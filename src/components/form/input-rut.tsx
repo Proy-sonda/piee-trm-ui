@@ -1,67 +1,55 @@
 'use client';
 
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import IfContainer from '../if-container';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface InputRutProps extends Omit<BaseProps, 'label'> {
-  label?: string;
-
-  omitirLabel?: boolean;
-
+interface InputRutProps extends InputReciclableBase {
   /** Define si usar RUT o RUN en los mensajes de error (defecto: `rut`) */
   tipo?: 'rut' | 'run';
 
-  deshabilitado?: boolean;
-
   omitirSignoObligatorio?: boolean;
 
-  opcional?: boolean;
+  /** Solo se va a llamar si el RUT es valido */
+  onBlur?: (rut: string) => Promise<void> | void;
 }
 
 export const InputRut: React.FC<InputRutProps> = ({
   name,
   className,
   label,
-  omitirLabel,
   tipo,
   deshabilitado,
   opcional,
   omitirSignoObligatorio,
+  onBlur: onBlurInterno,
 }) => {
-  const idInput = useRandomId('rut');
+  const { register, setValue } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    name,
+    prefijoId: 'rut',
+    label: {
+      texto: label,
+      opcional,
+      omitirSignoObligatorio,
+    },
+  });
 
   const tipoInput = () => (!tipo || tipo === 'rut' ? 'RUT' : 'RUN');
-
-  const determinarLabel = () => {
-    if (label === undefined || label === null) {
-      return '';
-    }
-
-    return omitirSignoObligatorio || opcional ? `${label}` : `${label} (*)`;
-  };
 
   return (
     <>
       <Form.Group className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <IfContainer show={!omitirLabel}>
-          <Form.Label>{determinarLabel()}</Form.Label>
-        </IfContainer>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
           type="text"
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           disabled={deshabilitado}
           {...register(name, {
             required: {
@@ -94,16 +82,18 @@ export const InputRut: React.FC<InputRutProps> = ({
               setValue(name, rut.length > 2 ? formatRut(rut, false) : rut);
             },
             onBlur: (event) => {
-              const rut = event.target.value;
+              const rut = event.target.value ?? '';
+
               if (validateRut(rut)) {
                 setValue(name, formatRut(rut, false));
+                onBlurInterno?.(rut);
               }
             },
           })}
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </Form.Group>
     </>

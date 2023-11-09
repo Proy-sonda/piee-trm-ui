@@ -1,67 +1,124 @@
 'use client';
 
-import { useRandomId } from '@/hooks/use-random-id';
+import IfContainer from '@/components/if-container';
+import { TextoBuenoMalo } from '@/components/texto-bueno-malo';
+import { Options, Result, passwordStrength } from 'check-password-strength';
 import React, { useState } from 'react';
-import { Form, FormGroup, InputGroup } from 'react-bootstrap';
+import { Form, FormGroup, InputGroup, ProgressBar } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { ErroresEditables, InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
-interface InputClaveProps extends BaseProps {
+interface InputClaveProps
+  extends InputReciclableBase,
+    ErroresEditables<'requerida' | 'clavesNoCoinciden'> {
   /**
-   * Propiedad `name` del `ClaveInput` con el que este input debe coincidir.
+   * Propiedad `name` del `InputClave` con el que este input debe coincidir.
    *
    * Si los valores no coindiden, el error se muestra en el input que define la propiedad
    * `debeCoincidirCon`.
    *
    * @example
    *  ```typescriptreact
-   *  <ClaveInput name="pwd" />
+   *  <InputClave name="pwd" />
    *
    *  // Se valida en este input que el valor coincida con el valor que tiene el input con la
    *  // propiedad name="pwd".
-   *  <ClaveInput name="pwdConfirma" debeCoincidirCon="pwd" />
+   *  <InputClave name="pwdConfirma" debeCoincidirCon="pwd" />
    *  ```
    */
   debeCoincidirCon?: string;
 
   omitirSignoObligatorio?: boolean;
 
-  errores?: {
-    requerida?: string;
-    clavesNoCoinciden?: string;
-  };
+  validarFortaleza?: boolean;
 }
 
 export const InputClave: React.FC<InputClaveProps> = ({
   name,
   label,
+  opcional,
   className,
   debeCoincidirCon,
   omitirSignoObligatorio,
+  validarFortaleza,
   errores,
 }) => {
-  const idInput = useRandomId('clave');
+  const opcionesPwd: Options<string> = [
+    { id: 0, value: 'Muy Débil', minDiversity: 0, minLength: 0 },
+    { id: 1, value: 'Débil', minDiversity: 2, minLength: 6 },
+    { id: 2, value: 'Normal', minDiversity: 3, minLength: 8 },
+    { id: 3, value: 'Fuerte', minDiversity: 4, minLength: 10 },
+  ];
 
   const [verClave, setVerClave] = useState(false);
 
-  const {
-    register,
-    formState: { errors },
-    getValues,
-  } = useFormContext();
+  const [mostrarRequerimientos, setMostrarRequerimientos] = useState(false);
+
+  const [resultadoClave, setResultadoClave] = useState<Result<string>>();
+
+  const { register, getValues } = useFormContext();
+
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'pwd',
+    name,
+    label: {
+      texto: label,
+      opcional,
+      omitirSignoObligatorio,
+    },
+  });
+
+  const porcentajeFortaleza = () => {
+    if (!getValues(name)) {
+      return 0;
+    }
+
+    switch (resultadoClave?.id) {
+      case 0:
+        return 25;
+      case 1:
+        return 50;
+      case 2:
+        return 75;
+      case 3:
+        return 100;
+      default:
+        return 0;
+    }
+  };
+
+  const colorFortaleza = () => {
+    switch (resultadoClave?.id) {
+      case 0:
+        return 'danger';
+      case 1:
+        return 'warning';
+      case 2:
+        return 'primary';
+      case 3:
+        return 'success';
+      default:
+        return 'secondary';
+    }
+  };
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{omitirSignoObligatorio ? `${label}` : `${label} (*)`}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <InputGroup>
           <Form.Control
             type={verClave ? 'text' : 'password'}
             autoComplete="new-custom-value"
-            isInvalid={!!errors[name]}
+            onFocus={() => setMostrarRequerimientos(!!validarFortaleza)}
+            isInvalid={tieneError}
             {...register(name, {
-              required: errores?.requerida ?? 'La clave es obligatoria',
+              required: {
+                value: !opcional,
+                message: errores?.requerida ?? 'La clave es obligatoria',
+              },
               validate: {
                 clavesCoinciden: (clave) => {
                   if (!debeCoincidirCon) {
@@ -76,6 +133,26 @@ export const InputClave: React.FC<InputClaveProps> = ({
                     return errores?.clavesNoCoinciden ?? 'Las contraseñas no coinciden';
                   }
                 },
+                validarFortaleza: (clave) => {
+                  if (!validarFortaleza) {
+                    return;
+                  }
+
+                  const resultado = passwordStrength(clave);
+                  if (resultado.id < 3 && resultado.length < 10) {
+                    return 'La contraseña no cumple con los requisitos';
+                  }
+                },
+              },
+              onChange: (event) => {
+                if (validarFortaleza) {
+                  const clave: string = event.target.value ?? '';
+
+                  setResultadoClave(passwordStrength(clave, opcionesPwd));
+                }
+              },
+              onBlur: () => {
+                setMostrarRequerimientos(false);
               },
             })}
           />
@@ -88,9 +165,43 @@ export const InputClave: React.FC<InputClaveProps> = ({
           </InputGroup.Text>
 
           <Form.Control.Feedback type="invalid" tooltip>
-            {errors[name]?.message?.toString()}
+            {mensajeError}
           </Form.Control.Feedback>
         </InputGroup>
+
+        <IfContainer show={validarFortaleza && mostrarRequerimientos}>
+          <ProgressBar
+            className={`mb-3 ${tieneError ? 'mt-5' : 'mt-3'}`}
+            label={resultadoClave?.value}
+            now={porcentajeFortaleza()}
+            variant={colorFortaleza()}
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave && resultadoClave.length >= 10}
+            texto="Al menos 10 caracteres de largo"
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave?.contains.includes('uppercase')}
+            texto="Al menos una letra mayúscula"
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave?.contains.includes('lowercase')}
+            texto="Al menos una letra minúscula"
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave?.contains.includes('number')}
+            texto="Al menos un número"
+          />
+
+          <TextoBuenoMalo
+            estaBueno={resultadoClave?.contains.includes('symbol')}
+            texto="Al menos un símbolo"
+          />
+        </IfContainer>
       </FormGroup>
     </>
   );

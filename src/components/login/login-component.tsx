@@ -12,6 +12,8 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import IfContainer from '../if-container';
+import SpinnerPantallaCompleta from '../spinner-pantalla-completa';
 import styles from './login.module.css';
 import ModalCambiarClaveTemporal from './modal-cambiar-clave-temporal';
 import ModalClaveEnviada from './modal-clave-enviada';
@@ -26,6 +28,7 @@ export const LoginComponent: React.FC<{}> = () => {
   const [showModalCambiarClave, setShowModalCambiarClave] = useState(false);
   const [showModalRecuperarClave, setShowModalRecuperarClave] = useState(false);
   const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
+  const [showSpinner, setShowSpinner] = useState(false);
 
   const router = useRouter();
 
@@ -54,6 +57,8 @@ export const LoginComponent: React.FC<{}> = () => {
 
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
     try {
+      setShowSpinner(true);
+
       await login(rut, clave);
 
       Swal.fire({
@@ -85,11 +90,17 @@ export const LoginComponent: React.FC<{}> = () => {
           html: messageError,
           confirmButtonColor: 'var(--color-blue)',
         });
+    } finally {
+      setShowSpinner(false);
     }
   };
 
   return (
     <>
+      <IfContainer show={showSpinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
+
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(handleLoginUsuario)} className={styles.formlogin}>
           <label style={{ fontWeight: 'bold' }}>
@@ -98,17 +109,17 @@ export const LoginComponent: React.FC<{}> = () => {
           <br />
 
           <InputRut
+            omitirSignoObligatorio
             label="RUN Persona Usuaria"
             name="rut"
             tipo="run"
-            omitirSignoObligatorio
             className="mb-3 mt-3"
           />
 
           <InputClave
+            omitirSignoObligatorio
             label="Clave de acceso"
             name="clave"
-            omitirSignoObligatorio
             className="mb-3"
           />
 
@@ -134,11 +145,11 @@ export const LoginComponent: React.FC<{}> = () => {
       <ModalCambiarClaveTemporal
         rutUsuario={rutUsuario}
         show={showModalCambiarClave}
-        onCerrarModal={() => {
-          setShowModalCambiarClave(false);
-        }}
+        onCerrarModal={() => setShowModalCambiarClave(false)}
         onClaveCambiada={() => {
           setShowModalCambiarClave(false);
+          formulario.setValue('clave', '', { shouldValidate: false });
+          formulario.setFocus('clave');
         }}
       />
 

@@ -1,21 +1,17 @@
-import { BaseProps } from '@/components/form';
-import { useRandomId } from '@/hooks/use-random-id';
+import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
+import { useInputReciclable } from '@/components/form/hooks';
 import { esFechaInvalida } from '@/utilidades';
 import { differenceInDays } from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
-interface InputDiasProps extends Omit<BaseProps, 'label'> {
-  opcional?: boolean;
-
+interface InputDiasProps extends InputReciclableBase, UnibleConFormArray {
   /** Número mínimo de días (default: 0) */
   minDias?: number;
 
   /** Numero maximo de dias (default: `31`) */
   maxDias?: number;
-
-  deshabilitado?: boolean;
 
   coincideConRango?: {
     /** Nombre del input en la función `register` para la fecha desde */
@@ -24,32 +20,11 @@ interface InputDiasProps extends Omit<BaseProps, 'label'> {
     /** Nombre del input en la función `register` para la fecha hasta */
     hasta: string;
   };
-
-  /**
-   * Indica de donde obtener los errores cuando se usa el input con `useFieldArray.
-   *
-   * Si se incluye esta propiedad se obtienen desde el arreglo usado por `useFieldArray`, pero si
-   * no se incluye se van a tratar de obtener los errores desde la propiedad`formState.errors[name]`
-   * que devuelve `useFormContext`.
-   */
-  unirConFieldArray?: {
-    /**
-     * La propiedad `name` usada cuando se creo el field array con `useFieldArray`.
-     * */
-    fieldArrayName: string;
-
-    /** El indice del input. */
-    index: number;
-
-    /**
-     * Nombre de la propiedad de un elemento del field array.
-     */
-    campo: string;
-  };
 }
 
 export const InputDias: React.FC<InputDiasProps> = ({
   name,
+  label,
   className,
   opcional,
   minDias,
@@ -61,43 +36,25 @@ export const InputDias: React.FC<InputDiasProps> = ({
   const minDiasFinal = minDias ?? 0;
   const maxDiasFinal = maxDias ?? 31;
 
-  const idInput = useRandomId('dias');
+  const { register, setValue, getValues } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-    setValue,
-    getValues,
-  } = useFormContext();
-
-  const tieneError = () => {
-    if (!unirConFieldArray) {
-      return !!errors[name];
-    }
-
-    const { fieldArrayName, index, campo } = unirConFieldArray;
-
-    return !!(errors[fieldArrayName] as any)?.at?.(index)?.[campo];
-  };
-
-  const mensajeDeError = () => {
-    if (!unirConFieldArray) {
-      return errors[name]?.message?.toString();
-    }
-
-    const { fieldArrayName, index, campo } = unirConFieldArray;
-
-    return (errors[fieldArrayName] as any)?.at?.(index)?.[campo]?.message?.toString();
-  };
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    name,
+    prefijoId: 'dias',
+    label: { texto: label },
+    unirConFieldArray,
+  });
 
   return (
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+
         <Form.Control
           type="number"
           inputMode="numeric"
           disabled={deshabilitado === true}
-          isInvalid={tieneError()}
+          isInvalid={tieneError}
           {...register(name, {
             valueAsNumber: true,
             required: {
@@ -145,7 +102,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {mensajeDeError()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

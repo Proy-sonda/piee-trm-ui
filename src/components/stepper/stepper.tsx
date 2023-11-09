@@ -73,6 +73,7 @@ export const Stepper: FC<Myprops> = ({ Options, onLinkClickeado }) => {
                   )}
                 </div>
               </div>
+
               <div className={`${styles.line} d-none d-md-inline-block`}></div>
             </Fragment>
           );
