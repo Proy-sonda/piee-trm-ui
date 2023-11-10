@@ -1,16 +1,14 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from '.';
+import { InputReciclableBase } from '.';
+import { useInputReciclable } from './hooks';
 
-interface InputArchivoProps extends BaseProps {
-  opcional?: boolean;
-
+interface InputArchivoProps extends InputReciclableBase {
   multiple?: boolean;
 }
 
-/** El valor del input va a ser un arreglo de objetos {@link File} */
+/** El valor del input va a ser un  {@link FileList} */
 export const InputArchivo: React.FC<InputArchivoProps> = ({
   name,
   label,
@@ -18,21 +16,25 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({
   opcional,
   multiple,
 }) => {
-  const idInput = useRandomId('archivo');
+  const { register } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'archivo',
+    name,
+    label: {
+      texto: label,
+      opcional,
+    },
+  });
 
   return (
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
-        <Form.Label>{`${label}${!opcional ? ' (*)' : ''}`}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
           type="file"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           multiple={multiple !== undefined && multiple === true}
           {...register(name, {
             required: {
@@ -43,7 +45,7 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({
         />
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

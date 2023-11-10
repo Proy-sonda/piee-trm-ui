@@ -1,17 +1,36 @@
-import { Unidadrhh } from '@/modelos/tramitacion';
+import { PayloadTramitacion } from '@/modelos/payload-tramitacion';
+import { DatoEmpleadorUnidad, Unidadesrrhh } from '@/modelos/tramitacion';
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl } from './environment';
+import { urlBackendTramitacion } from './environment';
 import { runFetchAbortable } from './fetch';
 
-export const buscarUnidadesDeRRHH = (rutEmpleador: string) => {
-  return runFetchAbortable<Unidadrhh[]>(`${apiUrl()}/unidad/rutempleador`, {
-    method: 'POST',
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
+export const buscarUnidadesDeRRHH = (
+  rutEmpleador: string,
+): [() => Promise<Unidadesrrhh[]>, () => void] => {
+  const payload: PayloadTramitacion = {
+    Accion: 2,
+    RutEmpleador: rutEmpleador,
+    CodigoUnidadRRHH: '',
+    RunUsuario: '',
+    RunTrabajador: '',
+  };
+
+  const [resp, abort] = runFetchAbortable<DatoEmpleadorUnidad>(
+    `${urlBackendTramitacion()}/operadores/all/obtieneempleadorrrhhusu`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: obtenerToken(),
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify(payload),
     },
-    body: JSON.stringify({
-      rutempleador: rutEmpleador,
-    }),
-  });
+  );
+
+  const obtenerUnidad = async () => {
+    const unidadrrh: Unidadesrrhh[] = (await resp()).unidadesrrhh;
+    return unidadrrh;
+  };
+
+  return [obtenerUnidad, abort];
 };

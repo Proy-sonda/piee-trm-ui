@@ -1,8 +1,8 @@
-import { useRandomId } from '@/hooks/use-random-id';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { BaseProps } from './base-props';
+import { InputReciclableBase } from './base-props';
+import { useInputReciclable } from './hooks';
 
 type Comuna = {
   idcomuna: string;
@@ -13,7 +13,7 @@ type Comuna = {
   };
 };
 
-interface ComboComunaProps extends BaseProps {
+interface ComboComunaProps extends InputReciclableBase {
   /** Datos para rellenar el combo */
   comunas?: Comuna[];
 
@@ -31,21 +31,24 @@ export const ComboComuna: React.FC<ComboComunaProps> = ({
   regionSeleccionada,
   textoOpcionPorDefecto,
 }) => {
-  const idInput = useRandomId('comuna');
+  const { register } = useFormContext();
 
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
+  const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
+    prefijoId: 'comuna',
+    name,
+    label: {
+      texto: label,
+    },
+  });
 
   return (
     <>
       <FormGroup className={`${className ?? ''} position-relative`} controlId={idInput}>
-        <Form.Label>{`${label} (*)`}</Form.Label>
+        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Select
           autoComplete="new-custom-value"
-          isInvalid={!!errors[name]}
+          isInvalid={tieneError}
           {...register(name, {
             validate: {
               comboObligatorio: (valor: string) => {
@@ -66,7 +69,7 @@ export const ComboComuna: React.FC<ComboComunaProps> = ({
         </Form.Select>
 
         <Form.Control.Feedback type="invalid" tooltip>
-          {errors[name]?.message?.toString()}
+          {mensajeError}
         </Form.Control.Feedback>
       </FormGroup>
     </>

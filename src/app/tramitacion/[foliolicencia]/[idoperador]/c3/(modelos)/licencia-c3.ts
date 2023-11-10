@@ -19,8 +19,8 @@ export interface RentaC3 {
    */
   tipoRenta: 0 | 1;
 
-  /** Periodo en formato `yyyy-MM` */
-  periodo: string;
+  /** Se fija la fecha al inicio del mes */
+  periodo: Date;
   dias: number;
   montoImponible: number;
   totalRemuneracion: number;

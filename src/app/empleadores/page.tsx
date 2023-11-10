@@ -3,23 +3,20 @@
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import Position from '@/components/stage/position';
 import Titulo from '@/components/titulo/titulo';
-import { EmpleadorContext } from '@/contexts/empleador-context';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
-import { useContext, useEffect, useState } from 'react';
-import Swal from 'sweetalert2';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
+import { useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
 import { desadscribirEmpleador } from './(servicios)/desadscribir-empleador';
 
 const EmpleadoresPage = () => {
-  const { cargaEmpleador } = useContext(EmpleadorContext);
-
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   const [refresh, refrescarPagina] = useRefrescarPagina();
@@ -37,23 +34,17 @@ const EmpleadoresPage = () => {
     }
 
     filtrarEmpleadores('', '');
-    cargaEmpleador(empleadores as any);
   }, [empleadores]);
 
   const desadscribirEntidadEmpleadora = async (empleador: Empleador) => {
     const empresa = empleador.razonsocial;
     const rut = empleador.rutempleador;
 
-    const { isConfirmed } = await Swal.fire({
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       title: 'Desadscribir',
-      icon: 'question',
       html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
-      showCancelButton: true,
-      showConfirmButton: true,
-      cancelButtonColor: 'red',
-      cancelButtonText: 'Cancelar',
       confirmButtonText: 'Aceptar',
-      confirmButtonColor: 'var(--color-blue)',
+      denyButtonText: 'Cancelar',
     });
 
     if (!isConfirmed) {
@@ -67,21 +58,11 @@ const EmpleadoresPage = () => {
 
       refrescarPagina();
 
-      Swal.fire({
-        icon: 'success',
-        html: `Entidad empleadora: <b>${empresa}</b> fue desuscrito con éxito`,
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      AlertaExito.fire({
+        html: `Entidad empleadora <b>${empresa}</b> fue desuscrita con éxito`,
       });
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Hubo un problema al desadscribir al empleador',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
-      });
+      AlertaError.fire({ title: 'Hubo un problema al desadscribir a la entidad empleadora' });
     } finally {
       setMostrarSpinner(false);
     }
@@ -112,48 +93,42 @@ const EmpleadoresPage = () => {
   };
 
   return (
-    <div className="bgads">
-      <Position position={4} />
-      <div>
-        <div className="mx-3 mx-lg-5">
-          <div style={{ marginTop: '-20px' }}>
-            <Titulo url="">
-              <h5>Listado de entidades empleadoras</h5>
-            </Titulo>
-          </div>
+    <Container fluid className="px-3 px-lg-5 py-4">
+      <Titulo url="">
+        <h1 className="fs-5">Listado de entidades empleadoras</h1>
+      </Titulo>
 
-          <BarraBusquedaEntidadesEmpleadoras onBuscar={filtrarEmpleadores} />
+      <div className="mt-4">
+        <BarraBusquedaEntidadesEmpleadoras onBuscar={filtrarEmpleadores} />
+      </div>
 
-          <div className="row mt-4">
-            <div className="col-md-12 col-xl-12">
-              <IfContainer show={mostrarSpinner}>
-                <SpinnerPantallaCompleta />
-              </IfContainer>
+      <div className="row mt-4">
+        <div className="col-md-12 col-xl-12">
+          <IfContainer show={mostrarSpinner}>
+            <SpinnerPantallaCompleta />
+          </IfContainer>
 
-              <IfContainer show={cargandoEmpleador}>
-                <div className="mt-4">
-                  <LoadingSpinner titulo="Cargando empleadores"></LoadingSpinner>
-                </div>
-              </IfContainer>
-
-              <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length > 0}>
-                <h4 className="my-5 text-center">Error al cargar empleadores</h4>
-              </IfContainer>
-
-              <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length === 0}>
-                <TablaEntidadesEmpleadoras
-                  empleadores={empleadoresFiltrados ?? []}
-                  onDesadscribirEmpleador={desadscribirEntidadEmpleadora}
-                />
-              </IfContainer>
+          <IfContainer show={cargandoEmpleador}>
+            <div className="mt-4">
+              <LoadingSpinner titulo="Cargando empleadores"></LoadingSpinner>
             </div>
-          </div>
-          <br />
+          </IfContainer>
+
+          <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length > 0}>
+            <h4 className="my-5 text-center">Error al cargar empleadores</h4>
+          </IfContainer>
+
+          <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length === 0}>
+            <TablaEntidadesEmpleadoras
+              empleadores={empleadoresFiltrados ?? []}
+              onDesadscribirEmpleador={desadscribirEntidadEmpleadora}
+            />
+          </IfContainer>
         </div>
       </div>
 
       <ModalInscribirEntidadEmpleadora onEntidadEmpleadoraCreada={onEntidadEmpleadoraCreada} />
-    </div>
+    </Container>
   );
 };
 

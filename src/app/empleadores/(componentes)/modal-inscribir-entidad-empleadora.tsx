@@ -5,16 +5,17 @@ import {
   InputCalle,
   InputEmail,
   InputNumero,
+  InputRazonSocial,
   InputRut,
   InputTelefono,
 } from '@/components/form';
-import InputRazonSocial from '@/components/form/input-razon-social';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import React, { useState } from 'react';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
+import React, { useContext, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
 import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
 import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
@@ -33,6 +34,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
   onEntidadEmpleadoraCreada,
 }) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const { usuario } = useContext(AuthContext);
 
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     tipoEmpleadores: buscarTiposDeEmpleadores(),
@@ -61,37 +63,24 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
   const crearNuevaEntidad: SubmitHandler<FormularioInscribirEntidadEmpleadora> = async (data) => {
     try {
       setMostrarSpinner(true);
-
-      await inscribirEmpleador(data);
+      if (usuario == undefined) return;
+      await inscribirEmpleador(data, usuario?.rut);
 
       resetearFormulario();
 
-      Swal.fire({
-        icon: 'success',
-        title: 'La nueva entidad empleadora fue inscrita con éxito',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      AlertaExito.fire({
+        html: 'La nueva entidad empleadora fue inscrita con éxito',
       });
 
       onEntidadEmpleadoraCreada();
     } catch (error) {
       if (error instanceof EmpleadorYaExisteError) {
-        return Swal.fire({
-          icon: 'error',
-          title: 'RUT del empleador ya existe',
-          showConfirmButton: true,
-          confirmButtonColor: 'var(--color-blue)',
-          confirmButtonText: 'OK',
+        return AlertaError.fire({
+          html: 'RUT del empleador ya existe',
         });
       }
-
-      return Swal.fire({
-        icon: 'error',
-        title: 'Error al inscribir empleador',
-        showConfirmButton: true,
-        confirmButtonColor: 'var(--color-blue)',
-        confirmButtonText: 'OK',
+      return AlertaError.fire({
+        html: 'Error al inscribir empleador',
       });
     } finally {
       setMostrarSpinner(false);
@@ -191,6 +180,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                         idElemento={'idregion'}
                         descripcion={'nombre'}
                         label="Región"
+                        tipoValor="string"
                       />
 
                       <ComboComuna
@@ -210,6 +200,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       />
 
                       <InputBlockDepartamento
+                        opcional
                         name="departamento"
                         className="col-12 col-lg-6 col-xl-3"
                         label="Block / Departamento"
@@ -265,14 +256,14 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                   <div className="modal-footer">
                     <div className="w-100 d-flex flex-column flex-md-row-reverse">
                       <button type="submit" className="btn btn-primary">
-                        Confirmar Adscripción
+                        Grabar
                       </button>
                       <button
                         type="button"
                         className="btn btn-danger mt-2 mt-md-0 me-md-2"
                         data-bs-dismiss="modal"
                         onClick={onCerrarModal}>
-                        Cancelar
+                        Volver
                       </button>
                     </div>
                   </div>

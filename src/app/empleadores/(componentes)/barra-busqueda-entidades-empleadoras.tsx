@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { AuthContext } from '@/contexts';
+import React, { useContext, useState } from 'react';
 import { formatRut, validateRut } from 'rutlib';
 
 interface BarraBusquedaEntidadesEmpleadorasProps {
@@ -9,6 +10,7 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
   onBuscar,
 }) => {
   const [rut, setRut] = useState('');
+  const { usuario } = useContext(AuthContext);
   const [razonSocial, setRazonSocial] = useState('');
   const [error, seterror] = useState(false);
 
@@ -66,6 +68,7 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
               }}>
               Buscar
             </button>
+
             <button
               type="button"
               className="btn btn-success mt-3 mt-md-0"

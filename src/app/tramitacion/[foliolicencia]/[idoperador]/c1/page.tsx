@@ -7,10 +7,10 @@ import {
   InputCalle,
   InputFecha,
   InputNumero,
+  InputRazonSocial,
   InputRut,
   InputTelefono,
 } from '@/components/form';
-import InputRazonSocial from '@/components/form/input-razon-social';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
@@ -27,8 +27,9 @@ import { buscarOcupacion } from '../(servicios)/buscar-ocupacion';
 import { buscarRegiones } from '../(servicios)/buscar-regiones';
 import { buscarCalle } from '../(servicios)/tipo-calle';
 
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import format from 'date-fns/format';
-import Swal from 'sweetalert2';
+import BotonesNavegacion from '../(componentes)/botones-navegacion';
 import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
@@ -106,7 +107,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   const [fadeinOut, setfadeinOut] = useState('');
   const [runEmpleador, setrunEmpleador] = useState<string>('');
   const [licenciaTramite, setlicenciaTramite] = useState<LicenciaTramitar>();
+  const [LMEEXIS, setLMEEXIS] = useState<LicenciaC1>();
   const [refrescar, refrescarPagina] = useRefrescarPagina();
+  const [errorEmpleador, seterrorEmpleador] = useState(false);
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     CCREGION: buscarRegiones(),
     CCCOMUNA: buscarComunas(),
@@ -118,25 +121,23 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   const [, licencia, cargandoData] = useMergeFetchObject(
     {
       LMETRM: buscarLicenciasParaTramitar(),
-      LMEEXIS: buscarZona1(folio, Number(idoperador)),
       LMEZONAC2: buscarZona2(folio, Number(idoperador)),
-      // LMEHEADER: buscarZona0(folio, idoperador),
     },
     [refrescar],
   );
 
+  useEffect(() => {
+    const BuscarLMExistente = async () => {
+      const data = await buscarZona1(folio, Number(idoperador));
+      if (data !== undefined) setLMEEXIS(data);
+    };
+    BuscarLMExistente();
+  }, []);
+
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
 
-  const fechaActual = () => {
-    let fechaHoy = new Date().toLocaleString('es-CL', options).split('-');
-    return `${fechaHoy[2]}-${fechaHoy[1]}-${fechaHoy[0]}`;
-  };
-
-  useEffect(
-    () => formulario.setValue('comuna', licencia?.LMEEXIS!?.comuna.idcomuna),
-    [regionSeleccionada],
-  );
+  useEffect(() => formulario.setValue('comuna', LMEEXIS!?.comuna.idcomuna), [regionSeleccionada]);
 
   useEffect(() => {
     if (licencia == undefined) return;
@@ -168,23 +169,27 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     if (runEmpleador == '') return;
     const busquedaEmpleador = async () => {
       const [empleador, resp] = await buscarEmpleador(runEmpleador);
+      if ((await empleador()) === undefined) {
+        seterrorEmpleador(true);
+        return;
+      }
       formulario.setValue('razon', (await empleador()).razonsocial);
-      if (licencia?.LMEEXIS != undefined) {
-        formulario.setValue('region', licencia.LMEEXIS.comuna.idcomuna.substring(0, 2));
-        formulario.setValue('calle', licencia.LMEEXIS.direccion);
-        formulario.setValue('numero', licencia.LMEEXIS.numero);
-        formulario.setValue('departamento', licencia.LMEEXIS.depto);
-        formulario.setValue('telefono', licencia.LMEEXIS.telefono);
-        formulario.setValue('ocupacion', licencia.LMEEXIS.ocupacion.idocupacion.toString());
+      if (LMEEXIS != undefined) {
+        formulario.setValue('region', LMEEXIS.comuna.idcomuna.substring(0, 2));
+        formulario.setValue('calle', LMEEXIS.direccion);
+        formulario.setValue('numero', LMEEXIS.numero);
+        formulario.setValue('departamento', LMEEXIS.depto);
+        formulario.setValue('telefono', LMEEXIS.telefono);
+        formulario.setValue('ocupacion', LMEEXIS.ocupacion.idocupacion.toString());
         formulario.setValue(
           'fecharecepcionlme',
-          format(new Date(licencia.LMEEXIS.fecharecepcion), 'yyyy-MM-dd'),
+          format(new Date(LMEEXIS.fecharecepcion), 'yyyy-MM-dd'),
         );
-        formulario.setValue('tipo', licencia.LMEEXIS.tipocalle.idtipocalle.toString());
+        formulario.setValue('tipo', LMEEXIS.tipocalle.idtipocalle.toString());
 
         formulario.setValue(
           'actividadlaboral',
-          licencia.LMEEXIS.actividadlaboral.idactividadlaboral.toString(),
+          LMEEXIS.actividadlaboral.idactividadlaboral.toString(),
         );
 
         return;
@@ -196,7 +201,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       formulario.setValue('numero', (await empleador()).direccionempleador.numero);
       formulario.setValue('departamento', (await empleador()).direccionempleador.depto);
       formulario.setValue('telefono', (await empleador()).telefonohabitual);
-      formulario.setValue('fecharecepcionlme', fechaActual());
+      formulario.setValue('fecharecepcionlme', format(new Date(), 'yyyy-MM-dd'));
 
       formulario.setValue(
         'actividadlaboral',
@@ -212,15 +217,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   );
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
-    if (!(await formulario.trigger())) {
-      Swal.fire({
-        icon: 'error',
+    if (!(await formulario.trigger()))
+      return AlertaError.fire({
         title: 'Hay campos inválidos',
-        text: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
-      return;
-    }
 
     const guardadoExitoso = await GuardarZ0Z1();
     if (!guardadoExitoso) {
@@ -251,10 +252,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       licencia?.LMEZONAC2.codigoseguroafc == 1 &&
       formulario.getValues('ocupacion') == '18'
     ) {
-      Swal.fire({
+      AlertaError.fire({
         icon: 'info',
         html: '<b>Persona trabajadora de casa particular</b> no puede pertenecer a AFC, favor verificar <b>"Previsión persona trabajadora"</b>',
-        confirmButtonColor: 'var(--color-blue)',
       });
       return false;
     }
@@ -319,11 +319,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
           break;
 
         case 'guardar':
-          Swal.fire({
-            icon: 'success',
+          AlertaExito.fire({
             html: 'Se ha guardado con éxito',
-            timer: 2000,
-            showConfirmButton: false,
           });
           break;
       }
@@ -332,26 +329,16 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     } catch (error) {
       if (error instanceof ErrorCrearLicencia) {
         respuesta = false;
-
-        Swal.fire({
-          icon: 'error',
-          title: 'Existe un problema al guardar los datos',
-          showConfirmButton: true,
-          confirmButtonColor: 'var(--color-blue)',
-          confirmButtonText: 'OK',
+        AlertaError.fire({
+          html: 'Existe un problema al guardar los datos',
         });
-
         return respuesta;
       }
 
       if (error instanceof ErrorCrearLicenciaC1) {
         respuesta = false;
-        Swal.fire({
-          icon: 'error',
-          title: 'Existe un problema al guardar los datos',
-          showConfirmButton: true,
-          confirmButtonColor: 'var(--color-blue)',
-          confirmButtonText: 'OK',
+        AlertaError.fire({
+          html: 'Existe un problema al guardar los datos',
         });
 
         return respuesta;
@@ -362,8 +349,28 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   };
 
   return (
-    <div className="bgads">
-      <div className="me-5 ms-5">
+    <>
+      <IfContainer show={errorEmpleador}>
+        <br />
+        <br />
+        <div className="row">
+          <b className="text-center">
+            <h4> No existen datos de la entidad empleadora asociados al usuario</h4>
+          </b>
+        </div>
+        <br />
+        <br />
+        <div className="row">
+          <div className="d-flex justify-content-center">
+            <button className="btn btn-danger" onClick={() => router.push('/tramitacion')}>
+              Volver
+            </button>
+          </div>
+        </div>
+        <br />
+      </IfContainer>
+
+      <IfContainer show={!errorEmpleador}>
         <Cabecera
           foliotramitacion={folio}
           idoperador={idoperador}
@@ -388,7 +395,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         <div
           className="row mt-2 pb-5"
           style={{
-            display: cargandoCombos || !erroresCargarCombos ? 'none' : 'block',
+            display: cargandoCombos || !erroresCargarCombos || !!errorEmpleador ? 'none' : 'block',
           }}>
           <FormProvider {...formulario}>
             <form
@@ -471,6 +478,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 />
 
                 <InputBlockDepartamento
+                  opcional
                   label="Departamento"
                   name="departamento"
                   className="col-lg-3 col-md-4 col-sm-12 mb-2"
@@ -520,37 +528,13 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   </div>
                 </IfContainer>
               </div>
-              <div className="row">
-                <div className="d-nne d-md-none col-lg-6 d-lg-inline"></div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <a className="btn btn-danger" href="/tramitacion">
-                    Tramitación
-                  </a>
-                </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-success"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'guardar')}>
-                    Guardar
-                  </button>
-                </div>
-                <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    {...formulario.register('accion')}
-                    onClick={() => formulario.setValue('accion', 'siguiente')}>
-                    Siguiente
-                  </button>
-                </div>
-              </div>
+
+              <BotonesNavegacion formulario={formulario} />
             </form>
           </FormProvider>
         </div>
-      </div>
-    </div>
+      </IfContainer>
+    </>
   );
 };
 

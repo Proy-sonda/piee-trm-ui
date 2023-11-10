@@ -66,10 +66,11 @@ const Cabecera: React.FC<myprops> = ({
 
   return (
     <>
-      <div className="row mt-5">
+      <div className="row">
         <Titulo url="">Tramitación / Tramitar</Titulo>
       </div>
-      <div className="row mt-2">
+
+      <div className="row mt-4">
         <InformacionLicencia folioLicencia={foliotramitacion} idoperador={idoperador} />
       </div>
       <div className="row me-5">

@@ -105,6 +105,7 @@ const ModalCambiarClaveTemporal: React.FC<ModalCambiarClaveTemporalProps> = ({
               />
 
               <InputClave
+                validarFortaleza
                 name="claveNueva"
                 label="Contraseña Nueva"
                 className="mb-3"

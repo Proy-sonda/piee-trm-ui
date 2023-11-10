@@ -1,4 +1,5 @@
 'use client';
+
 import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
@@ -10,7 +11,6 @@ import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import Swal from 'sweetalert2';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
 import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
@@ -30,6 +30,8 @@ import {
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
+import BotonesNavegacion from '../(componentes)/botones-navegacion';
 import {
   crearIdEntidadPrevisional,
   glosaCompletaEntidadPrevisional,
@@ -179,7 +181,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneraciones.append({
             prevision: renta.idPrevision,
-            periodoRenta: renta.periodo as any,
+            periodoRenta: renta.periodo,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
             totalRemuneracion: renta.totalRemuneracion,
@@ -193,7 +195,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const periodosNormalesEsperados = esTrabajadorIndependiente(zona2) ? 12 : 3;
         let filasRestantes = periodosNormalesEsperados - zona3.rentas.length;
         while (filasRestantes-- > 0) {
-          remuneraciones.append({ desgloseHaberes: {} } as any);
+          remuneraciones.append({ periodoRenta: null, desgloseHaberes: {} } as any);
         }
       }
 
@@ -205,7 +207,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneracionesMaternidad.append({
             prevision: renta.idPrevision,
-            periodoRenta: renta.periodo as any,
+            periodoRenta: renta.periodo,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
             totalRemuneracion: renta.totalRemuneracion,
@@ -219,7 +221,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const periodosMaternidadEsperados = 3;
         let filasRestantesMaternidad = periodosMaternidadEsperados - zona3.rentasMaternidad.length;
         while (filasRestantesMaternidad-- > 0) {
-          remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
+          remuneracionesMaternidad.append({ periodoRenta: null, desgloseHaberes: {} } as any);
         }
       }
     }
@@ -235,7 +237,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
           remuneraciones.append({
             prevision: crearIdEntidadPrevisional(zona2.entidadprevisional),
-            periodoRenta: format(mesRenta, 'yyyy-MM') as any,
+            periodoRenta: mesRenta,
             desgloseHaberes: {},
           } as any);
         }
@@ -262,7 +264,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const renta = zona3.rentas[index];
 
         formulario.setValue(`remuneraciones.${index}.prevision`, renta.idPrevision);
-        formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo as any);
+        formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo);
         formulario.setValue(`remuneraciones.${index}.dias`, renta.dias);
         formulario.setValue(`remuneraciones.${index}.montoImponible`, renta.montoImponible);
         formulario.setValue(`remuneraciones.${index}.totalRemuneracion`, renta.totalRemuneracion);
@@ -278,7 +280,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const renta = zona3.rentasMaternidad[index];
 
         formulario.setValue(`remuneracionesMaternidad.${index}.prevision`, renta.idPrevision);
-        formulario.setValue(`remuneracionesMaternidad.${index}.periodoRenta`, renta.periodo as any);
+        formulario.setValue(`remuneracionesMaternidad.${index}.periodoRenta`, renta.periodo);
         formulario.setValue(`remuneracionesMaternidad.${index}.dias`, renta.dias);
         formulario.setValue(
           `remuneracionesMaternidad.${index}.montoImponible`,
@@ -305,25 +307,17 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   }, [zona3]);
 
   const onSubmitForm: SubmitHandler<FormularioC3> = async (datos) => {
-    if (!(await formulario.trigger())) {
-      Swal.fire({
-        icon: 'error',
-        title: 'Hay campos inválidos',
-        text: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
-        confirmButtonColor: 'var(--color-blue)',
+    if (!(await formulario.trigger()))
+      return AlertaError.fire({
+        title: 'Campos Inválidos',
+        html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
-      return;
-    }
 
-    if (!validarCompletitudDeFilas(datos)) {
-      Swal.fire({
-        icon: 'error',
+    if (!validarCompletitudDeFilas(datos))
+      return AlertaError.fire({
         title: 'Remuneraciones Incompletas',
-        text: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
       });
-      return;
-    }
 
     const datosLimpios: FormularioC3 = {
       ...datos,
@@ -362,18 +356,14 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       .concat(datos.remuneracionesMaternidad)
       .map((r) => capitalizar(format(r.periodoRenta, 'MMMM yyyy', { locale: esLocale })));
 
-    const { isConfirmed } = await Swal.fire({
+    const { isConfirmed } = await AlertaConfirmacion.fire({
       html: `
         <p>Antes de seguir, recuerde confirmar que debe ingresar Comprobante de Liquidación mensual para todos los periodos declarados:</p>
         ${periodosDeclarados.map((periodo) => `<li>${periodo}</li>`).join('')}
         <p class="mt-3 fw-bold">¿Está seguro que desea continuar o desea volver a ingresar o revisar la documentación?</p>
         `,
-      showConfirmButton: true,
       confirmButtonText: 'Continuar',
-      confirmButtonColor: 'var(--color-blue)',
-      showCancelButton: true,
-      cancelButtonText: 'Volver',
-      cancelButtonColor: 'var(--bs-danger)',
+      denyButtonText: 'Volver',
     });
 
     if (!isConfirmed) {
@@ -396,11 +386,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
     refrescarZona3();
 
-    Swal.fire({
+    AlertaExito.fire({
       html: 'Cambios guardados con éxito',
-      icon: 'success',
-      showConfirmButton: false,
-      timer: 2000,
+      didClose: () => (window.location.href = `/tramitacion/${foliolicencia}/${idoperador}/c3`),
     });
   };
 
@@ -432,11 +420,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         idOperador: parseInt(idoperador),
       });
     } catch (error) {
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         title: 'Error',
-        text: 'No se pudieron guardar los cambios en la licencia',
-        confirmButtonColor: 'var(--color-blue)',
+        html: 'No se pudieron guardar los cambios en la licencia',
       });
 
       return false;
@@ -509,7 +495,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   ) => {
     formulario.setValue(`${fieldArray}.${index}`, {
       prevision: '',
-      periodoRenta: undefined,
+      periodoRenta: null,
       desgloseHaberes: {},
       dias: undefined,
       diasIncapacidad: undefined,
@@ -532,540 +518,498 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         onDescartarDesglose={descartarDesglose}
       />
 
-      <div className="bgads">
-        <div className="mx-3 mx-lg-5 pb-4">
-          <IfContainer show={cargando}>
-            <LoadingSpinner titulo="Cargando información" />
-          </IfContainer>
+      <IfContainer show={cargando}>
+        <LoadingSpinner titulo="Cargando información" />
+      </IfContainer>
 
-          <IfContainer show={!cargando && hayErrores}>
-            <Row className="pt-5 pb-1">
+      <IfContainer show={!cargando && hayErrores}>
+        <Row className="pt-5 pb-1">
+          <Col xs={12}>
+            <h1 className="fs-3 text-center">Error</h1>
+
+            <IfContainer show={!zona2 && !errZona2}>
+              <p className="text-center">
+                Debe completar el paso 2 antes de poder continuar con el paso 3.
+              </p>
+            </IfContainer>
+
+            <IfContainer show={errPrevision || errTipoDocumentos}>
+              <p className="text-center">
+                Hubo un error al cargar los datos. Por favor intente más tarde.
+              </p>
+            </IfContainer>
+          </Col>
+        </Row>
+      </IfContainer>
+
+      <IfContainer show={!cargandoPrevision && !cargandoZona2 && !hayErrores}>
+        <FormProvider {...formulario}>
+          <Form onSubmit={formulario.handleSubmit(onSubmitForm)}>
+            <Cabecera
+              foliotramitacion={foliolicencia}
+              step={step}
+              idoperador={parseInt(idoperador)}
+              title="Informe de Remuneraciones Rentas y/o Subsidios"
+              onLicenciaCargada={setLicencia}
+              onLinkClickeado={(link) => {
+                formulario.setValue('linkNavegacion', link);
+                formulario.setValue('accion', 'navegar');
+                formulario.handleSubmit(onSubmitForm)();
+              }}
+            />
+
+            <Row className="my-3">
               <Col xs={12}>
-                <h1 className="fs-3 text-center">Error</h1>
-
-                <IfContainer show={!zona2 && !errZona2}>
-                  <p className="text-center">
-                    Debe completar el paso 2 antes de poder continuar con el paso 3.
-                  </p>
-                </IfContainer>
-
-                <IfContainer show={errPrevision || errTipoDocumentos}>
-                  <p className="text-center">
-                    Hubo un error al cargar los datos. Por favor intente más tarde.
-                  </p>
-                </IfContainer>
+                <h6 className="text-center">
+                  RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD
+                </h6>
               </Col>
             </Row>
-          </IfContainer>
 
-          <IfContainer show={!cargandoPrevision && !cargandoZona2 && !hayErrores}>
-            <FormProvider {...formulario}>
-              <Form onSubmit={formulario.handleSubmit(onSubmitForm)}>
-                <Cabecera
-                  foliotramitacion={foliolicencia}
-                  step={step}
-                  idoperador={parseInt(idoperador)}
-                  title="Informe de Remuneraciones Rentas y/o Subsidios"
-                  onLicenciaCargada={setLicencia}
-                  onLinkClickeado={(link) => {
-                    formulario.setValue('linkNavegacion', link);
-                    formulario.setValue('accion', 'navegar');
-                    formulario.handleSubmit(onSubmitForm)();
-                  }}
-                />
-
-                <Row className="my-3">
-                  <Col xs={12}>
-                    <h6 className="text-center">
-                      RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD
-                    </h6>
-                  </Col>
-                </Row>
-
-                <IfContainer show={completitudRemuneraciones.normales.length !== 0}>
-                  <Row>
-                    <Col xs={12}>
-                      <Alert variant="danger" className="d-flex align-items-center fade show">
-                        <i className="bi bi-exclamation-triangle me-2"></i>
-                        <span>
-                          Las siguientes filas están incompletas:
-                          {completitudRemuneraciones.normales.reduce(
-                            (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
-                            '',
-                          )}
-                        </span>
-                      </Alert>
-                    </Col>
-                  </Row>
-                </IfContainer>
-
-                <Row>
-                  <Col xs={12}>
-                    <Table className="table table-bordered">
-                      <Thead>
-                        <Tr className="align-middle text-center">
-                          <Th>Institución Previsional</Th>
-                          <Th>Periodo Renta</Th>
-                          <Th>N° Días</Th>
-                          <Th>Monto Imponible</Th>
-                          <Th>Total Remuneración</Th>
-                          <Th>Monto Incapacidad</Th>
-                          <Th>Días Incapacidad</Th>
-                          <Th>Registrar Desglose de haberes</Th>
-                          <Th> </Th>
-                        </Tr>
-                      </Thead>
-                      <Tbody>
-                        {remuneraciones.fields.map((field, index) => (
-                          <Tr key={field.id}>
-                            <Td>
-                              <ComboSimple
-                                opcional={index !== 0}
-                                name={`remuneraciones.${index}.prevision`}
-                                datos={tiposPrevisiones}
-                                idElemento={crearIdEntidadPrevisional}
-                                descripcion={glosaCompletaEntidadPrevisional}
-                                tipoValor="string"
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'prevision',
-                                  fieldArrayName: 'remuneraciones',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <InputMesAno
-                                opcional={index !== 0}
-                                name={`remuneraciones.${index}.periodoRenta`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'periodoRenta',
-                                  fieldArrayName: 'remuneraciones',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <InputDias
-                                opcional={index !== 0}
-                                name={`remuneraciones.${index}.dias`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'dias',
-                                  fieldArrayName: 'remuneraciones',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <InputMonto
-                                opcional={index !== 0}
-                                name={`remuneraciones.${index}.montoImponible`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'montoImponible',
-                                  fieldArrayName: 'remuneraciones',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <InputMonto
-                                opcional
-                                name={`remuneraciones.${index}.totalRemuneracion`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'totalRemuneracion',
-                                  fieldArrayName: 'remuneraciones',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <InputMonto
-                                opcional
-                                name={`remuneraciones.${index}.montoIncapacidad`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'montoIncapacidad',
-                                  fieldArrayName: 'remuneraciones',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <InputDias
-                                opcional
-                                name={`remuneraciones.${index}.diasIncapacidad`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'diasIncapacidad',
-                                  fieldArrayName: 'remuneraciones',
-                                }}
-                              />
-                            </Td>
-                            <Td>
-                              <div className="align-middle text-center">
-                                <button
-                                  type="button"
-                                  className="btn btn-primary"
-                                  onClick={() => {
-                                    setDatosModalDesglose({
-                                      // prettier-ignore
-                                      periodoRenta: formulario.getValues(`remuneraciones.${index}.periodoRenta`),
-                                      fieldArray: 'remuneraciones',
-                                      indexInput: index,
-                                      show: true,
-                                      // prettier-ignore
-                                      desgloseInicial: formulario.getValues(`remuneraciones.${index}.desgloseHaberes`),
-                                    });
-                                  }}>
-                                  <i className="bi bi-bounding-box-circles"></i>
-                                </button>
-
-                                <InputDesgloseDeHaberes
-                                  opcional
-                                  name={`remuneraciones.${index}.desgloseHaberes`}
-                                  montoImponibleName={`remuneraciones.${index}.montoImponible`}
-                                  unirConFieldArray={{
-                                    index,
-                                    campo: 'desgloseHaberes',
-                                    fieldArrayName: 'remuneraciones',
-                                  }}
-                                />
-                              </div>
-                            </Td>
-                            <Td>
-                              <div className="text-center align-middle">
-                                <button
-                                  type="button"
-                                  className="btn text-danger"
-                                  title="Descartar fila"
-                                  onClick={() => limpiarFila('remuneraciones', index)}>
-                                  <i className="bi bi-trash"></i>
-                                </button>
-                              </div>
-                            </Td>
-                          </Tr>
-                        ))}
-                      </Tbody>
-                    </Table>
-                  </Col>
-                </Row>
-
-                <Row className="mt-2">
-                  <Col sm={6} md={6} className="d-flex align-items-center justify-content-end">
-                    <span className="small fw-bold">
-                      Remuneración imponible previsional mes anterior inicio licencia médica:
+            <IfContainer show={completitudRemuneraciones.normales.length !== 0}>
+              <Row>
+                <Col xs={12}>
+                  <Alert variant="danger" className="d-flex align-items-center fade show">
+                    <i className="bi bi-exclamation-triangle me-2"></i>
+                    <span>
+                      Las siguientes filas están incompletas:
+                      {completitudRemuneraciones.normales.reduce(
+                        (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
+                        '',
+                      )}
                     </span>
-                  </Col>
+                  </Alert>
+                </Col>
+              </Row>
+            </IfContainer>
 
-                  <Col sm={6} md={2}>
-                    <InputMonto opcional name="remuneracionImponiblePrevisional" />
-                  </Col>
-
-                  <Col
-                    xs={8}
-                    sm={8}
-                    md={2}
-                    className="d-flex align-items-center justify-content-end">
-                    <span className="small fw-bold">% Desahucio:</span>
-                  </Col>
-
-                  <Col xs={4} sm={4} md={2}>
-                    <FormGroup controlId={'porcentajeDesahucio'} className="position-relative">
-                      <Form.Control
-                        type="number"
-                        step={0.02}
-                        isInvalid={!!formulario.formState.errors.porcentajeDesahucio}
-                        {...formulario.register('porcentajeDesahucio', {
-                          valueAsNumber: true,
-                          min: {
-                            value: 0,
-                            message: 'No puede ser menor a 0%',
-                          },
-                          max: {
-                            value: 100,
-                            message: 'No puede ser mayor a 100%',
-                          },
-                        })}
-                      />
-                      <Form.Control.Feedback type="invalid" tooltip>
-                        {formulario.formState.errors.porcentajeDesahucio?.message?.toString()}
-                      </Form.Control.Feedback>
-                    </FormGroup>
-                  </Col>
-                </Row>
-
-                <IfContainer show={licencia && esLicenciaMaternidad(licencia)}>
-                  <Row className="my-3">
-                    <Col xs={12}>
-                      <h6 className="text-center">
-                        EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO
-                        SIGUIENTE
-                      </h6>
-                    </Col>
-                  </Row>
-
-                  <IfContainer show={completitudRemuneraciones.maternidad.length !== 0}>
-                    <Row>
-                      <Col xs={12}>
-                        <Alert variant="danger" className="d-flex align-items-center fade show">
-                          <i className="bi bi-exclamation-triangle me-2"></i>
-                          <span>
-                            Las siguientes filas están incompletas:
-                            {completitudRemuneraciones.maternidad.reduce(
-                              (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
-                              '',
-                            )}
-                          </span>
-                        </Alert>
-                      </Col>
-                    </Row>
-                  </IfContainer>
-
-                  <Row>
-                    <Col xs={12}>
-                      <Table className="table table-bordered">
-                        <Thead>
-                          <Tr className="align-middle text-center">
-                            <Th>Institución Previsional</Th>
-                            <Th>Periodo Renta</Th>
-                            <Th>N° Días</Th>
-                            <Th>Monto Imponible</Th>
-                            <Th>Total Remuneración</Th>
-                            <Th>Monto Incapacidad</Th>
-                            <Th>Días Incapacidad</Th>
-                            <Th>Registrar Desglose de haberes</Th>
-                            <Th> </Th>
-                          </Tr>
-                        </Thead>
-                        <Tbody>
-                          {remuneracionesMaternidad.fields.map((field, index) => (
-                            <Tr key={field.id}>
-                              <Td>
-                                <ComboSimple
-                                  opcional
-                                  name={`remuneracionesMaternidad.${index}.prevision`}
-                                  datos={tiposPrevisiones}
-                                  idElemento={crearIdEntidadPrevisional}
-                                  descripcion={glosaCompletaEntidadPrevisional}
-                                  tipoValor="string"
-                                  unirConFieldArray={{
-                                    index,
-                                    campo: 'prevision',
-                                    fieldArrayName: 'remuneracionesMaternidad',
-                                  }}
-                                />
-                              </Td>
-                              <Td>
-                                <InputMesAno
-                                  opcional
-                                  name={`remuneracionesMaternidad.${index}.periodoRenta`}
-                                  unirConFieldArray={{
-                                    index,
-                                    campo: 'periodoRenta',
-                                    fieldArrayName: 'remuneracionesMaternidad',
-                                  }}
-                                />
-                              </Td>
-                              <Td>
-                                <InputDias
-                                  opcional
-                                  name={`remuneracionesMaternidad.${index}.dias`}
-                                  unirConFieldArray={{
-                                    index,
-                                    campo: 'dias',
-                                    fieldArrayName: 'remuneracionesMaternidad',
-                                  }}
-                                />
-                              </Td>
-                              <Td>
-                                <InputMonto
-                                  opcional
-                                  name={`remuneracionesMaternidad.${index}.montoImponible`}
-                                  unirConFieldArray={{
-                                    index,
-                                    campo: 'montoImponible',
-                                    fieldArrayName: 'remuneracionesMaternidad',
-                                  }}
-                                />
-                              </Td>
-                              <Td>
-                                <InputMonto
-                                  opcional
-                                  name={`remuneracionesMaternidad.${index}.totalRemuneracion`}
-                                  unirConFieldArray={{
-                                    index,
-                                    campo: 'totalRemuneracion',
-                                    fieldArrayName: 'remuneracionesMaternidad',
-                                  }}
-                                />
-                              </Td>
-                              <Td>
-                                <InputMonto
-                                  opcional
-                                  name={`remuneracionesMaternidad.${index}.montoIncapacidad`}
-                                  unirConFieldArray={{
-                                    index,
-                                    campo: 'montoIncapacidad',
-                                    fieldArrayName: 'remuneracionesMaternidad',
-                                  }}
-                                />
-                              </Td>
-                              <Td>
-                                <InputDias
-                                  opcional
-                                  name={`remuneracionesMaternidad.${index}.diasIncapacidad`}
-                                  unirConFieldArray={{
-                                    index,
-                                    campo: 'diasIncapacidad',
-                                    fieldArrayName: 'remuneracionesMaternidad',
-                                  }}
-                                />
-                              </Td>
-                              <Td>
-                                <div className="align-middle text-center">
-                                  <button
-                                    type="button"
-                                    className="btn btn-primary"
-                                    onClick={() => {
-                                      setDatosModalDesglose({
-                                        // prettier-ignore
-                                        periodoRenta: formulario.getValues(`remuneracionesMaternidad.${index}.periodoRenta`),
-                                        fieldArray: 'remuneracionesMaternidad',
-                                        indexInput: index,
-                                        show: true,
-                                        // prettier-ignore
-                                        desgloseInicial: formulario.getValues(`remuneracionesMaternidad.${index}.desgloseHaberes`),
-                                      });
-                                    }}>
-                                    <i className="bi bi-bounding-box-circles"></i>
-                                  </button>
-
-                                  <InputDesgloseDeHaberes
-                                    opcional
-                                    montoImponibleName={`remuneracionesMaternidad.${index}.montoImponible`}
-                                    name={`remuneracionesMaternidad.${index}.desgloseHaberes`}
-                                    unirConFieldArray={{
-                                      index,
-                                      campo: 'desgloseHaberes',
-                                      fieldArrayName: 'remuneracionesMaternidad',
-                                    }}
-                                  />
-                                </div>
-                              </Td>
-                              <Td>
-                                <div className="text-center align-middle">
-                                  <button
-                                    type="button"
-                                    className="btn text-danger"
-                                    title="Descartar fila"
-                                    onClick={() => limpiarFila('remuneracionesMaternidad', index)}>
-                                    <i className="bi bi-trash"></i>
-                                  </button>
-                                </div>
-                              </Td>
-                            </Tr>
-                          ))}
-                        </Tbody>
-                      </Table>
-                    </Col>
-                  </Row>
-                </IfContainer>
-
-                <Row className="mt-3">
-                  <h5>Documentos Adjuntos</h5>
-                  <p>
-                    Se recomienda adjuntar liquidaciones generadas por su sistema de remuneración
-                    (Exccel, Word, PDF, etc.). El tamaño máximo permitido por archivo es de 10 MB.
-                  </p>
-
-                  <ComboSimple
-                    opcional
-                    label="Tipo de documento"
-                    name="tipoDocumento"
-                    descripcion="tipoadjunto"
-                    idElemento="idtipoadjunto"
-                    datos={tiposDeDocumentos}
-                    className="col-md-4 mb-2"
-                  />
-
-                  <InputArchivo
-                    opcional
-                    name="documentosAdjuntos"
-                    label="Adjuntar documento"
-                    className="col-md-4 mb-2"
-                  />
-
-                  <div className="col-md-4 mb-2" style={{ alignSelf: 'end' }}>
-                    <button className="btn btn-primary">Adjuntar documento</button>
-                  </div>
-                </Row>
-
-                <Row className="mt-3">
-                  <Table className="table table-bordered">
-                    <Thead>
-                      <Tr className="align-middle">
-                        <Th>Tipo Documento</Th>
-                        <Th>Nombre Documento</Th>
-                        <Th>Acciones</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      <Tr className="align-middle">
-                        <Td>Comprobante Liquidacion Mensual</Td>
-                        <Td>a</Td>
+            <Row>
+              <Col xs={12}>
+                <Table className="table table-bordered">
+                  <Thead>
+                    <Tr className="align-middle text-center">
+                      <Th>Institución Previsional</Th>
+                      <Th>Periodo Renta</Th>
+                      <Th>N° Días</Th>
+                      <Th>Monto Imponible</Th>
+                      <Th>Total Remuneración</Th>
+                      <Th>Monto Incapacidad</Th>
+                      <Th>Días Incapacidad</Th>
+                      <Th>Registrar Desglose de haberes</Th>
+                      <Th> </Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {remuneraciones.fields.map((field, index) => (
+                      <Tr key={field.id}>
                         <Td>
-                          <div className="d-flex justify-content-evenly">
-                            <button type="button" className="btn btn-primary">
-                              <i className="bi bi-file-earmark-plus"></i>
+                          <ComboSimple
+                            opcional={index !== 0}
+                            name={`remuneraciones.${index}.prevision`}
+                            datos={tiposPrevisiones}
+                            idElemento={crearIdEntidadPrevisional}
+                            descripcion={glosaCompletaEntidadPrevisional}
+                            tipoValor="string"
+                            unirConFieldArray={{
+                              index,
+                              campo: 'prevision',
+                              fieldArrayName: 'remuneraciones',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <InputMesAno
+                            opcional={index !== 0}
+                            name={`remuneraciones.${index}.periodoRenta`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'periodoRenta',
+                              fieldArrayName: 'remuneraciones',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <InputDias
+                            opcional={index !== 0}
+                            name={`remuneraciones.${index}.dias`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'dias',
+                              fieldArrayName: 'remuneraciones',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <InputMonto
+                            opcional={index !== 0}
+                            name={`remuneraciones.${index}.montoImponible`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'montoImponible',
+                              fieldArrayName: 'remuneraciones',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <InputMonto
+                            opcional
+                            name={`remuneraciones.${index}.totalRemuneracion`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'totalRemuneracion',
+                              fieldArrayName: 'remuneraciones',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <InputMonto
+                            opcional
+                            name={`remuneraciones.${index}.montoIncapacidad`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'montoIncapacidad',
+                              fieldArrayName: 'remuneraciones',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <InputDias
+                            opcional
+                            name={`remuneraciones.${index}.diasIncapacidad`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'diasIncapacidad',
+                              fieldArrayName: 'remuneraciones',
+                            }}
+                          />
+                        </Td>
+                        <Td>
+                          <div className="align-middle text-center">
+                            <button
+                              type="button"
+                              className="btn btn-primary"
+                              onClick={() => {
+                                setDatosModalDesglose({
+                                  // prettier-ignore
+                                  periodoRenta: formulario.getValues(`remuneraciones.${index}.periodoRenta`),
+                                  fieldArray: 'remuneraciones',
+                                  indexInput: index,
+                                  show: true,
+                                  // prettier-ignore
+                                  desgloseInicial: formulario.getValues(`remuneraciones.${index}.desgloseHaberes`),
+                                });
+                              }}>
+                              <i className="bi bi-bounding-box-circles"></i>
                             </button>
-                            <button type="button" className="btn btn-danger">
-                              <i className="bi bi-x"></i>
+
+                            <InputDesgloseDeHaberes
+                              opcional
+                              name={`remuneraciones.${index}.desgloseHaberes`}
+                              montoImponibleName={`remuneraciones.${index}.montoImponible`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'desgloseHaberes',
+                                fieldArrayName: 'remuneraciones',
+                              }}
+                            />
+                          </div>
+                        </Td>
+                        <Td>
+                          <div className="text-center align-middle">
+                            <button
+                              type="button"
+                              className="btn text-danger"
+                              title="Descartar fila"
+                              onClick={() => limpiarFila('remuneraciones', index)}>
+                              <i className="bi bi-trash"></i>
                             </button>
                           </div>
                         </Td>
                       </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </Col>
+            </Row>
+
+            <Row className="mt-2">
+              <Col sm={6} md={6} className="d-flex align-items-center justify-content-end">
+                <span className="small fw-bold">
+                  Remuneración imponible previsional mes anterior inicio licencia médica:
+                </span>
+              </Col>
+
+              <Col sm={6} md={2}>
+                <InputMonto opcional name="remuneracionImponiblePrevisional" />
+              </Col>
+
+              <Col xs={8} sm={8} md={2} className="d-flex align-items-center justify-content-end">
+                <span className="small fw-bold">% Desahucio:</span>
+              </Col>
+
+              <Col xs={4} sm={4} md={2}>
+                <FormGroup controlId={'porcentajeDesahucio'} className="position-relative">
+                  <Form.Control
+                    type="number"
+                    step={0.02}
+                    isInvalid={!!formulario.formState.errors.porcentajeDesahucio}
+                    {...formulario.register('porcentajeDesahucio', {
+                      valueAsNumber: true,
+                      min: {
+                        value: 0,
+                        message: 'No puede ser menor a 0%',
+                      },
+                      max: {
+                        value: 100,
+                        message: 'No puede ser mayor a 100%',
+                      },
+                    })}
+                  />
+                  <Form.Control.Feedback type="invalid" tooltip>
+                    {formulario.formState.errors.porcentajeDesahucio?.message?.toString()}
+                  </Form.Control.Feedback>
+                </FormGroup>
+              </Col>
+            </Row>
+
+            <IfContainer show={licencia && esLicenciaMaternidad(licencia)}>
+              <Row className="my-3">
+                <Col xs={12}>
+                  <h6 className="text-center">
+                    EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO
+                    SIGUIENTE
+                  </h6>
+                </Col>
+              </Row>
+
+              <IfContainer show={completitudRemuneraciones.maternidad.length !== 0}>
+                <Row>
+                  <Col xs={12}>
+                    <Alert variant="danger" className="d-flex align-items-center fade show">
+                      <i className="bi bi-exclamation-triangle me-2"></i>
+                      <span>
+                        Las siguientes filas están incompletas:
+                        {completitudRemuneraciones.maternidad.reduce(
+                          (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
+                          '',
+                        )}
+                      </span>
+                    </Alert>
+                  </Col>
+                </Row>
+              </IfContainer>
+
+              <Row>
+                <Col xs={12}>
+                  <Table className="table table-bordered">
+                    <Thead>
+                      <Tr className="align-middle text-center">
+                        <Th>Institución Previsional</Th>
+                        <Th>Periodo Renta</Th>
+                        <Th>N° Días</Th>
+                        <Th>Monto Imponible</Th>
+                        <Th>Total Remuneración</Th>
+                        <Th>Monto Incapacidad</Th>
+                        <Th>Días Incapacidad</Th>
+                        <Th>Registrar Desglose de haberes</Th>
+                        <Th> </Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {remuneracionesMaternidad.fields.map((field, index) => (
+                        <Tr key={field.id}>
+                          <Td>
+                            <ComboSimple
+                              opcional
+                              name={`remuneracionesMaternidad.${index}.prevision`}
+                              datos={tiposPrevisiones}
+                              idElemento={crearIdEntidadPrevisional}
+                              descripcion={glosaCompletaEntidadPrevisional}
+                              tipoValor="string"
+                              unirConFieldArray={{
+                                index,
+                                campo: 'prevision',
+                                fieldArrayName: 'remuneracionesMaternidad',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputMesAno
+                              opcional
+                              name={`remuneracionesMaternidad.${index}.periodoRenta`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'periodoRenta',
+                                fieldArrayName: 'remuneracionesMaternidad',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputDias
+                              opcional
+                              name={`remuneracionesMaternidad.${index}.dias`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'dias',
+                                fieldArrayName: 'remuneracionesMaternidad',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputMonto
+                              opcional
+                              name={`remuneracionesMaternidad.${index}.montoImponible`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'montoImponible',
+                                fieldArrayName: 'remuneracionesMaternidad',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputMonto
+                              opcional
+                              name={`remuneracionesMaternidad.${index}.totalRemuneracion`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'totalRemuneracion',
+                                fieldArrayName: 'remuneracionesMaternidad',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputMonto
+                              opcional
+                              name={`remuneracionesMaternidad.${index}.montoIncapacidad`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'montoIncapacidad',
+                                fieldArrayName: 'remuneracionesMaternidad',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputDias
+                              opcional
+                              name={`remuneracionesMaternidad.${index}.diasIncapacidad`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'diasIncapacidad',
+                                fieldArrayName: 'remuneracionesMaternidad',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <div className="align-middle text-center">
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => {
+                                  setDatosModalDesglose({
+                                    // prettier-ignore
+                                    periodoRenta: formulario.getValues(`remuneracionesMaternidad.${index}.periodoRenta`),
+                                    fieldArray: 'remuneracionesMaternidad',
+                                    indexInput: index,
+                                    show: true,
+                                    // prettier-ignore
+                                    desgloseInicial: formulario.getValues(`remuneracionesMaternidad.${index}.desgloseHaberes`),
+                                  });
+                                }}>
+                                <i className="bi bi-bounding-box-circles"></i>
+                              </button>
+
+                              <InputDesgloseDeHaberes
+                                opcional
+                                montoImponibleName={`remuneracionesMaternidad.${index}.montoImponible`}
+                                name={`remuneracionesMaternidad.${index}.desgloseHaberes`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'desgloseHaberes',
+                                  fieldArrayName: 'remuneracionesMaternidad',
+                                }}
+                              />
+                            </div>
+                          </Td>
+                          <Td>
+                            <div className="text-center align-middle">
+                              <button
+                                type="button"
+                                className="btn text-danger"
+                                title="Descartar fila"
+                                onClick={() => limpiarFila('remuneracionesMaternidad', index)}>
+                                <i className="bi bi-trash"></i>
+                              </button>
+                            </div>
+                          </Td>
+                        </Tr>
+                      ))}
                     </Tbody>
                   </Table>
-                </Row>
+                </Col>
+              </Row>
+            </IfContainer>
 
-                <Row className="row">
-                  <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
-                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      {...formulario.register('accion')}
-                      onClick={() => formulario.setValue('accion', 'anterior')}>
-                      Anterior
-                    </button>
-                  </div>
-                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                    <a className="btn btn-danger" href="/tramitacion">
-                      Tramitación
-                    </a>
-                  </div>
-                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                    <button
-                      type="submit"
-                      className="btn btn-success"
-                      {...formulario.register('accion')}
-                      onClick={() => formulario.setValue('accion', 'guardar')}>
-                      Guardar
-                    </button>
-                  </div>
-                  <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      {...formulario.register('accion')}
-                      onClick={() => formulario.setValue('accion', 'siguiente')}>
-                      Siguiente
-                    </button>
-                  </div>
-                </Row>
-              </Form>
-            </FormProvider>
-          </IfContainer>
-        </div>
-      </div>
+            <Row className="mt-3">
+              <h5>Documentos Adjuntos</h5>
+              <p>
+                Se recomienda adjuntar liquidaciones generadas por su sistema de remuneración
+                (Exccel, Word, PDF, etc.). El tamaño máximo permitido por archivo es de 10 MB.
+              </p>
+
+              <ComboSimple
+                opcional
+                label="Tipo de documento"
+                name="tipoDocumento"
+                descripcion="tipoadjunto"
+                idElemento="idtipoadjunto"
+                datos={tiposDeDocumentos}
+                className="col-md-4 mb-2"
+              />
+
+              <InputArchivo
+                opcional
+                name="documentosAdjuntos"
+                label="Adjuntar documento"
+                className="col-md-4 mb-2"
+              />
+
+              <div className="col-md-4 mb-2" style={{ alignSelf: 'end' }}>
+                <button className="btn btn-primary">Adjuntar documento</button>
+              </div>
+            </Row>
+
+            <Row className="mt-3">
+              <Table className="table table-bordered">
+                <Thead>
+                  <Tr className="align-middle">
+                    <Th>Tipo Documento</Th>
+                    <Th>Nombre Documento</Th>
+                    <Th>Acciones</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr className="align-middle">
+                    <Td>Comprobante Liquidacion Mensual</Td>
+                    <Td>a</Td>
+                    <Td>
+                      <div className="d-flex justify-content-evenly">
+                        <button type="button" className="btn btn-primary">
+                          <i className="bi bi-file-earmark-plus"></i>
+                        </button>
+                        <button type="button" className="btn btn-danger">
+                          <i className="bi bi-x"></i>
+                        </button>
+                      </div>
+                    </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
+            </Row>
+
+            <BotonesNavegacion formulario={formulario} anterior />
+          </Form>
+        </FormProvider>
+      </IfContainer>
     </>
   );
 };
