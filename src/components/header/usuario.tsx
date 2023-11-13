@@ -53,7 +53,7 @@ const Usuario: React.FC = () => {
                 </small>
               </div>
               <div>
-                <small>{usuario?.email ?? ''}</small>
+                <small>{usuario?.rut ?? ''}</small>
               </div>
             </Dropdown.Item>
             <Dropdown.Divider />
