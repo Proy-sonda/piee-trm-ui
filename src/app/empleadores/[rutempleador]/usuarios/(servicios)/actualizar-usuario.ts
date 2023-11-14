@@ -28,15 +28,15 @@ export const actualizarUsuario = async (request: EditarUsuarioRequest) => {
   }
 };
 
-async function actualizarUsuarioInterno(request: EditarUsuarioRequest) {
+async function actualizarUsuarioInterno({ usuarioOriginal, ...request }: EditarUsuarioRequest) {
   const payload = {
-    idusuario: request.usuarioOriginal.idusuario,
+    idusuario: usuarioOriginal.idusuario,
     rutusuario: request.rut,
     nombres: request.nombres,
     apellidos: request.apellidos,
     usuarioempleador: [
       {
-        idusuarioempleador: 0,
+        idusuarioempleador: usuarioOriginal.usuarioempleadorActual.idusuarioempleador,
         email: request.email,
         emailconfirma: request.confirmarEmail,
         telefonouno: request.telefono1,
@@ -49,8 +49,7 @@ async function actualizarUsuarioInterno(request: EditarUsuarioRequest) {
           rol: ' ',
         },
         estadousuario: {
-          idestadousuario:
-            request.usuarioOriginal.usuarioempleadorActual.estadousuario.idestadousuario,
+          idestadousuario: usuarioOriginal.usuarioempleadorActual.estadousuario.idestadousuario,
           descripcion: ' ',
         },
       },
