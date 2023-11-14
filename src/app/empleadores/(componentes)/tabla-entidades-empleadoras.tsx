@@ -5,8 +5,6 @@ import { Empleador } from '@/modelos/empleador';
 import Link from 'next/link';
 import { useContext } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { UsuarioEntidadEmpleadora } from '../[rutempleador]/usuarios/(modelos)/usuario-entidad-empleadora';
-import { buscarUsuarios } from '../[rutempleador]/usuarios/(servicios)/buscar-usuarios';
 
 interface TablaEntidadesEmpleadorasProps {
   empleadores: Empleador[];
@@ -29,14 +27,14 @@ export default function TablaEntidadesEmpleadoras({
 
   const { usuario } = useContext(AuthContext);
 
-  const obtenerRolPorEmpleador = async (empleador: Empleador) => {
-    const [resp] = await buscarUsuarios(empleador.rutempleador);
-    const empleadore: UsuarioEntidadEmpleadora | undefined = (await resp()).find(
-      ({ rutusuario }) => rutusuario == usuario?.rut,
-    );
-    if (empleadore?.rol.idrol == 1) return true;
-    return false;
-  };
+  // const obtenerRolPorEmpleador = async (empleador: Empleador) => {
+  //   const [resp] = await buscarUsuarios(empleador.rutempleador);
+  //   const empleadore: UsuarioEntidadEmpleadora | undefined = (await resp()).find(
+  //     ({ rutusuario }) => rutusuario == usuario?.rut,
+  //   );
+  //   if (empleadore?.rol.idrol == 1) return true;
+  //   return false;
+  // };
 
   return (
     <>
@@ -62,7 +60,8 @@ export default function TablaEntidadesEmpleadoras({
                 </Td>
                 <Td>{empleador.razonsocial}</Td>
                 <Td className="text-center">
-                  {obtenerRolPorEmpleador(empleador).then(
+                  {/* TODO: Restaurar mostrar/ocultar boton por rol */}
+                  {/* {obtenerRolPorEmpleador(empleador).then(
                     (value) =>
                       value && (
                         <button
@@ -75,7 +74,16 @@ export default function TablaEntidadesEmpleadoras({
                           Desadscribir
                         </button>
                       ),
-                  )}
+                  )} */}
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      onDesadscribirEmpleador(empleador);
+                    }}
+                    title={`Desadscribir empleador ${empleador.razonsocial}`}>
+                    Desadscribir
+                  </button>
                 </Td>
               </Tr>
             ))
