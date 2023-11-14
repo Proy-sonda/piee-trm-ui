@@ -18,7 +18,7 @@ export const crearUsuario = async (request: CrearUsuarioRequest) => {
   try {
     await crearUsuarioInterno(request);
   } catch (error) {
-    if (error instanceof HttpError && error.body.message === 'Rut Usuario ya existe') {
+    if (error instanceof HttpError && error.body.message === 'Usuario/Empleador ya creado') {
       throw new PersonaUsuariaYaExisteError();
     }
 
@@ -37,18 +37,18 @@ async function crearUsuarioInterno(request: CrearUsuarioRequest) {
     rutusuario: request.rut,
     nombres: request.nombres,
     apellidos: request.apellidos,
-    email: request.email,
-    emailconfirma: request.confirmarEmail,
-    telefonouno: request.telefono1,
-    telefonodos: request.telefono2,
-    rol: {
-      idrol: request.rolId,
-      rol: ' ',
-    },
     usuarioempleador: [
       {
+        email: request.email,
+        emailconfirma: request.confirmarEmail,
+        telefonouno: request.telefono1,
+        telefonodos: request.telefono2,
         empleador: {
           idempleador: request.idEmpleador,
+        },
+        rol: {
+          idrol: request.rolId,
+          rol: ' ',
         },
       },
     ],

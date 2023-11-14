@@ -72,7 +72,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
       if (error instanceof PersonaUsuariaYaExisteError) {
         return AlertaError.fire({
           title: 'Error',
-          text: 'El RUN de la persona usuaria ya existe',
+          text: 'La persona usuaria ya existe en esta empresa',
         });
       }
 
@@ -98,21 +98,17 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
   };
 
   const parcharConRut = async (rut: string) => {
-    const [req] = buscarUsuarioPorRut(rut);
+    const [request] = buscarUsuarioPorRut(rut);
 
     try {
       setMostrarSpinner(true);
 
-      const usuario = await req();
+      const usuario = await request();
 
       if (usuario) {
         formulario.setValue('rut', usuario.rutusuario);
         formulario.setValue('nombres', usuario.nombres);
         formulario.setValue('apellidos', usuario.apellidos);
-        formulario.setValue('telefono1', usuario.telefonouno);
-        formulario.setValue('telefono2', usuario.telefonodos);
-        formulario.setValue('email', usuario.email);
-        formulario.setValue('confirmarEmail', usuario.email);
 
         formulario.clearErrors();
 
