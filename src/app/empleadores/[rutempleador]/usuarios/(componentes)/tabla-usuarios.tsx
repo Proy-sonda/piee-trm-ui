@@ -45,7 +45,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
   const reenviarContrasena = async (usuario: UsuarioEntidadEmpleadora) => {
     const rut = usuario.rutusuario;
-    const email = usuario.usuarioempleador.email;
+    const email = usuario.usuarioempleadorActual.email;
 
     const mensaje = esElUsuarioConectado(usuario)
       ? `<p>A continuación se enviará una nueva clave temporal a su correo <b>${email}</b>` +
@@ -166,11 +166,11 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 </Td>
                 <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
                 <IfContainer show={noEsTablet()}>
-                  <Td>{usuario.usuarioempleador.telefonouno?.trim() ?? ' '}</Td>
-                  <Td>{usuario.usuarioempleador.email?.trim() ?? ' '}</Td>
+                  <Td>{usuario.usuarioempleadorActual.telefonouno?.trim() ?? ' '}</Td>
+                  <Td>{usuario.usuarioempleadorActual.email?.trim() ?? ' '}</Td>
                 </IfContainer>
-                <Td>{usuario.usuarioempleador.rol.rol}</Td>
-                <Td>{usuario.usuarioempleador.estadousuario.descripcion}</Td>
+                <Td>{usuario.usuarioempleadorActual.rol.rol}</Td>
+                <Td>{usuario.usuarioempleadorActual.estadousuario.descripcion}</Td>
                 {rolUsuario == 'Administrador' && (
                   <Td>
                     <div className="d-none d-lg-inline-block">

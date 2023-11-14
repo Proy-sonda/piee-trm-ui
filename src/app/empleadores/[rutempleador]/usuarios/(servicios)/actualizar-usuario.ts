@@ -1,3 +1,4 @@
+import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
 import { RespuestaWSOperadores } from '@/modelos/respuesta-ws-operadores';
 import { UsuarioToken } from '@/modelos/usuario';
 import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
@@ -6,11 +7,11 @@ import { apiUrl, urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 import { FormularioEditarUsuario } from '../(modelos)/formulario-editar-usuario';
 import { PayloadCambiarUsuarioOperadores } from '../(modelos)/payload-cambiar-usuario-operadores';
+import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 
 interface EditarUsuarioRequest extends FormularioEditarUsuario {
-  idUsuario: number;
-  rutEmpleador: string;
-  estadoUsuarioId: number;
+  usuarioOriginal: UsuarioEntidadEmpleadora;
+  empleador: EmpleadorPorId;
 }
 
 export const actualizarUsuario = async (request: EditarUsuarioRequest) => {
@@ -29,22 +30,31 @@ export const actualizarUsuario = async (request: EditarUsuarioRequest) => {
 
 async function actualizarUsuarioInterno(request: EditarUsuarioRequest) {
   const payload = {
-    idusuario: request.idUsuario,
+    idusuario: request.usuarioOriginal.idusuario,
     rutusuario: request.rut,
     nombres: request.nombres,
     apellidos: request.apellidos,
-    email: request.email,
-    emailconfirma: request.confirmarEmail,
-    telefonouno: request.telefono1,
-    telefonodos: request.telefono2,
-    rol: {
-      idrol: request.rolId,
-      rol: ' ',
-    },
-    estadousuario: {
-      idestadousuario: request.estadoUsuarioId,
-      descripcion: ' ',
-    },
+    usuarioempleador: [
+      {
+        idusuarioempleador: 0,
+        email: request.email,
+        emailconfirma: request.confirmarEmail,
+        telefonouno: request.telefono1,
+        telefonodos: request.telefono2,
+        empleador: {
+          idempleador: request.empleador.idempleador,
+        },
+        rol: {
+          idrol: request.rolId,
+          rol: ' ',
+        },
+        estadousuario: {
+          idestadousuario:
+            request.usuarioOriginal.usuarioempleadorActual.estadousuario.idestadousuario,
+          descripcion: ' ',
+        },
+      },
+    ],
   };
 
   await runFetchConThrow<void>(`${apiUrl()}/usuario/update`, {
@@ -65,7 +75,7 @@ async function actualizarUsuarioConWS(request: EditarUsuarioRequest) {
     RunUsuario: usuario.rut,
     usuario: {
       accion: 2,
-      rutempleador: request.rutEmpleador,
+      rutempleador: request.empleador.rutempleador,
       runusuario: request.rut,
       apellidosusuario: request.apellidos,
       nombresusuario: request.nombres,
