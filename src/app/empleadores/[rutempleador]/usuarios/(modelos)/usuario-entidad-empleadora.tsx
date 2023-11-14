@@ -37,8 +37,17 @@ export const usuarioEntidadEmpleadoraDesdeApi = (
     return undefined;
   }
 
+  /* Aqui se aprovecha de reparar posibles valores nulos que vengan desde el backend */
   return {
     ...usuarioAPI,
-    usuarioempleadorActual: usuarioEmpleador,
+    usuarioempleadorActual: {
+      empleador: usuarioEmpleador.empleador,
+      estadousuario: usuarioEmpleador.estadousuario,
+      rol: usuarioEmpleador.rol,
+      email: usuarioEmpleador.email ?? '',
+      telefonouno: usuarioEmpleador.telefonouno ?? '',
+      telefonodos: usuarioEmpleador.telefonodos ?? '',
+      idusuarioempleador: usuarioEmpleador.idusuarioempleador,
+    },
   } as UsuarioEntidadEmpleadora;
 };
