@@ -1,4 +1,4 @@
-import { useRol } from '@/app/empleadores/[rutempleador]/(hooks)/use-Rol';
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Usuariosunidad } from '@/modelos/tramitacion';
@@ -10,7 +10,7 @@ type props = {
 };
 
 export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handleDelete }) => {
-  const { RolUsuario } = useRol();
+  const { rolEnEmpleadorActual } = useEmpleadorActual();
   const [usuariosPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: usuarioAsociado,
     tamanoPagina: 5,
@@ -22,7 +22,7 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
         <Thead>
           <Tr>
             <Th>RUN</Th>
-            <Th>{RolUsuario == 'Administrador' && 'Acciones'}</Th>
+            <Th>{rolEnEmpleadorActual === 'administrador' && 'Acciones'}</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -32,7 +32,7 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
                 <Td>{runusuario}</Td>
 
                 <Td>
-                  {RolUsuario == 'Administrador' && (
+                  {rolEnEmpleadorActual === 'administrador' && (
                     <button
                       title={`Eliminar ${runusuario}`}
                       onClick={(e) => {

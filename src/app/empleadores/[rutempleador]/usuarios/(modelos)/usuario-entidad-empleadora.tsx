@@ -1,5 +1,5 @@
-import { UsuarioEmpleador } from './usuario-empleador';
-import { UsuarioEntidadEmpleadoraAPI } from './usuario-entidad-empleadora-api';
+import { UsuarioEmpleador } from '@/modelos/usuario-empleador';
+import { UsuarioEntidadEmpleadoraAPI } from '@/modelos/usuario-entidad-empleadora-api';
 
 export interface UsuarioEntidadEmpleadora {
   idusuario: number;

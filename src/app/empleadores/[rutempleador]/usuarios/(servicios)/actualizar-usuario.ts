@@ -1,4 +1,4 @@
-import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
+import { Empleador } from '@/modelos/empleador';
 import { RespuestaWSOperadores } from '@/modelos/respuesta-ws-operadores';
 import { UsuarioToken } from '@/modelos/usuario';
 import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
@@ -11,7 +11,7 @@ import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleador
 
 interface EditarUsuarioRequest extends FormularioEditarUsuario {
   usuarioOriginal: UsuarioEntidadEmpleadora;
-  empleador: EmpleadorPorId;
+  empleador: Empleador;
 }
 
 export const actualizarUsuario = async (request: EditarUsuarioRequest) => {

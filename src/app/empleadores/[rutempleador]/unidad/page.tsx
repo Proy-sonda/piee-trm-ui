@@ -10,7 +10,6 @@ import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Nav } from 'react-bootstrap';
-import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
@@ -37,9 +36,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
 
   const [abrirModalEditarUnidad, setAbrirModalEditarUnidad] = useState(false);
 
-  const { RolUsuario } = useRol();
-
-  const { empleadorActual } = useEmpleadorActual();
+  const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
 
   const [unidadesFiltradas, setunidadesFiltradas] = useState<Unidadesrrhh[] | undefined>([]);
 
@@ -96,7 +93,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
           )}
         </div>
         <div className="col-7">
-          {RolUsuario == 'Administrador' && (
+          {rolEnEmpleadorActual === 'administrador' && (
             <div className="mt-3 d-flex justify-content-end">
               <button
                 className="btn btn-success"

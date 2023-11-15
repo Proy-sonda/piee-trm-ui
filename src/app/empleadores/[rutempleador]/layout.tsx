@@ -5,9 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Collapse, Container, Offcanvas, Row, Stack } from 'react-bootstrap';
 import { useEmpleadorActual } from '../(contexts)/empleador-actual-context';
-import { EmpleadorPorUsuarioProvider } from './(contexts)/empleadores-por-usuario';
 import styles from './layout.module.css';
-import { buscarEmpleadorRut } from './unidad/[idunidad]/usuarios/(servicios)/buscar-empleador-rut';
 
 interface LinkNavegacion {
   href: string;
@@ -41,11 +39,7 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
 
   // Carga el empleador la primera vez
   useEffect(() => {
-    const busquedaEmpleadorId = async () => {
-      const [resp, abort] = await buscarEmpleadorRut(rutempleador);
-      cambiarEmpleador((await resp()).idempleador);
-    };
-    busquedaEmpleadorId();
+    cambiarEmpleador(rutempleador);
   }, [rutempleador]);
 
   const claseLinkActivo = (link: LinkNavegacion) => {
@@ -55,7 +49,7 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
   };
 
   return (
-    <EmpleadorPorUsuarioProvider>
+    <>
       {/* MENU DE ESCRITORIO */}
       <div className="w-100 d-none d-lg-flex">
         <div
@@ -128,6 +122,6 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
           </Offcanvas.Body>
         </Offcanvas>
       </Container>
-    </EmpleadorPorUsuarioProvider>
+    </>
   );
 }

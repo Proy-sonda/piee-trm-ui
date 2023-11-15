@@ -1,4 +1,3 @@
-import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
 import {
   ComboSimple,
   InputApellidos,
@@ -11,19 +10,20 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { Empleador } from '@/modelos/empleador';
 import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
+import { buscarUsuarioPorRut } from '@/servicios/buscar-usuario-por-rut';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioCrearUsuario } from '../(modelos)/formulario-crear-usuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
-import { buscarUsuarioPorRut } from '../(servicios)/buscar-usuario-por-rut';
 import { PersonaUsuariaYaExisteError, crearUsuario } from '../(servicios)/crear-usuario';
 
 interface ModalCrearUsuarioProps {
   show: boolean;
-  empleador?: EmpleadorPorId;
+  empleador?: Empleador;
   onCerrarModal: () => void;
   onUsuarioCreado: () => void;
 }

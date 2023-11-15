@@ -1,4 +1,3 @@
-import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
 import {
   ComboSimple,
   InputApellidos,
@@ -11,6 +10,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { Empleador } from '@/modelos/empleador';
 import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useEffect, useState } from 'react';
@@ -26,9 +26,9 @@ interface ModalEditarUsuarioProps {
   show: boolean;
   idUsuario?: number;
   cantidadUsuariosAdminActivos: number;
-  empleador?: EmpleadorPorId;
+  empleador?: Empleador;
   onCerrarModal: () => void;
-  onUsuarioEditado: () => void;
+  onUsuarioEditado: (rutUsuario: string) => void;
 }
 
 const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
@@ -95,7 +95,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
       AlertaExito.fire({ text: 'Persona usuaria actualizada con éxito' });
 
-      onUsuarioEditado();
+      onUsuarioEditado(usuarioEditar.rutusuario);
     } catch (error) {
       if (error instanceof WebServiceOperadoresError) {
         return AlertaError.fire({

@@ -1,4 +1,5 @@
 import { FetchResponse } from '@/hooks/use-merge-fetch';
+import { UsuarioEntidadEmpleadoraAPI } from '@/modelos/usuario-entidad-empleadora-api';
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
@@ -6,7 +7,6 @@ import {
   UsuarioEntidadEmpleadora,
   usuarioEntidadEmpleadoraDesdeApi,
 } from '../(modelos)/usuario-entidad-empleadora';
-import { UsuarioEntidadEmpleadoraAPI } from '../(modelos)/usuario-entidad-empleadora-api';
 
 export const buscarUsuarios = (rutEmpleador: string): FetchResponse<UsuarioEntidadEmpleadora[]> => {
   const [request, abortador] = runFetchAbortable<UsuarioEntidadEmpleadoraAPI[]>(

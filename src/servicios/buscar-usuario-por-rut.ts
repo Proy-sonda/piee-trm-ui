@@ -1,7 +1,7 @@
+import { UsuarioEntidadEmpleadoraAPI } from '@/modelos/usuario-entidad-empleadora-api';
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
-import { UsuarioEntidadEmpleadoraAPI } from '../(modelos)/usuario-entidad-empleadora-api';
 
 export const buscarUsuarioPorRut = (rut: string) => {
   return runFetchAbortable<UsuarioEntidadEmpleadoraAPI | undefined>(
