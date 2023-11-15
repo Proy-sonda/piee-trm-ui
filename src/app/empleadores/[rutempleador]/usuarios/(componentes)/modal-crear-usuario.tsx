@@ -134,7 +134,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
       const usuario = await request();
 
       if (!usuario || !empleador) {
-        return;
+        throw new Error('No existe el usuario y/o el empleador');
       }
 
       setUsuarioExistente(usuario);
