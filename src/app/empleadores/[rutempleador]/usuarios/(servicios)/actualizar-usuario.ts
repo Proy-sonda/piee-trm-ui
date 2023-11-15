@@ -14,6 +14,10 @@ interface EditarUsuarioRequest extends FormularioEditarUsuario {
   empleador: Empleador;
 }
 
+/**
+ * **IMPORTANTE**: Este endpoint siempre va a habilitar al usuario, independiente de si esta
+ * habilitado o no.
+ */
 export const actualizarUsuario = async (request: EditarUsuarioRequest) => {
   try {
     await actualizarUsuarioInterno(request);
@@ -49,7 +53,7 @@ async function actualizarUsuarioInterno({ usuarioOriginal, ...request }: EditarU
           rol: ' ',
         },
         estadousuario: {
-          idestadousuario: usuarioOriginal.usuarioempleadorActual.estadousuario.idestadousuario,
+          idestadousuario: 1, // 1 = Habilitado
           descripcion: ' ',
         },
       },

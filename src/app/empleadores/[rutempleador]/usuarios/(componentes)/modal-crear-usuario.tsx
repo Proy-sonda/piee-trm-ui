@@ -11,6 +11,7 @@ import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
+import { UsuarioEntidadEmpleadoraAPI } from '@/modelos/usuario-entidad-empleadora-api';
 import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
 import { buscarUsuarioPorRut } from '@/servicios/buscar-usuario-por-rut';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
@@ -18,6 +19,8 @@ import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioCrearUsuario } from '../(modelos)/formulario-crear-usuario';
+import { usuarioEntidadEmpleadoraDesdeApi } from '../(modelos)/usuario-entidad-empleadora';
+import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
 import { PersonaUsuariaYaExisteError, crearUsuario } from '../(servicios)/crear-usuario';
 
@@ -40,28 +43,20 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     roles: buscarRolesUsuarios(),
   });
 
-  const [bloquearRut, setBloquearRut] = useState(false);
+  const [usuarioExistente, setUsuarioExistente] = useState<UsuarioEntidadEmpleadoraAPI>();
 
   const formulario = useForm<FormularioCrearUsuario>({ mode: 'onBlur' });
 
   const limpiarFormulario = () => {
     formulario.reset();
-    setBloquearRut(false);
+    setUsuarioExistente(undefined);
   };
 
   const handleCrearUsuario: SubmitHandler<FormularioCrearUsuario> = async (data) => {
     try {
-      if (!empleador) {
-        throw new Error('NO EXISTE EL EL EMPLEADOR');
-      }
-
       setMostrarSpinner(true);
 
-      await crearUsuario({
-        ...data,
-        idEmpleador: empleador.idempleador,
-        rutEmpleador: empleador.rutempleador,
-      });
+      await llamarEndpointParaCrearUsuario(data);
 
       AlertaExito.fire({ text: 'Persona usuaria creada con éxito' });
 
@@ -92,6 +87,39 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     }
   };
 
+  const llamarEndpointParaCrearUsuario = async (data: FormularioCrearUsuario) => {
+    if (!empleador) {
+      throw new Error('NO EXISTE EL EL EMPLEADOR');
+    }
+
+    if (!usuarioExistente) {
+      await crearUsuario({
+        ...data,
+        idEmpleador: empleador.idempleador,
+        rutEmpleador: empleador.rutempleador,
+      });
+    } else {
+      const usuarioConEmpleadorActual = usuarioEntidadEmpleadoraDesdeApi(
+        usuarioExistente,
+        empleador.rutempleador,
+      );
+
+      if (!usuarioConEmpleadorActual) {
+        await crearUsuario({
+          ...data,
+          idEmpleador: empleador.idempleador,
+          rutEmpleador: empleador.rutempleador,
+        });
+      } else {
+        await actualizarUsuario({
+          ...data,
+          empleador,
+          usuarioOriginal: usuarioConEmpleadorActual,
+        });
+      }
+    }
+  };
+
   const handleCerrarModal = () => {
     limpiarFormulario();
     onCerrarModal();
@@ -105,17 +133,31 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
 
       const usuario = await request();
 
-      if (usuario) {
-        formulario.setValue('rut', usuario.rutusuario);
-        formulario.setValue('nombres', usuario.nombres);
-        formulario.setValue('apellidos', usuario.apellidos);
+      if (!usuario || !empleador) {
+        throw new Error('No existe el usuario y/o el empleador');
+      }
 
-        formulario.clearErrors();
+      setUsuarioExistente(usuario);
 
-        setBloquearRut(true);
+      formulario.clearErrors();
+      formulario.setValue('rut', usuario.rutusuario);
+      formulario.setValue('nombres', usuario.nombres);
+      formulario.setValue('apellidos', usuario.apellidos);
+
+      const empleadorUsuario = usuario.usuarioempleador.find(
+        (ue) => ue.empleador.rutempleador === empleador.rutempleador,
+      );
+
+      if (empleadorUsuario) {
+        // Se usa un valor por defecto en caso de que venga NULL desde la base de datos por la
+        // migracion al nuevo modelo de usuario. P.D.: No deberia pasar que venga NULL.
+        formulario.setValue('telefono1', empleadorUsuario.telefonouno ?? '');
+        formulario.setValue('telefono2', empleadorUsuario.telefonodos ?? '');
+        formulario.setValue('email', empleadorUsuario.email ?? '');
+        formulario.setValue('confirmarEmail', empleadorUsuario.email ?? '');
       }
     } catch (error) {
-      // Nada que hacer si hay un error
+      setUsuarioExistente(undefined);
     } finally {
       setMostrarSpinner(false);
     }
@@ -149,7 +191,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                     name="rut"
                     label="RUN"
                     tipo="run"
-                    deshabilitado={bloquearRut}
+                    deshabilitado={!!usuarioExistente}
                     onBlur={parcharConRut}
                     className="col-12 col-lg-6 col-xl-3"
                   />
