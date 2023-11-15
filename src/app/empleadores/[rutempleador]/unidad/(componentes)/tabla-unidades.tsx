@@ -12,7 +12,6 @@ import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { Unidadesrrhh as UnidadAccion } from '../(modelos)/payload-unidades';
 import { eliminarUnidad } from '../(servicios)/eliminar-unidad';
-import { useRol } from '../../(hooks)/use-Rol';
 
 interface TablaUnidadesProps {
   unidades: Unidadesrrhh[];
@@ -29,8 +28,7 @@ const TablaUnidades = ({
 }: TablaUnidadesProps) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
-  const { RolUsuario } = useRol();
-  const { empleadorActual } = useEmpleadorActual();
+  const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
   const { usuario } = useContext(AuthContext);
 
   const [unidadesPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
@@ -127,7 +125,7 @@ const TablaUnidades = ({
 
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
-                    {RolUsuario == 'Administrador' && (
+                    {rolEnEmpleadorActual === 'administrador' && (
                       <>
                         <button
                           className="btn text-primary"
@@ -159,7 +157,7 @@ const TablaUnidades = ({
                       </Dropdown.Toggle>
 
                       <Dropdown.Menu>
-                        {RolUsuario == 'Administrador' && (
+                        {rolEnEmpleadorActual === 'administrador' && (
                           <>
                             <Dropdown.Item onClick={editarUnidadInterno(unidad)}>
                               Editar unidad

@@ -1,45 +1,79 @@
+import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
-import { AuthContext } from '@/contexts';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades';
 import Link from 'next/link';
-import { useContext } from 'react';
+import { useState } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { UsuarioEntidadEmpleadora } from '../[rutempleador]/usuarios/(modelos)/usuario-entidad-empleadora';
-import { buscarUsuarios } from '../[rutempleador]/usuarios/(servicios)/buscar-usuarios';
+import { PermisoPorEmpleador } from '../(modelos)/permiso-por-empleador';
+import { desadscribirEmpleador } from '../(servicios)/desadscribir-empleador';
 
 interface TablaEntidadesEmpleadorasProps {
   empleadores: Empleador[];
-  onDesadscribirEmpleador: (empleador: Empleador) => void;
-}
-
-interface EsAdminAds {
-  rutempleador: string;
-  Administrador: boolean;
+  permisos: PermisoPorEmpleador[];
+  onEmpleadorDesuscrito: () => void;
 }
 
 export default function TablaEntidadesEmpleadoras({
   empleadores,
-  onDesadscribirEmpleador,
+  permisos,
+  onEmpleadorDesuscrito,
 }: TablaEntidadesEmpleadorasProps) {
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+
   const [empleadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: empleadores,
     tamanoPagina: 5,
   });
 
-  const { usuario } = useContext(AuthContext);
+  const desadscribirEntidadEmpleadora = async (empleador: Empleador) => {
+    const empresa = empleador.razonsocial;
+    const rut = empleador.rutempleador;
 
-  const obtenerRolPorEmpleador = async (empleador: Empleador) => {
-    const [resp] = await buscarUsuarios(empleador.rutempleador);
-    const empleadore: UsuarioEntidadEmpleadora | undefined = (await resp()).find(
-      ({ rutusuario }) => rutusuario == usuario?.rut,
-    );
-    if (empleadore?.rol.idrol == 1) return true;
-    return false;
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      title: 'Desadscribir',
+      html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
+      confirmButtonText: 'Aceptar',
+      denyButtonText: 'Cancelar',
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    try {
+      setMostrarSpinner(true);
+
+      await desadscribirEmpleador(rut);
+
+      onEmpleadorDesuscrito();
+
+      AlertaExito.fire({ html: `Entidad empleadora <b>${empresa}</b> fue desuscrita con éxito` });
+    } catch (error) {
+      AlertaError.fire({ title: 'Hubo un problema al desadscribir a la entidad empleadora' });
+    } finally {
+      setMostrarSpinner(false);
+    }
+  };
+
+  const puedeDesuscribir = (empleador: Empleador) => {
+    const permiso = permisos.find(({ rutEmpleador }) => rutEmpleador === empleador.rutempleador);
+
+    if (!permiso) {
+      return false;
+    }
+
+    return permiso.rol === 'administrador';
   };
 
   return (
     <>
+      <IfContainer show={mostrarSpinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
+
       <Table className="table table-hover">
         <Thead className="align-middle">
           <Tr>
@@ -62,20 +96,14 @@ export default function TablaEntidadesEmpleadoras({
                 </Td>
                 <Td>{empleador.razonsocial}</Td>
                 <Td className="text-center">
-                  {obtenerRolPorEmpleador(empleador).then(
-                    (value) =>
-                      value && (
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            onDesadscribirEmpleador(empleador);
-                          }}
-                          title={`Desadscribir empleador ${empleador.razonsocial}`}>
-                          Desadscribir
-                        </button>
-                      ),
-                  )}
+                  <IfContainer show={puedeDesuscribir(empleador)}>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => desadscribirEntidadEmpleadora(empleador)}
+                      title={`Desadscribir empleador ${empleador.razonsocial}`}>
+                      Desadscribir
+                    </button>
+                  </IfContainer>
                 </Td>
               </Tr>
             ))

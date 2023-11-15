@@ -19,7 +19,6 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Unidadesrrhh } from '../(modelos)/payload-unidades';
 import { actualizarUnidad } from '../(servicios)/actualizar-unidad';
 import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
-import { useRol } from '../../(hooks)/use-Rol';
 import { buscarComunas } from '../../../(servicios)/buscar-comunas';
 import { buscarRegiones } from '../../../(servicios)/buscar-regiones';
 import { InputIdentificadorUnidadRRHH } from './input-identificador-unidad-rrhh';
@@ -53,8 +52,8 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
     [idUnidad],
   );
 
-  const { empleadorActual } = useEmpleadorActual();
-  const { RolUsuario } = useRol();
+  const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
+
   const { usuario } = useContext(AuthContext);
 
   const formulario = useForm<Unidadesrrhh>({ mode: 'onBlur' });
@@ -130,7 +129,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
       <Modal backdrop="static" size="xl" centered show={show} keyboard={false}>
         <Modal.Header closeButton onClick={handleCerrarModal}>
           <Modal.Title className="fs-5">
-            {RolUsuario == 'Administrador'
+            {rolEnEmpleadorActual === 'administrador'
               ? `Modificar Unidad RRHH - ${unidadRRHH!?.glosaunidadrrhh ?? ''}`
               : `Unidad RRHH - ${unidadRRHH!?.glosaunidadrrhh ?? ''}`}
           </Modal.Title>
@@ -233,7 +232,7 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
 
             <Modal.Footer>
               <div className="w-100 d-flex flex-column flex-md-row flex-md-row-reverse">
-                {RolUsuario == 'Administrador' && (
+                {rolEnEmpleadorActual === 'administrador' && (
                   <button type="submit" className="btn btn-primary">
                     Grabar
                   </button>

@@ -1,4 +1,3 @@
-import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
 import {
   ComboSimple,
   InputApellidos,
@@ -11,19 +10,20 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { Empleador } from '@/modelos/empleador';
 import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
+import { buscarUsuarioPorRut } from '@/servicios/buscar-usuario-por-rut';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioCrearUsuario } from '../(modelos)/formulario-crear-usuario';
 import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
-import { buscarUsuarioPorRut } from '../(servicios)/buscar-usuario-por-rut';
 import { PersonaUsuariaYaExisteError, crearUsuario } from '../(servicios)/crear-usuario';
 
 interface ModalCrearUsuarioProps {
   show: boolean;
-  empleador?: EmpleadorPorId;
+  empleador?: Empleador;
   onCerrarModal: () => void;
   onUsuarioCreado: () => void;
 }
@@ -72,7 +72,7 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
       if (error instanceof PersonaUsuariaYaExisteError) {
         return AlertaError.fire({
           title: 'Error',
-          text: 'El RUN de la persona usuaria ya existe',
+          text: 'La persona usuaria ya existe en esta empresa',
         });
       }
 
@@ -98,21 +98,17 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
   };
 
   const parcharConRut = async (rut: string) => {
-    const [req] = buscarUsuarioPorRut(rut);
+    const [request] = buscarUsuarioPorRut(rut);
 
     try {
       setMostrarSpinner(true);
 
-      const usuario = await req();
+      const usuario = await request();
 
       if (usuario) {
         formulario.setValue('rut', usuario.rutusuario);
         formulario.setValue('nombres', usuario.nombres);
         formulario.setValue('apellidos', usuario.apellidos);
-        formulario.setValue('telefono1', usuario.telefonouno);
-        formulario.setValue('telefono2', usuario.telefonodos);
-        formulario.setValue('email', usuario.email);
-        formulario.setValue('confirmarEmail', usuario.email);
 
         formulario.clearErrors();
 

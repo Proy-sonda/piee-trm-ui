@@ -27,7 +27,6 @@ import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alert
 import exportFromJSON from 'export-from-json';
 import { Trabajadoresxrrhh } from '../../(modelos)/payload-unidades';
 import { buscarUnidadPorId } from '../../(servicios)/buscar-unidad-por-id';
-import { useRol } from '../../../(hooks)/use-Rol';
 import { ProgressBarCustom } from './(componentes)/progress-bar';
 import styles from './trabajadores.module.css';
 
@@ -46,8 +45,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [unidadEmpleador, setunidadEmpleador] = useState<Unidadesrrhh[] | undefined>();
   const [trabajadores, settrabajadores] = useState<Trabajadoresunidadrrhh[]>([]);
 
-  const { RolUsuario } = useRol();
-  const { empleadorActual } = useEmpleadorActual();
+  const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
   const [csvData, setCsvData] = useState<any[]>([]);
   let [loading, setLoading] = useState(false);
   const [error, seterror] = useState({
@@ -373,7 +371,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           </Titulo>
         </div>
 
-        {RolUsuario == 'Administrador' && (
+        {rolEnEmpleadorActual === 'administrador' && (
           <div className="row mt-4">
             <div className="col-md-12 col-xs-12 col-lg-5">
               <h5>Cargar Personas Trabajadoras</h5>
@@ -574,7 +572,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="col-md-12">
             <div className="row">
               <h5 className="text-center">Personas Trabajadoras</h5>
-              {RolUsuario == 'Administrador' && (
+              {rolEnEmpleadorActual === 'administrador' && (
                 <span
                   className="text-end animate animate__fadeIn"
                   style={{

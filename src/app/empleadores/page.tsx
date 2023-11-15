@@ -2,22 +2,21 @@
 
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import Titulo from '@/components/titulo/titulo';
-import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { AuthContext } from '@/contexts';
+import { emptyFetch, useFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
-import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
 import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
-import { desadscribirEmpleador } from './(servicios)/desadscribir-empleador';
+import { buscarPermisosPorEmpleador } from './(servicios)/buscar-permisos-por-empleador';
 
 const EmpleadoresPage = () => {
-  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const { usuario } = useContext(AuthContext);
 
   const [refresh, refrescarPagina] = useRefrescarPagina();
 
@@ -26,8 +25,13 @@ const EmpleadoresPage = () => {
     [refresh],
   );
 
+  const [, permisos] = useFetch(usuario ? buscarPermisosPorEmpleador(usuario.rut) : emptyFetch(), [
+    usuario,
+  ]);
+
   const [empleadoresFiltrados, setEmpleadoresFiltrados] = useState<Empleador[]>([]);
 
+  // Filtrar empleadores cuando carga
   useEffect(() => {
     if (!empleadores) {
       return;
@@ -35,42 +39,6 @@ const EmpleadoresPage = () => {
 
     filtrarEmpleadores('', '');
   }, [empleadores]);
-
-  const desadscribirEntidadEmpleadora = async (empleador: Empleador) => {
-    const empresa = empleador.razonsocial;
-    const rut = empleador.rutempleador;
-
-    const { isConfirmed } = await AlertaConfirmacion.fire({
-      title: 'Desadscribir',
-      html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
-      confirmButtonText: 'Aceptar',
-      denyButtonText: 'Cancelar',
-    });
-
-    if (!isConfirmed) {
-      return;
-    }
-
-    try {
-      setMostrarSpinner(true);
-
-      await desadscribirEmpleador(rut);
-
-      refrescarPagina();
-
-      AlertaExito.fire({
-        html: `Entidad empleadora <b>${empresa}</b> fue desuscrita con éxito`,
-      });
-    } catch (error) {
-      AlertaError.fire({ title: 'Hubo un problema al desadscribir a la entidad empleadora' });
-    } finally {
-      setMostrarSpinner(false);
-    }
-  };
-
-  const onEntidadEmpleadoraCreada = () => {
-    refrescarPagina();
-  };
 
   const filtrarEmpleadores = (rut: string, razonSocial: string) => {
     const porFiltrar = empleadores ?? [];
@@ -104,10 +72,6 @@ const EmpleadoresPage = () => {
 
       <div className="row mt-4">
         <div className="col-md-12 col-xl-12">
-          <IfContainer show={mostrarSpinner}>
-            <SpinnerPantallaCompleta />
-          </IfContainer>
-
           <IfContainer show={cargandoEmpleador}>
             <div className="mt-4">
               <LoadingSpinner titulo="Cargando empleadores"></LoadingSpinner>
@@ -120,14 +84,15 @@ const EmpleadoresPage = () => {
 
           <IfContainer show={!cargandoEmpleador && errorCargaEmpleador.length === 0}>
             <TablaEntidadesEmpleadoras
+              permisos={permisos ?? []}
               empleadores={empleadoresFiltrados ?? []}
-              onDesadscribirEmpleador={desadscribirEntidadEmpleadora}
+              onEmpleadorDesuscrito={() => refrescarPagina()}
             />
           </IfContainer>
         </div>
       </div>
 
-      <ModalInscribirEntidadEmpleadora onEntidadEmpleadoraCreada={onEntidadEmpleadoraCreada} />
+      <ModalInscribirEntidadEmpleadora onEntidadEmpleadoraCreada={() => refrescarPagina()} />
     </Container>
   );
 };

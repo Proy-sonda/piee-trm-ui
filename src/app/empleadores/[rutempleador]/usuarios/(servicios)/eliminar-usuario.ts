@@ -49,10 +49,10 @@ async function eliminarUsuarioConWS(request: EliminarUsuarioRequest) {
       runusuario: request.rutusuario,
       apellidosusuario: request.apellidos,
       nombresusuario: request.nombres,
-      rolusuario: request.rol.idrol,
-      telefono: request.telefonouno,
-      telefonomovil: request.telefonodos,
-      correoelectronicousuario: request.email,
+      rolusuario: request.usuarioempleadorActual.rol.idrol,
+      telefono: request.usuarioempleadorActual.telefonouno,
+      telefonomovil: request.usuarioempleadorActual.telefonodos,
+      correoelectronicousuario: request.usuarioempleadorActual.email,
     },
   };
 

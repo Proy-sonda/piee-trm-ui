@@ -1,4 +1,3 @@
-import { EmpleadorPorId } from '@/app/empleadores/(modelos)/empleador-por-id';
 import {
   ComboSimple,
   InputApellidos,
@@ -11,6 +10,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { Empleador } from '@/modelos/empleador';
 import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useEffect, useState } from 'react';
@@ -26,9 +26,9 @@ interface ModalEditarUsuarioProps {
   show: boolean;
   idUsuario?: number;
   cantidadUsuariosAdminActivos: number;
-  empleador?: EmpleadorPorId;
+  empleador?: Empleador;
   onCerrarModal: () => void;
-  onUsuarioEditado: () => void;
+  onUsuarioEditado: (rutUsuario: string) => void;
 }
 
 const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
@@ -46,8 +46,8 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
   });
 
   const [errUsuario, usuarioEditar, cargandoUsuario] = useFetch(
-    idUsuario ? buscarUsuarioPorId(idUsuario) : emptyFetch(),
-    [idUsuario],
+    idUsuario && empleador ? buscarUsuarioPorId(idUsuario, empleador.rutempleador) : emptyFetch(),
+    [idUsuario, empleador],
   );
 
   const formulario = useForm<FormularioEditarUsuario>({ mode: 'onBlur' });
@@ -68,11 +68,11 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
     formulario.setValue('rut', usuarioEditar.rutusuario);
     formulario.setValue('nombres', usuarioEditar.nombres);
     formulario.setValue('apellidos', usuarioEditar.apellidos);
-    formulario.setValue('telefono1', usuarioEditar.telefonouno);
-    formulario.setValue('telefono2', usuarioEditar.telefonodos);
-    formulario.setValue('email', usuarioEditar.email);
-    formulario.setValue('confirmarEmail', usuarioEditar.email);
-    formulario.setValue('rolId', usuarioEditar.rol.idrol);
+    formulario.setValue('telefono1', usuarioEditar.usuarioempleadorActual.telefonouno ?? '');
+    formulario.setValue('telefono2', usuarioEditar.usuarioempleadorActual.telefonodos ?? '');
+    formulario.setValue('email', usuarioEditar.usuarioempleadorActual.email ?? '');
+    formulario.setValue('confirmarEmail', usuarioEditar.usuarioempleadorActual.email ?? '');
+    formulario.setValue('rolId', usuarioEditar.usuarioempleadorActual.rol.idrol);
   }, [cargandoUsuario, usuarioEditar, errUsuario]);
 
   const handleActualizarUsuario: SubmitHandler<FormularioEditarUsuario> = async (data) => {
@@ -89,14 +89,13 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
       await actualizarUsuario({
         ...data,
-        idUsuario: usuarioEditar.idusuario,
-        estadoUsuarioId: usuarioEditar.estadousuario.idestadousuario,
-        rutEmpleador: empleador.rutempleador,
+        empleador: empleador,
+        usuarioOriginal: usuarioEditar,
       });
 
       AlertaExito.fire({ text: 'Persona usuaria actualizada con éxito' });
 
-      onUsuarioEditado();
+      onUsuarioEditado(usuarioEditar.rutusuario);
     } catch (error) {
       if (error instanceof WebServiceOperadoresError) {
         return AlertaError.fire({
@@ -187,7 +186,7 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                       <input
                         type="text"
                         className="form-control"
-                        value={usuarioEditar?.rol.rol ?? ''}
+                        value={usuarioEditar?.usuarioempleadorActual.rol.rol ?? ''}
                         disabled
                       />
                     </div>
