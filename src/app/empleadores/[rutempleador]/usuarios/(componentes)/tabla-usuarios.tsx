@@ -101,6 +101,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
       await eliminarUsuario({
         ...usuario,
+        idEmpleador: empleadorActual.idempleador,
         rutEmpleador: empleadorActual.rutempleador,
       });
 
