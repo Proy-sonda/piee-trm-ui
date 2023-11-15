@@ -1,0 +1,27 @@
+.label-pdf {
+    font-size: 12px;
+    margin-bottom: 0px;
+    margin-top: 0px;
+}
+
+.label-pdf > b{
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.header-pdf{
+    background-image: url('../../../../../../img/header.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    margin: 0.5px;
+    color: white;
+    font-weight: bold;
+    font-size: 36px;
+    padding: 2%;
+    text-align: center;
+}
+
+.fondo-cabecera {
+    background-color: #E0E0E0;
+    padding: 2%;
+}
