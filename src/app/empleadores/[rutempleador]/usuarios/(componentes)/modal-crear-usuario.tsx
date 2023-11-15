@@ -105,14 +105,28 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
 
       const usuario = await request();
 
-      if (usuario) {
-        formulario.setValue('rut', usuario.rutusuario);
-        formulario.setValue('nombres', usuario.nombres);
-        formulario.setValue('apellidos', usuario.apellidos);
+      if (!usuario || !empleador) {
+        return;
+      }
 
-        formulario.clearErrors();
+      setBloquearRut(true);
 
-        setBloquearRut(true);
+      formulario.clearErrors();
+      formulario.setValue('rut', usuario.rutusuario);
+      formulario.setValue('nombres', usuario.nombres);
+      formulario.setValue('apellidos', usuario.apellidos);
+
+      const empleadorUsuario = usuario.usuarioempleador.find(
+        (ue) => ue.empleador.rutempleador === empleador.rutempleador,
+      );
+
+      if (empleadorUsuario) {
+        // Se usa un valor por defecto en caso de que venga NULL desde la base de datos por la
+        // migracion al nuevo modelo de usuario. P.D.: No deberia pasar que venga NULL.
+        formulario.setValue('telefono1', empleadorUsuario.telefonouno ?? '');
+        formulario.setValue('telefono2', empleadorUsuario.telefonodos ?? '');
+        formulario.setValue('email', empleadorUsuario.email ?? '');
+        formulario.setValue('confirmarEmail', empleadorUsuario.email ?? '');
       }
     } catch (error) {
       // Nada que hacer si hay un error
