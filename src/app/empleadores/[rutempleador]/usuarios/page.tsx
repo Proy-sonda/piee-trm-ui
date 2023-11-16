@@ -74,8 +74,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
         strIncluye(`${usuario.nombres} ${usuario.apellidos}`, textoBusqueda) ||
         strIncluye(usuario.usuarioempleadorActual.email, textoBusqueda) ||
         strIncluye(usuario.usuarioempleadorActual.telefonouno, textoBusqueda) ||
-        strIncluye(usuario.usuarioempleadorActual.rol.rol, textoBusqueda) ||
-        strIncluye(usuario.usuarioempleadorActual.estadousuario.descripcion, textoBusqueda)
+        strIncluye(usuario.usuarioempleadorActual.rol.rol, textoBusqueda)
       );
     });
 

@@ -142,7 +142,6 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               <Th>Correo electrónico</Th>
             </IfContainer>
             <Th>Rol</Th>
-            <Th>Estado</Th>
             {rolEnEmpleadorActual === 'administrador' && <Th></Th>}
           </Tr>
         </Thead>
@@ -168,7 +167,6 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                   <Td>{usuario.usuarioempleadorActual.email?.trim() ?? ' '}</Td>
                 </IfContainer>
                 <Td>{usuario.usuarioempleadorActual.rol.rol}</Td>
-                <Td>{usuario.usuarioempleadorActual.estadousuario.descripcion}</Td>
                 {rolEnEmpleadorActual === 'administrador' && (
                   <Td>
                     <div className="d-none d-lg-inline-block">
