@@ -8,10 +8,13 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import footerimg from '@/img/fondo_footer.png';
+import imgfonasa from '@/img/logo-fonasa.png';
 import { addDays, format } from 'date-fns';
 import es from 'date-fns/locale/es';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import Image from 'next/image';
 import { FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { buscarZona4 } from '../(servicios)/buscar-z4';
@@ -152,7 +155,16 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
         <div id="contenidoPDF">
           <div className={`me-5 ms-5 ${styles['label-pdf']}`}>
             <div className={`row ${styles['header-pdf']}`}>
-              <p>Licencia Tramitada - {format(new Date(), "dd 'de' MMMM 'de' yyyy", { locale })}</p>
+              <div
+                className="col-md-5"
+                style={{
+                  position: 'absolute',
+                  alignItems: 'center',
+                  alignSelf: 'center',
+                }}>
+                <Image src={imgfonasa.src} alt="Fonasa header" width={200} height={110} />
+              </div>
+              <p>Comprobante de Tramitación</p>
             </div>
             <div className={styles['fondo-cabecera']}>
               <div className="row mt-2">
@@ -282,7 +294,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
             </div>
             <div className={`${styles['fondo-cabecera']}`}>
               <div className={`row`}>
-                <table className="table table-stripped text-center">
+                <table className="table text-center">
                   <thead>
                     <tr>
                       <th>Institución Previsional</th>
@@ -315,7 +327,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
               </div>
               <div className={`${styles['fondo-cabecera']}`}>
                 <div className={`row`}>
-                  <table className="table table-striped text-center">
+                  <table className="table text-center">
                     <thead>
                       <tr>
                         <th>Institución Previsional</th>
@@ -347,21 +359,21 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
               </label>
             </div>
             <div className={`${styles['fondo-cabecera']}`}>
-              <table className="table table-bordered">
+              <table className="table">
                 <thead>
                   <tr>
-                    <th className="text-center">TIPO DOCUMENTO</th>
+                    <th>TIPO DOCUMENTO</th>
                     <th className="text-center">NOMBRE DOCUMENTO</th>
                   </tr>
                 </thead>
-                <tbody className="text-center">
+                <tbody>
                   <tr>
                     <td>Comprobante Liquidacion Mensual</td>
-                    <td>liquidacion_202301.pdf</td>
+                    <td className="text-center">liquidacion_202301.pdf</td>
                   </tr>
                   <tr>
                     <td>Contrato de Trabajo Vigente a la fecha</td>
-                    <td>ContratoTrabajo.pdf</td>
+                    <td className="text-center">ContratoTrabajo.pdf</td>
                   </tr>
                   <tr>
                     <td>Certificado de Pago Cotizaciones</td>
@@ -405,7 +417,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </p>
               </IfContainer>
               <IfContainer show={zonas!?.zona4!?.length > 0}>
-                <table className="table table-bordered">
+                <table className="table">
                   <thead className="text-center">
                     <tr>
                       <th>Total días</th>
@@ -425,6 +437,17 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                   </tbody>
                 </table>
               </IfContainer>
+            </div>
+
+            <div className={`row ${styles['header-pdf']}`}>
+              <b>Prueba</b>
+              <div
+                className="col-md-4"
+                style={{
+                  position: 'relative',
+                }}>
+                <Image src={footerimg.src} alt="Imagen de footer" width={100} height={5}></Image>
+              </div>
             </div>
           </div>
         </div>

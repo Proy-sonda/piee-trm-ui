@@ -18,10 +18,29 @@
     font-weight: bold;
     font-size: 36px;
     padding: 2%;
+}
+
+
+.header-pdf label{
+    text-align: center;
+}
+.header-pdf p{
     text-align: center;
 }
 
 .fondo-cabecera {
-    background-color: #E0E0E0;
+    /* background-color: #E0E0E0; */
+    
+    padding: 2%;
+}
+
+.footer-pdf{
+    
+    background-repeat: no-repeat;
+    /* background-size: 100% 100%; */
+    margin: 0.5px;
+    color: white;
+    font-weight: bold;
+    font-size: 36px;
     padding: 2%;
 }
