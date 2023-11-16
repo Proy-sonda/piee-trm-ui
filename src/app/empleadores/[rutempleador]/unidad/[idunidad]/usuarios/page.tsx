@@ -231,7 +231,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                     </select>
                   </div>
                   <div className="col-md-6 align-self-end">
-                    <button type="submit" className="btn btn-success">
+                    <button type="submit" className="mt-2 mt-md-0 btn btn-success">
                       Agregar
                     </button>
                   </div>
