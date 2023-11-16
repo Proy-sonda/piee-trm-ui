@@ -341,6 +341,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       <IfContainer show={spinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
+
       <Cabecera
         foliotramitacion={foliolicencia}
         idoperador={idoperador}
@@ -352,13 +353,15 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           formulario.handleSubmit(onHandleSubmit)();
         }}
       />
+
       <IfContainer show={cargandoCombos}>
         <div className={fadeinOut}>
           <LoadingSpinner titulo="Cargando datos..." />
         </div>
       </IfContainer>
+
       <div
-        className="row mt-2 pb-5"
+        className="row"
         style={{
           display: cargandoCombos || !erroresCargarCombos ? 'none' : 'inline',
         }}>
@@ -366,17 +369,17 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           <form
             className="animate__animated animate__fadeIn"
             onSubmit={formulario.handleSubmit(onHandleSubmit)}>
-            <div className="row">
+            <div className="row align-items-baseline g-3">
               <ComboSimple
                 label="Régimen Previsional"
                 descripcion="regimenprevisional"
                 idElemento="codigoregimenprevisional"
                 name="regimen"
                 datos={combos?.REGIMEN}
-                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
 
-              <div className="col-lg-3 col-md-4 col-sm-12 mb-2 position-relative">
+              <div className="col-12 col-sm-6 col-lg-4 col-xl-3 position-relative">
                 <label className="mb-2">Institución Previsional (*)</label>
                 <select
                   {...formulario.register('previsional', {
@@ -454,10 +457,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 idElemento="idcalidadtrabajador"
                 name="calidad"
                 datos={combos?.CALIDADTRABAJADOR}
-                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
 
-              <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
+              <div className="col-12 col-sm-6 col-lg-4 col-xl-3">
                 <label className="mb-2 animate__animated animate__fadeIn">
                   Persona Pertenece a AFC{' '}
                   {esAFC && LMECABECERA?.ocupacion.idocupacion != 18 && '(*)'}
@@ -499,7 +502,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   </p>
                 </IfContainer>
               </div>
-              <div className="col-lg-3 col-md-4 col-sm-12 mb-2">
+              <div className="col-12 col-sm-6 col-lg-4 col-xl-3">
                 <label className="mb-2">Contrato de duración indefinida</label>
                 <InputRadioButtons
                   direccion="horizontal"
@@ -521,13 +524,13 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 name="fechaafilacionprevisional"
                 label="Fecha Afiliación Entidad Previsional"
                 opcional
-                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
 
               <InputFecha
                 name="fechacontratotrabajo"
                 label="Fecha Contrato de trabajo"
-                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
 
               <ComboSimple
@@ -537,17 +540,19 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 datos={entePagador}
                 name="entidadremuneradora"
                 tipoValor="string"
-                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
               <InputOtroMotivoDeRechazo
                 name="nombreentidadpagadorasubsidio"
                 opcional
                 label="Nombre Entidad Pagadora Subsidio"
-                className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
             </div>
 
-            <BotonesNavegacion formulario={formulario} anterior />
+            <div className="mt-4">
+              <BotonesNavegacion formulario={formulario} anterior />
+            </div>
           </form>
         </FormProvider>
       </div>
