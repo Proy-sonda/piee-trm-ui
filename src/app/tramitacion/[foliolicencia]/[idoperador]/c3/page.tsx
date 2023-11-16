@@ -585,169 +585,181 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
             <Row>
               <Col xs={12}>
-                <Table className="table table-bordered">
-                  <Thead>
-                    <Tr className="align-middle text-center">
-                      <Th>Institución Previsional</Th>
-                      <Th>Periodo Renta</Th>
-                      <Th>N° Días</Th>
-                      <Th>Monto Imponible</Th>
-                      <Th>Total Remuneración</Th>
-                      <Th>Monto Incapacidad</Th>
-                      <Th>Días Incapacidad</Th>
-                      <Th>Registrar Desglose de haberes</Th>
-                      <Th> </Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {remuneraciones.fields.map((field, index) => (
-                      <Tr key={field.id}>
-                        <Td>
-                          <ComboSimple
-                            opcional={index !== 0}
-                            name={`remuneraciones.${index}.prevision`}
-                            datos={tiposPrevisiones}
-                            idElemento={crearIdEntidadPrevisional}
-                            descripcion={glosaCompletaEntidadPrevisional}
-                            tipoValor="string"
-                            unirConFieldArray={{
-                              index,
-                              campo: 'prevision',
-                              fieldArrayName: 'remuneraciones',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <InputMesAno
-                            opcional={index !== 0}
-                            name={`remuneraciones.${index}.periodoRenta`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'periodoRenta',
-                              fieldArrayName: 'remuneraciones',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <InputDias
-                            opcional={index !== 0}
-                            name={`remuneraciones.${index}.dias`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'dias',
-                              fieldArrayName: 'remuneraciones',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <InputMonto
-                            opcional={index !== 0}
-                            name={`remuneraciones.${index}.montoImponible`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'montoImponible',
-                              fieldArrayName: 'remuneraciones',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <InputMonto
-                            opcional
-                            name={`remuneraciones.${index}.totalRemuneracion`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'totalRemuneracion',
-                              fieldArrayName: 'remuneraciones',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <InputMonto
-                            opcional
-                            name={`remuneraciones.${index}.montoIncapacidad`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'montoIncapacidad',
-                              fieldArrayName: 'remuneraciones',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <InputDias
-                            opcional
-                            name={`remuneraciones.${index}.diasIncapacidad`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'diasIncapacidad',
-                              fieldArrayName: 'remuneraciones',
-                            }}
-                          />
-                        </Td>
-                        <Td>
-                          <div className="align-middle text-center">
-                            <button
-                              type="button"
-                              className="btn btn-primary"
-                              onClick={() => {
-                                setDatosModalDesglose({
-                                  // prettier-ignore
-                                  periodoRenta: formulario.getValues(`remuneraciones.${index}.periodoRenta`),
-                                  fieldArray: 'remuneraciones',
-                                  indexInput: index,
-                                  show: true,
-                                  // prettier-ignore
-                                  desgloseInicial: formulario.getValues(`remuneraciones.${index}.desgloseHaberes`),
-                                });
-                              }}>
-                              <i className="bi bi-bounding-box-circles"></i>
-                            </button>
-
-                            <InputDesgloseDeHaberes
-                              opcional
-                              name={`remuneraciones.${index}.desgloseHaberes`}
-                              montoImponibleName={`remuneraciones.${index}.montoImponible`}
+                <div className="table-responsive">
+                  <Table className="table table-bordered">
+                    <Thead>
+                      <Tr className="align-middle text-center">
+                        <Th>Institución Previsional</Th>
+                        <Th>Periodo Renta</Th>
+                        <Th>
+                          <span className="text-nowrap">N° Días</span>
+                        </Th>
+                        <Th>Monto Imponible</Th>
+                        <Th>Total Remuneración</Th>
+                        <Th>Monto Incapacidad</Th>
+                        <Th>Días Incapacidad</Th>
+                        <Th>Registrar Desglose de haberes</Th>
+                        <Th> </Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
+                      {remuneraciones.fields.map((field, index) => (
+                        <Tr key={field.id}>
+                          <Td>
+                            <ComboSimple
+                              opcional={index !== 0}
+                              name={`remuneraciones.${index}.prevision`}
+                              datos={tiposPrevisiones}
+                              idElemento={crearIdEntidadPrevisional}
+                              descripcion={glosaCompletaEntidadPrevisional}
+                              tipoValor="string"
                               unirConFieldArray={{
                                 index,
-                                campo: 'desgloseHaberes',
+                                campo: 'prevision',
                                 fieldArrayName: 'remuneraciones',
                               }}
                             />
-                          </div>
-                        </Td>
-                        <Td>
-                          <div className="text-center align-middle">
-                            <button
-                              type="button"
-                              className="btn text-danger"
-                              title="Descartar fila"
-                              onClick={() => limpiarFila('remuneraciones', index)}>
-                              <i className="bi bi-trash"></i>
-                            </button>
-                          </div>
-                        </Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
+                          </Td>
+                          <Td>
+                            <InputMesAno
+                              opcional={index !== 0}
+                              name={`remuneraciones.${index}.periodoRenta`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'periodoRenta',
+                                fieldArrayName: 'remuneraciones',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputDias
+                              opcional={index !== 0}
+                              name={`remuneraciones.${index}.dias`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'dias',
+                                fieldArrayName: 'remuneraciones',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputMonto
+                              opcional={index !== 0}
+                              name={`remuneraciones.${index}.montoImponible`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'montoImponible',
+                                fieldArrayName: 'remuneraciones',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputMonto
+                              opcional
+                              name={`remuneraciones.${index}.totalRemuneracion`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'totalRemuneracion',
+                                fieldArrayName: 'remuneraciones',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputMonto
+                              opcional
+                              name={`remuneraciones.${index}.montoIncapacidad`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'montoIncapacidad',
+                                fieldArrayName: 'remuneraciones',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <InputDias
+                              opcional
+                              name={`remuneraciones.${index}.diasIncapacidad`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'diasIncapacidad',
+                                fieldArrayName: 'remuneraciones',
+                              }}
+                            />
+                          </Td>
+                          <Td>
+                            <div className="align-middle text-center">
+                              <button
+                                type="button"
+                                className="btn btn-primary"
+                                onClick={() => {
+                                  setDatosModalDesglose({
+                                    // prettier-ignore
+                                    periodoRenta: formulario.getValues(`remuneraciones.${index}.periodoRenta`),
+                                    fieldArray: 'remuneraciones',
+                                    indexInput: index,
+                                    show: true,
+                                    // prettier-ignore
+                                    desgloseInicial: formulario.getValues(`remuneraciones.${index}.desgloseHaberes`),
+                                  });
+                                }}>
+                                <i className="bi bi-bounding-box-circles"></i>
+                              </button>
+
+                              <InputDesgloseDeHaberes
+                                opcional
+                                name={`remuneraciones.${index}.desgloseHaberes`}
+                                montoImponibleName={`remuneraciones.${index}.montoImponible`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'desgloseHaberes',
+                                  fieldArrayName: 'remuneraciones',
+                                }}
+                              />
+                            </div>
+                          </Td>
+                          <Td>
+                            <div className="text-center align-middle">
+                              <button
+                                type="button"
+                                className="btn text-danger"
+                                title="Descartar fila"
+                                onClick={() => limpiarFila('remuneraciones', index)}>
+                                <i className="bi bi-trash"></i>
+                              </button>
+                            </div>
+                          </Td>
+                        </Tr>
+                      ))}
+                    </Tbody>
+                  </Table>
+                </div>
               </Col>
             </Row>
 
             <Row className="mt-2">
-              <Col sm={6} md={6} className="d-flex align-items-center justify-content-end">
+              <Col
+                xs={12}
+                sm={6}
+                md={6}
+                className="mt-2 mb-2 mt-sm-0 d-flex align-items-center justify-content-start">
                 <span className="small fw-bold">
                   Remuneración imponible previsional mes anterior inicio licencia médica:
                 </span>
               </Col>
 
-              <Col sm={6} md={2}>
+              <Col xs={12} sm={6} md={2}>
                 <InputMonto opcional name="remuneracionImponiblePrevisional" />
               </Col>
 
-              <Col xs={8} sm={8} md={2} className="d-flex align-items-center justify-content-end">
+              <Col
+                xs={12}
+                sm={6}
+                md={2}
+                className="mt-3 mb-2 mt-sm-0 d-flex align-items-center justify-content-start">
                 <span className="small fw-bold">% Desahucio:</span>
               </Col>
 
-              <Col xs={4} sm={4} md={2}>
+              <Col xs={12} sm={6} md={2}>
                 <FormGroup controlId={'porcentajeDesahucio'} className="position-relative">
                   <Form.Control
                     type="number"
@@ -773,7 +785,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
             </Row>
 
             <IfContainer show={licencia && esLicenciaMaternidad(licencia)}>
-              <Row className="my-3">
+              <Row className="mt-5 mb-3">
                 <Col xs={12}>
                   <h6 className="text-center">
                     EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO
@@ -801,150 +813,153 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
               <Row>
                 <Col xs={12}>
-                  <Table className="table table-bordered">
-                    <Thead>
-                      <Tr className="align-middle text-center">
-                        <Th>Institución Previsional</Th>
-                        <Th>Periodo Renta</Th>
-                        <Th>N° Días</Th>
-                        <Th>Monto Imponible</Th>
-                        <Th>Total Remuneración</Th>
-                        <Th>Monto Incapacidad</Th>
-                        <Th>Días Incapacidad</Th>
-                        <Th>Registrar Desglose de haberes</Th>
-                        <Th> </Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {remuneracionesMaternidad.fields.map((field, index) => (
-                        <Tr key={field.id}>
-                          <Td>
-                            <ComboSimple
-                              opcional
-                              name={`remuneracionesMaternidad.${index}.prevision`}
-                              datos={tiposPrevisiones}
-                              idElemento={crearIdEntidadPrevisional}
-                              descripcion={glosaCompletaEntidadPrevisional}
-                              tipoValor="string"
-                              unirConFieldArray={{
-                                index,
-                                campo: 'prevision',
-                                fieldArrayName: 'remuneracionesMaternidad',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <InputMesAno
-                              opcional
-                              name={`remuneracionesMaternidad.${index}.periodoRenta`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'periodoRenta',
-                                fieldArrayName: 'remuneracionesMaternidad',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <InputDias
-                              opcional
-                              name={`remuneracionesMaternidad.${index}.dias`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'dias',
-                                fieldArrayName: 'remuneracionesMaternidad',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <InputMonto
-                              opcional
-                              name={`remuneracionesMaternidad.${index}.montoImponible`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'montoImponible',
-                                fieldArrayName: 'remuneracionesMaternidad',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <InputMonto
-                              opcional
-                              name={`remuneracionesMaternidad.${index}.totalRemuneracion`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'totalRemuneracion',
-                                fieldArrayName: 'remuneracionesMaternidad',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <InputMonto
-                              opcional
-                              name={`remuneracionesMaternidad.${index}.montoIncapacidad`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'montoIncapacidad',
-                                fieldArrayName: 'remuneracionesMaternidad',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <InputDias
-                              opcional
-                              name={`remuneracionesMaternidad.${index}.diasIncapacidad`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'diasIncapacidad',
-                                fieldArrayName: 'remuneracionesMaternidad',
-                              }}
-                            />
-                          </Td>
-                          <Td>
-                            <div className="align-middle text-center">
-                              <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={() => {
-                                  setDatosModalDesglose({
-                                    // prettier-ignore
-                                    periodoRenta: formulario.getValues(`remuneracionesMaternidad.${index}.periodoRenta`),
-                                    fieldArray: 'remuneracionesMaternidad',
-                                    indexInput: index,
-                                    show: true,
-                                    // prettier-ignore
-                                    desgloseInicial: formulario.getValues(`remuneracionesMaternidad.${index}.desgloseHaberes`),
-                                  });
-                                }}>
-                                <i className="bi bi-bounding-box-circles"></i>
-                              </button>
-
-                              <InputDesgloseDeHaberes
+                  <div className="table-responsive">
+                    <Table className="table table-bordered">
+                      <Thead>
+                        <Tr className="align-middle text-center">
+                          <Th>Institución Previsional</Th>
+                          <Th>Periodo Renta</Th>
+                          <Th>
+                            <span className="text-nowrap">N° Días</span>
+                          </Th>
+                          <Th>Monto Imponible</Th>
+                          <Th>Total Remuneración</Th>
+                          <Th>Monto Incapacidad</Th>
+                          <Th>Días Incapacidad</Th>
+                          <Th>Registrar Desglose de haberes</Th>
+                          <Th> </Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {remuneracionesMaternidad.fields.map((field, index) => (
+                          <Tr key={field.id}>
+                            <Td>
+                              <ComboSimple
                                 opcional
-                                montoImponibleName={`remuneracionesMaternidad.${index}.montoImponible`}
-                                name={`remuneracionesMaternidad.${index}.desgloseHaberes`}
+                                name={`remuneracionesMaternidad.${index}.prevision`}
+                                datos={tiposPrevisiones}
+                                idElemento={crearIdEntidadPrevisional}
+                                descripcion={glosaCompletaEntidadPrevisional}
+                                tipoValor="string"
                                 unirConFieldArray={{
                                   index,
-                                  campo: 'desgloseHaberes',
+                                  campo: 'prevision',
                                   fieldArrayName: 'remuneracionesMaternidad',
                                 }}
                               />
-                            </div>
-                          </Td>
-                          <Td>
-                            <div className="text-center align-middle">
-                              <button
-                                type="button"
-                                className="btn text-danger"
-                                title="Descartar fila"
-                                onClick={() => limpiarFila('remuneracionesMaternidad', index)}>
-                                <i className="bi bi-trash"></i>
-                              </button>
-                            </div>
-                          </Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
+                            </Td>
+                            <Td>
+                              <InputMesAno
+                                opcional
+                                name={`remuneracionesMaternidad.${index}.periodoRenta`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'periodoRenta',
+                                  fieldArrayName: 'remuneracionesMaternidad',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputDias
+                                opcional
+                                name={`remuneracionesMaternidad.${index}.dias`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'dias',
+                                  fieldArrayName: 'remuneracionesMaternidad',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputMonto
+                                opcional
+                                name={`remuneracionesMaternidad.${index}.montoImponible`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'montoImponible',
+                                  fieldArrayName: 'remuneracionesMaternidad',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputMonto
+                                opcional
+                                name={`remuneracionesMaternidad.${index}.totalRemuneracion`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'totalRemuneracion',
+                                  fieldArrayName: 'remuneracionesMaternidad',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputMonto
+                                opcional
+                                name={`remuneracionesMaternidad.${index}.montoIncapacidad`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'montoIncapacidad',
+                                  fieldArrayName: 'remuneracionesMaternidad',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <InputDias
+                                opcional
+                                name={`remuneracionesMaternidad.${index}.diasIncapacidad`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'diasIncapacidad',
+                                  fieldArrayName: 'remuneracionesMaternidad',
+                                }}
+                              />
+                            </Td>
+                            <Td>
+                              <div className="align-middle text-center">
+                                <button
+                                  type="button"
+                                  className="btn btn-primary"
+                                  onClick={() => {
+                                    setDatosModalDesglose({
+                                      // prettier-ignore
+                                      periodoRenta: formulario.getValues(`remuneracionesMaternidad.${index}.periodoRenta`),
+                                      fieldArray: 'remuneracionesMaternidad',
+                                      indexInput: index,
+                                      show: true,
+                                      // prettier-ignore
+                                      desgloseInicial: formulario.getValues(`remuneracionesMaternidad.${index}.desgloseHaberes`),
+                                    });
+                                  }}>
+                                  <i className="bi bi-bounding-box-circles"></i>
+                                </button>
+                                <InputDesgloseDeHaberes
+                                  opcional
+                                  montoImponibleName={`remuneracionesMaternidad.${index}.montoImponible`}
+                                  name={`remuneracionesMaternidad.${index}.desgloseHaberes`}
+                                  unirConFieldArray={{
+                                    index,
+                                    campo: 'desgloseHaberes',
+                                    fieldArrayName: 'remuneracionesMaternidad',
+                                  }}
+                                />
+                              </div>
+                            </Td>
+                            <Td>
+                              <div className="text-center align-middle">
+                                <button
+                                  type="button"
+                                  className="btn text-danger"
+                                  title="Descartar fila"
+                                  onClick={() => limpiarFila('remuneracionesMaternidad', index)}>
+                                  <i className="bi bi-trash"></i>
+                                </button>
+                              </div>
+                            </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
+                    </Table>
+                  </div>
                 </Col>
               </Row>
             </IfContainer>
