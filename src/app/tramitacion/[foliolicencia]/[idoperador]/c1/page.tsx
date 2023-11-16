@@ -393,7 +393,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         </IfContainer>
 
         <div
-          className="row mt-2 pb-5"
+          className="row mt-2"
           style={{
             display: cargandoCombos || !erroresCargarCombos || !!errorEmpleador ? 'none' : 'block',
           }}>
@@ -401,26 +401,26 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
             <form
               className="animate__animated animate__fadeIn"
               onSubmit={formulario.handleSubmit(onHandleSubmit)}>
-              <div className="row">
+              <div className="row g-3 align-items-baseline">
                 <InputRut
                   name="run"
                   label="Rut Entidad Empleadora"
                   tipo="run"
                   deshabilitado
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <InputRazonSocial
                   name="razon"
                   label="Razón Social Entidad Empleadora"
                   deshabilitado
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <InputTelefono
                   name="telefono"
                   label="Teléfono"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <div
@@ -433,7 +433,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 <InputFecha
                   label="Fecha Recepción LME"
                   name="fecharecepcionlme"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                   opcional
                   noAnteriorA="fechaemision"
                   esEmision
@@ -445,7 +445,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   idElemento="idregion"
                   descripcion="nombre"
                   label="Región"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <ComboComuna
@@ -453,7 +453,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   name="comuna"
                   comunas={combos?.CCCOMUNA}
                   regionSeleccionada={regionSeleccionada}
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <ComboSimple
@@ -462,26 +462,26 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   descripcion="tipocalle"
                   idElemento="idtipocalle"
                   datos={combos?.CALLE}
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <InputCalle
                   label="Calle"
                   name="calle"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <InputNumero
                   label="Número"
                   name="numero"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <InputBlockDepartamento
                   opcional
                   label="Departamento"
                   name="departamento"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <ComboSimple
@@ -490,7 +490,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   name="actividadlaboral"
                   datos={combos?.ACTIVIDAD}
                   descripcion="actividadlaboral"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <ComboSimple
@@ -499,19 +499,17 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   datos={combos?.OCUPACION}
                   idElemento="idocupacion"
                   descripcion="ocupacion"
-                  className="col-lg-3 col-md-4 col-sm-12 mb-2"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
                 <IfContainer show={Number(ocupacionSeleccionada) == 19}>
-                  <label className="mb-2"></label>
-
-                  <div className="col-lg-3 col-md-4 col-sm-12 mb-2 mt-2 position-relative">
+                  <div className="col-12 col-sm-6 col-lg-4 col-xl-3 position-relative">
                     <input
                       type="text"
-                      className={`form-control ${
+                      className={`mt-2 form-control ${
                         formulario.formState.errors.otro ? 'is-invalid' : ''
                       }`}
-                      placeholder="Otro..."
+                      placeholder="Otra ocupación..."
                       {...formulario.register('otro', {
                         required: {
                           message: 'El campo otro es obligatorio',
@@ -529,7 +527,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 </IfContainer>
               </div>
 
-              <BotonesNavegacion formulario={formulario} />
+              <div className="mt-4">
+                <BotonesNavegacion formulario={formulario} />
+              </div>
             </form>
           </FormProvider>
         </div>
