@@ -1,4 +1,4 @@
-export interface tipoDocumento {
+export interface TipoDocumento {
   idtipoadjunto: number;
   tipoadjunto: string;
 }

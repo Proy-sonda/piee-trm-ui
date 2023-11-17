@@ -1,6 +1,6 @@
 'use client';
 
-import { ComboSimple, InputArchivo, InputMesAno } from '@/components/form';
+import { ComboSimple, InputMesAno } from '@/components/form';
 import IfContainer from '@/components/if-container';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { capitalizar } from '@/utilidades';
@@ -39,6 +39,7 @@ import {
 import { esTrabajadorIndependiente } from '../c2/(modelos)/licencia-c2';
 import { buscarEntidadPrevisional } from '../c2/(servicios)/buscar-entidad-previsional';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
+import DocumentosAdjuntosC3 from './(componentes)/documentos-adjuntos-c3';
 import { InputDesgloseDeHaberes } from './(componentes)/input-desglose-de-haberes';
 import {
   DatosModalDesgloseHaberes,
@@ -544,7 +545,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
       <IfContainer show={!cargandoPrevision && !cargandoZona2 && !hayErrores}>
         <FormProvider {...formulario}>
-          <Form onSubmit={formulario.handleSubmit(onSubmitForm)}>
+          <Form id="tramitacionC3" onSubmit={formulario.handleSubmit(onSubmitForm)}>
             <Cabecera
               foliotramitacion={foliolicencia}
               step={step}
@@ -963,66 +964,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                 </Col>
               </Row>
             </IfContainer>
-
-            <Row className="mt-3">
-              <h5>Documentos Adjuntos</h5>
-              <p>
-                Se recomienda adjuntar liquidaciones generadas por su sistema de remuneración
-                (Exccel, Word, PDF, etc.). El tamaño máximo permitido por archivo es de 10 MB.
-              </p>
-
-              <ComboSimple
-                opcional
-                label="Tipo de documento"
-                name="tipoDocumento"
-                descripcion="tipoadjunto"
-                idElemento="idtipoadjunto"
-                datos={tiposDeDocumentos}
-                className="col-md-4 mb-2"
-              />
-
-              <InputArchivo
-                opcional
-                name="documentosAdjuntos"
-                label="Adjuntar documento"
-                className="col-md-4 mb-2"
-              />
-
-              <div className="col-md-4 mb-2" style={{ alignSelf: 'end' }}>
-                <button className="btn btn-primary">Adjuntar documento</button>
-              </div>
-            </Row>
-
-            <Row className="mt-3">
-              <Table className="table table-bordered">
-                <Thead>
-                  <Tr className="align-middle">
-                    <Th>Tipo Documento</Th>
-                    <Th>Nombre Documento</Th>
-                    <Th>Acciones</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  <Tr className="align-middle">
-                    <Td>Comprobante Liquidacion Mensual</Td>
-                    <Td>a</Td>
-                    <Td>
-                      <div className="d-flex justify-content-evenly">
-                        <button type="button" className="btn btn-primary">
-                          <i className="bi bi-file-earmark-plus"></i>
-                        </button>
-                        <button type="button" className="btn btn-danger">
-                          <i className="bi bi-x"></i>
-                        </button>
-                      </div>
-                    </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </Row>
-
-            <BotonesNavegacion formulario={formulario} anterior />
           </Form>
+        </FormProvider>
+
+        <DocumentosAdjuntosC3 tiposDocumentos={tiposDeDocumentos} />
+
+        <FormProvider {...formulario}>
+          <BotonesNavegacion formId="tramitacionC3" formulario={formulario} anterior />
         </FormProvider>
       </IfContainer>
     </>

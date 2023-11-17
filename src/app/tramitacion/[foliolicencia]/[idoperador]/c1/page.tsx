@@ -399,6 +399,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
           }}>
           <FormProvider {...formulario}>
             <form
+              id="tramitacionC1"
               className="animate__animated animate__fadeIn"
               onSubmit={formulario.handleSubmit(onHandleSubmit)}>
               <div className="row g-3 align-items-baseline">
@@ -528,7 +529,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
               </div>
 
               <div className="mt-4">
-                <BotonesNavegacion formulario={formulario} />
+                <BotonesNavegacion formId="tramitacionC1" formulario={formulario} />
               </div>
             </form>
           </FormProvider>

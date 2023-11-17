@@ -6,6 +6,9 @@ import { useInputReciclable } from './hooks';
 
 interface InputArchivoProps extends InputReciclableBase {
   multiple?: boolean;
+  accept?: string;
+  /** Tamaño maximo de los archivos, en bytes. */
+  tamanoMaximo?: number;
 }
 
 /** El valor del input va a ser un  {@link FileList} */
@@ -15,6 +18,8 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({
   className,
   opcional,
   multiple,
+  accept,
+  tamanoMaximo,
 }) => {
   const { register } = useFormContext();
 
@@ -35,11 +40,29 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({
         <Form.Control
           type="file"
           isInvalid={tieneError}
+          accept={accept}
           multiple={multiple !== undefined && multiple === true}
           {...register(name, {
             required: {
               value: !opcional,
-              message: 'Debe adjuntar evidencia',
+              message: 'Este campo es obligatorio',
+            },
+            validate: {
+              tamanoMaximoPermitido: (archivos: FileList) => {
+                if (!tamanoMaximo) {
+                  return;
+                }
+
+                for (let index = 0; index < archivos.length; index++) {
+                  const archivo = archivos.item(index)!;
+
+                  if (archivo.size > tamanoMaximo) {
+                    return archivos.length === 1
+                      ? 'Archivo sobrepasa el tamaño máximo permitido'
+                      : 'Archivos sobrepasas el tamaño máximo permitido';
+                  }
+                }
+              },
             },
           })}
         />

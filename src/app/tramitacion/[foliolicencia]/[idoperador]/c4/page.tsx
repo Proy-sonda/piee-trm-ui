@@ -406,7 +406,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         </IfContainer>
 
         <FormProvider {...formulario}>
-          <form onSubmit={formulario.handleSubmit(onSubmitForm)}>
+          <form id="tramitacionC4" onSubmit={formulario.handleSubmit(onSubmitForm)}>
             <Row>
               <Col xs={12}>
                 <Table className="table table-bordered">
@@ -492,7 +492,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
               </Col>
             </Row>
 
-            <BotonesNavegacion formulario={formulario} anterior finaliza />
+            <BotonesNavegacion formId="tramitacionC4" formulario={formulario} anterior finaliza />
           </form>
         </FormProvider>
       </IfContainer>
