@@ -54,7 +54,10 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
       (td) => td.idtipoadjunto === tipoDocumento,
     )!;
 
-    setDocumentosAdjuntados((docs) => [...docs, [tipoDocumentoSeleccionado, documentos.item(0)!]]);
+    // Si se mueve documentos.item(0) directamente a setDocumentosAdjuntados tira un error
+    const documento = documentos.item(0)!;
+    setDocumentosAdjuntados((docs) => [...docs, [tipoDocumentoSeleccionado, documento]]);
+    formulario.reset();
   };
 
   const eliminarDocumento = async (indexDocumentoEliminar: number) => {
