@@ -1,5 +1,12 @@
+'use client';
+
+import {
+  LicenciaTramitar,
+  esLicenciaAccidenteLaboral,
+  esLicenciaEnfermedadProfesional,
+} from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { ComboSimple, InputArchivo } from '@/components/form';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
@@ -11,15 +18,30 @@ interface FormularioAdjuntarDocumentoC3 {
 }
 
 interface DocumentosAdjuntosC3Props {
+  licencia?: LicenciaTramitar;
   tiposDocumentos?: TipoDocumento[];
 }
 
 const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
+  licencia,
   tiposDocumentos: tiposDocumentos,
 }) => {
+  const tamanoMaximoDocumentoBytes = 5_000_000;
+
   const formulario = useForm<FormularioAdjuntarDocumentoC3>({ mode: 'onBlur' });
 
-  const tamanoMaximoDocumentoBytes = 5_000_000;
+  const [tiposDocumentosFiltrados, setTiposDocumentosFiltrados] = useState<TipoDocumento[]>([]);
+
+  // Filtrar documentos
+  useEffect(() => {
+    if (!tiposDocumentos || !licencia) {
+      setTiposDocumentosFiltrados([]);
+    } else if (esLicenciaAccidenteLaboral(licencia) || esLicenciaEnfermedadProfesional(licencia)) {
+      setTiposDocumentosFiltrados(tiposDocumentos.filter((t) => t.idtipoadjunto !== 5));
+    } else {
+      setTiposDocumentosFiltrados(tiposDocumentos);
+    }
+  }, [tiposDocumentos, licencia]);
 
   const adjuntarDocumento: SubmitHandler<FormularioAdjuntarDocumentoC3> = async (datos) => {
     console.log('Adjuntando documento...');
@@ -44,7 +66,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
                 name="tipoDocumento"
                 descripcion="tipoadjunto"
                 idElemento="idtipoadjunto"
-                datos={tiposDocumentos}
+                datos={tiposDocumentosFiltrados}
                 className="col-12 col-sm-5 col-md-4 col-lg-4 col-xl-3 col-xxl-2"
               />
 
@@ -69,33 +91,35 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
 
       <Row className="mt-4">
         <Col xs={12}>
-          <Table className="table table-bordered">
-            <Thead>
-              <Tr className="align-middle">
-                <Th>Tipo Documento</Th>
-                <Th>Nombre Documento</Th>
-                <Th>
-                  <div className="text-center">Acciones</div>
-                </Th>
-              </Tr>
-            </Thead>
-            <Tbody>
-              <Tr className="align-middle">
-                <Td>Comprobante Liquidacion Mensual</Td>
-                <Td>a</Td>
-                <Td>
-                  <div className="d-flex justify-content-center">
-                    <button type="button" className="btn btn-primary">
-                      <i className="bi bi-download"></i>
-                    </button>
-                    <button type="button" className="ms-2 btn btn-danger">
-                      <i className="bi bi-x-lg"></i>
-                    </button>
-                  </div>
-                </Td>
-              </Tr>
-            </Tbody>
-          </Table>
+          <div className="table-responsive">
+            <Table className="table table-bordered">
+              <Thead>
+                <Tr className="align-middle">
+                  <Th>Tipo Documento</Th>
+                  <Th>Nombre Documento</Th>
+                  <Th>
+                    <div className="text-center">Acciones</div>
+                  </Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                <Tr className="align-middle">
+                  <Td>Comprobante Liquidacion Mensual</Td>
+                  <Td>a</Td>
+                  <Td>
+                    <div className="d-flex justify-content-center">
+                      <button type="button" className="btn btn-primary">
+                        <i className="bi bi-download"></i>
+                      </button>
+                      <button type="button" className="ms-2 btn btn-danger">
+                        <i className="bi bi-x-lg"></i>
+                      </button>
+                    </div>
+                  </Td>
+                </Tr>
+              </Tbody>
+            </Table>
+          </div>
         </Col>
       </Row>
     </>

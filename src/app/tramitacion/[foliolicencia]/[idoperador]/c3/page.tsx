@@ -967,7 +967,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           </Form>
         </FormProvider>
 
-        <DocumentosAdjuntosC3 tiposDocumentos={tiposDeDocumentos} />
+        <DocumentosAdjuntosC3 licencia={licencia} tiposDocumentos={tiposDeDocumentos} />
 
         <FormProvider {...formulario}>
           <BotonesNavegacion formId="tramitacionC3" formulario={formulario} anterior />
