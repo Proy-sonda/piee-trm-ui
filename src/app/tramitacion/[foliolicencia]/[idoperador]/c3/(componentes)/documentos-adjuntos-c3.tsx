@@ -14,7 +14,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { TipoDocumento, esDocumentoDiatDiep } from '../../(modelo)/tipo-documento';
 
 interface FormularioAdjuntarDocumentoC3 {
-  tipoDocumento: number;
+  idTipoDocumento: number;
   documentos: FileList;
 }
 
@@ -47,16 +47,16 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   }, [tiposDocumentos, licencia]);
 
   const adjuntarDocumento: SubmitHandler<FormularioAdjuntarDocumentoC3> = async ({
-    tipoDocumento,
+    idTipoDocumento,
     documentos,
   }) => {
-    const tipoDocumentoSeleccionado = tiposDocumentosFiltrados.find(
-      (td) => td.idtipoadjunto === tipoDocumento,
+    const tipoDocumento = tiposDocumentosFiltrados.find(
+      (td) => td.idtipoadjunto === idTipoDocumento,
     )!;
 
     // Si se mueve documentos.item(0) directamente a setDocumentosAdjuntados tira un error
     const documento = documentos.item(0)!;
-    setDocumentosAdjuntados((docs) => [...docs, [tipoDocumentoSeleccionado, documento]]);
+    setDocumentosAdjuntados((docs) => [...docs, [tipoDocumento, documento]]);
     formulario.reset();
   };
 
@@ -96,7 +96,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
             <Row className="g-3 align-items-baseline">
               <ComboSimple
                 label="Tipo de documento"
-                name="tipoDocumento"
+                name="idTipoDocumento"
                 descripcion="tipoadjunto"
                 idElemento="idtipoadjunto"
                 datos={tiposDocumentosFiltrados}
