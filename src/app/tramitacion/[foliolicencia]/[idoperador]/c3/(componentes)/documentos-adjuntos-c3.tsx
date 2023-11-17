@@ -58,10 +58,27 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
       ...documentos,
       [tipoDocumentoSeleccionado, documentosAdjuntos.item(0)!],
     ]);
+  };
 
-    setTiposDocumentosFiltrados((tiposDocumentos) =>
-      tiposDocumentos.filter((td) => td !== tipoDocumentoSeleccionado),
+  const eliminarDocumento = async (indexDocumentoEliminar: number) => {
+    setDocumentosAdjuntados((documentos) =>
+      documentos.filter((_, index) => index !== indexDocumentoEliminar),
     );
+  };
+
+  const descargarDocumento = async (documento: File) => {
+    const urlArchivo = URL.createObjectURL(documento);
+
+    const linkDescarga = document.createElement('a');
+    linkDescarga.style.display = 'none';
+    linkDescarga.href = urlArchivo;
+    linkDescarga.download = documento.name;
+    document.body.appendChild(linkDescarga);
+
+    linkDescarga.click();
+
+    document.body.removeChild(linkDescarga);
+    URL.revokeObjectURL(urlArchivo);
   };
 
   return (
@@ -108,7 +125,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
       <Row className="mt-4">
         <Col xs={12}>
           <IfContainer show={documentosAdjuntados.length === 0}>
-            <h3 className="mt-3 mb-5 fs-5 text-center">No hay documentos aún</h3>
+            <h3 className="mt-3 mb-5 fs-5 text-center">No se han adjuntados documentos aún</h3>
           </IfContainer>
 
           <IfContainer show={documentosAdjuntados.length > 0}>
@@ -130,10 +147,18 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
                       <Td>{documento.name}</Td>
                       <Td>
                         <div className="d-flex justify-content-center">
-                          <button type="button" className="btn btn-primary">
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            title="Descargar documento"
+                            onClick={() => descargarDocumento(documento)}>
                             <i className="bi bi-download"></i>
                           </button>
-                          <button type="button" className="ms-2 btn btn-danger">
+                          <button
+                            type="button"
+                            className="ms-2 btn btn-danger"
+                            title="Eliminar documento"
+                            onClick={() => eliminarDocumento(index)}>
                             <i className="bi bi-x-lg"></i>
                           </button>
                         </div>
