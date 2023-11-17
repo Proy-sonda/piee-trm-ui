@@ -42,6 +42,7 @@ export const ComboSimple = <T extends Record<string, any>>({
   name,
   label,
   className,
+  deshabilitado,
   datos,
   idElemento,
   descripcion,
@@ -78,6 +79,7 @@ export const ComboSimple = <T extends Record<string, any>>({
 
         <Form.Select
           autoComplete="new-custom-value"
+          disabled={deshabilitado}
           isInvalid={tieneError}
           {...register(name, {
             setValueAs: (value) => {

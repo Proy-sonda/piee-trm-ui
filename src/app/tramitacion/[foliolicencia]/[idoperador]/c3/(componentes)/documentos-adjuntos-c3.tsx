@@ -7,8 +7,9 @@ import {
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { ComboSimple, InputArchivo } from '@/components/form';
 import IfContainer from '@/components/if-container';
+import { formatBytes } from '@/utilidades';
 import React, { useEffect, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Alert, Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { TipoDocumento, esDocumentoDiatDiep } from '../../(modelo)/tipo-documento';
@@ -27,6 +28,10 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   licencia,
   tiposDocumentos: tiposDocumentos,
 }) => {
+  /** Nuevas extensions deben ir en minuscula */
+  const extensionesPermitidas = ['.xls', '.xlsx', '.doc', '.docx', '.pdf'];
+  const maximaCantidadDeArchivos = 15;
+  const tamanoMinimoDocumentoBytes = 2_000;
   const tamanoMaximoDocumentoBytes = 5_000_000;
 
   const formulario = useForm<FormularioAdjuntarDocumentoC3>({ mode: 'onBlur' });
@@ -54,6 +59,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
       (td) => td.idtipoadjunto === idTipoDocumento,
     )!;
 
+    // LIMPIAR FORMULARIO
     // Si se mueve documentos.item(0) directamente a setDocumentosAdjuntados tira un error
     const documento = documentos.item(0)!;
     setDocumentosAdjuntados((docs) => [...docs, [tipoDocumento, documento]]);
@@ -81,20 +87,30 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     URL.revokeObjectURL(urlArchivo);
   };
 
+  const limiteDeArchivosAlcanzado = () => documentosAdjuntados.length >= maximaCantidadDeArchivos;
+
   return (
     <>
       <Row className="mt-3">
         <h5>Documentos Adjuntos</h5>
         <p>
           Se recomienda adjuntar liquidaciones generadas por su sistema de remuneración (Excel,
-          Word, PDF, etc.). El tamaño máximo permitido por archivo es de{' '}
-          {tamanoMaximoDocumentoBytes / 1_000_000} MB.
+          Word, PDF, etc.). El tamaño de cada archivo debe estar entre{' '}
+          {formatBytes(tamanoMinimoDocumentoBytes)} y {formatBytes(tamanoMaximoDocumentoBytes)}.
         </p>
+
+        <IfContainer show={limiteDeArchivosAlcanzado()}>
+          <Alert variant="warning" className="d-flex align-items-center fade show">
+            <i className="bi bi-exclamation-triangle me-2"></i>
+            <span>Cantidad máxima de archivos alcanzada</span>
+          </Alert>
+        </IfContainer>
 
         <FormProvider {...formulario}>
           <Form id="adjuntarDocumentoC3" onSubmit={formulario.handleSubmit(adjuntarDocumento)}>
             <Row className="g-3 align-items-baseline">
               <ComboSimple
+                deshabilitado={limiteDeArchivosAlcanzado()}
                 label="Tipo de documento"
                 name="idTipoDocumento"
                 descripcion="tipoadjunto"
@@ -106,6 +122,10 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
               <InputArchivo
                 name="documentos"
                 label="Documento"
+                deshabilitado={limiteDeArchivosAlcanzado()}
+                accept={extensionesPermitidas.join(',')}
+                extensionesPermitidas={extensionesPermitidas}
+                tamanoMinimo={tamanoMinimoDocumentoBytes}
                 tamanoMaximo={tamanoMaximoDocumentoBytes}
                 className="col-12 col-sm-7 col-md-4 col-lg-5 col-xl-4 col-xxl-3"
               />
@@ -113,7 +133,11 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
               <div
                 className="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-5 col-xxl-7 d-flex flex-column flex-sm-row "
                 style={{ alignSelf: 'end' }}>
-                <button type="submit" form="adjuntarDocumentoC3" className="btn btn-primary ">
+                <button
+                  type="submit"
+                  form="adjuntarDocumentoC3"
+                  className="btn btn-primary"
+                  disabled={limiteDeArchivosAlcanzado()}>
                   Adjuntar Documento
                 </button>
               </div>
