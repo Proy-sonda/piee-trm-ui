@@ -6,6 +6,7 @@ import {
   esLicenciaEnfermedadProfesional,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { ComboSimple, InputArchivo } from '@/components/form';
+import IfContainer from '@/components/if-container';
 import React, { useEffect, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -32,6 +33,8 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
 
   const [tiposDocumentosFiltrados, setTiposDocumentosFiltrados] = useState<TipoDocumento[]>([]);
 
+  const [documentosAdjuntados, setDocumentosAdjuntados] = useState<[TipoDocumento, File][]>([]);
+
   // Filtrar documentos
   useEffect(() => {
     if (!tiposDocumentos || !licencia) {
@@ -43,9 +46,22 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     }
   }, [tiposDocumentos, licencia]);
 
-  const adjuntarDocumento: SubmitHandler<FormularioAdjuntarDocumentoC3> = async (datos) => {
-    console.log('Adjuntando documento...');
-    console.table(datos);
+  const adjuntarDocumento: SubmitHandler<FormularioAdjuntarDocumentoC3> = async ({
+    tipoDocumento,
+    documentosAdjuntos,
+  }) => {
+    const tipoDocumentoSeleccionado = tiposDocumentosFiltrados.find(
+      (td) => td.idtipoadjunto === tipoDocumento,
+    )!;
+
+    setDocumentosAdjuntados((documentos) => [
+      ...documentos,
+      [tipoDocumentoSeleccionado, documentosAdjuntos.item(0)!],
+    ]);
+
+    setTiposDocumentosFiltrados((tiposDocumentos) =>
+      tiposDocumentos.filter((td) => td !== tipoDocumentoSeleccionado),
+    );
   };
 
   return (
@@ -91,35 +107,43 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
 
       <Row className="mt-4">
         <Col xs={12}>
-          <div className="table-responsive">
-            <Table className="table table-bordered">
-              <Thead>
-                <Tr className="align-middle">
-                  <Th>Tipo Documento</Th>
-                  <Th>Nombre Documento</Th>
-                  <Th>
-                    <div className="text-center">Acciones</div>
-                  </Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                <Tr className="align-middle">
-                  <Td>Comprobante Liquidacion Mensual</Td>
-                  <Td>a</Td>
-                  <Td>
-                    <div className="d-flex justify-content-center">
-                      <button type="button" className="btn btn-primary">
-                        <i className="bi bi-download"></i>
-                      </button>
-                      <button type="button" className="ms-2 btn btn-danger">
-                        <i className="bi bi-x-lg"></i>
-                      </button>
-                    </div>
-                  </Td>
-                </Tr>
-              </Tbody>
-            </Table>
-          </div>
+          <IfContainer show={documentosAdjuntados.length === 0}>
+            <h3 className="mt-3 mb-5 fs-5 text-center">No hay documentos aún</h3>
+          </IfContainer>
+
+          <IfContainer show={documentosAdjuntados.length > 0}>
+            <div className="table-responsive">
+              <Table className="table table-bordered">
+                <Thead>
+                  <Tr className="align-middle">
+                    <Th>Tipo Documento</Th>
+                    <Th>Nombre Documento</Th>
+                    <Th>
+                      <div className="text-center">Acciones</div>
+                    </Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {documentosAdjuntados.map(([tipoDocumento, documento], index) => (
+                    <Tr key={index} className="align-middle">
+                      <Td>{tipoDocumento.tipoadjunto}</Td>
+                      <Td>{documento.name}</Td>
+                      <Td>
+                        <div className="d-flex justify-content-center">
+                          <button type="button" className="btn btn-primary">
+                            <i className="bi bi-download"></i>
+                          </button>
+                          <button type="button" className="ms-2 btn btn-danger">
+                            <i className="bi bi-x-lg"></i>
+                          </button>
+                        </div>
+                      </Td>
+                    </Tr>
+                  ))}
+                </Tbody>
+              </Table>
+            </div>
+          </IfContainer>
         </Col>
       </Row>
     </>
