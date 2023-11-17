@@ -114,7 +114,7 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({
                   const archivo = archivos.item(index)!;
 
                   if (!extensionesPermitidas.includes(extensionArchivo(archivo.name))) {
-                    const exts = extensionesPermitidas.join(' ,');
+                    const exts = extensionesPermitidas.join(', ');
 
                     return archivos.length === 1
                       ? `Debe tener alguna de las siguientes extensiones: ${exts}`
