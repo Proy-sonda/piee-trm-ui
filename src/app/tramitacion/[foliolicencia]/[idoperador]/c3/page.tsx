@@ -13,7 +13,7 @@ import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Cabecera from '../(componentes)/cabecera';
 import { InputDias } from '../(componentes)/input-dias';
-import { BuscarTipoDocumento } from '../(servicios)/tipo-documento';
+import { buscarTiposDocumento } from '../(servicios)/buscar-tipos-documento';
 
 import {
   LicenciaTramitar,
@@ -89,7 +89,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   ]);
 
   const [errTipoDocumentos, tiposDeDocumentos, cargandoTipoDocumentos] = useFetch(
-    BuscarTipoDocumento(),
+    buscarTiposDocumento(),
   );
 
   const [errPrevision, tiposPrevisiones, cargandoPrevision] = useFetch(

@@ -11,11 +11,11 @@ import React, { useEffect, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { TipoDocumento } from '../../(modelo)/documento';
+import { TipoDocumento, esDocumentoDiatDiep } from '../../(modelo)/tipo-documento';
 
 interface FormularioAdjuntarDocumentoC3 {
   tipoDocumento: number;
-  documentosAdjuntos: FileList;
+  documentos: FileList;
 }
 
 interface DocumentosAdjuntosC3Props {
@@ -40,7 +40,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     if (!tiposDocumentos || !licencia) {
       setTiposDocumentosFiltrados([]);
     } else if (esLicenciaAccidenteLaboral(licencia) || esLicenciaEnfermedadProfesional(licencia)) {
-      setTiposDocumentosFiltrados(tiposDocumentos.filter((t) => t.idtipoadjunto !== 5));
+      setTiposDocumentosFiltrados(tiposDocumentos.filter((t) => !esDocumentoDiatDiep(t)));
     } else {
       setTiposDocumentosFiltrados(tiposDocumentos);
     }
@@ -48,16 +48,13 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
 
   const adjuntarDocumento: SubmitHandler<FormularioAdjuntarDocumentoC3> = async ({
     tipoDocumento,
-    documentosAdjuntos,
+    documentos,
   }) => {
     const tipoDocumentoSeleccionado = tiposDocumentosFiltrados.find(
       (td) => td.idtipoadjunto === tipoDocumento,
     )!;
 
-    setDocumentosAdjuntados((documentos) => [
-      ...documentos,
-      [tipoDocumentoSeleccionado, documentosAdjuntos.item(0)!],
-    ]);
+    setDocumentosAdjuntados((docs) => [...docs, [tipoDocumentoSeleccionado, documentos.item(0)!]]);
   };
 
   const eliminarDocumento = async (indexDocumentoEliminar: number) => {
@@ -104,7 +101,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
               />
 
               <InputArchivo
-                name="documentosAdjuntos"
+                name="documentos"
                 label="Documento"
                 tamanoMaximo={tamanoMaximoDocumentoBytes}
                 className="col-12 col-sm-7 col-md-4 col-lg-5 col-xl-4 col-xxl-3"
@@ -125,7 +122,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
       <Row className="mt-4">
         <Col xs={12}>
           <IfContainer show={documentosAdjuntados.length === 0}>
-            <h3 className="mt-3 mb-5 fs-5 text-center">No se han adjuntados documentos aún</h3>
+            <h3 className="mt-3 mb-5 fs-5 text-center">No se han adjuntados documentos</h3>
           </IfContainer>
 
           <IfContainer show={documentosAdjuntados.length > 0}>
