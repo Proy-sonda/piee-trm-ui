@@ -2,8 +2,7 @@
 
 import {
   LicenciaTramitar,
-  esLicenciaAccidenteLaboral,
-  esLicenciaEnfermedadProfesional,
+  esLicenciaDiatDiep,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { ComboSimple, InputArchivo } from '@/components/form';
 import IfContainer from '@/components/if-container';
@@ -31,8 +30,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   tiposDocumentos,
   documentosAdjuntos,
 }) => {
-  /** Nuevas extensions deben ir en minuscula */
-  const extensionesPermitidas = ['.xls', '.xlsx', '.doc', '.docx', '.pdf'];
+  const extensionesPermitidas = ['.xls', '.xlsx', '.doc', '.docx', '.pdf']; // Nuevas extensions deben ir en minuscula
   const maximaCantidadDeArchivos = 15;
   const tamanoMinimoDocumentoBytes = 2_000;
   const tamanoMaximoDocumentoBytes = 5_000_000;
@@ -45,10 +43,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   useEffect(() => {
     if (!tiposDocumentos || !licencia) {
       setTiposDocumentosFiltrados([]);
-    } else if (
-      !esLicenciaAccidenteLaboral(licencia) &&
-      !esLicenciaEnfermedadProfesional(licencia)
-    ) {
+    } else if (!esLicenciaDiatDiep(licencia)) {
       setTiposDocumentosFiltrados(tiposDocumentos.filter((t) => !esDocumentoDiatDiep(t)));
     } else {
       setTiposDocumentosFiltrados(tiposDocumentos);

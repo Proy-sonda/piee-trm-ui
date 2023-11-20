@@ -68,10 +68,6 @@ export const esLicenciaFONASA = (licencia: LicenciaTramitar) => {
   return licencia.entidadsalud.identidadsalud === 1;
 };
 
-export const esLicenciaAccidenteLaboral = (licencia: LicenciaTramitar) => {
-  return licencia.tipolicencia.idtipolicencia === 5;
-};
-
-export const esLicenciaEnfermedadProfesional = (licencia: LicenciaTramitar) => {
-  return licencia.tipolicencia.idtipolicencia === 6;
+export const esLicenciaDiatDiep = (licencia: LicenciaTramitar) => {
+  return [5, 6].includes(licencia.tipolicencia.idtipolicencia);
 };
