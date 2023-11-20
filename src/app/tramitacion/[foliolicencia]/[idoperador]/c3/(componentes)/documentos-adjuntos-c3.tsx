@@ -44,7 +44,10 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   useEffect(() => {
     if (!tiposDocumentos || !licencia) {
       setTiposDocumentosFiltrados([]);
-    } else if (esLicenciaAccidenteLaboral(licencia) || esLicenciaEnfermedadProfesional(licencia)) {
+    } else if (
+      !esLicenciaAccidenteLaboral(licencia) &&
+      !esLicenciaEnfermedadProfesional(licencia)
+    ) {
       setTiposDocumentosFiltrados(tiposDocumentos.filter((t) => !esDocumentoDiatDiep(t)));
     } else {
       setTiposDocumentosFiltrados(tiposDocumentos);
