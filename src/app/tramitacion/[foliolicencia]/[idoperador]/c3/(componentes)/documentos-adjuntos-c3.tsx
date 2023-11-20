@@ -10,8 +10,9 @@ import IfContainer from '@/components/if-container';
 import { formatBytes } from '@/utilidades';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Form, Row } from 'react-bootstrap';
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { FormProvider, SubmitHandler, UseFieldArrayReturn, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import { FormularioC3 } from '../(modelos)/formulario-c3';
 import { TipoDocumento, esDocumentoDiatDiep } from '../../(modelo)/tipo-documento';
 
 interface FormularioAdjuntarDocumentoC3 {
@@ -22,11 +23,13 @@ interface FormularioAdjuntarDocumentoC3 {
 interface DocumentosAdjuntosC3Props {
   licencia?: LicenciaTramitar;
   tiposDocumentos?: TipoDocumento[];
+  documentosAdjuntos: UseFieldArrayReturn<FormularioC3, 'documentosAdjuntos', 'id'>;
 }
 
 const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   licencia,
-  tiposDocumentos: tiposDocumentos,
+  tiposDocumentos,
+  documentosAdjuntos,
 }) => {
   /** Nuevas extensions deben ir en minuscula */
   const extensionesPermitidas = ['.xls', '.xlsx', '.doc', '.docx', '.pdf'];
@@ -37,8 +40,6 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   const formulario = useForm<FormularioAdjuntarDocumentoC3>({ mode: 'onBlur' });
 
   const [tiposDocumentosFiltrados, setTiposDocumentosFiltrados] = useState<TipoDocumento[]>([]);
-
-  const [documentosAdjuntados, setDocumentosAdjuntados] = useState<[TipoDocumento, File][]>([]);
 
   // Filtrar documentos
   useEffect(() => {
@@ -65,14 +66,12 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     // LIMPIAR FORMULARIO
     // Si se mueve documentos.item(0) directamente a setDocumentosAdjuntados tira un error
     const documento = documentos.item(0)!;
-    setDocumentosAdjuntados((docs) => [...docs, [tipoDocumento, documento]]);
+    documentosAdjuntos.prepend({ tipoDocumento, documento });
     formulario.reset();
   };
 
   const eliminarDocumento = async (indexDocumentoEliminar: number) => {
-    setDocumentosAdjuntados((documentos) =>
-      documentos.filter((_, index) => index !== indexDocumentoEliminar),
-    );
+    documentosAdjuntos.remove(indexDocumentoEliminar);
   };
 
   const descargarDocumento = async (documento: File) => {
@@ -90,7 +89,9 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     URL.revokeObjectURL(urlArchivo);
   };
 
-  const limiteDeArchivosAlcanzado = () => documentosAdjuntados.length >= maximaCantidadDeArchivos;
+  const limiteDeArchivosAlcanzado = () => {
+    return documentosAdjuntos.fields.length >= maximaCantidadDeArchivos;
+  };
 
   return (
     <>
@@ -151,11 +152,11 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
 
       <Row className="mt-4">
         <Col xs={12}>
-          <IfContainer show={documentosAdjuntados.length === 0}>
+          <IfContainer show={documentosAdjuntos.fields.length === 0}>
             <h3 className="mt-3 mb-5 fs-5 text-center">No se han adjuntados documentos</h3>
           </IfContainer>
 
-          <IfContainer show={documentosAdjuntados.length > 0}>
+          <IfContainer show={documentosAdjuntos.fields.length > 0}>
             <div className="table-responsive">
               <Table className="table table-bordered">
                 <Thead>
@@ -168,7 +169,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {documentosAdjuntados.map(([tipoDocumento, documento], index) => (
+                  {documentosAdjuntos.fields.map(({ tipoDocumento, documento }, index) => (
                     <Tr key={index} className="align-middle">
                       <Td>{tipoDocumento.tipoadjunto}</Td>
                       <Td>{documento.name}</Td>

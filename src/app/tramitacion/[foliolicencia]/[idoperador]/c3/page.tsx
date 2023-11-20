@@ -118,9 +118,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     defaultValues: {
       accion: 'siguiente',
       linkNavegacion: '',
+      documentosAdjuntos: [],
       remuneraciones: [],
       remuneracionesMaternidad: [],
     },
+  });
+
+  const documentosAdjuntos = useFieldArray({
+    control: formulario.control,
+    name: 'documentosAdjuntos',
   });
 
   const remuneraciones = useFieldArray({
@@ -623,7 +629,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           </Form>
         </FormProvider>
 
-        <DocumentosAdjuntosC3 licencia={licencia} tiposDocumentos={tiposDeDocumentos} />
+        <DocumentosAdjuntosC3
+          licencia={licencia}
+          tiposDocumentos={tiposDeDocumentos}
+          documentosAdjuntos={documentosAdjuntos}
+        />
 
         <FormProvider {...formulario}>
           <BotonesNavegacion formId="tramitacionC3" formulario={formulario} anterior />
