@@ -17,6 +17,7 @@ import jsPDF from 'jspdf';
 import Image from 'next/image';
 import { FormEvent, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { buscarZona4 } from '../(servicios)/buscar-z4';
 import { LicenciaC1 } from '../../c1/(modelos)';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
@@ -60,8 +61,6 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
     },
     [refresh],
   );
-
-  console.log(zonas);
 
   const [, entidadesPrevisionales] = useFetch(
     zonas?.zona2
@@ -111,9 +110,13 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
     e.preventDefault();
     setcargandoPDF(true);
     const contenido = document.getElementById('contenidoPDF');
+    let vp = document.getElementById('viewportMeta')!?.getAttribute('content');
+
+    document.getElementById('viewportMeta')!?.setAttribute('content', 'width=800');
+
     if (contenido === null) return;
 
-    html2canvas(contenido).then((canvas) => {
+    html2canvas(contenido, { windowWidth: 1280 }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF();
       const imgProps: any = pdf.getImageProperties(imgData);
@@ -132,7 +135,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
   };
 
   return (
-    <Modal show={modalimprimir} size="xl" fullscreen centered>
+    <Modal show={modalimprimir} size="xl" fullscreen centered scrollable>
       <Modal.Header closeButton onClick={() => setmodalimprimir(!modalimprimir)}>
         <Modal.Title>PDF</Modal.Title>
       </Modal.Header>
@@ -145,9 +148,12 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
         </IfContainer>
 
         <div className="row mb-2">
-          <div className="d-grid gap-2 col-3 mx-auto">
+          <div className="d-grid gap-2 col-3 col-xs-3 col-sm-3 mx-auto">
             <button className="btn btn-primary" onClick={handleClickImprimir}>
-              <i className="bi bi-printer"></i> &nbsp; IMPRIMIR PDF
+              <div className="flex">
+                <i className="bi bi-printer"></i> &nbsp;
+                <div className="d-none d-xl-inline">IMPRIMIR PDF</div>
+              </div>
             </button>
           </div>
         </div>
@@ -162,19 +168,19 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                   alignItems: 'center',
                   alignSelf: 'center',
                 }}>
-                <Image src={imgfonasa.src} alt="Fonasa header" width={200} height={110} />
+                <Image src={imgfonasa.src} alt="Fonasa header" width={180} height={110} />
               </div>
               <p>Comprobante de Tramitación</p>
             </div>
             <div className={styles['fondo-cabecera']}>
               <div className="row mt-2">
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>RUT Entidad Empleadora: </b>
                     {zona1?.rutempleador}
                   </label>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Calidad de la Persona Trabajadora: </b>
                     {zonas?.zona2.calidadtrabajador.calidadtrabajador}
@@ -182,19 +188,19 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>RUN: </b>
                     {zonas?.zona0.ruttrabajador}
                   </label>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>Folio LME: </b>
                   {zona1?.foliolicencia}
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Nombre: </b>
                     {zonas?.zona0.nombres +
@@ -204,7 +210,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                       zonas?.zona0.apellidomaterno}
                   </label>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Fecha Primera Afiliación: </b>{' '}
                     {format(new Date(zonas?.zona2.fechaafiliacion ?? '01/10/2022'), 'dd/MM/yyyy')}
@@ -212,25 +218,25 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Razón social Entidad Empleadora:</b> {razonSocial}
                   </label>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Institución Provisional:</b> {zonas?.zona2.entidadprevisional.glosa}
                   </label>
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Dirección donde cumple funciones: </b>
                     {`${zona1?.tipocalle.tipocalle} ${zona1?.direccion} ${zona1?.numero} ${zona1?.depto}, ${zona1?.comuna.nombre}`}
                   </label>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Afiliado AFC: </b>
                     {zonas?.zona2.codigoseguroafc == 1 ? 'SÍ' : 'NO'}
@@ -238,13 +244,13 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Actividad Laboral: </b>
                     {zona1?.actividadlaboral.actividadlaboral}
                   </label>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Contrato Indefinido: </b>
                     {zonas?.zona2.codigocontratoindef == 1 ? 'SÍ' : 'NO'}
@@ -252,13 +258,13 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Ocupación: </b>
                     {zona1?.ocupacion.ocupacion}
                   </label>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Fecha Contrato: </b>
                     {format(new Date(zonas?.zona2.fechacontrato ?? '01/10/2023'), 'dd/MM/yyyy')}
@@ -266,13 +272,13 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
               </div>
               <div className="row">
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>Nombre Entidad Pagadora Subsidio: </b>
                     {zonas?.zona2.entidadpagadora.entidadpagadora}
                   </label>
                 </div>
-                <div className="col-md-6">
+                <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>{licencia?.tiporesposo.tiporeposo}</b> por <b>{licencia?.diasreposo}</b>{' '}
                     día/s desde el{' '}
@@ -294,26 +300,26 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
             </div>
             <div className={`${styles['fondo-cabecera']}`}>
               <div className={`row`}>
-                <table className="table text-center">
-                  <thead>
-                    <tr>
-                      <th>Institución Previsional</th>
-                      <th>Fecha</th>
-                      <th>Total Remuneraciones</th>
-                      <th>N° Días Subsidio Incapacidad Laboral</th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                <Table className="table text-center table-bordered">
+                  <Thead>
+                    <Tr>
+                      <Th>Institución Previsional</Th>
+                      <Th>Fecha</Th>
+                      <Th>Total Remuneraciones</Th>
+                      <Th>N° Días Subsidio Incapacidad Laboral</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
                     {zonas?.zona3?.rentas.map((renta) => (
-                      <tr key={Math.random()}>
-                        <td>{obtenerEntidadPrevisional(renta.idPrevision)}</td>
-                        <td>{format(new Date(renta.periodo), "MMMM 'de' yyyy", { locale })}</td>
-                        <td>${renta.montoImponible.toLocaleString()}</td>
-                        <td>{renta.dias}</td>
-                      </tr>
+                      <Tr key={Math.random()}>
+                        <Td>{obtenerEntidadPrevisional(renta.idPrevision)}</Td>
+                        <Td>{format(new Date(renta.periodo), "MMMM 'de' yyyy", { locale })}</Td>
+                        <Td>${renta.montoImponible.toLocaleString()}</Td>
+                        <Td>{renta.dias}</Td>
+                      </Tr>
                     ))}
-                  </tbody>
-                </table>
+                  </Tbody>
+                </Table>
               </div>
             </div>
             <IfContainer show={consultaMaterna(licencia)}>
@@ -327,26 +333,26 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
               </div>
               <div className={`${styles['fondo-cabecera']}`}>
                 <div className={`row`}>
-                  <table className="table text-center">
-                    <thead>
-                      <tr>
-                        <th>Institución Previsional</th>
-                        <th>Fecha</th>
-                        <th>Total Remuneraciones</th>
-                        <th>N° Días Subsidio Incapacidad Laboral</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                  <Table className="table text-center table-bordered">
+                    <Thead>
+                      <Tr>
+                        <Th>Institución Previsional</Th>
+                        <Th>Fecha</Th>
+                        <Th>Total Remuneraciones</Th>
+                        <Th>N° Días Subsidio Incapacidad Laboral</Th>
+                      </Tr>
+                    </Thead>
+                    <Tbody>
                       {zonas?.zona3?.rentasMaternidad.map((renta) => (
-                        <tr key={Math.random()}>
-                          <td>{obtenerEntidadPrevisional(renta.idPrevision)}</td>
-                          <td>{format(new Date(renta.periodo), 'MMMM yyyy', { locale })}</td>
-                          <td>${renta.montoImponible.toLocaleString()}</td>
-                          <td>{renta.dias}</td>
-                        </tr>
+                        <Tr key={Math.random()}>
+                          <Td>{obtenerEntidadPrevisional(renta.idPrevision)}</Td>
+                          <Td>{format(new Date(renta.periodo), 'MMMM yyyy', { locale })}</Td>
+                          <Td>${renta.montoImponible.toLocaleString()}</Td>
+                          <Td>{renta.dias}</Td>
+                        </Tr>
                       ))}
-                    </tbody>
-                  </table>
+                    </Tbody>
+                  </Table>
                 </div>
               </div>
             </IfContainer>
@@ -359,44 +365,44 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
               </label>
             </div>
             <div className={`${styles['fondo-cabecera']}`}>
-              <table className="table">
-                <thead>
-                  <tr>
-                    <th>TIPO DOCUMENTO</th>
-                    <th className="text-center">NOMBRE DOCUMENTO</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Comprobante Liquidacion Mensual</td>
-                    <td className="text-center">liquidacion_202301.pdf</td>
-                  </tr>
-                  <tr>
-                    <td>Contrato de Trabajo Vigente a la fecha</td>
-                    <td className="text-center">ContratoTrabajo.pdf</td>
-                  </tr>
-                  <tr>
-                    <td>Certificado de Pago Cotizaciones</td>
-                    <td> </td>
-                  </tr>
-                  <tr>
-                    <td>Comprobante Pago Cotizaciones operación Renta</td>
-                    <td> </td>
-                  </tr>
-                  <tr>
-                    <td>Certificado de Afiliación</td>
-                    <td> </td>
-                  </tr>
-                  <tr>
-                    <td>Denuncia Individual de Accidente del Trabajo (DIAT)</td>
-                    <td> </td>
-                  </tr>
-                  <tr>
-                    <td>Denuncia Individual de Enfermedad Profesional (DIEP)</td>
-                    <td> </td>
-                  </tr>
-                </tbody>
-              </table>
+              <Table className="table table-bordered">
+                <Thead>
+                  <Tr>
+                    <Th>TIPO DOCUMENTO</Th>
+                    <Th className="text-center">NOMBRE DOCUMENTO</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  <Tr>
+                    <Td>Comprobante Liquidacion Mensual</Td>
+                    <Td className="text-center">liquidacion_202301.pdf</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Contrato de Trabajo Vigente a la fecha</Td>
+                    <Td className="text-center">ContratoTrabajo.pdf</Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Certificado de Pago Cotizaciones</Td>
+                    <Td> </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Comprobante Pago Cotizaciones operación Renta</Td>
+                    <Td> </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Certificado de Afiliación</Td>
+                    <Td> </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Denuncia Individual de Accidente del Trabajo (DIAT)</Td>
+                    <Td> </Td>
+                  </Tr>
+                  <Tr>
+                    <Td>Denuncia Individual de Enfermedad Profesional (DIEP)</Td>
+                    <Td> </Td>
+                  </Tr>
+                </Tbody>
+              </Table>
             </div>
             <div className={`row ${styles['header-pdf']}`}>
               <label
@@ -417,25 +423,25 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </p>
               </IfContainer>
               <IfContainer show={zonas!?.zona4!?.length > 0}>
-                <table className="table">
-                  <thead className="text-center">
-                    <tr>
-                      <th>Total días</th>
-                      <th>Desde</th>
-                      <th>Hasta</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-center">
+                <Table className="table table-bordered">
+                  <Thead className="text-center">
+                    <Tr>
+                      <Th>Total días</Th>
+                      <Th>Desde</Th>
+                      <Th>Hasta</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody className="text-center">
                     {zonas &&
                       zonas!?.zona4!?.map(({ lmandias, lmafechadesde, lmafechahasta }, index) => (
-                        <tr key={index}>
-                          <td>{lmandias}</td>
-                          <td>{format(new Date(lmafechadesde), 'dd/MM/yyyy')}</td>
-                          <td>{format(new Date(lmafechahasta), 'dd/MM/yyyy')}</td>
-                        </tr>
+                        <Tr key={index}>
+                          <Td>{lmandias}</Td>
+                          <Td>{format(new Date(lmafechadesde), 'dd/MM/yyyy')}</Td>
+                          <Td>{format(new Date(lmafechahasta), 'dd/MM/yyyy')}</Td>
+                        </Tr>
                       ))}
-                  </tbody>
-                </table>
+                  </Tbody>
+                </Table>
               </IfContainer>
             </div>
 

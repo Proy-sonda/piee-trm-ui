@@ -21,7 +21,7 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
     <>
       <Head>
         <title>Portal Tramitación LME</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" id="viewportMeta" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="row">
