@@ -1,17 +1,5 @@
 'use client';
 
-import IfContainer from '@/components/if-container';
-import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
-import { capitalizar } from '@/utilidades';
-import { format, subMonths } from 'date-fns';
-import esLocale from 'date-fns/locale/es';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { Col, Form, FormGroup, Row } from 'react-bootstrap';
-import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
-import Cabecera from '../(componentes)/cabecera';
-import { buscarTiposDocumento } from '../(servicios)/buscar-tipos-documento';
-
 import {
   LicenciaTramitar,
   esLicenciaMaternidad,
@@ -23,11 +11,22 @@ import {
   limpiarRemuneracion,
   remuneracionTieneAlgunCampoValido,
 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
+import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { capitalizar } from '@/utilidades';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
+import { format, subMonths } from 'date-fns';
+import esLocale from 'date-fns/locale/es';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Col, Form, FormGroup, Row } from 'react-bootstrap';
+import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import BotonesNavegacion from '../(componentes)/botones-navegacion';
+import Cabecera from '../(componentes)/cabecera';
+import { buscarTiposDocumento } from '../(servicios)/buscar-tipos-documento';
 import { crearIdEntidadPrevisional } from '../c2/(modelos)/entidad-previsional';
 import { esTrabajadorIndependiente } from '../c2/(modelos)/licencia-c2';
 import { buscarEntidadPrevisional } from '../c2/(servicios)/buscar-entidad-previsional';
