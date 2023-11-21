@@ -5,7 +5,7 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { addDays, format } from 'date-fns';
+import { addDays, format, parse } from 'date-fns';
 import es from 'date-fns/locale/es';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -112,6 +112,12 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
     };
     buscarEmpleador();
   }, [zona1]);
+
+  const ConvertirFecha = (fecha_tramitacion: string) => {
+    if (fecha_tramitacion === 'Invalid date') return format(new Date('01/01/1900'), 'dd/MM/yyyy');
+    const fechaParseada = parse(fecha_tramitacion, 'yyyy-MM-dd', new Date());
+    return format(fechaParseada, 'dd/MM/yyyy');
+  };
 
   const calcularFechaFin = () => {
     if (licencia?.fechainicioreposo === undefined) return new Date('01/01/1900');
@@ -261,7 +267,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>FECHA TRAMITACIÓN: </b>
-                    {format(new Date(zonas?.zona0.fechatramitacion ?? '01/01/1990'), 'dd/MM/yyyy')}
+                    {ConvertirFecha(zonas!?.zona0!?.fechatramitacion ?? '1900-01-01')}
                   </label>
                 </div>
               </div>
