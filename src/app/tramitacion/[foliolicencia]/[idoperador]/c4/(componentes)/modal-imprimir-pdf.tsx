@@ -1,4 +1,4 @@
-import { buscarEmpleadorRut } from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/usuarios/(servicios)/buscar-empleador-rut';
+import { buscarEmpleadorRut } from '@/app/empleadores/(servicios)/buscar-empleador-rut';
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import IfContainer from '@/components/if-container';
