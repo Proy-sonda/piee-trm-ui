@@ -38,6 +38,7 @@ interface PasoC4Props {
 
 const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
   const idOperadorNumber = parseInt(idoperador);
+  const [CargaPDF, setCargaPDF] = useState<boolean>(false);
 
   const step = [
     {
@@ -353,6 +354,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         setmodalimprimir={setmodalimprimir}
         refrescarZona4={refrescarZona4}
         refresh={refresh}
+        setCargaPDF={setCargaPDF}
       />
 
       <ModalConfirmarTramitacion
@@ -366,7 +368,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         onTramitacionConfirmada={tramitarLaLicencia}
       />
 
-      <IfContainer show={mostrarSpinner}>
+      <IfContainer show={mostrarSpinner || CargaPDF}>
         <SpinnerPantallaCompleta />
       </IfContainer>
 

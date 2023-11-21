@@ -1,30 +1,22 @@
 import { buscarEmpleadorRut } from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/usuarios/(servicios)/buscar-empleador-rut';
-import {
-  LicenciaTramitar,
-  esLicenciaMaternidad,
-} from '@/app/tramitacion/(modelos)/licencia-tramitar';
+import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import footerimg from '@/img/fondo_footer.png';
 import imgfonasa from '@/img/logo-fonasa.png';
 import { addDays, format } from 'date-fns';
 import es from 'date-fns/locale/es';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import Image from 'next/image';
-import { FormEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { buscarZona4 } from '../(servicios)/buscar-z4';
+import { numeroALetras } from '../(util)/numero-a-letra';
 import { LicenciaC1 } from '../../c1/(modelos)';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
-import {
-  crearIdEntidadPrevisional,
-  glosaCompletaEntidadPrevisional,
-} from '../../c2/(modelos)/entidad-previsional';
 import { buscarEntidadPrevisional } from '../../c2/(servicios)/buscar-entidad-previsional';
 import { buscarZona2 } from '../../c2/(servicios)/buscar-z2';
 import { buscarZona3 } from '../../c3/(servicios)/buscar-z3';
@@ -38,6 +30,7 @@ interface IModalImprimirPdfProps {
   setmodalimprimir: (modal: boolean) => void;
   refrescarZona4: () => void;
   refresh: boolean;
+  setCargaPDF: (carga: boolean) => void;
 }
 
 const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
@@ -45,6 +38,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
   idOperadorNumber,
   modalimprimir,
   setmodalimprimir,
+  setCargaPDF,
   refrescarZona4,
   refresh,
 }) => {
@@ -68,14 +62,10 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
       : emptyFetch(),
     [zonas?.zona2],
   );
-  const obtenerEntidadPrevisional = (idEntidad: string) => {
-    const entidad = (entidadesPrevisionales ?? []).find(
-      (e) => crearIdEntidadPrevisional(e) === idEntidad,
-    );
 
-    return !entidad ? '' : glosaCompletaEntidadPrevisional(entidad);
-  };
   const [, licenciasTramitar, cargando] = useFetch(buscarLicenciasParaTramitar());
+
+  const [telefono, settelefono] = useState('');
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
@@ -93,30 +83,15 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
   }, []);
 
   useEffect(() => {
-    if (zona1 === undefined) return;
-    const buscarEmpleador = async () => {
-      const [resp, abort] = await buscarEmpleadorRut(zona1?.rutempleador);
-      setrazonSocial((await resp()).razonsocial);
-    };
-    buscarEmpleador();
-  }, [zona1]);
-
-  const calcularFechaFin = () => {
-    if (licencia?.fechainicioreposo === undefined) return new Date('01/01/1900');
-    return addDays(new Date(licencia!?.fechainicioreposo), licencia!?.diasreposo) ?? '01/01/1900';
-  };
-
-  const handleClickImprimir = (e: FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    setcargandoPDF(true);
+    if (modalimprimir === false) return;
+    if (zonas === undefined) return;
     const contenido = document.getElementById('contenidoPDF');
-    let vp = document.getElementById('viewportMeta')!?.getAttribute('content');
-
-    document.getElementById('viewportMeta')!?.setAttribute('content', 'width=800');
-
     if (contenido === null) return;
+    setcargandoPDF(true);
+    setCargaPDF(true);
+    setmodalimprimir(false);
 
-    html2canvas(contenido, { windowWidth: 1280 }).then((canvas) => {
+    html2canvas(contenido, { windowWidth: 860 }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF();
       const imgProps: any = pdf.getImageProperties(imgData);
@@ -125,13 +100,24 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       setcargandoPDF(false);
       window.open(pdf.output('bloburl'), '_blank');
+      setCargaPDF(false);
       setmodalimprimir(false);
     });
-  };
+  }, [modalimprimir]);
 
-  const consultaMaterna = (licencia: LicenciaTramitar | undefined) => {
-    if (licencia == undefined) return false;
-    return esLicenciaMaternidad(licencia);
+  useEffect(() => {
+    if (zona1 === undefined) return;
+    const buscarEmpleador = async () => {
+      const [resp, abort] = await buscarEmpleadorRut(zona1?.rutempleador);
+      setrazonSocial((await resp()).razonsocial);
+      settelefono((await resp()).telefonohabitual);
+    };
+    buscarEmpleador();
+  }, [zona1]);
+
+  const calcularFechaFin = () => {
+    if (licencia?.fechainicioreposo === undefined) return new Date('01/01/1900');
+    return addDays(new Date(licencia!?.fechainicioreposo), licencia!?.diasreposo) ?? '01/01/1900';
   };
 
   return (
@@ -147,18 +133,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
           <LoadingSpinner titulo="Cargando información..." />
         </IfContainer>
 
-        <div className="row mb-2">
-          <div className="d-grid gap-2 col-3 col-xs-3 col-sm-3 mx-auto">
-            <button className="btn btn-primary" onClick={handleClickImprimir}>
-              <div className="flex">
-                <i className="bi bi-printer"></i> &nbsp;
-                <div className="d-none d-xl-inline">IMPRIMIR PDF</div>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <div id="contenidoPDF">
+        <div id="contenidoPDF" className={styles.watermark}>
           <div className={`me-5 ms-5 ${styles['label-pdf']}`}>
             <div className={`row ${styles['header-pdf']}`}>
               <div
@@ -168,26 +143,28 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                   alignItems: 'center',
                   alignSelf: 'center',
                 }}>
-                <Image src={imgfonasa.src} alt="Fonasa header" width={180} height={110} />
+                <Image src={imgfonasa.src} alt="Fonasa header" width={80} height={40} />
               </div>
               <p>Comprobante de Tramitación</p>
             </div>
+
             <div className={styles['fondo-cabecera']}>
-              <div className="row mt-2">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>RUT Entidad Empleadora: </b>
-                    {zona1?.rutempleador}
-                  </label>
-                </div>
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>Calidad de la Persona Trabajadora: </b>
-                    {zonas?.zona2.calidadtrabajador.calidadtrabajador}
-                  </label>
-                </div>
+              <div className="row text-center">
+                <p>
+                  La COMPIN, la Unidad de Licencias &nbsp;Médicas &nbsp;o la Isapre, en su caso,
+                  podrán &nbsp;rechazar &nbsp;o aprobar &nbsp;las licencias{' '}
+                </p>
+                <p>
+                  médicas, reducir &nbsp;o ampliar &nbsp;el período solicitado &nbsp;o cambiarlo
+                  &nbsp;de total &nbsp;a parcial &nbsp;y viceversa. Art. 16 D.S. Nº 3/1984
+                </p>
               </div>
-              <div className="row">
+              <div className={`row ${styles['row-titulo']}`}>
+                <label>
+                  <b>IDENTIFICACIÓN DE LA PERSONA TRABAJADORA</b>
+                </label>
+              </div>
+              <div className="row mt-4">
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>RUN: </b>
@@ -195,14 +172,14 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                   </label>
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <b>Folio LME: </b>
+                  <b>FOLIO LICENCIA: </b>
                   {zona1?.foliolicencia}
                 </div>
               </div>
-              <div className="row">
+              <div className="row mt-2">
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>Nombre: </b>
+                    <b>NOMBRE: </b>
                     {zonas?.zona0.nombres +
                       ' ' +
                       zonas?.zona0.apellidopaterno +
@@ -212,248 +189,103 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>Fecha Primera Afiliación: </b>{' '}
-                    {format(new Date(zonas?.zona2.fechaafiliacion ?? '01/10/2022'), 'dd/MM/yyyy')}
+                    <b>ESTADO: </b> {zonas?.zona0.estadolicencia.estadolicencia} -{' '}
+                    <b>FECHA ESTADO: </b>
+                    {format(new Date(zonas?.zona0.fechaestado ?? '01/01/1990'), 'dd/MM/yyyy')}
                   </label>
                 </div>
               </div>
-              <div className="row">
+              <div className="row mt-2">
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>Razón social Entidad Empleadora:</b> {razonSocial}
+                    <b>FECHA EMISIÓN:</b>{' '}
+                    {format(new Date(zonas?.zona0.fechaemision ?? '01/01/1990'), 'dd/MM/yyyy')}
                   </label>
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>Institución Provisional:</b> {zonas?.zona2.entidadprevisional.glosa}
-                  </label>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>Dirección donde cumple funciones: </b>
-                    {`${zona1?.tipocalle.tipocalle} ${zona1?.direccion} ${zona1?.numero} ${zona1?.depto}, ${zona1?.comuna.nombre}`}
-                  </label>
-                </div>
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>Afiliado AFC: </b>
-                    {zonas?.zona2.codigoseguroafc == 1 ? 'SÍ' : 'NO'}
+                    <b>N° DE DÍAS:</b> {zonas?.zona0.ndias}
                   </label>
                 </div>
               </div>
-              <div className="row">
+              <div className="row mt-2">
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>Actividad Laboral: </b>
+                    <b>FECHA INICIO REPOSO:</b>{' '}
+                    {format(new Date(zonas?.zona0.fechainicioreposo ?? '01/01/1990'), 'dd/MM/yyyy')}
+                  </label>
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <label>
+                    <b>N° DE DÍAS EN PALABRAS:</b> {numeroALetras(zonas?.zona0.ndias ?? 0)}
+                  </label>
+                </div>
+              </div>
+              <div className="row mt-2">
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <label>
+                    <b>FECHA TERMINO REPOSO: </b>
+                    {format(calcularFechaFin(), 'dd/MM/yyyy')}
+                  </label>
+                </div>
+              </div>
+
+              <hr />
+              <div className={`row ${styles['row-titulo']}`}>
+                <label>
+                  <b>IDENTIFICACIÓN DE LA ENTIDAD EMPLEADORA</b>
+                </label>
+              </div>
+              <div className="row mt-4">
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <label>
+                    <b>RUT: </b>
+                    {zona1?.rutempleador.replaceAll('-', '')}
+                  </label>
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <label>
+                    <b>TELÉFONO: </b> {telefono}
+                  </label>
+                </div>
+              </div>
+              <div className="row mt-2">
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <label>
+                    <b>NOMBRE ENTIDAD EMPLEADORA: </b>
+                    {razonSocial}
+                  </label>
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <label>
+                    <b>FECHA: </b>
+                    {format(new Date(), 'dd/MM/yyyy')}
+                  </label>
+                </div>
+              </div>
+              <div className="row mt-2">
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <label>
+                    <b>ACTIVIDAD LABORAL PERSONA TRABAJADORA: </b>
                     {zona1?.actividadlaboral.actividadlaboral}
                   </label>
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>Contrato Indefinido: </b>
-                    {zonas?.zona2.codigocontratoindef == 1 ? 'SÍ' : 'NO'}
-                  </label>
-                </div>
-              </div>
-              <div className="row">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>Ocupación: </b>
+                    <b>OCUPACIÓN: </b>
                     {zona1?.ocupacion.ocupacion}
                   </label>
                 </div>
-                <div className="col-md-6 col-xs-6 col-sm-6">
+              </div>
+              <div className="row mt-2">
+                <div className="col-md-8 col-xs-8 col-sm-8">
                   <label>
-                    <b>Fecha Contrato: </b>
-                    {format(new Date(zonas?.zona2.fechacontrato ?? '01/10/2023'), 'dd/MM/yyyy')}
+                    <b>DIRECCIÓN DONDE CUMPLE FUNCIONES: </b>
+                    {`${zona1?.tipocalle.tipocalle} ${zona1?.direccion} ${zona1?.numero} ${zona1?.depto}, ${zona1?.comuna.nombre}`}
                   </label>
                 </div>
               </div>
-              <div className="row">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>Nombre Entidad Pagadora Subsidio: </b>
-                    {zonas?.zona2.entidadpagadora.entidadpagadora}
-                  </label>
-                </div>
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>{licencia?.tiporesposo.tiporeposo}</b> por <b>{licencia?.diasreposo}</b>{' '}
-                    día/s desde el{' '}
-                    <b>
-                      {format(new Date(licencia?.fechainicioreposo ?? '01/10/2023'), 'dd/MM/yyyy')}
-                    </b>{' '}
-                    al <b>{format(calcularFechaFin(), 'dd/MM/yyyy')}</b>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div className={`row ${styles['header-pdf']}`}>
-              <label
-                style={{
-                  fontSize: '24px',
-                }}>
-                Rentas de meses anteriores a la incapacidad
-              </label>
-            </div>
-            <div className={`${styles['fondo-cabecera']}`}>
-              <div className={`row`}>
-                <Table className="table text-center table-bordered">
-                  <Thead>
-                    <Tr>
-                      <Th>Institución Previsional</Th>
-                      <Th>Fecha</Th>
-                      <Th>Total Remuneraciones</Th>
-                      <Th>N° Días Subsidio Incapacidad Laboral</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {zonas?.zona3?.rentas.map((renta) => (
-                      <Tr key={Math.random()}>
-                        <Td>{obtenerEntidadPrevisional(renta.idPrevision)}</Td>
-                        <Td>{format(new Date(renta.periodo), "MMMM 'de' yyyy", { locale })}</Td>
-                        <Td>${renta.montoImponible.toLocaleString()}</Td>
-                        <Td>{renta.dias}</Td>
-                      </Tr>
-                    ))}
-                  </Tbody>
-                </Table>
-              </div>
-            </div>
-            <IfContainer show={consultaMaterna(licencia)}>
-              <div className={`row ${styles['header-pdf']}`}>
-                <label
-                  style={{
-                    fontSize: '24px',
-                  }}>
-                  Rentas de maternidad
-                </label>
-              </div>
-              <div className={`${styles['fondo-cabecera']}`}>
-                <div className={`row`}>
-                  <Table className="table text-center table-bordered">
-                    <Thead>
-                      <Tr>
-                        <Th>Institución Previsional</Th>
-                        <Th>Fecha</Th>
-                        <Th>Total Remuneraciones</Th>
-                        <Th>N° Días Subsidio Incapacidad Laboral</Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {zonas?.zona3?.rentasMaternidad.map((renta) => (
-                        <Tr key={Math.random()}>
-                          <Td>{obtenerEntidadPrevisional(renta.idPrevision)}</Td>
-                          <Td>{format(new Date(renta.periodo), 'MMMM yyyy', { locale })}</Td>
-                          <Td>${renta.montoImponible.toLocaleString()}</Td>
-                          <Td>{renta.dias}</Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
-                </div>
-              </div>
-            </IfContainer>
-            <div className={`row ${styles['header-pdf']}`}>
-              <label
-                style={{
-                  fontSize: '24px',
-                }}>
-                Documentos adjuntos
-              </label>
-            </div>
-            <div className={`${styles['fondo-cabecera']}`}>
-              <Table className="table table-bordered">
-                <Thead>
-                  <Tr>
-                    <Th>TIPO DOCUMENTO</Th>
-                    <Th className="text-center">NOMBRE DOCUMENTO</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  <Tr>
-                    <Td>Comprobante Liquidacion Mensual</Td>
-                    <Td className="text-center">liquidacion_202301.pdf</Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Contrato de Trabajo Vigente a la fecha</Td>
-                    <Td className="text-center">ContratoTrabajo.pdf</Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Certificado de Pago Cotizaciones</Td>
-                    <Td> </Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Comprobante Pago Cotizaciones operación Renta</Td>
-                    <Td> </Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Certificado de Afiliación</Td>
-                    <Td> </Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Denuncia Individual de Accidente del Trabajo (DIAT)</Td>
-                    <Td> </Td>
-                  </Tr>
-                  <Tr>
-                    <Td>Denuncia Individual de Enfermedad Profesional (DIEP)</Td>
-                    <Td> </Td>
-                  </Tr>
-                </Tbody>
-              </Table>
-            </div>
-            <div className={`row ${styles['header-pdf']}`}>
-              <label
-                style={{
-                  fontSize: '24px',
-                }}>
-                Licencias Anteriores en los Últimos 6 meses
-              </label>
-            </div>
-            <div className={`${styles['fondo-cabecera']}`}>
-              <IfContainer show={zonas!?.zona4?.length === 0}>
-                <p
-                  style={{
-                    fontSize: '18px',
-                  }}
-                  className="text-center">
-                  <b>No se informaron licencias de los últimos 6 meses</b>
-                </p>
-              </IfContainer>
-              <IfContainer show={zonas!?.zona4!?.length > 0}>
-                <Table className="table table-bordered">
-                  <Thead className="text-center">
-                    <Tr>
-                      <Th>Total días</Th>
-                      <Th>Desde</Th>
-                      <Th>Hasta</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody className="text-center">
-                    {zonas &&
-                      zonas!?.zona4!?.map(({ lmandias, lmafechadesde, lmafechahasta }, index) => (
-                        <Tr key={index}>
-                          <Td>{lmandias}</Td>
-                          <Td>{format(new Date(lmafechadesde), 'dd/MM/yyyy')}</Td>
-                          <Td>{format(new Date(lmafechahasta), 'dd/MM/yyyy')}</Td>
-                        </Tr>
-                      ))}
-                  </Tbody>
-                </Table>
-              </IfContainer>
-            </div>
-
-            <div className={`row ${styles['header-pdf']}`}>
-              <b>Prueba</b>
-              <div
-                className="col-md-4"
-                style={{
-                  position: 'relative',
-                }}>
-                <Image src={footerimg.src} alt="Imagen de footer" width={100} height={5}></Image>
-              </div>
+              <hr />
             </div>
           </div>
         </div>
