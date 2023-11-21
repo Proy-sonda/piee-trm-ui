@@ -106,7 +106,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
   useEffect(() => {
     if (zona1 === undefined) return;
     const buscarEmpleador = async () => {
-      const [resp, abort] = await buscarEmpleadorRut(zona1?.rutempleador);
+      const [resp] = await buscarEmpleadorRut(zona1?.rutempleador);
       setrazonSocial((await resp()).razonsocial);
       settelefono((await resp()).telefonohabitual);
     };
@@ -261,10 +261,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>FECHA TRAMITACIÓN: </b>
-                    {format(
-                      new Date(zonas?.zona0.fechatramitacion ?? '01/01/1990'),
-                      "dd/MM/yyyy'  'HH:mm",
-                    )}
+                    {format(new Date(zonas?.zona0.fechatramitacion ?? '01/01/1990'), 'dd/MM/yyyy')}
                   </label>
                 </div>
               </div>
