@@ -5,12 +5,10 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import imgfonasa from '@/img/logo-fonasa.png';
 import { addDays, format } from 'date-fns';
 import es from 'date-fns/locale/es';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { buscarZona4 } from '../(servicios)/buscar-z4';
@@ -143,13 +141,13 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                   alignItems: 'center',
                   alignSelf: 'center',
                 }}>
-                <Image src={imgfonasa.src} alt="Fonasa header" width={80} height={40} />
+                {/* <Image src={imgfonasa.src} alt="Fonasa header" width={80} height={40} /> */}
               </div>
               <p>Comprobante de Tramitación</p>
             </div>
 
             <div className={styles['fondo-cabecera']}>
-              <div className="row text-center">
+              <div className="row text-center mt-2">
                 <p>
                   La COMPIN, la Unidad de Licencias &nbsp;Médicas &nbsp;o la Isapre, en su caso,
                   podrán &nbsp;rechazar &nbsp;o aprobar &nbsp;las licencias{' '}
@@ -189,9 +187,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>ESTADO: </b> {zonas?.zona0.estadolicencia.estadolicencia} -{' '}
-                    <b>FECHA ESTADO: </b>
-                    {format(new Date(zonas?.zona0.fechaestado ?? '01/01/1990'), 'dd/MM/yyyy')}
+                    <b>ESTADO: </b> {zonas?.zona0.estadolicencia.estadolicencia}
                   </label>
                 </div>
               </div>
@@ -204,7 +200,8 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>N° DE DÍAS:</b> {zonas?.zona0.ndias}
+                    <b>FECHA ESTADO: </b>
+                    {format(new Date(zonas?.zona0.fechaestado ?? '01/01/1990'), 'dd/MM/yyyy')}
                   </label>
                 </div>
               </div>
@@ -217,7 +214,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>N° DE DÍAS EN PALABRAS:</b> {numeroALetras(zonas?.zona0.ndias ?? 0)}
+                    <b>N° DE DÍAS:</b> {zonas?.zona0.ndias}
                   </label>
                 </div>
               </div>
@@ -226,6 +223,11 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                   <label>
                     <b>FECHA TERMINO REPOSO: </b>
                     {format(calcularFechaFin(), 'dd/MM/yyyy')}
+                  </label>
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <label>
+                    <b>N° DE DÍAS EN PALABRAS:</b> {numeroALetras(zonas?.zona0.ndias ?? 0)}
                   </label>
                 </div>
               </div>
@@ -258,8 +260,11 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
-                    <b>FECHA: </b>
-                    {format(new Date(), 'dd/MM/yyyy')}
+                    <b>FECHA TRAMITACIÓN: </b>
+                    {format(
+                      new Date(zonas?.zona0.fechatramitacion ?? '01/01/1990'),
+                      "dd/MM/yyyy'  'HH:mm",
+                    )}
                   </label>
                 </div>
               </div>

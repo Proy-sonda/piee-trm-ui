@@ -10,8 +10,9 @@
 }
 
 .header-pdf{
-    background-image: url('../../../../../../img/header.png');
-    
+    /* background-image: url('../../../../../../img/header.png'); */
+    background-color: #B4B3B3;
+    border: 2px solid black;
     background-repeat: no-repeat;
     background-size: 100% 100%;
     margin: 0.5px;
@@ -47,7 +48,7 @@
     z-index: 9999;
     /* Margen para que el texto no se pegue a los bordes */
     margin-left: 50%;
-    margin-top: 10%;
+    margin-top: 20%;
     /*texto en una misma linea*/
     white-space: nowrap;
 
