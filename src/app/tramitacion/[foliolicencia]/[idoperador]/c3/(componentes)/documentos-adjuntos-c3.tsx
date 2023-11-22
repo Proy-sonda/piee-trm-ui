@@ -9,7 +9,13 @@ import IfContainer from '@/components/if-container';
 import { AlertaConfirmacion, formatBytes } from '@/utilidades';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Form, Row } from 'react-bootstrap';
-import { FormProvider, SubmitHandler, UseFieldArrayReturn, useForm } from 'react-hook-form';
+import {
+  FieldError,
+  FormProvider,
+  SubmitHandler,
+  UseFieldArrayReturn,
+  useForm,
+} from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { FormularioC3 } from '../(modelos)/formulario-c3';
 import { TipoDocumento, esDocumentoDiatDiep } from '../../(modelo)/tipo-documento';
@@ -23,12 +29,14 @@ interface DocumentosAdjuntosC3Props {
   licencia?: LicenciaTramitar;
   tiposDocumentos?: TipoDocumento[];
   documentosAdjuntos: UseFieldArrayReturn<FormularioC3, 'documentosAdjuntos', 'id'>;
+  errorDocumentosAdjuntos?: FieldError;
 }
 
 const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   licencia,
   tiposDocumentos,
   documentosAdjuntos,
+  errorDocumentosAdjuntos,
 }) => {
   const extensionesPermitidas = ['.xls', '.xlsx', '.doc', '.docx', '.pdf']; // Nuevas extensions deben ir en minuscula
   const maximaCantidadDeArchivos = 15;
@@ -112,11 +120,22 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
           {formatBytes(tamanoMinimoDocumentoBytes)} y {formatBytes(tamanoMaximoDocumentoBytes)}.
         </p>
 
+        <IfContainer show={errorDocumentosAdjuntos}>
+          <Col>
+            <Alert variant="danger" className="d-flex align-items-center fade show">
+              <i className="bi bi-exclamation-triangle me-2"></i>
+              <span>{errorDocumentosAdjuntos?.message}</span>
+            </Alert>
+          </Col>
+        </IfContainer>
+
         <IfContainer show={limiteDeArchivosAlcanzado()}>
-          <Alert variant="warning" className="d-flex align-items-center fade show">
-            <i className="bi bi-exclamation-triangle me-2"></i>
-            <span>Cantidad máxima de archivos alcanzada</span>
-          </Alert>
+          <Col>
+            <Alert variant="warning" className="d-flex align-items-center fade show">
+              <i className="bi bi-exclamation-triangle me-2"></i>
+              <span>Cantidad máxima de archivos alcanzada</span>
+            </Alert>
+          </Col>
         </IfContainer>
 
         <FormProvider {...formulario}>

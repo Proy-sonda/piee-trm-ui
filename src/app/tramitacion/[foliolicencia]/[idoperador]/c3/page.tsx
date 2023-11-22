@@ -127,6 +127,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   const documentosAdjuntos = useFieldArray({
     control: formulario.control,
     name: 'documentosAdjuntos',
+    rules: {
+      required: 'Debe adjuntar al menos un documento',
+    },
   });
 
   const remuneraciones = useFieldArray({
@@ -633,6 +636,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           licencia={licencia}
           tiposDocumentos={tiposDeDocumentos}
           documentosAdjuntos={documentosAdjuntos}
+          errorDocumentosAdjuntos={formulario.formState.errors.documentosAdjuntos?.root}
         />
 
         <FormProvider {...formulario}>
