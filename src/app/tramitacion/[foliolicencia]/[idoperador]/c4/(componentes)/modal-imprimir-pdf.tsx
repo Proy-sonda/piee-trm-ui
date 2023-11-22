@@ -29,6 +29,7 @@ interface IModalImprimirPdfProps {
   refrescarZona4: () => void;
   refresh: boolean;
   setCargaPDF: (carga: boolean) => void;
+  actualizaTramitacion?: boolean;
 }
 
 const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
@@ -39,6 +40,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
   setCargaPDF,
   refrescarZona4,
   refresh,
+  actualizaTramitacion,
 }) => {
   const [zona1, setzona1] = useState<LicenciaC1 | undefined>();
   const [razonSocial, setrazonSocial] = useState<string>('');
@@ -51,7 +53,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
       zona3: buscarZona3(foliolicencia, idOperadorNumber),
       zona4: buscarZona4(foliolicencia, idOperadorNumber),
     },
-    [refresh],
+    [refresh, actualizaTramitacion],
   );
 
   const [, entidadesPrevisionales] = useFetch(

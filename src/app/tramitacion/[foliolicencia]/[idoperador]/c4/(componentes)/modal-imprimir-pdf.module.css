@@ -38,8 +38,6 @@
     /* Centrar marca de agua en mitad de la pantalla*/
     top: 50%;
     left: 50%;
-    
-    
     /* Rotar texto */
     transform: rotate(-45deg);
     /* Tamaño y color del texto */
@@ -53,8 +51,6 @@
     margin-top: 20%;
     /*texto en una misma linea*/
     white-space: nowrap;
-
-    
     inset: 0;
     /* background: 
       url('data:image/svg+xml;utf8,<svg style="transform:rotate(-45deg)" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 50 60"><text x="0" y="25" fill="%23000">Lorem </text></svg>') 

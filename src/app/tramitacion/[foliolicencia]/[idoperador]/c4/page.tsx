@@ -39,7 +39,7 @@ interface PasoC4Props {
 const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
   const idOperadorNumber = parseInt(idoperador);
   const [CargaPDF, setCargaPDF] = useState<boolean>(false);
-
+  const [actualizaTramitacion, setactualizaTramitacion] = useState(false);
   const step = [
     {
       label: 'Entidad Empleadora/Independiente',
@@ -317,9 +317,9 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         html: 'Licencia tramitada con éxito',
         didClose: async () => {
           setMostrarSpinner(false);
-
+          setactualizaTramitacion(true);
           const resp = await AlertaConfirmacion.fire({
-            html: '¿Desea exportar a PDF la licencia tramitada?',
+            html: '¿Desea exportar a PDF el comprobante de tramitación?',
           });
           if (resp.isConfirmed) {
             setmodalimprimir(true);
@@ -355,6 +355,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         refrescarZona4={refrescarZona4}
         refresh={refresh}
         setCargaPDF={setCargaPDF}
+        actualizaTramitacion={actualizaTramitacion}
       />
 
       <ModalConfirmarTramitacion
