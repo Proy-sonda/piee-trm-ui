@@ -6,7 +6,7 @@ import {
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { ComboSimple, InputArchivo } from '@/components/form';
 import IfContainer from '@/components/if-container';
-import { formatBytes } from '@/utilidades';
+import { AlertaConfirmacion, formatBytes } from '@/utilidades';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, UseFieldArrayReturn, useForm } from 'react-hook-form';
@@ -66,6 +66,20 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   };
 
   const eliminarDocumento = async (indexDocumentoEliminar: number) => {
+    const item = documentosAdjuntos.fields.at(indexDocumentoEliminar);
+    if (!item) {
+      return;
+    }
+
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      icon: 'warning',
+      html: `<p>¿Está seguro que desea eliminar el archivo <b>${item.documento.name}</b>?</p>`,
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
     documentosAdjuntos.remove(indexDocumentoEliminar);
   };
 
