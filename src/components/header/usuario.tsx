@@ -1,6 +1,7 @@
 'use client';
 
 import { AuthContext } from '@/contexts';
+import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useContext } from 'react';
 import { Dropdown } from 'react-bootstrap';
@@ -8,7 +9,7 @@ import Swal from 'sweetalert2';
 import IfContainer from '../if-container';
 
 const Usuario: React.FC = () => {
-  const { usuario, logout } = useContext(AuthContext);
+  const { usuario, ultimaConexion, logout } = useContext(AuthContext);
 
   const router = useRouter();
 
@@ -55,6 +56,19 @@ const Usuario: React.FC = () => {
               <div>
                 <small>{usuario?.rut ?? ''}</small>
               </div>
+
+              {ultimaConexion && (
+                <>
+                  <div>
+                    <small>
+                      <b>Ultima Conexión: </b>
+                    </small>
+                  </div>
+                  <div>
+                    <small>{format(new Date(ultimaConexion), 'dd/MM/yyyy HH:mm:ss')}</small>
+                  </div>
+                </>
+              )}
             </Dropdown.Item>
             <Dropdown.Divider />
             <Dropdown.Item onClick={handleLogout}>
