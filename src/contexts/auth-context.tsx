@@ -180,6 +180,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       console.error('ERROR EN LOGOUT: ', error);
     } finally {
       setUsuario(undefined);
+      setultimaConexion('');
 
       setMostrarAlertaExpiraSesion(false);
 
