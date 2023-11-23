@@ -70,9 +70,15 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     idTipoDocumento,
     documentos,
   }) => {
-    // Si se mueve documentos.item(0) directamente a setDocumentosAdjuntados tira un error cuando
-    // se resetea el formulario
     const documento = documentos.item(0)!;
+
+    if (documentosAdjuntos.fields.some((d) => nombreDocumentoAdjunto(d) === documento.name)) {
+      return AlertaError.fire({
+        title: 'Error',
+        html: '<p>Ya existe un documento con el mismo nombre.</p>',
+      });
+    }
+
     documentosAdjuntos.prepend({ idtipoadjunto: idTipoDocumento, documento });
     formulario.reset();
   };
