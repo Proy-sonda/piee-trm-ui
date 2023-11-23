@@ -1,10 +1,11 @@
 import { esFechaInvalida } from '@/utilidades';
 import { DesgloseDeHaberes } from './desglose-de-haberes';
+import { DocumentoAdjuntoZ3 } from './documento-adjunto-z3';
 
 export interface FormularioC3 {
   accion: 'siguiente' | 'guardar' | 'anterior' | 'navegar';
   linkNavegacion: string;
-  tipoDocumento: string;
+  documentosAdjuntos: DocumentoAdjuntoZ3[];
   remuneracionImponiblePrevisional: number;
   porcentajeDesahucio: number;
   remuneraciones: Remuneracion[];

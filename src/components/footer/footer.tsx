@@ -1,9 +1,13 @@
-import React from 'react';
+'use client';
+import { AuthContext } from '@/contexts';
+import { format } from 'date-fns';
+import React, { useContext } from 'react';
 import styles from './footer.module.css';
 
 interface AppFooterProps {}
 
 const AppFooter: React.FC<AppFooterProps> = ({}) => {
+  const { ultimaConexion } = useContext(AuthContext);
   return (
     <footer className={styles['footer-container']}>
       <div className={styles['footer-background']}>
@@ -12,7 +16,12 @@ const AppFooter: React.FC<AppFooterProps> = ({}) => {
           <div className="col-12">
             <div className={styles['footer-content']}>
               <div className={styles['contact']}>
-                <p>Para soporte comunicarse a:</p>
+                {ultimaConexion && (
+                  <>
+                    <span>Ultima conexión: </span>
+                    {format(new Date(ultimaConexion), 'dd/MM/yyyy HH:mm:ss')} <br />
+                  </>
+                )}
                 <span>Teléfono:</span>&nbsp;<a href="tel:+56227149554">+56227149554</a> -{' '}
                 <span>Email:</span>{' '}
                 <a href="mailto:soportempleador@fonasa.gov.cl">soportempleador@fonasa.gov.cl</a>

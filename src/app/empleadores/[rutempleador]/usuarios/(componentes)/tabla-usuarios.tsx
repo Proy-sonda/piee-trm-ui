@@ -13,11 +13,9 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 import { eliminarUsuario } from '../(servicios)/eliminar-usuario';
 import { recuperarContrasena } from '../(servicios)/recuperar-clave';
-import { RolUsuarioHook } from '../../(hooks)/use-Rol';
 
 interface TablaUsuariosProps {
   usuarios: UsuarioEntidadEmpleadora[];
-  rolUsuario: RolUsuarioHook;
   cantidadAdministradoresActivos: number;
   onEditarUsuario: (usuarioId: number) => void;
   onUsuarioEliminado: () => void | Promise<void>;
@@ -25,14 +23,13 @@ interface TablaUsuariosProps {
 
 const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   usuarios,
-  rolUsuario,
   cantidadAdministradoresActivos,
   onEditarUsuario: handleEditarUsuario,
   onUsuarioEliminado,
 }) => {
   const { usuario, logout } = useContext(AuthContext);
 
-  const { empleadorActual } = useEmpleadorActual();
+  const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
 
   const router = useRouter();
 
@@ -45,7 +42,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
   const reenviarContrasena = async (usuario: UsuarioEntidadEmpleadora) => {
     const rut = usuario.rutusuario;
-    const email = usuario.email;
+    const email = usuario.usuarioempleadorActual.email;
 
     const mensaje = esElUsuarioConectado(usuario)
       ? `<p>A continuación se enviará una nueva clave temporal a su correo <b>${email}</b>` +
@@ -104,6 +101,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
       await eliminarUsuario({
         ...usuario,
+        idEmpleador: empleadorActual.idempleador,
         rutEmpleador: empleadorActual.rutempleador,
       });
 
@@ -144,8 +142,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               <Th>Correo electrónico</Th>
             </IfContainer>
             <Th>Rol</Th>
-            <Th>Estado</Th>
-            {rolUsuario == 'Administrador' && <Th></Th>}
+            {rolEnEmpleadorActual === 'administrador' && <Th></Th>}
           </Tr>
         </Thead>
         <Tbody className="text-center align-middle">
@@ -153,7 +150,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
             usuariosPaginados.map((usuario) => (
               <Tr key={usuario.idusuario}>
                 <Td>
-                  {rolUsuario === 'Administrador' ? (
+                  {rolEnEmpleadorActual === 'administrador' ? (
                     <span
                       className="text-primary cursor-pointer text-nowrap"
                       title="Editar persona usuaria"
@@ -166,12 +163,11 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 </Td>
                 <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
                 <IfContainer show={noEsTablet()}>
-                  <Td>{usuario.telefonouno.trim() || ' '}</Td>
-                  <Td>{usuario.email}</Td>
+                  <Td>{usuario.usuarioempleadorActual.telefonouno?.trim() ?? ' '}</Td>
+                  <Td>{usuario.usuarioempleadorActual.email?.trim() ?? ' '}</Td>
                 </IfContainer>
-                <Td>{usuario.rol.rol}</Td>
-                <Td>{usuario.estadousuario.descripcion}</Td>
-                {rolUsuario == 'Administrador' && (
+                <Td>{usuario.usuarioempleadorActual.rol.rol}</Td>
+                {rolEnEmpleadorActual === 'administrador' && (
                   <Td>
                     <div className="d-none d-lg-inline-block">
                       <button

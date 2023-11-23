@@ -7,7 +7,7 @@ export interface LicenciaC0 {
   nombres: string;
   fechaemision: string;
   fechainicioreposo: string;
-
+  fechatramitacion?: string;
   /** En formato `yyyy-MM-dd` */
   fechaestado: string;
   ndias: number;

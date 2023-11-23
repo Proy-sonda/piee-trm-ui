@@ -3,12 +3,12 @@
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import Titulo from '@/components/titulo/titulo';
+import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { strIncluye } from '@/utilidades';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
-import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
 import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
@@ -22,11 +22,17 @@ import { buscarUsuarios } from './(servicios)/buscar-usuarios';
 interface UsuariosPageProps {}
 
 const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
-  const { cargandoEmpleador, empleadorActual, errorCargarEmpleador } = useEmpleadorActual();
+  const { usuario } = useContext(AuthContext);
+
+  const {
+    cargandoEmpleador,
+    empleadorActual,
+    errorCargarEmpleador,
+    rolEnEmpleadorActual,
+    actualizarRol,
+  } = useEmpleadorActual();
 
   const [refresh, cargarUsuarios] = useRefrescarPagina();
-
-  const { RolUsuario, actualizarRol } = useRol();
 
   const [, usuarios] = useFetch(
     empleadorActual ? buscarUsuarios(empleadorActual.rutempleador) : emptyFetch(),
@@ -66,10 +72,9 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
       return (
         strIncluye(usuario.rutusuario, textoBusqueda) ||
         strIncluye(`${usuario.nombres} ${usuario.apellidos}`, textoBusqueda) ||
-        strIncluye(usuario.email, textoBusqueda) ||
-        strIncluye(usuario.telefonouno, textoBusqueda) ||
-        strIncluye(usuario.rol.rol, textoBusqueda) ||
-        strIncluye(usuario.estadousuario.descripcion, textoBusqueda)
+        strIncluye(usuario.usuarioempleadorActual.email, textoBusqueda) ||
+        strIncluye(usuario.usuarioempleadorActual.telefonouno, textoBusqueda) ||
+        strIncluye(usuario.usuarioempleadorActual.rol.rol, textoBusqueda)
       );
     });
 
@@ -93,7 +98,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
           />
         </Col>
 
-        <IfContainer show={RolUsuario === 'Administrador'}>
+        <IfContainer show={rolEnEmpleadorActual === 'administrador'}>
           <Col
             xs={12}
             sm={4}
@@ -124,7 +129,6 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
             <TablaUsuarios
               usuarios={usuariosFiltrados}
               cantidadAdministradoresActivos={cantidadUsuariosAdmin}
-              rolUsuario={RolUsuario}
               onEditarUsuario={(idUsuario) => {
                 setIdUsuarioEditar(idUsuario);
                 setAbrirModalEditarUsuario(true);
@@ -154,11 +158,14 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
           setIdUsuarioEditar(undefined);
           setAbrirModalEditarUsuario(false);
         }}
-        onUsuarioEditado={() => {
+        onUsuarioEditado={(rutUsuarioEditado) => {
           setIdUsuarioEditar(undefined);
           setAbrirModalEditarUsuario(false);
           cargarUsuarios();
-          actualizarRol();
+
+          if (usuario && usuario.rut === rutUsuarioEditado) {
+            actualizarRol();
+          }
         }}
       />
     </>

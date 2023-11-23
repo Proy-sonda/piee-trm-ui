@@ -1,4 +1,5 @@
 import { DesgloseDeHaberes } from './desglose-de-haberes';
+import { DocumentoGuardadoZ3 } from './documento-adjunto-z3';
 
 export interface LicenciaC3 {
   folioLicencia: string;
@@ -10,6 +11,7 @@ export interface LicenciaC3 {
   porcentajeDesahucio: number;
   rentas: RentaC3[];
   rentasMaternidad: RentaC3[];
+  licenciazc3adjuntos: DocumentoGuardadoZ3[];
 }
 
 export interface RentaC3 {

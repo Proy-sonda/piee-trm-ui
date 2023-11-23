@@ -12,7 +12,6 @@ import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alert
 import React, { ChangeEvent, Fragment, useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Usuarioxrrhh } from '../../(modelos)/payload-unidades';
-import { useRol } from '../../../(hooks)/use-Rol';
 import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
@@ -41,8 +40,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const [refresh, setRefresh] = useState(0);
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
   const [usuariosAsociados, setusuariosAsociados] = useState<Usuariosunidad[] | undefined>([]);
-  const { RolUsuario } = useRol();
-  const { empleadorActual } = useEmpleadorActual();
+  const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
   const { usuario } = useContext(AuthContext);
 
   const formulario = useForm<Formulario>({
@@ -111,7 +109,9 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
     const usuarioaasociar: Usuarioxrrhh = {
       acccionusuxrrhh: 1,
-      rolusuario: usuarios.find(({ rutusuario }) => rutusuario == data.runusuario)?.rol.idrol ?? 0,
+      rolusuario:
+        usuarios.find(({ rutusuario }) => rutusuario == data.runusuario)?.usuarioempleadorActual.rol
+          .idrol ?? 0,
       codigounidadrrhh: idunidad,
       runusuario: data.runusuario,
     };
@@ -186,7 +186,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         </Titulo>
       </div>
 
-      {RolUsuario == 'Administrador' && (
+      {rolEnEmpleadorActual === 'administrador' && (
         <>
           <div className="row mt-4">
             <h5>Cargar Personas Usuarias</h5>
@@ -231,7 +231,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                     </select>
                   </div>
                   <div className="col-md-6 align-self-end">
-                    <button type="submit" className="btn btn-success">
+                    <button type="submit" className="mt-2 mt-md-0 btn btn-success">
                       Agregar
                     </button>
                   </div>

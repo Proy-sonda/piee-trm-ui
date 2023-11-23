@@ -20,7 +20,6 @@ import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import { buscarActividadesLaborales } from '../../(servicios)/buscar-actividades-laborales';
 import { buscarCajasDeCompensacion } from '../../(servicios)/buscar-cajas-de-compensacion';
@@ -62,7 +61,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
 
   const regionSeleccionada = formulario.watch('regionId');
 
-  const { RolUsuario } = useRol();
+  const { rolEnEmpleadorActual } = useEmpleadorActual();
 
   // Parchar fomulario
   useEffect(() => {
@@ -296,11 +295,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
             </div>
             <div className="row mt-5">
               <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
-                {RolUsuario == 'Administrador' && (
+                <IfContainer show={rolEnEmpleadorActual === 'administrador'}>
                   <button type="submit" className="btn btn-primary">
                     Grabar
                   </button>
-                )}
+                </IfContainer>
 
                 <Link className="btn btn-danger mt-2 mt-sm-0 me-0 me-sm-2" href={'/empleadores'}>
                   Volver

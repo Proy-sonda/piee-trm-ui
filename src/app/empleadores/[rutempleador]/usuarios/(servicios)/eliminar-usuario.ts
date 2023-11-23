@@ -8,33 +8,37 @@ import { PayloadCambiarUsuarioOperadores } from '../(modelos)/payload-cambiar-us
 import { UsuarioEntidadEmpleadora } from '../(modelos)/usuario-entidad-empleadora';
 
 type EliminarUsuarioRequest = UsuarioEntidadEmpleadora & {
+  idEmpleador: number;
   rutEmpleador: string;
 };
 
-export const eliminarUsuario = async (usuario: EliminarUsuarioRequest) => {
+export const eliminarUsuario = async (request: EliminarUsuarioRequest) => {
   try {
-    await eliminarUsuarioInterno(usuario.idusuario);
+    await eliminarUsuarioInterno(request);
   } catch (error) {
     throw error;
   }
 
   try {
-    await eliminarUsuarioConWS(usuario);
+    await eliminarUsuarioConWS(request);
   } catch (error) {
     throw new WebServiceOperadoresError();
   }
 };
 
-async function eliminarUsuarioInterno(idUsuario: number) {
+async function eliminarUsuarioInterno(request: EliminarUsuarioRequest) {
+  const payload = {
+    idusuario: request.idusuario,
+    idempleador: request.idEmpleador,
+  };
+
   return runFetchConThrow<void>(`${apiUrl()}/usuario/idusuario`, {
     method: 'DELETE',
     headers: {
       Authorization: obtenerToken(),
       'Content-type': 'application/json',
     },
-    body: JSON.stringify({
-      idusuario: idUsuario,
-    }),
+    body: JSON.stringify(payload),
   });
 }
 
@@ -49,10 +53,10 @@ async function eliminarUsuarioConWS(request: EliminarUsuarioRequest) {
       runusuario: request.rutusuario,
       apellidosusuario: request.apellidos,
       nombresusuario: request.nombres,
-      rolusuario: request.rol.idrol,
-      telefono: request.telefonouno,
-      telefonomovil: request.telefonodos,
-      correoelectronicousuario: request.email,
+      rolusuario: request.usuarioempleadorActual.rol.idrol,
+      telefono: request.usuarioempleadorActual.telefonouno,
+      telefonomovil: request.usuarioempleadorActual.telefonodos,
+      correoelectronicousuario: request.usuarioempleadorActual.email,
     },
   };
 

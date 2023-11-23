@@ -1,4 +1,4 @@
-import { useRol } from '@/app/empleadores/[rutempleador]/(hooks)/use-Rol';
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
@@ -28,7 +28,7 @@ const TablaTrabajadores: React.FC<props> = ({
     tamanoPagina: 5,
   });
 
-  const { RolUsuario } = useRol();
+  const { rolEnEmpleadorActual } = useEmpleadorActual();
 
   const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -75,7 +75,7 @@ const TablaTrabajadores: React.FC<props> = ({
           <Tr>
             <Th>RUN</Th>
             <Th>Fecha Registro</Th>
-            {RolUsuario == 'Administrador' && <Th>Acciones</Th>}
+            {rolEnEmpleadorActual === 'administrador' && <Th>Acciones</Th>}
           </Tr>
         </Thead>
         <Tbody className="align-middle text-center">
@@ -91,9 +91,9 @@ const TablaTrabajadores: React.FC<props> = ({
                   {trabajador.runtrabajador}
                   {/* </Link> */}
                 </Td>
-                <td>{format(new Date(trabajador.fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</td>
+                <Td>{format(new Date(trabajador.fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</Td>
 
-                {RolUsuario == 'Administrador' && (
+                {rolEnEmpleadorActual === 'administrador' && (
                   <Td>
                     {/* <button
                       className="btn btn-sm btn-primary"
@@ -120,7 +120,7 @@ const TablaTrabajadores: React.FC<props> = ({
             <Tr>
               <Td>-</Td>
               <Td>-</Td>
-              {RolUsuario == 'Administrador' && <Td>-</Td>}
+              {rolEnEmpleadorActual === 'administrador' && <Td>-</Td>}
             </Tr>
           )}
         </Tbody>
