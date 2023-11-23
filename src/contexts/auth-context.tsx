@@ -16,6 +16,7 @@ import { ReactNode, createContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
 type AuthContextType = {
+  ultimaConexion: string;
   estaLogueado: boolean;
   usuario?: UsuarioToken;
   login: (rut: string, clave: string) => Promise<UsuarioToken>;
@@ -23,6 +24,7 @@ type AuthContextType = {
 };
 
 export const AuthContext = createContext<AuthContextType>({
+  ultimaConexion: '',
   estaLogueado: false,
   usuario: undefined,
   login: async () => ({}) as any,
@@ -33,6 +35,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const { fullPath } = useUrl();
 
   const [estaLogueado, setEstaLogueado] = useState(false);
+
+  const [ultimaConexion, setultimaConexion] = useState('');
 
   const [usuario, setUsuario] = useState<UsuarioToken | undefined>(undefined);
 
@@ -185,15 +189,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const onLoginExitoso = (nuevoUsuario: UsuarioToken) => {
     setUsuario(nuevoUsuario);
-
     setMostrarAlertaExpiraSesion(true);
 
     setEstaLogueado(true);
+    if (nuevoUsuario?.ultimaconexion === null) {
+      setultimaConexion(new Date().toLocaleString());
+    } else {
+      setultimaConexion(nuevoUsuario?.ultimaconexion as string);
+    }
   };
 
   return (
     <AuthContext.Provider
       value={{
+        ultimaConexion,
         estaLogueado,
         usuario,
         login,

@@ -5,5 +5,6 @@ export type TokenAutenticacion = {
     apellidos: string;
     nombres: string;
     rutusuario: string;
+    ultimaconexion: string;
   };
 };
