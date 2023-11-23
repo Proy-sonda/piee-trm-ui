@@ -18,7 +18,7 @@ const AppFooter: React.FC<AppFooterProps> = ({}) => {
               <div className={styles['contact']}>
                 {ultimaConexion && (
                   <>
-                    <span>Ultima conexión: </span> <br />
+                    <span>Ultima conexión: </span>
                     {format(new Date(ultimaConexion), 'dd/MM/yyyy HH:mm:ss')} <br />
                   </>
                 )}
