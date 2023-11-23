@@ -13,6 +13,7 @@ import { Alert, Col, Modal, Row } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { LicenciaAnterior } from '../(modelos)/formulario-c4';
 import { buscarEmpleador } from '../../(servicios)/buscar-empleador';
+import { buscarTiposDocumento } from '../../(servicios)/buscar-tipos-documento';
 import { LicenciaC1 } from '../../c1/(modelos)';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
 import {
@@ -42,10 +43,11 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
   onCerrar,
   onTramitacionConfirmada,
 }) => {
-  const [erroresZona, [zona0, zona2, zona3], cargandoZonas] = useMergeFetchArray([
+  const [erroresZona, [zona0, zona2, zona3, tiposDocumentos], cargandoZonas] = useMergeFetchArray([
     buscarZona0(datos.folioLicencia, datos.idOperador),
     buscarZona2(datos.folioLicencia, datos.idOperador),
     buscarZona3(datos.folioLicencia, datos.idOperador),
+    buscarTiposDocumento(),
   ]);
 
   const [zona1, setzona1] = useState<LicenciaC1>();
@@ -137,6 +139,14 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
     );
 
     return !entidad ? '' : glosaCompletaEntidadPrevisional(entidad);
+  };
+
+  const nombreTipoDocumento = (idTipoDocumento: number) => {
+    const tipoDocumento = (tiposDocumentos ?? []).find(
+      (td) => td.idtipoadjunto === idTipoDocumento,
+    );
+
+    return tipoDocumento?.tipoadjunto ?? '-';
   };
 
   return (
@@ -353,34 +363,12 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     </Tr>
                   </Thead>
                   <Tbody className="text-center">
-                    <Tr>
-                      <Td>Comprobante Liquidacion Mensual</Td>
-                      <Td>liquidacion_202301.pdf</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Contrato de Trabajo Vigente a la fecha</Td>
-                      <Td>ContratoTrabajo.pdf</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Certificado de Pago Cotizaciones</Td>
-                      <Td> </Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Comprobante Pago Cotizaciones operación Renta</Td>
-                      <Td> </Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Certificado de Afiliación</Td>
-                      <Td> </Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Denuncia Individual de Accidente del Trabajo (DIAT)</Td>
-                      <Td> </Td>
-                    </Tr>
-                    <Tr>
-                      <Td>Denuncia Individual de Enfermedad Profesional (DIEP)</Td>
-                      <Td> </Td>
-                    </Tr>
+                    {(zona3?.licenciazc3adjuntos ?? []).map(({ idtipoadjunto, nombrelocal }) => (
+                      <Tr>
+                        <Td>{nombreTipoDocumento(idtipoadjunto)}</Td>
+                        <Td>{nombrelocal}</Td>
+                      </Tr>
+                    ))}
                   </Tbody>
                 </Table>
               </Col>
