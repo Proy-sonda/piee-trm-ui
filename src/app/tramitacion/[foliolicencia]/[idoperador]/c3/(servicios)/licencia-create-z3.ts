@@ -5,13 +5,14 @@ import { format } from 'date-fns';
 import { DesgloseDeHaberes, obtenerGlosaDesglosaHaberes } from '../(modelos)/desglose-de-haberes';
 import { FormularioC3, Remuneracion } from '../(modelos)/formulario-c3';
 import { parsearIdEntidadPrevisional } from '../../c2/(modelos)/entidad-previsional';
+import { subirDocumentosZ3 } from './subir-documentos-z3';
 
 export type LicenciaCrearZ3Request = FormularioC3 & {
   folioLicencia: string;
   idOperador: number;
 };
 
-export const crearLicenciaZ3 = (request: LicenciaCrearZ3Request) => {
+export const crearLicenciaZ3 = async (request: LicenciaCrearZ3Request) => {
   const remuneraciones = request.remuneraciones.map(convertirRemuneracion(0));
   const remuneracionesMaternidad = request.remuneracionesMaternidad.map(convertirRemuneracion(1));
 
@@ -26,13 +27,19 @@ export const crearLicenciaZ3 = (request: LicenciaCrearZ3Request) => {
     licenciazc3rentas: remuneraciones.concat(remuneracionesMaternidad),
   };
 
-  return runFetchConThrow(`${urlBackendTramitacion()}/licencia/zona3/create`, {
+  await runFetchConThrow<void>(`${urlBackendTramitacion()}/licencia/zona3/create`, {
     method: 'POST',
     headers: {
       Authorization: obtenerToken(),
       'Content-type': 'application/json',
     },
     body: JSON.stringify(payload),
+  });
+
+  await subirDocumentosZ3({
+    codigoOperador: request.idOperador,
+    folioLicencia: request.folioLicencia,
+    documentos: request.documentosAdjuntos,
   });
 };
 

@@ -40,6 +40,7 @@ export const buscarZona3 = (
         },
         porcentajeDesahucio: licencia.porcendesahucio,
         remuneracionImponiblePrevisional: licencia.montoimponible,
+        licenciazc3adjuntos: licencia.licenciazc3adjuntos,
         rentas: licencia.licenciazc3rentas.filter((x) => x.tiporenta === 0).map(parsearRenta),
         rentasMaternidad: licencia.licenciazc3rentas
           .filter((x) => x.tiporenta === 1)

@@ -118,8 +118,17 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     defaultValues: {
       accion: 'siguiente',
       linkNavegacion: '',
+      documentosAdjuntos: [],
       remuneraciones: [],
       remuneracionesMaternidad: [],
+    },
+  });
+
+  const documentosAdjuntos = useFieldArray({
+    control: formulario.control,
+    name: 'documentosAdjuntos',
+    rules: {
+      required: 'Debe adjuntar al menos un documento',
     },
   });
 
@@ -215,6 +224,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         let filasRestantesMaternidad = periodosMaternidadEsperados - zona3.rentasMaternidad.length;
         while (filasRestantesMaternidad-- > 0) {
           remuneracionesMaternidad.append(datosFilaVacia());
+        }
+      }
+
+      // DOCUMENTOS ADJUNTOS
+      if (documentosAdjuntos.fields.length === 0) {
+        for (const documento of zona3.licenciazc3adjuntos) {
+          documentosAdjuntos.append(documento);
         }
       }
     }
@@ -623,7 +639,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           </Form>
         </FormProvider>
 
-        <DocumentosAdjuntosC3 licencia={licencia} tiposDocumentos={tiposDeDocumentos} />
+        <DocumentosAdjuntosC3
+          licencia={licencia}
+          tiposDocumentos={tiposDeDocumentos}
+          documentosAdjuntos={documentosAdjuntos}
+          errorDocumentosAdjuntos={formulario.formState.errors.documentosAdjuntos?.root}
+          onDocumentoEliminado={() => refrescarZona3()}
+        />
 
         <FormProvider {...formulario}>
           <BotonesNavegacion formId="tramitacionC3" formulario={formulario} anterior />
