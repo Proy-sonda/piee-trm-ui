@@ -23,6 +23,10 @@ export class UsuarioToken {
     return `${this.nombres}  ${this.apellidos}`;
   }
 
+  get ultimaconexion() {
+    return this.tokenAuth.user.ultimaconexion;
+  }
+
   /**
    * @returns
    * Por cuantos segundos es valido el token, desde la emisión de este;
