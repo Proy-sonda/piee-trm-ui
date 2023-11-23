@@ -328,6 +328,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         }
       }
     }
+
+    // DOCUMENTOS ADJUNTOS
+    if (documentosAdjuntos.fields.length === zona3.licenciazc3adjuntos.length) {
+      for (let index = 0; index < zona3.licenciazc3adjuntos.length; index++) {
+        documentosAdjuntos.update(index, zona3.licenciazc3adjuntos[index]);
+      }
+    }
   }, [zona3]);
 
   const datosFilaVacia = () => {
