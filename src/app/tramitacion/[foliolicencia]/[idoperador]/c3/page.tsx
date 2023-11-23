@@ -226,6 +226,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           remuneracionesMaternidad.append(datosFilaVacia());
         }
       }
+
+      // DOCUMENTOS ADJUNTOS
+      if (documentosAdjuntos.fields.length === 0) {
+        for (const documento of zona3.licenciazc3adjuntos) {
+          documentosAdjuntos.append(documento);
+        }
+      }
     }
 
     // No existe zona C3 en la base de datos, colocar filas por defecto
@@ -637,6 +644,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           tiposDocumentos={tiposDeDocumentos}
           documentosAdjuntos={documentosAdjuntos}
           errorDocumentosAdjuntos={formulario.formState.errors.documentosAdjuntos?.root}
+          onDocumentoEliminado={() => refrescarZona3()}
         />
 
         <FormProvider {...formulario}>

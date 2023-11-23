@@ -6,7 +6,8 @@ import {
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { ComboSimple, InputArchivo } from '@/components/form';
 import IfContainer from '@/components/if-container';
-import { AlertaConfirmacion, formatBytes } from '@/utilidades';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AlertaConfirmacion, AlertaError, AlertaExito, formatBytes } from '@/utilidades';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Form, Row } from 'react-bootstrap';
 import {
@@ -17,7 +18,10 @@ import {
   useForm,
 } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import { esDocumentoNuevoZ3, nombreDocumentoAdjunto } from '../(modelos)/documento-adjunto-z3';
 import { FormularioC3 } from '../(modelos)/formulario-c3';
+import { descargarDocumentoZ3 } from '../(servicios)/descargar-documento-z3';
+import { eliminarDocumentoZ3 } from '../(servicios)/eliminar-documento-z3';
 import { TipoDocumento, esDocumentoDiatDiep } from '../../(modelo)/tipo-documento';
 
 interface FormularioAdjuntarDocumentoC3 {
@@ -30,6 +34,7 @@ interface DocumentosAdjuntosC3Props {
   tiposDocumentos?: TipoDocumento[];
   documentosAdjuntos: UseFieldArrayReturn<FormularioC3, 'documentosAdjuntos', 'id'>;
   errorDocumentosAdjuntos?: FieldError;
+  onDocumentoEliminado: () => void | Promise<void>;
 }
 
 const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
@@ -37,6 +42,7 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   tiposDocumentos,
   documentosAdjuntos,
   errorDocumentosAdjuntos,
+  onDocumentoEliminado,
 }) => {
   const extensionesPermitidas = ['.xls', '.xlsx', '.doc', '.docx', '.pdf']; // Nuevas extensions deben ir en minuscula
   const maximaCantidadDeArchivos = 15;
@@ -46,6 +52,8 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   const formulario = useForm<FormularioAdjuntarDocumentoC3>({ mode: 'onBlur' });
 
   const [tiposDocumentosFiltrados, setTiposDocumentosFiltrados] = useState<TipoDocumento[]>([]);
+
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   // Filtrar documentos
   useEffect(() => {
@@ -62,56 +70,123 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     idTipoDocumento,
     documentos,
   }) => {
-    const tipoDocumento = tiposDocumentosFiltrados.find(
-      (td) => td.idtipoadjunto === idTipoDocumento,
-    )!;
-
-    // LIMPIAR FORMULARIO
-    // Si se mueve documentos.item(0) directamente a setDocumentosAdjuntados tira un error
+    // Si se mueve documentos.item(0) directamente a setDocumentosAdjuntados tira un error cuando
+    // se resetea el formulario
     const documento = documentos.item(0)!;
-    documentosAdjuntos.prepend({ tipoDocumento, documento });
+    documentosAdjuntos.prepend({ idtipoadjunto: idTipoDocumento, documento });
     formulario.reset();
   };
 
-  const eliminarDocumento = async (indexDocumentoEliminar: number) => {
-    const item = documentosAdjuntos.fields.at(indexDocumentoEliminar);
+  const eliminarDocumento = async (index: number) => {
+    const item = documentosAdjuntos.fields.at(index);
     if (!item) {
       return;
     }
 
     const { isConfirmed } = await AlertaConfirmacion.fire({
       icon: 'warning',
-      html: `<p>¿Está seguro que desea eliminar el archivo <b>${item.documento.name}</b>?</p>`,
+      html: `<p>¿Está seguro que desea eliminar el archivo <b>${nombreDocumentoAdjunto(
+        item,
+      )}</b>?</p>`,
     });
 
     if (!isConfirmed) {
       return;
     }
 
-    documentosAdjuntos.remove(indexDocumentoEliminar);
+    if (esDocumentoNuevoZ3(item)) {
+      documentosAdjuntos.remove(index);
+
+      AlertaExito.fire({
+        html: `Documento <b>${nombreDocumentoAdjunto(item)}</b> fue eliminado con éxito.`,
+      });
+    } else {
+      const { idadjunto } = item;
+
+      try {
+        setMostrarSpinner(true);
+
+        await eliminarDocumentoZ3(idadjunto);
+
+        documentosAdjuntos.remove(index);
+
+        onDocumentoEliminado();
+
+        AlertaExito.fire({
+          html: `Documento <b>${nombreDocumentoAdjunto(item)}</b> fue eliminado con éxito.`,
+        });
+      } catch (error) {
+        AlertaError.fire({
+          title: 'Error',
+          html: `<p>No se pudo eliminar el documento adjunto <b>${nombreDocumentoAdjunto(
+            item,
+          )}</b>. Por favor intente más tarde.</p>`,
+        });
+      } finally {
+        setMostrarSpinner(false);
+      }
+    }
   };
 
-  const descargarDocumento = async (documento: File) => {
-    const urlArchivo = URL.createObjectURL(documento);
+  const descargarDocumento = async (index: number) => {
+    const item = documentosAdjuntos.fields.at(index);
+    if (!item) {
+      return;
+    }
 
-    const linkDescarga = document.createElement('a');
-    linkDescarga.style.display = 'none';
-    linkDescarga.href = urlArchivo;
-    linkDescarga.download = documento.name;
-    document.body.appendChild(linkDescarga);
+    if (esDocumentoNuevoZ3(item)) {
+      const { documento } = item;
+      const urlArchivo = URL.createObjectURL(documento);
+      const linkDescarga = document.createElement('a');
+      linkDescarga.style.display = 'none';
+      linkDescarga.href = urlArchivo;
+      linkDescarga.download = documento.name;
+      document.body.appendChild(linkDescarga);
 
-    linkDescarga.click();
+      linkDescarga.click();
 
-    document.body.removeChild(linkDescarga);
-    URL.revokeObjectURL(urlArchivo);
+      document.body.removeChild(linkDescarga);
+      URL.revokeObjectURL(urlArchivo);
+    } else {
+      const { idadjunto } = item;
+
+      try {
+        setMostrarSpinner(true);
+
+        const { url } = await descargarDocumentoZ3(idadjunto);
+
+        window.open(url, '_blank');
+      } catch (error) {
+        AlertaError.fire({
+          title: 'Error',
+          html: `<p>Falló la descarga del documento adjunto <b>${nombreDocumentoAdjunto(
+            item,
+          )}</b>. Por favor intente más tarde.</p>`,
+        });
+      } finally {
+        setMostrarSpinner(false);
+      }
+    }
   };
 
   const limiteDeArchivosAlcanzado = () => {
     return documentosAdjuntos.fields.length >= maximaCantidadDeArchivos;
   };
 
+  const nombreTipoDocumento = (idTipoDocumento: number) => {
+    const tipoDocumento = tiposDocumentosFiltrados.find(
+      (td) => td.idtipoadjunto === idTipoDocumento,
+    );
+
+    return tipoDocumento?.tipoadjunto ?? '-';
+  };
+
   return (
     <>
+      <IfContainer show={mostrarSpinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
+
       <Row className="mt-3">
         <h5>Documentos Adjuntos</h5>
         <p>
@@ -197,17 +272,17 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {documentosAdjuntos.fields.map(({ tipoDocumento, documento }, index) => (
-                    <Tr key={index} className="align-middle">
-                      <Td>{tipoDocumento.tipoadjunto}</Td>
-                      <Td>{documento.name}</Td>
+                  {documentosAdjuntos.fields.map((field, index) => (
+                    <Tr key={field.id} className="align-middle">
+                      <Td>{nombreTipoDocumento(field.idtipoadjunto)}</Td>
+                      <Td>{nombreDocumentoAdjunto(field)}</Td>
                       <Td>
                         <div className="d-flex justify-content-center">
                           <button
                             type="button"
                             className="btn btn-primary"
                             title="Descargar documento"
-                            onClick={() => descargarDocumento(documento)}>
+                            onClick={() => descargarDocumento(index)}>
                             <i className="bi bi-download"></i>
                           </button>
                           <button
