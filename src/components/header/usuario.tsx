@@ -61,8 +61,11 @@ const Usuario: React.FC = () => {
                 <>
                   <div>
                     <small>
-                      Ult. Con.: <i>{format(new Date(ultimaConexion), 'dd/MM/yyyy HH:mm:ss')}</i>
+                      <b>Ultima Conexión: </b>
                     </small>
+                  </div>
+                  <div>
+                    <small>{format(new Date(ultimaConexion), 'dd/MM/yyyy HH:mm:ss')}</small>
                   </div>
                 </>
               )}
