@@ -65,5 +65,9 @@ export const esLicenciaMaternidad = (licencia: LicenciaTramitar) => {
 };
 
 export const esLicenciaFONASA = (licencia: LicenciaTramitar) => {
-  return licencia.entidadsalud.identidadsalud === 1; // 1 => FONASA
+  return licencia.entidadsalud.identidadsalud === 1;
+};
+
+export const esLicenciaDiatDiep = (licencia: LicenciaTramitar) => {
+  return [5, 6].includes(licencia.tipolicencia.idtipolicencia);
 };

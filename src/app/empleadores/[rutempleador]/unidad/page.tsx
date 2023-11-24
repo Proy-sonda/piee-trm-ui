@@ -10,7 +10,6 @@ import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Nav } from 'react-bootstrap';
-import { useRol } from '../(hooks)/use-Rol';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
 import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
@@ -37,9 +36,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
 
   const [abrirModalEditarUnidad, setAbrirModalEditarUnidad] = useState(false);
 
-  const { RolUsuario } = useRol();
-
-  const { empleadorActual } = useEmpleadorActual();
+  const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
 
   const [unidadesFiltradas, setunidadesFiltradas] = useState<Unidadesrrhh[] | undefined>([]);
 
@@ -75,29 +72,29 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
           MEDIPASS
         </Nav.Link>
       </Nav>
-      <div className="row mt-2">
-        <div className="col-5">
-          {unidades!?.length > 0 && (
-            <input
-              type="text"
-              className="form-control mt-3"
-              placeholder="Buscar unidad RRHH"
-              onChange={(e) => {
-                setunidadesFiltradas(
-                  unidades?.filter(
-                    ({ glosaunidadrrhh, codigounidadrrhh, telefono }) =>
-                      glosaunidadrrhh.toUpperCase().includes(e.target.value.toUpperCase()) ||
-                      codigounidadrrhh.includes(e.target.value) ||
-                      telefono.includes(e.target.value),
-                  ),
-                );
-              }}
-            />
-          )}
+
+      <div className="row my-4 g-3">
+        <div className="col-12 col-sm-8 col-md-6 col-lg-5 col-xxl-4">
+          <input
+            className="form-control"
+            type="search"
+            placeholder="Buscar unidad de RRHH"
+            onChange={(e) => {
+              setunidadesFiltradas(
+                unidades?.filter(
+                  ({ glosaunidadrrhh, codigounidadrrhh, telefono }) =>
+                    glosaunidadrrhh.toUpperCase().includes(e.target.value.toUpperCase()) ||
+                    codigounidadrrhh.includes(e.target.value) ||
+                    telefono.includes(e.target.value),
+                ),
+              );
+            }}
+          />
         </div>
-        <div className="col-7">
-          {RolUsuario == 'Administrador' && (
-            <div className="mt-3 d-flex justify-content-end">
+
+        <IfContainer show={rolEnEmpleadorActual === 'administrador'}>
+          <div className="col-12 col-sm-4 col-md-6 col-lg-7 col-xxl-8">
+            <div className="w-100 d-flex flex-column flex-md-row justify-content-sm-end">
               <button
                 className="btn btn-success"
                 disabled={cargandoUnidades || !!errorCargarUnidad}
@@ -105,8 +102,8 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
                 + Agregar Unidad RRHH
               </button>
             </div>
-          )}
-        </div>
+          </div>
+        </IfContainer>
       </div>
 
       <div className="row mt-2">

@@ -122,7 +122,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
       <Container fluid>
         <Row>
           <Titulo url="">
-            <h5 className="m-0 p-0">Tramitación / No Recepcionar</h5>
+            <h1 className="m-0 p-0 fs-5">Tramitación / No Recepcionar</h1>
           </Titulo>
         </Row>
 

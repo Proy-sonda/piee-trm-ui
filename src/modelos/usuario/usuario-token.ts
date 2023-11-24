@@ -1,5 +1,4 @@
 import jwt_decode from 'jwt-decode';
-import { MapaRolesUsuario, RolUsuario } from './mapa-roles-usuario';
 import { TokenAutenticacion } from './token-autenticacion';
 
 export class UsuarioToken {
@@ -20,12 +19,12 @@ export class UsuarioToken {
     return this.tokenAuth.user.apellidos;
   }
 
-  get email() {
-    return this.tokenAuth.user.email;
-  }
-
   nombreCompleto(): string {
     return `${this.nombres}  ${this.apellidos}`;
+  }
+
+  get ultimaconexion() {
+    return this.tokenAuth.user.ultimaconexion;
   }
 
   /**
@@ -56,14 +55,5 @@ export class UsuarioToken {
     const inicialApellido = apellidos === '' ? '' : apellidos[0].toUpperCase();
 
     return inicialNombre + inicialApellido;
-  }
-
-  tieneRol(rol: RolUsuario): boolean {
-    return MapaRolesUsuario[rol] === this.tokenAuth.user.rol.idrol;
-  }
-
-  /** Retorna `true` si el usuario tiene al menos uno de los roles indicados. */
-  tieneRoles(roles: RolUsuario[]): boolean {
-    return roles.some((rol) => this.tieneRol(rol));
   }
 }

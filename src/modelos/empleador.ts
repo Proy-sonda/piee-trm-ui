@@ -3,13 +3,18 @@ export interface Empleador {
   rutempleador: string;
   razonsocial: string;
   nombrefantasia: string;
+  telefonohabitual: string;
+  telefonomovil: string;
+  email: string;
+  holding: string;
   estadoempleador: Estadoempleador;
+  direccionempleador: Direccionempleador;
   ccaf: Ccaf;
+  tamanoempresa: Tamanoempresa;
   tipoempleador: Tipoempleador;
   sistemaremuneracion: Sistemaremuneracion;
-  direccionempleador: Direccionempleador;
+  fecharegistro: string;
   actividadlaboral: Actividadlaboral;
-  tamanoempresa: Tamanoempresa;
 }
 
 interface Actividadlaboral {

@@ -46,13 +46,7 @@ export const LoginComponent: React.FC<{}> = () => {
       return;
     }
 
-    const redirectPath = searchParams.get('redirectTo');
-    const redirectTo =
-      !redirectPath || (redirectPath.startsWith('/empleadores') && !usuario.tieneRol('admin'))
-        ? null
-        : redirectPath;
-
-    router.push(redirectTo ?? '/tramitacion');
+    router.push(searchParams.get('redirectTo') ?? '/tramitacion');
   }, [usuario]);
 
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {

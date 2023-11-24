@@ -1,12 +1,13 @@
 import { UseFormReturn } from 'react-hook-form';
 
 interface mypropsApp {
+  formId: string;
   formulario: UseFormReturn<any, any, undefined>;
   anterior?: boolean;
   finaliza?: boolean;
 }
 
-const BotonesNavegacion: React.FC<mypropsApp> = ({ formulario, anterior, finaliza }) => {
+const BotonesNavegacion: React.FC<mypropsApp> = ({ formId, formulario, anterior, finaliza }) => {
   return (
     <div className="row">
       {anterior ? (
@@ -15,6 +16,7 @@ const BotonesNavegacion: React.FC<mypropsApp> = ({ formulario, anterior, finaliz
           <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
             <button
               type="submit"
+              form={formId}
               className="btn btn-primary"
               {...formulario.register('accion')}
               onClick={() => formulario.setValue('accion', 'anterior')}>
@@ -29,6 +31,7 @@ const BotonesNavegacion: React.FC<mypropsApp> = ({ formulario, anterior, finaliz
           <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
             <button
               type="submit"
+              form={formId}
               className="btn btn-success"
               {...formulario.register('accion')}
               onClick={() => formulario.setValue('accion', 'guardar')}>
@@ -38,6 +41,7 @@ const BotonesNavegacion: React.FC<mypropsApp> = ({ formulario, anterior, finaliz
           <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
             <button
               type="submit"
+              form={formId}
               className="btn btn-primary"
               {...formulario.register('accion')}
               onClick={() => formulario.setValue('accion', finaliza ? 'tramitar' : 'siguiente')}>
