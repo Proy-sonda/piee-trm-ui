@@ -37,7 +37,7 @@ interface DocumentosAdjuntosC3Props {
   onDocumentoEliminado: () => void | Promise<void>;
 }
 
-const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
+export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   licencia,
   tiposDocumentos,
   documentosAdjuntos,
@@ -311,5 +311,3 @@ const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     </>
   );
 };
-
-export default DocumentosAdjuntosC3;

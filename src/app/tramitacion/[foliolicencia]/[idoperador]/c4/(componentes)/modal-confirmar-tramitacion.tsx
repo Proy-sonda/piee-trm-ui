@@ -364,7 +364,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                   </Thead>
                   <Tbody className="text-center">
                     {(zona3?.licenciazc3adjuntos ?? []).map(({ idtipoadjunto, nombrelocal }) => (
-                      <Tr>
+                      <Tr key={idtipoadjunto}>
                         <Td>{nombreTipoDocumento(idtipoadjunto)}</Td>
                         <Td>{nombrelocal}</Td>
                       </Tr>

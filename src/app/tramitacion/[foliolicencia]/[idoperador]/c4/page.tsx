@@ -1,33 +1,31 @@
 'use client';
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { InputFecha } from '@/components/form';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import { useFetch } from '@/hooks/use-merge-fetch';
-import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { useFetch, useRefrescarPagina } from '@/hooks';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import BotonesNavegacion from '../(componentes)/botones-navegacion';
-import Cabecera from '../(componentes)/cabecera';
+import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { InputDias } from '../(componentes)/input-dias';
 import {
   DatosModalConfirmarTramitacion,
   ModalConfirmarTramitacion,
-} from './(componentes)/modal-confirmar-tramitacion';
-import ModalImprimirPdf from './(componentes)/modal-imprimir-pdf';
+  ModalImprimirPdf,
+} from './(componentes)';
 import {
   FormularioC4,
   estaLicenciaAnteriorCompleta,
   licenciaAnteriorTieneCamposValidos,
-} from './(modelos)/formulario-c4';
-import { buscarZona4 } from './(servicios)/buscar-z4';
-import { crearLicenciaZ4 } from './(servicios)/licencia-create-z4';
-import { tramitarLicenciaMedica } from './(servicios)/tramitar-licencia';
+} from './(modelos)';
+import { buscarZona4, crearLicenciaZ4, tramitarLicenciaMedica } from './(servicios)';
+
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 
 interface PasoC4Props {
   params: {

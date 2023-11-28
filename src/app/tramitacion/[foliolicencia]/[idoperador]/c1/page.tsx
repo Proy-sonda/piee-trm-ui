@@ -20,8 +20,7 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import BotonesNavegacion from '../(componentes)/botones-navegacion';
-import Cabecera from '../(componentes)/cabecera';
+
 import {
   buscarCalle,
   buscarComunas,
@@ -30,10 +29,12 @@ import {
   buscarRegiones,
 } from '../(servicios)';
 
+import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { LicenciaC1 } from './(modelos)';
+import { formularioApp } from './(modelos)/formulario-type';
 import { LicenciaC0 } from './(modelos)/licencia-c0';
 import {
   ErrorCrearLicencia,
@@ -50,24 +51,6 @@ interface myprops {
     foliolicencia: string;
     idoperador: number;
   };
-}
-interface formularioApp {
-  accion: 'siguiente' | 'guardar' | 'navegar';
-  linkNavegacion: string;
-  run: string;
-  razon: string;
-  telefono: string;
-  fecharecepcionlme: string;
-  region: string;
-  comuna: string;
-  tipo: string;
-  fechaemision: string;
-  calle: string;
-  numero: string;
-  departamento: string;
-  actividadlaboral: string;
-  ocupacion: string;
-  otro: string;
 }
 
 const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador } }) => {
