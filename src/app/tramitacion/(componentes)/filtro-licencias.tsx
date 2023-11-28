@@ -93,6 +93,7 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               datos={unidadesRRHH}
               idElemento="codigounidadrrhh"
               descripcion="glosaunidadrrhh"
+              tipoValor="string"
               className="col-12 col-md-6 col-lg-3"
             />
           </div>

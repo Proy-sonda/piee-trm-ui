@@ -366,12 +366,15 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     </Tr>
                   </Thead>
                   <Tbody className="text-center">
-                    {(zona3?.licenciazc3adjuntos ?? []).map(({ idtipoadjunto, nombrelocal }) => (
-                      <Tr key={idtipoadjunto}>
-                        <Td>{nombreTipoDocumento(idtipoadjunto)}</Td>
-                        <Td>{nombrelocal}</Td>
-                      </Tr>
-                    ))}
+
+                    {(zona3?.licenciazc3adjuntos ?? []).map(
+                      ({ idtipoadjunto, nombrelocal, idpiielicenciaszc3adjuntos }) => (
+                        <Tr key={idpiielicenciaszc3adjuntos}>
+                          <Td>{nombreTipoDocumento(idtipoadjunto)}</Td>
+                          <Td>{nombrelocal}</Td>
+                        </Tr>
+                      ),
+                    )}
                   </Tbody>
                 </Table>
               </Col>
