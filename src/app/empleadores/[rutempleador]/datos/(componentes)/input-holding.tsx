@@ -6,7 +6,7 @@ import { useFormContext } from 'react-hook-form';
 
 interface InputHoldingProps extends InputReciclableBase {}
 
-const InputHolding: React.FC<InputHoldingProps> = ({ name, label, className }) => {
+export const InputHolding: React.FC<InputHoldingProps> = ({ name, label, className }) => {
   const { register, setValue } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
@@ -45,5 +45,3 @@ const InputHolding: React.FC<InputHoldingProps> = ({ name, label, className }) =
     </>
   );
 };
-
-export default InputHolding;

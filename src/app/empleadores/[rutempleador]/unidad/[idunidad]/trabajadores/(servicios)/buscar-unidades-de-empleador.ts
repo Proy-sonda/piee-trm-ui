@@ -15,7 +15,7 @@ export const buscarUnidadesDeEmpleador = (
     RunTrabajador: '',
     RunUsuario: '',
   };
-  console.log(payload);
+
   const [resp, abort] = runFetchAbortable<DatoEmpleadorUnidad>(
     `${urlBackendTramitacion()}/operadores/all/obtieneempleadorrrhhusu`,
     {

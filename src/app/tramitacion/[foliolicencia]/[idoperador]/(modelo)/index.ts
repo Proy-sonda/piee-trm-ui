@@ -1,4 +1,5 @@
 export * from './actividad-laboral';
+export * from './cabecera';
 export * from './caja-de-compensacion';
 export * from './calidad-trabajador';
 export * from './comuna';

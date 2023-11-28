@@ -1,2 +1,4 @@
-export { default as BotonesNavegacion } from './botones-navegacion';
-export { default as Cabecera } from './cabecera';
+export * from './botones-navegacion';
+export * from './cabecera';
+export * from './informacion-licencia';
+export * from './input-dias';

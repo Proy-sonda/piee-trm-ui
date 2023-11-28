@@ -18,21 +18,17 @@ import {
 } from './(componentes)';
 import {
   FormularioC4,
+  PasoC4Props,
   estaLicenciaAnteriorCompleta,
   licenciaAnteriorTieneCamposValidos,
 } from './(modelos)';
 import { buscarZona4, crearLicenciaZ4, tramitarLicenciaMedica } from './(servicios)';
 
-const IfContainer = dynamic(() => import('@/components/if-container'));
-const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
-const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
-
-interface PasoC4Props {
-  params: {
-    foliolicencia: string;
-    idoperador: string;
-  };
-}
+const IfContainer = dynamic(() => import('@/components/if-container'), { ssr: false });
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'), { ssr: false });
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'), {
+  ssr: false,
+});
 
 const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
   const idOperadorNumber = parseInt(idoperador);

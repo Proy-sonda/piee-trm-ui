@@ -1,21 +1,23 @@
 'use client';
 
-import IfContainer from '@/components/if-container';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import Titulo from '@/components/titulo/titulo';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
-import { strIncluye } from '@/utilidades/str-incluye';
+import { Titulo } from '@/components';
+import { useMergeFetchObject } from '@/hooks';
+import { buscarEmpleadores } from '@/servicios';
+import { strIncluye } from '@/utilidades';
 import { isWithinInterval } from 'date-fns';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import FiltroLicencias from './(componentes)/filtro-licencias';
-import SemaforoLicencias, { FiltroEstadoLicencia } from './(componentes)/semaforo-licencias';
-import TablaLicenciasTramitar from './(componentes)/tabla-licencias-tramitar';
+import {
+  FiltroEstadoLicencia,
+  FiltroLicencias,
+  SemaforoLicencias,
+  TablaLicenciasTramitar,
+} from './(componentes)';
+import { FiltroBusquedaLicencias, LicenciaTramitar, hayFiltros } from './(modelos)';
+import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para-tramitar';
 
-import { buscarLicenciasParaTramitar } from '../tramitacion/(servicios)/buscar-licencias-para-tramitar';
-
-import { FiltroBusquedaLicencias, hayFiltros } from './(modelos)/filtro-busqueda-licencias';
-import { LicenciaTramitar } from './(modelos)/licencia-tramitar';
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 
 const TramitacionPage = () => {
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
@@ -41,7 +43,7 @@ const TramitacionPage = () => {
     setLicenciasFiltradas(
       licenciasParaFiltrar.filter(licenciaCumple(filtrosBusqueda, filtroEstado)),
     );
-  }, [filtrosBusqueda, filtroEstado]);
+  }, [filtrosBusqueda, filtroEstado, datosBandeja?.licenciasParaTramitar]);
 
   const licenciaCumple = (filtros: FiltroBusquedaLicencias, filtroEstado: FiltroEstadoLicencia) => {
     return (licencia: LicenciaTramitar) => {

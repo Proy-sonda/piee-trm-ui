@@ -158,14 +158,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   // Unifica todas las posibles cargas de datos
   useEffect(() => {
     setCargando(cargandoZona2 || cargandoZona3 || cargandoTipoDocumentos || cargandoPrevision);
-  }, [cargandoZona2, cargandoZona3, cargandoPrevision]);
+  }, [cargandoZona2, cargandoZona3, cargandoPrevision, cargandoTipoDocumentos]);
 
   // Agregar las filas de remuneraciones (parchar o crear)
   useEffect(() => {
     if (!licencia || !zona2) {
       return;
     }
-
     // Existe zona C3 en la base de datos
     if (zona2 && zona3) {
       // prettier-ignore
@@ -256,7 +255,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         }
       }
     }
-  }, [licencia, zona2, zona3]);
+  }, [zona2, zona3, licencia]);
 
   // Refresca los valores de la zona 3
   useEffect(() => {
@@ -332,7 +331,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         documentosAdjuntos.update(index, zona3.licenciazc3adjuntos[index]);
       }
     }
-  }, [zona3]);
+  }, [zona3, formulario, licencia, zona2]);
 
   const datosFilaVacia = () => {
     return {

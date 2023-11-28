@@ -30,7 +30,6 @@ export const buscarUnidadPorId = (
     const Unidad: Unidadesrrhh | undefined = (await resp())!?.unidadesrrhh.find(
       (value) => value.codigounidadrrhh == idUnidad,
     );
-    console.log(Unidad);
 
     return Unidad;
   };

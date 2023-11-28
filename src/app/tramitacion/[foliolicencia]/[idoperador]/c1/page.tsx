@@ -117,12 +117,15 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       if (data !== undefined) setLMEEXIS(data);
     };
     BuscarLMExistente();
-  }, []);
+  }, [folio, idoperador]);
 
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
 
-  useEffect(() => formulario.setValue('comuna', LMEEXIS!?.comuna.idcomuna), [regionSeleccionada]);
+  useEffect(
+    () => formulario.setValue('comuna', LMEEXIS!?.comuna.idcomuna),
+    [regionSeleccionada, LMEEXIS, formulario],
+  );
 
   useEffect(() => {
     if (licencia == undefined) return;
@@ -134,7 +137,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       'run',
       licencia!?.LMETRM.find(({ foliolicencia }) => foliolicencia == folio)!?.rutempleador,
     );
-  }, [licencia]);
+  }, [licencia, folio, formulario]);
 
   useEffect(() => {
     if (licencia!?.LMETRM == undefined) return;
@@ -148,7 +151,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         'yyyy-MM-dd',
       ),
     );
-  }, [licencia?.LMETRM]);
+  }, [licencia, folio, licencia]);
 
   useEffect(() => {
     if (runEmpleador == '') return;
@@ -194,7 +197,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       );
     };
     busquedaEmpleador();
-  }, [runEmpleador]);
+  }, [runEmpleador, LMEEXIS, formulario]);
 
   useEffect(
     () => (!cargandoCombos ? setfadeinOut('animate__animated animate__fadeOut') : setfadeinOut('')),

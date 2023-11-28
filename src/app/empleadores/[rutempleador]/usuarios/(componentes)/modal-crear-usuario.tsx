@@ -31,7 +31,7 @@ interface ModalCrearUsuarioProps {
   onUsuarioCreado: () => void;
 }
 
-const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
+export const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
   show,
   empleador,
   onCerrarModal,
@@ -269,5 +269,3 @@ const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
     </>
   );
 };
-
-export default ModalCrearUsuario;

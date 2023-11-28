@@ -74,7 +74,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     };
 
     BuscarZonaC1();
-  }, []);
+  }, [foliolicencia, idoperador]);
 
   const step = [
     {
@@ -285,7 +285,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         }
       }),
     );
-  }, [calidadtrabajador]);
+  }, [calidadtrabajador, combos, foliolicencia, formulario]);
 
   useEffect(() => {
     setspinner(true);
@@ -338,7 +338,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     setTimeout(() => {
       setspinner(false);
     }, 2000);
-  }, [combos?.LMEEXISTEZONA2]);
+  }, [combos, formulario]);
 
   return (
     <>

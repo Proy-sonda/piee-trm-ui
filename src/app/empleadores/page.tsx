@@ -1,8 +1,8 @@
 'use client';
 
+import { Titulo } from '@/components';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
-import Titulo from '@/components/titulo/titulo';
 import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
@@ -37,7 +37,7 @@ const EmpleadoresPage = () => {
       return;
     }
 
-    filtrarEmpleadores('', '');
+    setEmpleadoresFiltrados(empleadores);
   }, [empleadores]);
 
   const filtrarEmpleadores = (rut: string, razonSocial: string) => {

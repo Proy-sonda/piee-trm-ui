@@ -1,11 +1,5 @@
 'use client';
 
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import Titulo from '@/components/titulo/titulo';
-
-import TablaTrabajadores from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(componentes)/tabla-trabajadores';
-import { Trabajador } from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(modelos)';
 import {
   actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
@@ -13,23 +7,27 @@ import {
   crearTrabajador,
   eliminarTrabajador,
 } from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(servicios)';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+
+import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
+import { Titulo } from '@/components';
+import { AuthContext } from '@/contexts';
+import { useMergeFetchObject } from '@/hooks';
+import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
+import exportFromJSON from 'export-from-json';
+import dynamic from 'next/dynamic';
 import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-
-import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
-import { AuthContext } from '@/contexts';
-import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
-import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
-import exportFromJSON from 'export-from-json';
-import { Trabajadoresxrrhh } from '../../(modelos)/payload-unidades';
-import { buscarUnidadPorId } from '../../(servicios)/buscar-unidad-por-id';
-import { ProgressBarCustom } from './(componentes)/progress-bar';
+import { Trabajadoresxrrhh } from '../../(modelos)';
+import { buscarUnidadPorId } from '../../(servicios)';
+import { ProgressBarCustom, TablaTrabajadores } from './(componentes)';
+import { Trabajador } from './(modelos)';
 import styles from './trabajadores.module.css';
-
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
 interface TrabajadoresPageProps {
   params: {
     rutempleador: string;
@@ -83,13 +81,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       setunidadEmpleador(await resp());
     };
     busquedaUnidadEmpleador();
-  }, [trabajadores]);
+  }, [trabajadores, idunidad, rutempleador]);
 
   useEffect(() => {
     if (datosPagina?.trabajadores != undefined) {
       settrabajadores(datosPagina!?.trabajadores);
     }
-  }, [datosPagina?.trabajadores || refresh]);
+  }, [datosPagina, refresh]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 

@@ -7,7 +7,12 @@ interface mypropsApp {
   finaliza?: boolean;
 }
 
-const BotonesNavegacion: React.FC<mypropsApp> = ({ formId, formulario, anterior, finaliza }) => {
+export const BotonesNavegacion: React.FC<mypropsApp> = ({
+  formId,
+  formulario,
+  anterior,
+  finaliza,
+}) => {
   return (
     <div className="row">
       {anterior ? (
@@ -80,5 +85,3 @@ const BotonesNavegacion: React.FC<mypropsApp> = ({ formId, formulario, anterior,
     </div>
   );
 };
-
-export default BotonesNavegacion;
