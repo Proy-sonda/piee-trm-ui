@@ -1,38 +1,27 @@
 import { buscarEmpleadorRut } from '@/app/empleadores/(servicios)/buscar-empleador-rut';
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { addDays, format, parse } from 'date-fns';
-import es from 'date-fns/locale/es';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import { ModalImprimirPdfProps } from '../(modelos)';
 import { buscarZona4 } from '../(servicios)/buscar-z4';
 import { numeroALetras } from '../(util)/numero-a-letra';
 import { LicenciaC1 } from '../../c1/(modelos)';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
-import { buscarEntidadPrevisional } from '../../c2/(servicios)/buscar-entidad-previsional';
-import { buscarZona2 } from '../../c2/(servicios)/buscar-z2';
-import { buscarZona3 } from '../../c3/(servicios)/buscar-z3';
+import { buscarZona2 } from '../../c2/(servicios)';
+import { buscarZona3 } from '../../c3/(servicios)';
 import styles from './modal-imprimir-pdf.module.css';
 
-const locale = es;
-interface IModalImprimirPdfProps {
-  foliolicencia: string;
-  idOperadorNumber: number;
-  modalimprimir: boolean;
-  setmodalimprimir: (modal: boolean) => void;
-  refrescarZona4: () => void;
-  refresh: boolean;
-  setCargaPDF: (carga: boolean) => void;
-  actualizaTramitacion?: boolean;
-}
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 
-const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
+export const ModalImprimirPdf: React.FC<ModalImprimirPdfProps> = ({
   foliolicencia,
   idOperadorNumber,
   modalimprimir,
@@ -46,7 +35,7 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
   const [razonSocial, setrazonSocial] = useState<string>('');
   const [cargandoPDF, setcargandoPDF] = useState(false);
 
-  const [errorCargaZona, zonas, cargandoZonas] = useMergeFetchObject(
+  const [, zonas, cargandoZonas] = useMergeFetchObject(
     {
       zona0: buscarZona0(foliolicencia, idOperadorNumber),
       zona2: buscarZona2(foliolicencia, idOperadorNumber),
@@ -54,13 +43,6 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
       zona4: buscarZona4(foliolicencia, idOperadorNumber),
     },
     [refresh, actualizaTramitacion],
-  );
-
-  const [, entidadesPrevisionales] = useFetch(
-    zonas?.zona2
-      ? buscarEntidadPrevisional(zonas.zona2.entidadprevisional.codigoregimenprevisional)
-      : emptyFetch(),
-    [zonas?.zona2],
   );
 
   const [, licenciasTramitar, cargando] = useFetch(buscarLicenciasParaTramitar());
@@ -303,5 +285,3 @@ const ModalImprimirPdf: React.FC<IModalImprimirPdfProps> = ({
     </Modal>
   );
 };
-
-export default ModalImprimirPdf;

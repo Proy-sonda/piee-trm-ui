@@ -1,23 +1,24 @@
 'use client';
 
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import Titulo from '@/components/titulo/titulo';
+import { Titulo } from '@/components';
 import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { strIncluye } from '@/utilidades';
+import dynamic from 'next/dynamic';
 import React, { useContext, useEffect, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
-import ModalCrearUsuario from './(componentes)/modal-crear-usuario';
-import ModalEditarUsuario from './(componentes)/modal-editar-usuario';
+import { ModalCrearUsuario, ModalEditarUsuario } from './(componentes)';
 import TablaUsuarios from './(componentes)/tabla-usuarios';
 import {
   UsuarioEntidadEmpleadora,
   esUsuarioAdminHabilitado,
 } from './(modelos)/usuario-entidad-empleadora';
 import { buscarUsuarios } from './(servicios)/buscar-usuarios';
+
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
 
 interface UsuariosPageProps {}
 

@@ -30,17 +30,15 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
   ];
 
   const { empleadorActual, cambiarEmpleador } = useEmpleadorActual();
+  useEffect(() => {
+    cambiarEmpleador(rutempleador);
+  }, [rutempleador]);
 
   const pathname = usePathname();
 
   const [abrirMenuDesktop, setAbrirMenuDesktop] = useState(true);
 
   const [abrirMenuMovil, setAbrirMenuMovil] = useState(false);
-
-  // Carga el empleador la primera vez
-  useEffect(() => {
-    cambiarEmpleador(rutempleador);
-  }, [rutempleador]);
 
   const claseLinkActivo = (link: LinkNavegacion) => {
     const [linkPathname] = link.href.split('?');

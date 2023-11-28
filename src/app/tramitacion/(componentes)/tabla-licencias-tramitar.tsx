@@ -14,7 +14,7 @@ interface TablaLicenciasTramitarProps {
   licencias?: LicenciaTramitar[];
 }
 
-const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
+export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   licencias,
   empleadores,
 }) => {
@@ -122,5 +122,3 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     </>
   );
 };
-
-export default TablaLicenciasTramitar;

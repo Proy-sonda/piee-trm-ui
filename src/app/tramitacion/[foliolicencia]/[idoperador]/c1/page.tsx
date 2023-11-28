@@ -11,29 +11,30 @@ import {
   InputRut,
   InputTelefono,
 } from '@/components/form';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
+import format from 'date-fns/format';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import Cabecera from '../(componentes)/cabecera';
-import { buscarComunas } from '../(servicios)/buscar-comunas';
 
-import { buscarEmpleador } from '../(servicios)/buscar-empleador';
-import { buscarOcupacion } from '../(servicios)/buscar-ocupacion';
-import { buscarRegiones } from '../(servicios)/buscar-regiones';
-import { buscarCalle } from '../(servicios)/tipo-calle';
+import {
+  buscarCalle,
+  buscarComunas,
+  buscarEmpleador,
+  buscarOcupacion,
+  buscarRegiones,
+} from '../(servicios)';
 
-import { AlertaError, AlertaExito } from '@/utilidades/alertas';
-import format from 'date-fns/format';
-import BotonesNavegacion from '../(componentes)/botones-navegacion';
+import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
 import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { LicenciaC1 } from './(modelos)';
+import { formularioApp } from './(modelos)/formulario-type';
 import { LicenciaC0 } from './(modelos)/licencia-c0';
 import {
   ErrorCrearLicencia,
@@ -43,29 +44,13 @@ import {
   crearLicenciaZ1,
 } from './(servicios)/';
 
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'), { ssr: false });
+const IfContainer = dynamic(() => import('@/components/if-container'), { ssr: false });
 interface myprops {
   params: {
     foliolicencia: string;
     idoperador: number;
   };
-}
-interface formularioApp {
-  accion: 'siguiente' | 'guardar' | 'navegar';
-  linkNavegacion: string;
-  run: string;
-  razon: string;
-  telefono: string;
-  fecharecepcionlme: string;
-  region: string;
-  comuna: string;
-  tipo: string;
-  fechaemision: string;
-  calle: string;
-  numero: string;
-  departamento: string;
-  actividadlaboral: string;
-  ocupacion: string;
-  otro: string;
 }
 
 const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador } }) => {
@@ -132,12 +117,15 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       if (data !== undefined) setLMEEXIS(data);
     };
     BuscarLMExistente();
-  }, []);
+  }, [folio, idoperador]);
 
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
 
-  useEffect(() => formulario.setValue('comuna', LMEEXIS!?.comuna.idcomuna), [regionSeleccionada]);
+  useEffect(
+    () => formulario.setValue('comuna', LMEEXIS!?.comuna.idcomuna),
+    [regionSeleccionada, LMEEXIS, formulario],
+  );
 
   useEffect(() => {
     if (licencia == undefined) return;
@@ -149,7 +137,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       'run',
       licencia!?.LMETRM.find(({ foliolicencia }) => foliolicencia == folio)!?.rutempleador,
     );
-  }, [licencia]);
+  }, [licencia, folio, formulario]);
 
   useEffect(() => {
     if (licencia!?.LMETRM == undefined) return;
@@ -163,7 +151,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         'yyyy-MM-dd',
       ),
     );
-  }, [licencia?.LMETRM]);
+  }, [licencia, folio, licencia]);
 
   useEffect(() => {
     if (runEmpleador == '') return;
@@ -209,7 +197,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       );
     };
     busquedaEmpleador();
-  }, [runEmpleador]);
+  }, [runEmpleador, LMEEXIS, formulario]);
 
   useEffect(
     () => (!cargandoCombos ? setfadeinOut('animate__animated animate__fadeOut') : setfadeinOut('')),

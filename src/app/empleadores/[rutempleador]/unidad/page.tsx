@@ -1,20 +1,20 @@
 'use client';
 
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import Titulo from '@/components/titulo/titulo';
-import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
-import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+import { Titulo } from '@/components';
+import { emptyFetch, useFetch, useRefrescarPagina } from '@/hooks';
 import { Unidadesrrhh } from '@/modelos/tramitacion';
-import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
+import { buscarUnidadesDeRRHH } from '@/servicios';
+import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Nav } from 'react-bootstrap';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
-import ModalEditarUnidad from './(componentes)/modal-editar-unidad';
-import ModalNuevaUnidad from './(componentes)/modal-nueva-unidad';
+import { ModalEditarUnidad, ModalNuevaUnidad } from './(componentes)';
 import TablaUnidades from './(componentes)/tabla-unidades';
 import { TIPOS_DE_OPERADORES, TipoOperador } from './(modelos)/tipo-operador';
+
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
 
 interface UnidadRRHHPageProps {
   params: {

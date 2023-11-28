@@ -1,36 +1,36 @@
 'use client';
 
-import { LicenciaTramitar, esLicenciaFONASA } from '@/app/tramitacion/(modelos)/licencia-tramitar';
-import { ComboSimple, InputArchivo, InputFecha, InputRadioButtons } from '@/components/form';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import Titulo from '@/components/titulo/titulo';
-import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { LicenciaTramitar, esLicenciaFONASA } from '@/app/tramitacion/(modelos)';
+import { ComboSimple, InputArchivo, InputFecha, InputRadioButtons, Titulo } from '@/components';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
-import InformacionLicencia from '../(componentes)/informacion-licencia';
-import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
-import { FormularioNoTramitarLicencia } from './(modelos)/formulario-no-tramitar-licencia';
-import { esOtroMotivoDeRechazo, esRelacionLaboralTerminada } from './(modelos)/motivo-de-rechazo';
-import { buscarMotivosDeRechazo } from './(servicios)/buscar-motivos-de-rechazo';
+
+import { useMergeFetchArray } from '@/hooks';
+import dynamic from 'next/dynamic';
+import { InformacionLicencia } from '../(componentes)';
+import { buscarCajasDeCompensacion } from '../(servicios)';
+import {
+  FormularioNoTramitarLicencia,
+  NoRecepcionarLicenciaPageProps,
+  esOtroMotivoDeRechazo,
+  esRelacionLaboralTerminada,
+} from './(modelos)';
 import {
   NoPuedeCrearZona0Error,
   NoTramitarError,
+  buscarMotivosDeRechazo,
   noTamitarLicenciaMedica,
-} from './(servicios)/no-tramitar-licencia';
+} from './(servicios)';
 
-interface NoRecepcionarLicenciaPageProps {
-  params: {
-    foliolicencia: string;
-    idoperador: string;
-  };
-}
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
 
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliolicencia, idoperador },

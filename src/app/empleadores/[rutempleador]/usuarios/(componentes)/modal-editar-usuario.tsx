@@ -6,21 +6,21 @@ import {
   InputRut,
   InputTelefono,
 } from '@/components/form';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+
+import { WebServiceOperadoresError } from '@/modelos';
 import { Empleador } from '@/modelos/empleador';
-import { WebServiceOperadoresError } from '@/modelos/web-service-operadores-error';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
+import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { FormularioEditarUsuario } from '../(modelos)/formulario-editar-usuario';
-import { esUsuarioAdministrador } from '../(modelos)/usuario-entidad-empleadora';
-import { actualizarUsuario } from '../(servicios)/actualizar-usuario';
-import { buscarRolesUsuarios } from '../(servicios)/buscar-roles-usuarios';
-import { buscarUsuarioPorId } from '../(servicios)/buscar-usuario-por-id';
+import { FormularioEditarUsuario, esUsuarioAdministrador } from '../(modelos)';
+import { actualizarUsuario, buscarRolesUsuarios, buscarUsuarioPorId } from '../(servicios)';
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 
 interface ModalEditarUsuarioProps {
   show: boolean;
@@ -31,7 +31,7 @@ interface ModalEditarUsuarioProps {
   onUsuarioEditado: (rutUsuario: string) => void;
 }
 
-const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
+export const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
   show,
   idUsuario,
   cantidadUsuariosAdminActivos,
@@ -73,7 +73,15 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
     formulario.setValue('email', usuarioEditar.usuarioempleadorActual.email ?? '');
     formulario.setValue('confirmarEmail', usuarioEditar.usuarioempleadorActual.email ?? '');
     formulario.setValue('rolId', usuarioEditar.usuarioempleadorActual.rol.idrol);
-  }, [cargandoUsuario, usuarioEditar, errUsuario]);
+  }, [
+    cargandoUsuario,
+    usuarioEditar,
+    errUsuario,
+    cargandoCombos,
+    combos,
+    errCargarCombos.length,
+    formulario,
+  ]);
 
   const handleActualizarUsuario: SubmitHandler<FormularioEditarUsuario> = async (data) => {
     try {
@@ -246,5 +254,3 @@ const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
     </>
   );
 };
-
-export default ModalEditarUsuario;

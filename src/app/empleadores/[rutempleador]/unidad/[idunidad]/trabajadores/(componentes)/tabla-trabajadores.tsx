@@ -16,7 +16,7 @@ interface props {
   idunidad: number;
 }
 
-const TablaTrabajadores: React.FC<props> = ({
+export const TablaTrabajadores: React.FC<props> = ({
   trabajadores,
   unidad,
   handleEditTrabajador,
@@ -136,5 +136,3 @@ const TablaTrabajadores: React.FC<props> = ({
     </>
   );
 };
-
-export default TablaTrabajadores;

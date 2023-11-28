@@ -7,7 +7,7 @@ type TituloProps = {
   url: string;
 };
 
-const Titulo: React.FC<TituloProps> = ({ children, url }) => {
+export const Titulo: React.FC<TituloProps> = ({ children, url }) => {
   return (
     <div className="pb-2 border-bottom d-flex align-items-center justify-content-between flex-wrap">
       <div>{children}</div>
@@ -42,5 +42,3 @@ const Titulo: React.FC<TituloProps> = ({ children, url }) => {
     </div>
   );
 };
-
-export default Titulo;

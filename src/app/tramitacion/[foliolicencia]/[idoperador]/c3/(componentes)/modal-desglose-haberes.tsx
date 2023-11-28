@@ -54,7 +54,7 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
     formulario.setValue('bono3', datos.desgloseInicial.bono3);
     formulario.setValue('bono4', datos.desgloseInicial.bono4);
     formulario.setValue('bono5', datos.desgloseInicial.bono5);
-  }, [datos.desgloseInicial]);
+  }, [datos.desgloseInicial, formulario]);
 
   const handleCerrarModal = () => {
     formulario.reset();

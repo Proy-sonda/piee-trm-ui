@@ -11,35 +11,32 @@ import {
   limpiarRemuneracion,
   remuneracionTieneAlgunCampoValido,
 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
-import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+
+import { emptyFetch, useFetch, useRefrescarPagina } from '@/hooks';
 import { capitalizar } from '@/utilidades';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { format, subMonths } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
-import BotonesNavegacion from '../(componentes)/botones-navegacion';
-import Cabecera from '../(componentes)/cabecera';
-import { buscarTiposDocumento } from '../(servicios)/buscar-tipos-documento';
-import { crearIdEntidadPrevisional } from '../c2/(modelos)/entidad-previsional';
-import { esTrabajadorIndependiente } from '../c2/(modelos)/licencia-c2';
-import { buscarEntidadPrevisional } from '../c2/(servicios)/buscar-entidad-previsional';
-import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
-import DocumentosAdjuntosC3 from './(componentes)/documentos-adjuntos-c3';
+import { BotonesNavegacion, Cabecera } from '../(componentes)';
+import { buscarTiposDocumento } from '../(servicios)';
+import { crearIdEntidadPrevisional, esTrabajadorIndependiente } from '../c2/(modelos)';
+import { buscarEntidadPrevisional, buscarZona2 } from '../c2/(servicios)';
 import {
   DatosModalDesgloseHaberes,
+  DocumentosAdjuntosC3,
   ModalDesgloseDeHaberes,
-} from './(componentes)/modal-desglose-haberes';
-import TablaDeRentas from './(componentes)/tabla-de-rentas';
-import { buscarZona3 } from './(servicios)/buscar-z3';
-import { crearLicenciaZ3 } from './(servicios)/licencia-create-z3';
+  TablaDeRentas,
+} from './(componentes)';
+import { buscarZona3, crearLicenciaZ3 } from './(servicios)';
 
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 interface C3PageProps {
   params: {
     foliolicencia: string;
@@ -161,14 +158,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   // Unifica todas las posibles cargas de datos
   useEffect(() => {
     setCargando(cargandoZona2 || cargandoZona3 || cargandoTipoDocumentos || cargandoPrevision);
-  }, [cargandoZona2, cargandoZona3, cargandoPrevision]);
+  }, [cargandoZona2, cargandoZona3, cargandoPrevision, cargandoTipoDocumentos]);
 
   // Agregar las filas de remuneraciones (parchar o crear)
   useEffect(() => {
     if (!licencia || !zona2) {
       return;
     }
-
     // Existe zona C3 en la base de datos
     if (zona2 && zona3) {
       // prettier-ignore
@@ -259,7 +255,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         }
       }
     }
-  }, [licencia, zona2, zona3]);
+  }, [zona2, zona3, licencia]);
 
   // Refresca los valores de la zona 3
   useEffect(() => {
@@ -335,7 +331,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         documentosAdjuntos.update(index, zona3.licenciazc3adjuntos[index]);
       }
     }
-  }, [zona3]);
+  }, [zona3, formulario, licencia, zona2]);
 
   const datosFilaVacia = () => {
     return {

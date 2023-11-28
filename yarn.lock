@@ -2120,10 +2120,10 @@ react-spinners@^0.13.8:
   resolved "https://registry.npmjs.org/react-spinners/-/react-spinners-0.13.8.tgz"
   integrity sha512-3e+k56lUkPj0vb5NDXPVFAOkPC//XyhKPJjvcGjyMNPWsBKpplfeyialP74G7H7+It7KzhtET+MvGqbKgAqpZA==
 
-react-super-responsive-table@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.npmjs.org/react-super-responsive-table/-/react-super-responsive-table-5.2.1.tgz"
-  integrity sha512-93DAJbI4FjR0Yops+0v1MZIUhIMRQOm/N//o35mk/g4NCZ99HIOB+gdZPorZwKX3mfr3h3H3ATcU4jLMfpuC9Q==
+react-super-responsive-table@^5.2.2:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/react-super-responsive-table/-/react-super-responsive-table-5.2.2.tgz#fc3f45b921fa60718b87077dafcba2c48350091d"
+  integrity sha512-LDsGq8X3TBn0AMv5gX/0wFeWoFMMmiZXNTD1kIMMWz3WflPMHUZOSHXXlG5EOO2u3WSNcVl7MLIk83maS/Xj0g==
 
 react-transition-group@^4.4.5:
   version "4.4.5"

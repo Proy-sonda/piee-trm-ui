@@ -12,7 +12,7 @@ interface InformacionLicenciaProps {
   onLicenciaCargada?: (licencia: LicenciaTramitar) => void;
 }
 
-const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
+export const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
   folioLicencia,
   idoperador,
   onLicenciaCargada,
@@ -24,13 +24,13 @@ const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
   useEffect(() => {
     const x = (licenciasTramitar ?? []).find((lic) => lic.foliolicencia === folioLicencia);
     setLicencia(x);
-  }, [licenciasTramitar]);
+  }, [licenciasTramitar, folioLicencia]);
 
   useEffect(() => {
     if (licencia && onLicenciaCargada) {
       onLicenciaCargada(licencia);
     }
-  }, [licencia]);
+  }, [licencia, onLicenciaCargada]);
 
   const calcularFechaFin = () => {
     return addDays(new Date(licencia!.fechaemision), licencia!.diasreposo);
@@ -64,5 +64,3 @@ const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
     </div>
   );
 };
-
-export default InformacionLicencia;

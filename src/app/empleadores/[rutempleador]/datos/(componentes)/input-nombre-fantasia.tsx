@@ -6,7 +6,11 @@ import { useFormContext } from 'react-hook-form';
 
 interface InputNombreFantasiaProps extends InputReciclableBase {}
 
-const InputNombreFantasia: React.FC<InputNombreFantasiaProps> = ({ name, label, className }) => {
+export const InputNombreFantasia: React.FC<InputNombreFantasiaProps> = ({
+  name,
+  label,
+  className,
+}) => {
   const { register, setValue } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
@@ -50,5 +54,3 @@ const InputNombreFantasia: React.FC<InputNombreFantasiaProps> = ({ name, label, 
     </>
   );
 };
-
-export default InputNombreFantasia;
