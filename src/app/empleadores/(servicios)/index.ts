@@ -2,7 +2,6 @@ export * from './buscar-actividades-laborales';
 export * from './buscar-cajas-de-compensacion';
 export * from './buscar-comunas';
 export * from './buscar-empleador-rut';
-export * from './buscar-empleadores';
 export * from './buscar-permisos-por-empleador';
 export * from './buscar-regiones';
 export * from './buscar-sistemas-de-remuneracion';
