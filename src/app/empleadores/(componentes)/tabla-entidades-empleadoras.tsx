@@ -42,6 +42,9 @@ export default function TablaEntidadesEmpleadoras({
       <b>2.- </b> La persona usuaria al realizar la solicitud de desadscripción declara conocer y aceptar los cambios que se generan en la tramitación de las Licencias Médicas indicadas en el punto anterior. <br/><br/>
       <b>3.- </b> Al realizar esta solicitud, la persona administradora podrá aceptar o rechazar la desadscripción de la entidad empleadora.`,
       confirmButtonText: 'Aceptar',
+      confirmButtonColor: 'var(--color-blue)',
+      denyButtonColor: 'var(--bs-danger)',
+      showDenyButton: true,
       denyButtonText: 'Cancelar',
     });
 
