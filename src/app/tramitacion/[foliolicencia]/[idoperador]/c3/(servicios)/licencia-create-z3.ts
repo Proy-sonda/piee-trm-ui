@@ -2,10 +2,14 @@ import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 import { format } from 'date-fns';
-import { DesgloseDeHaberes, obtenerGlosaDesglosaHaberes } from '../(modelos)/desglose-de-haberes';
-import { FormularioC3, Remuneracion } from '../(modelos)/formulario-c3';
-import { parsearIdEntidadPrevisional } from '../../c2/(modelos)/entidad-previsional';
-import { subirDocumentosZ3 } from './subir-documentos-z3';
+import { subirDocumentosZ3 } from '.';
+import {
+  DesgloseDeHaberes,
+  FormularioC3,
+  Remuneracion,
+  obtenerGlosaDesglosaHaberes,
+} from '../(modelos)';
+import { parsearIdEntidadPrevisional } from '../../c2/(modelos)';
 
 export type LicenciaCrearZ3Request = FormularioC3 & {
   folioLicencia: string;

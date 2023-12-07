@@ -1,32 +1,14 @@
 'use client';
-import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
-import { Stepper } from '@/components/stepper/stepper';
-import Titulo from '@/components/titulo/titulo';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
+
+import { LicenciaTramitar } from '@/app/tramitacion/(modelos)';
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
+import { Stepper, Titulo } from '@/components';
+import { useMergeFetchObject, useRefrescarPagina } from '@/hooks';
 import { useEffect, useState } from 'react';
+import { InformacionLicencia } from '.';
+import { interfaceCabecera } from '../(modelo)';
 
-import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
-import InformacionLicencia from './informacion-licencia';
-
-interface myprops {
-  foliotramitacion: string;
-  idoperador: number;
-  step: any[];
-  title: string;
-  rutEmpleador?: (run: string) => void;
-  onLicenciaCargada?: (licencia: LicenciaTramitar) => void;
-  onLinkClickeado?: (link: string) => void;
-}
-
-const options: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'numeric',
-  day: 'numeric',
-  hour12: false, // Para usar formato de 24 horas
-};
-
-const Cabecera: React.FC<myprops> = ({
+export const Cabecera: React.FC<interfaceCabecera> = ({
   foliotramitacion,
   step,
   title,
@@ -35,10 +17,9 @@ const Cabecera: React.FC<myprops> = ({
   onLicenciaCargada,
   onLinkClickeado,
 }) => {
-  const [refrescar, refrescarPagina] = useRefrescarPagina();
+  const [refrescar] = useRefrescarPagina();
   const [datopaciente, setdatopaciente] = useState<LicenciaTramitar>();
-  const [fechafin, setfechafin] = useState<string>('');
-  const [errorCargaData, data, cargandoData] = useMergeFetchObject(
+  const [, data, cargandoData] = useMergeFetchObject(
     {
       LMETRM: buscarLicenciasParaTramitar(),
     },
@@ -54,15 +35,14 @@ const Cabecera: React.FC<myprops> = ({
     setdatopaciente(licencia);
     if (rutEmpleador == undefined) return;
     if (datopaciente?.rutempleador) rutEmpleador(datopaciente?.rutempleador);
-  }, [cargandoData]);
-
-  useEffect(() => {
-    if (data?.LMETRM == undefined) return;
-    let fechainicio = new Date(datopaciente!?.fechainicioreposo);
-    let fechafin = fechainicio.setDate(fechainicio.getDate() + datopaciente!?.diasreposo);
-
-    setfechafin(new Date(fechafin).toLocaleString('es-CL', options));
-  }, [datopaciente]);
+  }, [
+    cargandoData,
+    data?.LMETRM,
+    datopaciente?.rutempleador,
+    foliotramitacion,
+    onLicenciaCargada,
+    rutEmpleador,
+  ]);
 
   return (
     <>
@@ -87,5 +67,3 @@ const Cabecera: React.FC<myprops> = ({
     </>
   );
 };
-
-export default Cabecera;

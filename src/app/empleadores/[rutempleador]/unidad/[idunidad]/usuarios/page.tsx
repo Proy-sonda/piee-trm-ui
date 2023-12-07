@@ -1,24 +1,28 @@
 'use client';
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
-import { buscarUnidadPorId } from '@/app/empleadores/[rutempleador]/unidad/(servicios)/buscar-unidad-por-id';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import Titulo from '@/components/titulo/titulo';
+
 import { AuthContext } from '@/contexts';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+
 import { Usuariosunidad } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { ChangeEvent, Fragment, useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { Usuarioxrrhh } from '../../(modelos)/payload-unidades';
-import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)/usuario-entidad-empleadora';
-import { buscarUsuarios } from '../../../usuarios/(servicios)/buscar-usuarios';
-import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
-import { asociarUnidad } from './(servicios)/asociar-unidad';
-import { buscarUsuariosAsociado } from './(servicios)/buscar-usuario-asociado';
-import { eliminarUsuarioAsociado } from './(servicios)/eliminar-usuario-asociado';
+
 import styles from './usuarios.module.css';
+
+import { Titulo } from '@/components';
+import { useMergeFetchObject } from '@/hooks';
+import dynamic from 'next/dynamic';
+import { Usuarioxrrhh } from '../../(modelos)';
+import { buscarUnidadPorId } from '../../(servicios)';
+import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)';
+import { buscarUsuarios } from '../../../usuarios/(servicios)';
+import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
+import { asociarUnidad, buscarUsuariosAsociado, eliminarUsuarioAsociado } from './(servicios)';
+
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 interface iUsuarios {
   params: {
     rutempleador: string;
@@ -62,7 +66,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     busquedaUnidad();
 
     refrescarComponente();
-  }, []);
+  }, [idunidad]);
 
   useEffect(() => {
     const busquedaUsuarios = async () => {
@@ -71,7 +75,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       setusuarios(await resp());
     };
     busquedaUsuarios();
-  }, [empleadorActual?.rutempleador]);
+  }, [empleadorActual]);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
@@ -95,7 +99,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
           )?.runusuario,
       ),
     );
-  }, [datosPagina?.usuarioAso]);
+  }, [usuariosAsociados]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 

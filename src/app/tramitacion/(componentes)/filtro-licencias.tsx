@@ -14,7 +14,10 @@ interface FiltroLicenciasProps {
   onFiltrarLicencias: (formulario: FiltroBusquedaLicencias) => void | Promise<void>;
 }
 
-const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltrarLicencias }) => {
+export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
+  empleadores,
+  onFiltrarLicencias,
+}) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
 
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
@@ -90,6 +93,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
               datos={unidadesRRHH}
               idElemento="codigounidadrrhh"
               descripcion="glosaunidadrrhh"
+              tipoValor="string"
               className="col-12 col-md-6 col-lg-3"
             />
           </div>
@@ -106,5 +110,3 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
     </>
   );
 };
-
-export default FiltroLicencias;

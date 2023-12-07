@@ -11,6 +11,7 @@ import {
   renovarToken,
 } from '@/servicios/auth';
 import { thresholdAlertaExpiraSesion } from '@/servicios/environment';
+import { AlertaConfirmacion, AlertaError } from '@/utilidades';
 import { useRouter } from 'next/navigation';
 import { ReactNode, createContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
@@ -40,8 +41,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [usuario, setUsuario] = useState<UsuarioToken | undefined>(undefined);
 
-  const [mostrarAlertaExpiraSesion, setMostrarAlertaExpiraSesion] = useState(false);
-
   const router = useRouter();
 
   // Recargar usuario del token
@@ -70,100 +69,87 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Alerta de expiracion de sesion
   useEffect(() => {
-    let idTimeoutAlerta: NodeJS.Timeout | undefined;
-    let idTimerTiempoRestante: NodeJS.Timer | undefined;
     const usuario = obtenerUsuarioDeCookie();
-
-    const activarAlertaDeExpiracionDeSesion = () => {
-      clearTimeout(idTimeoutAlerta);
-
-      if (!usuario) {
-        return;
-      }
-
-      // prettier-ignore
-      const tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
-      if (tiempoParaMostrarAlerta < 0) {
-        logout(); // por si acaso
-        const searchParams = new URLSearchParams({ redirectTo: fullPath });
-        router.push(`/?${searchParams.toString()}`);
-        return;
-      }
-
-      idTimeoutAlerta = setTimeout(() => {
-        (async () => {
-          const { isConfirmed } = await Swal.fire({
-            title: 'Aviso de cierre de sesión',
-            html: `
-            <p>Su sesión está a punto de expirar, ¿Necesita más tiempo?</p>
-            <b>15</b>
-            `,
-            icon: 'warning',
-            showConfirmButton: true,
-            timer: 15000,
-            timerProgressBar: true,
-            confirmButtonText: 'Mantener sesión activa',
-            confirmButtonColor: 'var(--color-blue)',
-            showCancelButton: true,
-            cancelButtonText: 'Cerrar sesión',
-            cancelButtonColor: 'var(--bs-danger)',
-            allowEscapeKey: false,
-            allowOutsideClick: false,
-            didOpen: () => {
-              const b: any = Swal.getHtmlContainer()?.querySelector('b');
-              idTimerTiempoRestante = setInterval(() => {
-                b.textContent = Math.round((Swal.getTimerLeft() ?? 0) / 1000);
-              }, 1000);
-            },
-            didClose: () => {
-              clearInterval(idTimerTiempoRestante);
-            },
-          });
-
-          if (isConfirmed) {
-            try {
-              const usuarioRenovado = await renovarToken();
-
-              onLoginExitoso(usuarioRenovado);
-
-              activarAlertaDeExpiracionDeSesion();
-            } catch (error) {
-              await logout();
-
-              await Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                titleText: 'Se generó un problema al extender la sesión',
-                confirmButtonText: 'OK',
-                confirmButtonColor: 'var(--color-blue)',
-                showCancelButton: true,
-              });
-
-              setUsuario(undefined);
-
-              router.push('/');
-            }
-          } else {
-            try {
-              await logout();
-            } catch (error) {
-              console.error('[SESION TIMER] ERROR EN LOGOUT: ', error);
-            } finally {
-              router.push('/');
-            }
-          }
-        })();
-      }, tiempoParaMostrarAlerta);
-    };
-
-    if (mostrarAlertaExpiraSesion) {
-      activarAlertaDeExpiracionDeSesion();
+    if (!usuario) {
+      return;
     }
+
+    let idTimeoutAlerta: NodeJS.Timeout | undefined;
+    clearTimeout(idTimeoutAlerta);
+
+    // prettier-ignore
+    const tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+    if (tiempoParaMostrarAlerta < 0) {
+      logout(); // por si acaso
+      redirigirConSesionExpirada();
+      return;
+    }
+
+    idTimeoutAlerta = setTimeout(renovarTokenCallback, tiempoParaMostrarAlerta);
 
     return () => {
       clearTimeout(idTimeoutAlerta);
     };
-  }, [mostrarAlertaExpiraSesion]);
+  }, [usuario]);
+
+  const redirigirConSesionExpirada = () => {
+    const searchParams = new URLSearchParams({ redirectTo: fullPath });
+    router.push(`/?${searchParams.toString()}`);
+  };
+
+  const renovarTokenCallback = async () => {
+    let idTimerTiempoRestante: NodeJS.Timer | undefined;
+
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      icon: 'warning',
+      title: 'Aviso de cierre de sesión',
+      html: `
+        <p>Su sesión está a punto de expirar, ¿Necesita más tiempo?</p>
+        <b>15</b>
+      `,
+      showConfirmButton: true,
+      timer: 15000,
+      timerProgressBar: true,
+      confirmButtonText: 'Mantener sesión activa',
+      denyButtonText: 'Cerrar sesión',
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      didOpen: () => {
+        const b: any = Swal.getHtmlContainer()?.querySelector('b');
+        idTimerTiempoRestante = setInterval(() => {
+          b.textContent = Math.round((Swal.getTimerLeft() ?? 0) / 1000); // Tiempo restante en segundos
+        }, 1000);
+      },
+      didClose: () => {
+        clearInterval(idTimerTiempoRestante);
+      },
+    });
+
+    if (isConfirmed) {
+      try {
+        const usuarioRenovado = await renovarToken();
+
+        onLoginExitoso(usuarioRenovado);
+      } catch (error) {
+        await logout();
+
+        AlertaError.fire({
+          title: 'Error',
+          titleText: 'Se generó un problema al extender la sesión',
+        });
+
+        redirigirConSesionExpirada();
+      }
+    } else {
+      try {
+        await logout();
+      } catch (error) {
+        console.error('[SESION TIMER] ERROR EN LOGOUT: ', error);
+      } finally {
+        router.push('/');
+      }
+    }
+  };
 
   const login = async (rut: string, clave: string) => {
     const usuario = await loguearUsuario(rut, clave);
@@ -181,18 +167,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     } finally {
       setUsuario(undefined);
       setultimaConexion('');
-
-      setMostrarAlertaExpiraSesion(false);
-
       setEstaLogueado(false);
     }
   };
 
   const onLoginExitoso = (nuevoUsuario: UsuarioToken) => {
     setUsuario(nuevoUsuario);
-    setMostrarAlertaExpiraSesion(true);
-
     setEstaLogueado(true);
+
     if (nuevoUsuario?.ultimaconexion === null) {
       setultimaConexion(new Date().toLocaleString());
     } else {

@@ -11,9 +11,7 @@ import {
   InputRut,
   InputTelefono,
 } from '@/components/form';
-import IfContainer from '@/components/if-container';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import Titulo from '@/components/titulo/titulo';
+
 import { AuthContext } from '@/contexts';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
@@ -21,17 +19,24 @@ import Link from 'next/link';
 import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
-import { buscarActividadesLaborales } from '../../(servicios)/buscar-actividades-laborales';
-import { buscarCajasDeCompensacion } from '../../(servicios)/buscar-cajas-de-compensacion';
-import { buscarComunas } from '../../(servicios)/buscar-comunas';
-import { buscarRegiones } from '../../(servicios)/buscar-regiones';
-import { buscarSistemasDeRemuneracion } from '../../(servicios)/buscar-sistemas-de-remuneracion';
-import { buscarTamanosEmpresa } from '../../(servicios)/buscar-tamanos-empresa';
-import { buscarTiposDeEmpleadores } from '../../(servicios)/buscar-tipo-de-empleadores';
-import InputHolding from './(componentes)/input-holding';
-import InputNombreFantasia from './(componentes)/input-nombre-fantasia';
-import { CamposFormularioEmpleador } from './(modelos)/campos-formulario-empleador';
+
+import { Titulo } from '@/components';
+import dynamic from 'next/dynamic';
+import {
+  buscarActividadesLaborales,
+  buscarCajasDeCompensacion,
+  buscarComunas,
+  buscarRegiones,
+  buscarSistemasDeRemuneracion,
+  buscarTamanosEmpresa,
+  buscarTiposDeEmpleadores,
+} from '../../(servicios)';
+import { InputHolding, InputNombreFantasia } from './(componentes)';
+import { CamposFormularioEmpleador } from './(modelos)';
 import { actualizarEmpleador } from './(servicios)/actualizar-empleador';
+
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 
 interface DatosEmpleadoresPageProps {}
 
@@ -98,7 +103,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
       formulario.setValue('comunaId', empleadorActual.direccionempleador.comuna.idcomuna);
       setSpinnerCargar(false);
     }, 1000);
-  }, [cargandoCombos, cargandoEmpleador]);
+  }, [cargandoCombos, cargandoEmpleador, empleadorActual, errorCombos, formulario]);
 
   const onGuardarCambios: SubmitHandler<CamposFormularioEmpleador> = async (data) => {
     if (!empleadorActual) {

@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import styles from './button-image.module.css';
@@ -14,7 +15,13 @@ export const ButtonImage: React.FC<ButtonImageProps> = ({ url, text, img }) => {
       <div className={`row m-4 ${styles['gobrad']}`}>
         <div className="text-center">
           <Link href={url}>
-            <img src={img} className={styles['gobimg']} />
+            <Image
+              src={img}
+              className={styles['gobimg']}
+              alt="Imagen del gobierno"
+              width={150}
+              height={180}
+            />
           </Link>
         </div>
         <div className={`text-center ${styles['pgobcl']}`}>
