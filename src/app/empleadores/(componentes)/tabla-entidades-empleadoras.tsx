@@ -3,10 +3,11 @@ import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
-import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades';
+import { AlertaError, AlertaExito } from '@/utilidades';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import Swal from 'sweetalert2';
 import { PermisoPorEmpleador } from '../(modelos)/permiso-por-empleador';
 import { desadscribirEmpleador } from '../(servicios)/desadscribir-empleador';
 
@@ -32,7 +33,9 @@ export default function TablaEntidadesEmpleadoras({
     const empresa = empleador.razonsocial;
     const rut = empleador.rutempleador;
 
-    const { isConfirmed } = await AlertaConfirmacion.fire({
+    const { isConfirmed } = await Swal.fire({
+      iconColor: '#dc3545',
+      iconHtml: '<i class="bi bi-info-lg text-danger animate__animated animate__flash"></i>',
       title: 'Desadscribir',
       html: `<b>1.- </b> La desadscripción del portal PIEE implica que la entidad empleadora no podrá tramitar licencias médicas de forma electrónica,
       debiendo realizar este trámite de forma manual en el asegurador correspondiente a la persona trabajadora. <br/><br/>
