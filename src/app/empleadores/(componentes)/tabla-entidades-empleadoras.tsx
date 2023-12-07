@@ -38,10 +38,10 @@ export default function TablaEntidadesEmpleadoras({
       iconHtml:
         '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
       title: 'Desadscribir',
-      html: `<b>1.- </b> La desadscripción del portal PIEE implica que la entidad empleadora no podrá tramitar Licencias médicas de forma electrónica,
+      html: `<b>1.- </b> La desadscripción del portal PIEE implica que la entidad empleadora no podrá tramitar Licencias Médicas de forma electrónica,
       debiendo realizar este trámite de forma manual en el asegurador correspondiente a la persona trabajadora. <br/><br/>
       <b>2.- </b> La persona usuaria al realizar la solicitud de desadscripción declara conocer y aceptar los cambios que se generan en la tramitación de las Licencias Médicas indicadas en el punto anterior. <br/><br/>
-      <b>3.- </b> Al realizar esta solicitud, la persona administradora del portal podrá aceptar o rechazar esta solicitud, por lo que la entidad empleadora continuara activa hasta que se resuelva la solicitud. <br/><br/>`,
+      <b>3.- </b> Al realizar esta solicitud, la persona administradora del portal, podrá aceptarla o rechazarla, por lo que la entidad empleadora continuará activa hasta que se resuelva la solicitud. <br/><br/>`,
       confirmButtonText: 'Aceptar',
       confirmButtonColor: 'var(--color-blue)',
       denyButtonColor: 'var(--bs-danger)',
