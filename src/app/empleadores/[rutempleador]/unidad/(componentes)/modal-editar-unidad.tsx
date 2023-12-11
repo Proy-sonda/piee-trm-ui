@@ -32,7 +32,7 @@ interface ModalEditarUnidadProps {
   onCerrarModal: () => void;
 }
 
-const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
+export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
   show,
   rutempleador,
   idUnidad,
@@ -90,7 +90,15 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
       formulario.setValue('codigocomuna', unidadRRHH.codigocomuna);
       setMostrarSpinner(false);
     }, 100);
-  }, [cargandoCombos, unidadRRHH]);
+  }, [
+    cargandoCombos,
+    unidadRRHH,
+    cargandoUnidad,
+    errorCargarUnidad,
+    erroresCargarCombos,
+    formulario,
+    idUnidad,
+  ]);
 
   const handleCerrarModal = () => {
     formulario.clearErrors();
@@ -252,5 +260,3 @@ const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
     </>
   );
 };
-
-export default ModalEditarUnidad;

@@ -2,10 +2,8 @@ import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchAbortable } from '@/servicios/fetch';
 import { parse, startOfMonth } from 'date-fns';
-import { desgloseFromGlosas } from '../(modelos)/desglose-de-haberes';
-import { LicenciaC3, RentaC3 } from '../(modelos)/licencia-c3';
-import { LicenciaC3API, RentaAPI } from '../(modelos)/licencia-c3-api';
-import { crearIdEntidadPrevisional } from '../../c2/(modelos)/entidad-previsional';
+import { LicenciaC3, LicenciaC3API, RentaAPI, RentaC3, desgloseFromGlosas } from '../(modelos)';
+import { crearIdEntidadPrevisional } from '../../c2/(modelos)';
 
 export const buscarZona3 = (
   folioLicencia: string,

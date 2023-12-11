@@ -3,10 +3,11 @@ import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
-import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades';
+import { AlertaError, AlertaExito } from '@/utilidades';
 import Link from 'next/link';
 import { useState } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import Swal from 'sweetalert2';
 import { PermisoPorEmpleador } from '../(modelos)/permiso-por-empleador';
 import { desadscribirEmpleador } from '../(servicios)/desadscribir-empleador';
 
@@ -32,10 +33,19 @@ export default function TablaEntidadesEmpleadoras({
     const empresa = empleador.razonsocial;
     const rut = empleador.rutempleador;
 
-    const { isConfirmed } = await AlertaConfirmacion.fire({
+    const { isConfirmed } = await Swal.fire({
+      iconColor: 'white',
+      iconHtml:
+        '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
       title: 'Desadscribir',
-      html: `¿Esta seguro que desea desadscribir: <b>${rut} - ${empresa}</b>?`,
+      html: `<b>1.- </b> La desadscripción del portal PIEE implica que la entidad empleadora no podrá tramitar Licencias Médicas de forma electrónica,
+      debiendo realizar este trámite de forma manual en el asegurador correspondiente a la persona trabajadora. <br/><br/>
+      <b>2.- </b> La persona usuaria al realizar la solicitud de desadscripción declara conocer y aceptar los cambios que se generan en la tramitación de las Licencias Médicas indicadas en el punto anterior. <br/><br/>
+      <b>3.- </b> Al realizar esta solicitud, la persona administradora del portal, podrá aceptarla o rechazarla, por lo que la entidad empleadora continuará activa hasta que se resuelva la solicitud. <br/><br/>`,
       confirmButtonText: 'Aceptar',
+      confirmButtonColor: 'var(--color-blue)',
+      denyButtonColor: 'var(--bs-danger)',
+      showDenyButton: true,
       denyButtonText: 'Cancelar',
     });
 

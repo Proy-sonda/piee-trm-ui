@@ -51,6 +51,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
   ]);
 
   const [zona1, setzona1] = useState<LicenciaC1>();
+  const [zonas, setzonas] = useState<any[]>([]);
 
   useEffect(() => {
     const BuscarZona1 = async () => {
@@ -58,7 +59,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
       if (data !== undefined) setzona1(data);
     };
     BuscarZona1();
-  }, []);
+  }, [datos.folioLicencia, datos.idOperador]);
 
   const [, empleador] = useFetch(
     datos.licencia ? buscarEmpleador(datos.licencia.rutempleador) : emptyFetch(),
@@ -72,9 +73,11 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
     [zona2],
   );
 
-  const zonas = [zona0, zona1, zona2, zona3];
-
   const [hayErrores, setHayErrores] = useState(false);
+
+  useEffect(() => {
+    setzonas([zona0, zona1, zona2, zona3]);
+  }, [zona0, zona1, zona2, zona3]);
 
   // Determina si el modal esta ok
   useEffect(() => {
@@ -363,6 +366,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     </Tr>
                   </Thead>
                   <Tbody className="text-center">
+
                     {(zona3?.licenciazc3adjuntos ?? []).map(
                       ({ idtipoadjunto, nombrelocal, idpiielicenciaszc3adjuntos }) => (
                         <Tr key={idpiielicenciaszc3adjuntos}>

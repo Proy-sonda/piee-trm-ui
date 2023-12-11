@@ -18,31 +18,31 @@ export interface LicenciaC0 {
   entidadsalud: Entidadsalud;
 }
 
-export interface Entidadsalud {
+interface Entidadsalud {
   identidadsalud: number;
   nombre: string;
 }
-export interface Estadolicencia {
+interface Estadolicencia {
   idestadolicencia: number;
   estadolicencia: string;
 }
 
-export interface Estadotramitacion {
+interface Estadotramitacion {
   idestadotramitacion: number;
   estadotramitacion: string;
 }
 
-export interface Motivodevolucion {
+interface Motivodevolucion {
   idmotivodevolucion: number;
   motivodevolucion: string;
 }
 
-export interface Operador {
+interface Operador {
   idoperador: number;
   operador: string;
 }
 
-export interface Tipolicencia {
+interface Tipolicencia {
   idtipolicencia: number;
   tipolicencia: string;
 }

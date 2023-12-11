@@ -25,7 +25,7 @@ interface TablaDeRentasProps<
   onClickBotonDesglose: (datos: DatosModalDesgloseHaberes) => void | Promise<void>;
 }
 
-const TablaDeRentas = <
+export const TablaDeRentas = <
   T extends keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
 >({
   titulo,
@@ -230,5 +230,3 @@ const TablaDeRentas = <
     </>
   );
 };
-
-export default TablaDeRentas;

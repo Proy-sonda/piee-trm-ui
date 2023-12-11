@@ -1,9 +1,5 @@
 'use client';
-import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { ComboSimple, InputFecha, InputRadioButtons } from '@/components/form';
-import IfContainer from '@/components/if-container';
-import LoadingSpinner from '@/components/loading-spinner';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
@@ -11,20 +7,28 @@ import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import BotonesNavegacion from '../(componentes)/botones-navegacion';
-import Cabecera from '../(componentes)/cabecera';
-import { buscarCalidadTrabajador } from '../(servicios)/buscar-calidad-trabajador';
+
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { LicenciaC1 } from '../c1/(modelos)';
 import { buscarZona1 } from '../c1/(servicios)';
 import { InputOtroMotivoDeRechazo } from '../no-tramitar/(componentes)/input-otro-motivo-rechazo';
-import { EntidadPagadora } from './(modelos)/entidad-pagadora';
-import { EntidadPrevisional } from './(modelos)/entidad-previsional';
-import { Licenciac2 } from './(modelos)/licencia-c2';
-import { buscarEntidadPagadora } from './(servicios)/buscar-entidad-pagadora';
-import { buscarEntidadPrevisional } from './(servicios)/buscar-entidad-previsional';
-import { buscarZona2 } from './(servicios)/buscar-z2';
-import { ErrorCrearLicenciaC2, crearLicenciaZ2 } from './(servicios)/licencia-create-z2';
+
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
+import dynamic from 'next/dynamic';
+import { BotonesNavegacion, Cabecera } from '../(componentes)';
+import { buscarCalidadTrabajador } from '../(servicios)';
+import { EntidadPagadora, EntidadPrevisional, Licenciac2 } from './(modelos)';
+import {
+  ErrorCrearLicenciaC2,
+  buscarEntidadPagadora,
+  buscarEntidadPrevisional,
+  buscarZona2,
+  crearLicenciaZ2,
+} from './(servicios)/';
+
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
+const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
 
 interface myprops {
   params: {
@@ -70,7 +74,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     };
 
     BuscarZonaC1();
-  }, []);
+  }, [foliolicencia, idoperador]);
 
   const step = [
     {
@@ -281,7 +285,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         }
       }),
     );
-  }, [calidadtrabajador]);
+  }, [calidadtrabajador, combos, foliolicencia, formulario]);
 
   useEffect(() => {
     setspinner(true);
@@ -334,7 +338,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     setTimeout(() => {
       setspinner(false);
     }, 2000);
-  }, [combos?.LMEEXISTEZONA2]);
+  }, [combos, formulario]);
 
   return (
     <>

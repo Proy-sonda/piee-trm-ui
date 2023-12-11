@@ -13,7 +13,7 @@ interface SemaforoLicenciasProps {
   onEstadoSeleccionado: (estado: FiltroEstadoLicencia) => void | Promise<void>;
 }
 
-const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccionado }) => {
+export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccionado }) => {
   const semaforos: Semaforo[] = [
     { color: 'circlegreen', label: 'Por Tramitar', value: 'por-tramitar' },
     { color: 'circleyellow', label: 'Por Vencer', value: 'por-vencer' },
@@ -36,5 +36,3 @@ const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccion
     </>
   );
 };
-
-export default SemaforoLicencias;

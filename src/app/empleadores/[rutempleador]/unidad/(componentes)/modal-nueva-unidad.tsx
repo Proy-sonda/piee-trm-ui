@@ -1,6 +1,6 @@
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
-import { buscarComunas } from '@/app/empleadores/(servicios)/buscar-comunas';
-import { buscarRegiones } from '@/app/empleadores/(servicios)/buscar-regiones';
+import { buscarComunas, buscarRegiones } from '@/app/empleadores/(servicios)';
+import { buscarCalle } from '@/app/tramitacion/[foliolicencia]/[idoperador]/(servicios)';
 import {
   ComboComuna,
   ComboSimple,
@@ -9,29 +9,23 @@ import {
   InputNumero,
   InputTelefono,
 } from '@/components/form';
-import IfContainer from '@/components/if-container';
-import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+
 import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useContext, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { Unidadesrrhh } from '../(modelos)/payload-unidades';
-import { crearUnidad } from '../(servicios)/crear-unidad';
-import { buscarCalle } from '../../../../tramitacion/[foliolicencia]/[idoperador]/(servicios)/tipo-calle';
-import { InputNombreUnidadRRHH } from './input-nombre-unidad-rrhh';
+import { InputNombreUnidadRRHH } from '.';
+import { ModalNuevaUnidadProps, Unidadesrrhh } from '../(modelos)';
+import { crearUnidad } from '../(servicios)';
 
-interface ModalNuevaUnidadProps {
-  show: boolean;
-  rutempleador: string;
-  onCerrarModal: () => void;
-  onNuevaUnidadCreada: () => void;
-}
+import dynamic from 'next/dynamic';
+const IfContainer = dynamic(() => import('@/components/if-container'));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 
-const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
+export const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
   show,
-  rutempleador,
   onCerrarModal,
   onNuevaUnidadCreada,
 }) => {

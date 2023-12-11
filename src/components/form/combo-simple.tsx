@@ -105,7 +105,7 @@ export const ComboSimple = <T extends Record<string, any>>({
               },
             },
           })}>
-          <option value={!tipoValor || tipoValor === 'number' ? NaN : ''}>
+          <option value={!tipoValor || tipoValor === 'number' ? 0 : ''}>
             {textoOpcionPorDefecto ?? 'Seleccionar'}
           </option>
           {(datos ?? []).map((dato) => (
