@@ -60,9 +60,11 @@ export default function TablaEntidadesEmpleadoras({
 
       onEmpleadorDesuscrito();
 
-      AlertaExito.fire({ html: `Entidad empleadora <b>${empresa}</b> fue desuscrita con éxito` });
+      AlertaExito.fire({
+        html: `Solicitud de desadscripción para la Entidad Empleadora <b>${empresa}</b>, fue realizada con éxito`,
+      });
     } catch (error) {
-      AlertaError.fire({ title: 'Hubo un problema al desadscribir a la entidad empleadora' });
+      AlertaError.fire({ title: 'Hubo un problema al realizar la solicitud de desadscripción' });
     } finally {
       setMostrarSpinner(false);
     }
