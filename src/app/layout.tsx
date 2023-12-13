@@ -1,4 +1,5 @@
 import AppFooter from '@/components/footer/footer';
+import Version from '@/components/footer/version';
 import AppHeader from '@/components/header/header';
 import Position from '@/components/stage/position';
 import { AuthProvider } from '@/contexts';
@@ -40,7 +41,9 @@ export default function RootLayout(
               <div>{children}</div>
             </main>
 
-            <AppFooter />
+            <AppFooter>
+              <Version /> {/* Se tiene que pasar asi porque Version es un SSC. */}
+            </AppFooter>
           </body>
 
           <script
