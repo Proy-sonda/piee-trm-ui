@@ -1,13 +1,18 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
+import { AlertaInformacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
 import styles from './tabla-licencias-tramitar.module.css';
+
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
+const IfContainer = dynamic(() => import('@/components/if-container'));
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];
@@ -22,14 +27,25 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     datos: licencias,
     tamanoPagina: 5,
   });
+  const [loading, setloading] = useState(false);
 
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
   };
 
+  const evaluarTramitacion = (licencia: LicenciaTramitar) => {
+    if (licencia.estadolicencia.idestadolicencia === 1) {
+      return true;
+    }
+    return false;
+  };
+
   return (
     <>
+      <IfContainer show={loading}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
       <div className="table-responsive">
         <Table striped hover responsive>
           {/* <Table striped hover  className="table table-hover table-striped"> */}
@@ -92,16 +108,34 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <Link
-                      className="btn btn-sm btn-success"
-                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
-                      <small className="text-nowrap">TRAMITAR</small>
-                    </Link>
+                    <IfContainer show={evaluarTramitacion(licencia)}>
+                      <Link
+                        className="btn btn-sm btn-success"
+                        onClick={() => setloading(true)}
+                        href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
+                        <small className="text-nowrap">TRAMITAR</small>
+                      </Link>
+                    </IfContainer>
+                    <IfContainer show={!evaluarTramitacion(licencia)}>
+                      <button
+                        className="btn btn-sm btn-warning"
+                        onClick={(e) =>
+                          AlertaInformacion.fire(
+                            'En Proceso...',
+                            `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en proceso de tramitación.`,
+                          )
+                        }
+                        title="En proceso de tramitación">
+                        En Proceso...
+                      </button>
+                    </IfContainer>
+
                     <button className="btn btn-sm btn-primary">
                       <small className="text-nowrap">VER PDF</small>
                     </button>
                     <Link
                       className="btn btn-sm btn-danger"
+                      onClick={() => setloading(true)}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
                       <small className="text-nowrap"> NO RECEPCIONAR</small>
                     </Link>

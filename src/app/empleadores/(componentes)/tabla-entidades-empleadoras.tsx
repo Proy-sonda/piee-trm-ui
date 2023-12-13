@@ -33,6 +33,12 @@ export default function TablaEntidadesEmpleadoras({
     const empresa = empleador.razonsocial;
     const rut = empleador.rutempleador;
 
+    if (empleador.estadoempleador.idestadoempleador === 10) {
+      return AlertaError.fire({
+        html: `La entidad empleadora <b>${empleador.razonsocial}</b> ya se encuentra en proceso de desadscripción.`,
+      });
+    }
+
     const { isConfirmed } = await Swal.fire({
       iconColor: 'white',
       iconHtml:

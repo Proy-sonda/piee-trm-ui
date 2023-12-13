@@ -156,6 +156,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       await crearLicenciaZ2(licenciac2);
       switch (formulario.getValues('accion')) {
         case 'siguiente':
+          setspinner(true);
           router.push(`/tramitacion/${foliolicencia}/${idoperador}/c3`);
           break;
         case 'anterior':
