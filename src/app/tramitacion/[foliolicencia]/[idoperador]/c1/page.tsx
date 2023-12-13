@@ -36,6 +36,7 @@ import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { LicenciaC1 } from './(modelos)';
 import { formularioApp } from './(modelos)/formulario-type';
 import { LicenciaC0 } from './(modelos)/licencia-c0';
+
 import {
   ErrorCrearLicencia,
   ErrorCrearLicenciaC1,
@@ -45,6 +46,7 @@ import {
 } from './(servicios)/';
 
 const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'), { ssr: false });
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 const IfContainer = dynamic(() => import('@/components/if-container'), { ssr: false });
 interface myprops {
   params: {
@@ -95,6 +97,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   const [LMEEXIS, setLMEEXIS] = useState<LicenciaC1>();
   const [refrescar, refrescarPagina] = useRefrescarPagina();
   const [errorEmpleador, seterrorEmpleador] = useState(false);
+  const [Cargando, setCargando] = useState(false);
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
     CCREGION: buscarRegiones(),
     CCCOMUNA: buscarComunas(),
@@ -220,6 +223,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       case 'guardar':
         break;
       case 'siguiente':
+        setCargando(true);
         setTimeout(() => {
           router.push(`/tramitacion/${folio}/${idoperador}/c2`);
         }, 2000);
@@ -338,6 +342,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
   return (
     <>
+      <IfContainer show={Cargando}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
       <IfContainer show={errorEmpleador}>
         <br />
         <br />

@@ -3,11 +3,15 @@ import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React from 'react';
+import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
 import styles from './tabla-licencias-tramitar.module.css';
+
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
+const IfContainer = dynamic(() => import('@/components/if-container'));
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];
@@ -22,6 +26,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     datos: licencias,
     tamanoPagina: 5,
   });
+  const [loading, setloading] = useState(false);
 
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
@@ -30,6 +35,9 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
 
   return (
     <>
+      <IfContainer show={loading}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
       <div className="table-responsive">
         <Table striped hover responsive>
           {/* <Table striped hover  className="table table-hover table-striped"> */}
@@ -94,6 +102,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <Stack gap={2}>
                     <Link
                       className="btn btn-sm btn-success"
+                      onClick={() => setloading(true)}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
                       <small className="text-nowrap">TRAMITAR</small>
                     </Link>
@@ -102,6 +111,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     </button>
                     <Link
                       className="btn btn-sm btn-danger"
+                      onClick={() => setloading(true)}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
                       <small className="text-nowrap"> NO RECEPCIONAR</small>
                     </Link>
