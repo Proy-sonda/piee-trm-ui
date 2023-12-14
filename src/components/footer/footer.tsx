@@ -1,13 +1,17 @@
 'use client';
+
 import { AuthContext } from '@/contexts';
 import { format } from 'date-fns';
-import React, { useContext } from 'react';
+import { ReactNode, useContext } from 'react';
 import styles from './footer.module.css';
 
-interface AppFooterProps {}
+interface AppFooterProps {
+  children: ReactNode;
+}
 
-const AppFooter: React.FC<AppFooterProps> = ({}) => {
+const AppFooter: React.FC<AppFooterProps> = ({ children }) => {
   const { ultimaConexion } = useContext(AuthContext);
+
   return (
     <footer className={styles['footer-container']}>
       <div className={styles['footer-background']}>
@@ -26,6 +30,7 @@ const AppFooter: React.FC<AppFooterProps> = ({}) => {
                 <span>Email:</span>{' '}
                 <a href="mailto:soportempleador@fonasa.gov.cl">soportempleador@fonasa.gov.cl</a>
               </div>
+              {children}
             </div>
           </div>
         </div>
