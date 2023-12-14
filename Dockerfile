@@ -7,6 +7,8 @@ ARG NEXT_PUBLIC_URL_BACKEND_TRAMITACION
 
 WORKDIR /app
 
+RUN apk add git
+
 COPY package.json yarn.lock ./
 
 RUN npm install
