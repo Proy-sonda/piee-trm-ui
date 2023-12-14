@@ -17,7 +17,7 @@ function main() {
 }
 
 function crearVersion() {
-  let version = `${format(Date.now(), 'yyyyMMss')}`;
+  let version = `${format(Date.now(), 'yyyyMMdd')}`;
 
   if (comandoExiste('git --help')) {
     const ultimoCommit = execSync('git rev-parse --short HEAD').toString().trim();
