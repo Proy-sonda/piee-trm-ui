@@ -11,8 +11,8 @@ interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
    * Propiedad de un elemento de los datos para usar en las propiedades `key` y `value` del tag
    * `<option>`.
    *
-   * Se puede usar un callback para generar el ID a partir de un elemento del elemento en caso de
-   * que no se pueda usar una sola propiedad.
+   * Tambien se puede usar un callback para generar el ID a partir de un elemento caso de que no
+   * se pueda usar una sola propiedad.
    */
   idElemento: keyof T | ((elemento: T) => number | string);
 
@@ -35,8 +35,8 @@ interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
 }
 
 /**
- * El valor en caso de ser opcional es un string vacío cuando el combo es tipo `string` o `NaN`
- * cuando es un combo tipo `number`.
+ * El valor por defecto en caso de ser opcional es un string vacío cuando el combo es tipo `string`
+ * o el numero `0` cuando es un combo tipo `number`.
  */
 export const ComboSimple = <T extends Record<string, any>>({
   name,
@@ -95,7 +95,7 @@ export const ComboSimple = <T extends Record<string, any>>({
                   return;
                 }
 
-                if (Number.isNaN(valor)) {
+                if (Number.isNaN(valor) || valor === 0) {
                   return 'Este campo es obligatorio';
                 }
 
