@@ -1,16 +1,28 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
+import { AlertaConfirmacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
-import React from 'react';
+import dynamic from 'next/dynamic';
+import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
 import styles from './tabla-licencias-tramitadas.module.css';
 
+// prettier-ignore
+const ModalImprimirPdf = dynamic(() => import('./modal-imprimir-pdf').then((x) => x.ModalImprimirPdf));
+const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
+const IfContainer = dynamic(() => import('@/components/if-container'));
+
 interface TablaLicenciasTramitadasProps {
   empleadores: Empleador[];
   licencias?: LicenciaTramitar[];
+}
+
+interface DatosComprobanteTramitacion {
+  folioLicencia: string;
+  idOperador: number;
 }
 
 export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> = ({
@@ -22,14 +34,50 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
     tamanoPagina: 5,
   });
 
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+
+  const [datosComprobanteTramitacion, setDatosConfirmarTramitacion] =
+    useState<DatosComprobanteTramitacion>();
+
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     const empleador = empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador));
 
     return empleador?.razonsocial ?? '';
   };
 
+  const imprimirComprobanteTramitacion = async (licencia: LicenciaTramitar) => {
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      html: '¿Desea generar el comprobante de tramitación?',
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    setMostrarSpinner(true);
+    setDatosConfirmarTramitacion({
+      folioLicencia: licencia.foliolicencia,
+      idOperador: licencia.operador.idoperador,
+    });
+  };
+
   return (
     <>
+      <IfContainer show={mostrarSpinner}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
+
+      {datosComprobanteTramitacion && (
+        <ModalImprimirPdf
+          foliolicencia={datosComprobanteTramitacion.folioLicencia}
+          idOperadorNumber={datosComprobanteTramitacion.idOperador}
+          onComprobanteGenerado={() => {
+            setDatosConfirmarTramitacion(undefined);
+            setMostrarSpinner(false);
+          }}
+        />
+      )}
+
       <Table striped hover responsive>
         <thead>
           <tr className={`text-center ${styles['text-tr']}`}>
@@ -86,7 +134,11 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
               <td>
                 <Stack gap={2}>
                   <button className="btn btn-sm btn-primary">
-                    <small className="text-nowrap">COMPROBANTE TRAMITACIÓN</small>
+                    <small
+                      className="text-nowrap"
+                      onClick={() => imprimirComprobanteTramitacion(licencia)}>
+                      COMPROBANTE TRAMITACIÓN
+                    </small>
                   </button>
 
                   <button className="btn btn-sm btn-primary">

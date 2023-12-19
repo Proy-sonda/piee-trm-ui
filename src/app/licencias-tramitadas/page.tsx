@@ -6,11 +6,14 @@ import { buscarEmpleadores } from '@/servicios';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { buscarLicenciasParaTramitar } from '../tramitacion/(servicios)/buscar-licencias-para-tramitar';
-import { FiltroLicenciasTramitadas, TablaLicenciasTramitadas } from './(componentes)';
 import { FiltroBusquedaLicenciasTramitadas, LicenciaTramitar } from './(modelos)';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
+// prettier-ignore
+const TablaLicenciasTramitadas = dynamic(() => import('./(componentes)').then((x) => x.TablaLicenciasTramitadas));
+// prettier-ignore
+const FiltroLicenciasTramitadas = dynamic(() => import('./(componentes)').then((x) => x.FiltroLicenciasTramitadas));
 
 const LicenciasTramitadasPage = () => {
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
