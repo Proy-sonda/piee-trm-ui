@@ -126,7 +126,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
 
       <div className="mt-2 mb-4 d-flex align-items-center justify-content-end">
         <button className="btn btn-sm btn-primary" onClick={exportarLicenciasCSV}>
-          Exportar a CVS
+          Exportar a CSV
         </button>
       </div>
 
