@@ -73,11 +73,11 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
             <ComboSimple
               opcional
               name="tipoPeriodo"
-              label="Período a consultar"
+              label="Consultar por fecha de"
               className="col-12 col-md-6 col-lg-3"
               datos={[
-                { label: 'Por fecha de Emisión', value: 'fecha-emision' },
-                { label: 'Por fecha de Tramitación', value: 'fecha-tramitacion' },
+                { label: 'Emisión', value: 'fecha-emision' },
+                { label: 'Tramitación', value: 'fecha-tramitacion' },
               ]}
               idElemento={'value'}
               descripcion={'label'}
