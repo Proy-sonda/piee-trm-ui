@@ -4,6 +4,7 @@ import { Empleador } from '@/modelos/empleador';
 import { AlertaConfirmacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
+import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
@@ -45,6 +46,14 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
     return empleador?.razonsocial ?? '';
   };
 
+  const nombreTrabajador = (licencia: LicenciaTramitar) => {
+    return `${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`;
+  };
+
+  const formatearFecha = (fecha: string) => {
+    return format(new Date(fecha), 'dd-MM-yyyy');
+  };
+
   const imprimirComprobanteTramitacion = async (licencia: LicenciaTramitar) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
       html: '¿Desea generar el comprobante de tramitación?',
@@ -59,6 +68,43 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       folioLicencia: licencia.foliolicencia,
       idOperador: licencia.operador.idoperador,
     });
+  };
+
+  const exportarLicenciasCSV = async () => {
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      html: `¿Desea exportar las licencias tramitadas a CSV?`,
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    setMostrarSpinner(true);
+
+    const data = (licencias ?? []).map((licencia) => ({
+      Operador: licencia.operador.operador,
+      Folio: licencia.foliolicencia,
+      'Entidad de salud': licencia.entidadsalud.nombre,
+      Estado: licencia.estadolicencia.estadolicencia,
+      'RUT entidad empleadora': licencia.rutempleador,
+      'Entidad empleadora': nombreEmpleador(licencia),
+      'RUN persona trabajadora': licencia.runtrabajador,
+      'Nombre persona trabajadora': nombreTrabajador(licencia),
+      'Días de Reposo': licencia.diasreposo,
+      'Inicio de reposo': formatearFecha(licencia.fechainicioreposo),
+      'Fecha de emisión': formatearFecha(licencia.fechaemision),
+      'Tipo de licencia': licencia.tipolicencia.tipolicencia,
+    }));
+
+    exportFromJSON({
+      data,
+      fileName: `licencias_tramitadas_${format(Date.now(), 'dd_MM_yyyy_HH_mm_ss')}`,
+      exportType: exportFromJSON.types.csv,
+      delimiter: ',',
+      withBOM: true,
+    });
+
+    setMostrarSpinner(false);
   };
 
   return (
@@ -77,6 +123,12 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
           }}
         />
       )}
+
+      <div className="mt-2 mb-4 d-flex align-items-center justify-content-end">
+        <button className="btn btn-sm btn-primary" onClick={exportarLicenciasCSV}>
+          Exportar a CVS
+        </button>
+      </div>
 
       <Table striped hover responsive>
         <thead>
@@ -112,9 +164,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                 <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
               </td>
               <td>
-                <div className="mb-1 small text-nowrap">
-                  {`${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`}
-                </div>
+                <div className="mb-1 small text-nowrap">{nombreTrabajador(licencia)}</div>
                 <div className="mb-1 small text-nowrap">RUN: {licencia.runtrabajador}</div>
               </td>
               <td>
@@ -122,10 +172,10 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                   {licencia.tiporesposo.tiporeposo}: {licencia.diasreposo} día(s)
                 </div>
                 <div className="mb-1 small text-start text-nowrap">
-                  INICIO REPOSO: {format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy')}
+                  INICIO REPOSO: {formatearFecha(licencia.fechainicioreposo)}
                 </div>
                 <div className="mb-1 small text-start text-nowrap">
-                  FECHA DE EMISIÓN: {format(new Date(licencia.fechaemision), 'dd-MM-yyyy')}
+                  FECHA DE EMISIÓN: {formatearFecha(licencia.fechaemision)}
                 </div>
                 <div className="mb-1 small text-start text-nowrap">
                   {licencia.tipolicencia.tipolicencia}

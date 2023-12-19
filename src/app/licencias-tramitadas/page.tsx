@@ -17,7 +17,8 @@ const FiltroLicenciasTramitadas = dynamic(() => import('./(componentes)').then((
 
 const LicenciasTramitadasPage = () => {
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
-    licenciasParaTramitar: buscarLicenciasParaTramitar(),
+    /* TODO: Reemplazar por el servicio correcto para obtener solo licencias tramitaas */
+    licenciasTramitadas: buscarLicenciasParaTramitar(),
     empleadores: buscarEmpleadores(''),
   });
 
@@ -26,17 +27,17 @@ const LicenciasTramitadasPage = () => {
 
   // Actualizar listado de licencias
   useEffect(() => {
-    if (datosBandeja?.licenciasParaTramitar) {
-      setLicenciasFiltradas(datosBandeja?.licenciasParaTramitar ?? []);
+    if (datosBandeja?.licenciasTramitadas) {
+      setLicenciasFiltradas(datosBandeja?.licenciasTramitadas ?? []);
     }
   }, [datosBandeja]);
 
   // Filtrar licencias
   useEffect(() => {
-    const licenciasParaFiltrar = datosBandeja?.licenciasParaTramitar ?? [];
+    const licenciasParaFiltrar = datosBandeja?.licenciasTramitadas ?? [];
 
     setLicenciasFiltradas(licenciasParaFiltrar.filter(licenciaCumple(filtrosBusqueda)));
-  }, [filtrosBusqueda, datosBandeja?.licenciasParaTramitar]);
+  }, [filtrosBusqueda, datosBandeja?.licenciasTramitadas]);
 
   const licenciaCumple = (filtros: FiltroBusquedaLicenciasTramitadas) => {
     return () => {
@@ -57,7 +58,7 @@ const LicenciasTramitadasPage = () => {
       <IfContainer show={erroresCarga.length === 0}>
         <div className="row">
           <Titulo url="">
-            <h5>Filtro para licencias tramitadas</h5>
+            <h5>Filtro para Licencias Tramitadas</h5>
           </Titulo>
         </div>
 
