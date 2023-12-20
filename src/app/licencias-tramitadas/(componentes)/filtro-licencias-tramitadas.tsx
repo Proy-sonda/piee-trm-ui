@@ -6,16 +6,19 @@ import { esFechaInvalida } from '@/utilidades';
 import { endOfDay, startOfDay } from 'date-fns';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { EstadoLicencia } from '../(modelos)';
 import { FiltroBusquedaLicenciasTramitadas } from '../(modelos)/filtro-busqueda-licencias-tramitadas';
 import { FormularioFiltrarLicenciasTramitadas } from '../(modelos)/formulario-filtrar-licencias-tramitadas';
 
 interface FiltroLicenciasTramitadasProps {
   empleadores: Empleador[];
+  estadosLicencias: EstadoLicencia[];
   onFiltrarLicencias: (formulario: FiltroBusquedaLicenciasTramitadas) => void | Promise<void>;
 }
 
 export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps> = ({
   empleadores,
+  estadosLicencias,
   onFiltrarLicencias,
 }) => {
   const formulario = useForm<FormularioFiltrarLicenciasTramitadas>({ mode: 'onBlur' });
@@ -64,9 +67,9 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
               opcional
               name="idEstado"
               label="Estado"
-              datos={[]} /* TODO: Colocar aqui los estados de tramitacion */
-              idElemento="idestadotramitacion"
-              descripcion="estadotramitacion"
+              datos={estadosLicencias}
+              idElemento="idestadolicencia"
+              descripcion="estadolicencia"
               className="col-12 col-md-6 col-lg-3"
             />
 

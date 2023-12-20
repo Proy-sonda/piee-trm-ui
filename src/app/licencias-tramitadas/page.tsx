@@ -7,6 +7,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import { buscarLicenciasParaTramitar } from '../tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { FiltroBusquedaLicenciasTramitadas, LicenciaTramitar } from './(modelos)';
+import { buscarEstadosLicencias } from './(servicios)';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -20,6 +21,7 @@ const LicenciasTramitadasPage = () => {
     /* TODO: Reemplazar por el servicio correcto para obtener solo licencias tramitaas */
     licenciasTramitadas: buscarLicenciasParaTramitar(),
     empleadores: buscarEmpleadores(''),
+    estadosLicencias: buscarEstadosLicencias(),
   });
 
   const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitar[]>([]);
@@ -65,6 +67,7 @@ const LicenciasTramitadasPage = () => {
         <div className="pt-3 pb-4 border-bottom border-1">
           <FiltroLicenciasTramitadas
             empleadores={datosBandeja?.empleadores ?? []}
+            estadosLicencias={datosBandeja?.estadosLicencias ?? []}
             onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
           />
         </div>
