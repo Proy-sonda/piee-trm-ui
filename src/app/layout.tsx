@@ -1,4 +1,3 @@
-'use client';
 import AppFooter from '@/components/footer/footer';
 import Version from '@/components/footer/version';
 import AppHeader from '@/components/header/header';
