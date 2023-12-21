@@ -16,11 +16,12 @@ import { AuthContext } from '@/contexts';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 
 import { Titulo } from '@/components';
+import { GuiaUsuario } from '@/components/guia-usuario';
 import dynamic from 'next/dynamic';
 import {
   buscarActividadesLaborales,
@@ -46,7 +47,10 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
 
   const [spinnerCargar, setSpinnerCargar] = useState(false);
 
-  const { usuario } = useContext(AuthContext);
+  const {
+    usuario,
+    datosGuia: { listaguia, guia, AgregarGuia },
+  } = useContext(AuthContext);
 
   const [
     errorCombos,
@@ -61,6 +65,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
     buscarSistemasDeRemuneracion(),
     buscarTamanosEmpresa(),
   ]);
+
+  const datos = useRef(null);
 
   const formulario = useForm<CamposFormularioEmpleador>({ mode: 'onBlur' });
 
@@ -170,9 +176,62 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
           Entidad Empleadora - <b>{empleadorActual?.razonsocial ?? 'Cargando...'}</b> / Datos
           Entidad Empleadora
         </Titulo>
+        <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={datos} placement="top-start">
+          Datos registrados de la entidad empleadora <br />
+          <div className="text-end mt-2">
+            <button
+              className="btn btn-sm text-white"
+              onClick={() =>
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Menu lateral',
+                    activo: true,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'Datos página',
+                    activo: false,
+                  },
+                ])
+              }
+              style={{
+                border: '1px solid white',
+              }}>
+              <i className="bi bi-arrow-left"></i>
+              &nbsp; Anterior
+            </button>
+            &nbsp;
+            <button
+              className="btn btn-sm text-white"
+              onClick={() =>
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Menu lateral',
+                    activo: true,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'Datos página',
+                    activo: false,
+                  },
+                ])
+              }
+              style={{
+                border: '1px solid white',
+              }}>
+              Continuar &nbsp;
+              <i className="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </GuiaUsuario>
 
         <FormProvider {...formulario}>
-          <form onSubmit={formulario.handleSubmit(onGuardarCambios)}>
+          <form
+            onSubmit={formulario.handleSubmit(onGuardarCambios)}
+            ref={datos}
+            className={listaguia[1]!?.activo && guia ? 'overlay-marco' : ''}>
             <div className="row mt-3 g-3 align-items-baseline">
               <InputRut
                 deshabilitado

@@ -6,9 +6,10 @@ import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
+import { buscarZona0 } from '../[foliolicencia]/[idoperador]/c1/(servicios)';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -28,17 +29,22 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     tamanoPagina: 5,
   });
   const [loading, setloading] = useState(false);
+  const target = useRef(null);
 
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
   };
 
-  const evaluarTramitacion = (licencia: LicenciaTramitar) => {
-    if (licencia.estadolicencia.idestadolicencia === 1) {
-      return true;
-    }
-    return false;
+  const BuscarActivo = (foliolicencia: string, idoperador: number) => {
+    const busquedazona = async () => {
+      const [resp] = await buscarZona0(foliolicencia, idoperador);
+      return await resp();
+    };
+
+    return busquedazona().then((resp) => {
+      return resp;
+    });
   };
 
   return (
@@ -47,7 +53,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
         <SpinnerPantallaCompleta />
       </IfContainer>
       <div className="table-responsive">
-        <Table striped hover responsive>
+        <Table striped hover responsive ref={target}>
           {/* <Table striped hover  className="table table-hover table-striped"> */}
           <thead>
             <tr className={`text-center ${styles['text-tr']}`}>
@@ -60,7 +66,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
             </tr>
           </thead>
           <tbody>
-            {licenciasPaginadas.map((licencia) => (
+            {licenciasPaginadas.map(async (licencia) => (
               <tr key={licencia.foliolicencia} className="text-center align-middle">
                 <td className="px-4 py-3">
                   {/* TODO: Cambiar el color del circulo de acuerdo al estado */}
@@ -108,7 +114,12 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <IfContainer show={evaluarTramitacion(licencia)}>
+                    <IfContainer
+                      show={
+                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
+                          ?.estadotramitacion.idestadotramitacion === 1 ||
+                        !(await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))
+                      }>
                       <Link
                         className="btn btn-sm btn-success"
                         onClick={() => setloading(true)}
@@ -116,18 +127,39 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                         <small className="text-nowrap">TRAMITAR</small>
                       </Link>
                     </IfContainer>
-                    <IfContainer show={!evaluarTramitacion(licencia)}>
-                      <button
-                        className="btn btn-sm btn-warning"
-                        onClick={(e) =>
-                          AlertaInformacion.fire(
-                            'En Proceso...',
-                            `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en proceso de tramitación.`,
-                          )
-                        }
-                        title="En proceso de tramitación">
-                        En Proceso...
-                      </button>
+                    <IfContainer
+                      show={
+                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
+                          ?.estadotramitacion.idestadotramitacion !== 1 &&
+                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
+                          ?.estadotramitacion.idestadotramitacion
+                      }>
+                      {(await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
+                        ?.estadotramitacion.idestadotramitacion !== 3 ? (
+                        <button
+                          className="btn btn-sm btn-warning"
+                          onClick={(e) =>
+                            AlertaInformacion.fire(
+                              'En Proceso...',
+                              `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en proceso de tramitación.`,
+                            )
+                          }
+                          title="En proceso de tramitación">
+                          En Proceso...
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-sm btn-warning"
+                          onClick={(e) =>
+                            AlertaInformacion.fire(
+                              'Recibido por operador...',
+                              `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en el operador.`,
+                            )
+                          }
+                          title="Recibido por operador">
+                          Recibido...
+                        </button>
+                      )}
                     </IfContainer>
 
                     <button className="btn btn-sm btn-primary">
