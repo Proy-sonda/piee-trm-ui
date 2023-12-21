@@ -114,11 +114,7 @@ const LicenciasTramitadasPage = () => {
           <FiltroLicenciasTramitadas
             empleadores={datosBandeja?.empleadores ?? []}
             estadosLicencias={datosBandeja?.estadosLicencias ?? []}
-            onFiltrarLicencias={(x) => {
-              console.log('Filtrando licencias tramitadas');
-              console.table(x);
-              setFiltrosBusqueda(x);
-            }}
+            onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
           />
         </div>
 
