@@ -5,9 +5,8 @@ import { useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores } from '@/servicios';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import { buscarLicenciasParaTramitar } from '../tramitacion/(servicios)/buscar-licencias-para-tramitar';
-import { FiltroBusquedaLicenciasTramitadas, LicenciaTramitar } from './(modelos)';
-import { buscarEstadosLicencias } from './(servicios)';
+import { FiltroBusquedaLicenciasTramitadas, LicenciaTramitada } from './(modelos)';
+import { buscarEstadosLicencias, buscarLicenciasTramitadas } from './(servicios)';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -18,13 +17,12 @@ const FiltroLicenciasTramitadas = dynamic(() => import('./(componentes)').then((
 
 const LicenciasTramitadasPage = () => {
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
-    /* TODO: Reemplazar por el servicio correcto para obtener solo licencias tramitaas */
-    licenciasTramitadas: buscarLicenciasParaTramitar(),
+    licenciasTramitadas: buscarLicenciasTramitadas(),
     empleadores: buscarEmpleadores(''),
     estadosLicencias: buscarEstadosLicencias(),
   });
 
-  const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitar[]>([]);
+  const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitada[]>([]);
   const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltroBusquedaLicenciasTramitadas>({});
 
   // Actualizar listado de licencias
@@ -42,7 +40,7 @@ const LicenciasTramitadasPage = () => {
   }, [filtrosBusqueda, datosBandeja?.licenciasTramitadas]);
 
   const licenciaCumple = (filtros: FiltroBusquedaLicenciasTramitadas) => {
-    return () => {
+    return (licencia: LicenciaTramitada) => {
       return true;
     };
   };

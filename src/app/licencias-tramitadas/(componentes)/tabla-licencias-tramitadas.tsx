@@ -8,7 +8,7 @@ import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
+import { LicenciaTramitada } from '../(modelos)';
 import styles from './tabla-licencias-tramitadas.module.css';
 
 // prettier-ignore
@@ -18,7 +18,7 @@ const IfContainer = dynamic(() => import('@/components/if-container'));
 
 interface TablaLicenciasTramitadasProps {
   empleadores: Empleador[];
-  licencias?: LicenciaTramitar[];
+  licencias?: LicenciaTramitada[];
 }
 
 interface DatosComprobanteTramitacion {
@@ -37,16 +37,18 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
 
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
-  const [datosComprobanteTramitacion, setDatosConfirmarTramitacion] =
-    useState<DatosComprobanteTramitacion>();
+  // prettier-ignore
+  const [datosComprobanteTramitacion, setDatosComprobanteTramitacion] = useState<DatosComprobanteTramitacion>();
 
-  const nombreEmpleador = (licencia: LicenciaTramitar) => {
-    const empleador = empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador));
+  const nombreEmpleador = (licencia: LicenciaTramitada) => {
+    const empleador = empleadores.find((e) =>
+      strIncluye(licencia.licenciazc1.rutempleador, e.rutempleador),
+    );
 
     return empleador?.razonsocial ?? '';
   };
 
-  const nombreTrabajador = (licencia: LicenciaTramitar) => {
+  const nombreTrabajador = (licencia: LicenciaTramitada) => {
     return `${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`;
   };
 
@@ -54,7 +56,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
     return format(new Date(fecha), 'dd-MM-yyyy');
   };
 
-  const imprimirComprobanteTramitacion = async (licencia: LicenciaTramitar) => {
+  const imprimirComprobanteTramitacion = async (licencia: LicenciaTramitada) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
       html: '¿Desea generar el comprobante de tramitación?',
     });
@@ -64,7 +66,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
     }
 
     setMostrarSpinner(true);
-    setDatosConfirmarTramitacion({
+    setDatosComprobanteTramitacion({
       folioLicencia: licencia.foliolicencia,
       idOperador: licencia.operador.idoperador,
     });
@@ -86,11 +88,12 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       Folio: licencia.foliolicencia,
       'Entidad de salud': licencia.entidadsalud.nombre,
       Estado: licencia.estadolicencia.estadolicencia,
-      'RUT entidad empleadora': licencia.rutempleador,
+      'RUT entidad empleadora': licencia.licenciazc1.rutempleador,
       'Entidad empleadora': nombreEmpleador(licencia),
-      'RUN persona trabajadora': licencia.runtrabajador,
+      'RUN persona trabajadora': licencia.ruttrabajador,
       'Nombre persona trabajadora': nombreTrabajador(licencia),
-      'Días de Reposo': licencia.diasreposo,
+      // TODO: Falta incluir el tipo de reposo aqui
+      'Días de Reposo': licencia.ndias,
       'Inicio de reposo': formatearFecha(licencia.fechainicioreposo),
       'Fecha de emisión': formatearFecha(licencia.fechaemision),
       'Tipo de licencia': licencia.tipolicencia.tipolicencia,
@@ -118,7 +121,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
           foliolicencia={datosComprobanteTramitacion.folioLicencia}
           idOperadorNumber={datosComprobanteTramitacion.idOperador}
           onComprobanteGenerado={() => {
-            setDatosConfirmarTramitacion(undefined);
+            setDatosComprobanteTramitacion(undefined);
             setMostrarSpinner(false);
           }}
         />
@@ -161,16 +164,17 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
               </td>
               <td>
                 <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
-                <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
+                <div className="mb-1 small text-nowrap">{licencia.licenciazc1.rutempleador}</div>
               </td>
               <td>
                 <div className="mb-1 small text-nowrap">{nombreTrabajador(licencia)}</div>
-                <div className="mb-1 small text-nowrap">RUN: {licencia.runtrabajador}</div>
+                <div className="mb-1 small text-nowrap">RUN: {licencia.ruttrabajador}</div>
               </td>
               <td>
-                <div className="mb-1 small text-start text-nowrap">
-                  {licencia.tiporesposo.tiporeposo}: {licencia.diasreposo} día(s)
-                </div>
+                {/* TODO: Descomentar cuando este disponible el tipo de reposo */}
+                {/* <div className="mb-1 small text-start text-nowrap">
+                  {licencia.tiporesposo.tiporeposo}: {licencia.ndias} día(s)
+                </div> */}
                 <div className="mb-1 small text-start text-nowrap">
                   INICIO REPOSO: {formatearFecha(licencia.fechainicioreposo)}
                 </div>
