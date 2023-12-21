@@ -1,8 +1,10 @@
 'use client';
 
+import { GuiaUsuario } from '@/components/guia-usuario';
+import { AuthContext } from '@/contexts';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Collapse, Container, Offcanvas, Row, Stack } from 'react-bootstrap';
 import { useEmpleadorActual } from '../(contexts)/empleador-actual-context';
 import styles from './layout.module.css';
@@ -29,6 +31,10 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
     { titulo: 'Usuarios', href: `/empleadores/${rutempleador}/usuarios` },
   ];
 
+  const {
+    datosGuia: { AgregarGuia, listaguia, guia },
+  } = useContext(AuthContext);
+
   const { empleadorActual, cambiarEmpleador } = useEmpleadorActual();
   useEffect(() => {
     cambiarEmpleador(rutempleador);
@@ -39,6 +45,7 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
   const [abrirMenuDesktop, setAbrirMenuDesktop] = useState(true);
 
   const [abrirMenuMovil, setAbrirMenuMovil] = useState(false);
+  const menu = useRef(null);
 
   const claseLinkActivo = (link: LinkNavegacion) => {
     const [linkPathname] = link.href.split('?');
@@ -46,9 +53,20 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
     return pathname.startsWith(linkPathname) ? styles['link-activo'] : styles['link'];
   };
 
+  useEffect(() => {
+    AgregarGuia([
+      {
+        indice: 0,
+        nombre: 'Menu lateral',
+        activo: true,
+      },
+    ]);
+  }, []);
+
   return (
     <>
       {/* MENU DE ESCRITORIO */}
+
       <div className="w-100 d-none d-lg-flex">
         <div
           className={`border-end ${abrirMenuDesktop ? 'px-4' : 'px-3'}`}
@@ -60,8 +78,36 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
             <i className={`bi ${abrirMenuDesktop ? 'bi-chevron-left' : 'bi-chevron-right'}`}></i>
           </button>
 
-          <Collapse in={abrirMenuDesktop} dimension="width">
-            <div id="example-collapse-text">
+          <GuiaUsuario guia={listaguia[0]!?.activo && guia} target={menu} placement="top-start">
+            Menú lateral para navegación entre secciones <br />
+            <div className="mt-2 text-end">
+              <button
+                className="btn btn-sm"
+                style={{ border: '1px solid white', color: 'white' }}
+                onClick={() =>
+                  AgregarGuia([
+                    {
+                      indice: 0,
+                      nombre: 'Menu lateral',
+                      activo: false,
+                    },
+                    {
+                      indice: 1,
+                      nombre: 'Datos página',
+                      activo: true,
+                    },
+                  ])
+                }>
+                Continuar &nbsp;
+                <i className="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          </GuiaUsuario>
+          <Collapse
+            in={abrirMenuDesktop}
+            dimension="width"
+            className={listaguia[0]!?.activo && guia ? 'overlay-marco' : ''}>
+            <div id="example-collapse-text" ref={menu}>
               <h1 className="py-4 fs-6">
                 {empleadorActual ? empleadorActual.razonsocial : 'Cargando...'}
               </h1>

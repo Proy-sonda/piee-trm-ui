@@ -1,3 +1,4 @@
+'use client';
 import AppFooter from '@/components/footer/footer';
 import AppHeader from '@/components/header/header';
 import Position from '@/components/stage/position';
@@ -37,6 +38,7 @@ export default function RootLayout(
 
             <main className="bg-white shadow-sm">
               <Position />
+
               <div>{children}</div>
             </main>
 

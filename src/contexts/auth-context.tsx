@@ -16,12 +16,27 @@ import { useRouter } from 'next/navigation';
 import { ReactNode, createContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
+interface Guia {
+  indice: number;
+  nombre: string;
+  activo: boolean;
+}
+
 type AuthContextType = {
   ultimaConexion: string;
   estaLogueado: boolean;
   usuario?: UsuarioToken;
   login: (rut: string, clave: string) => Promise<UsuarioToken>;
   logout: () => Promise<void>;
+  datosGuia: {
+    guia: boolean;
+    nombreGuia: string;
+    activarDesactivarGuia: () => void;
+    NombreGuia: (nombre: string) => void;
+    AgregarGuia: (guiaNueva: Guia[]) => void;
+    listaguia: Guia[];
+    cambiarGuia: (tipo: string, indiceActual: number) => void;
+  };
 };
 
 export const AuthContext = createContext<AuthContextType>({
@@ -30,6 +45,15 @@ export const AuthContext = createContext<AuthContextType>({
   usuario: undefined,
   login: async () => ({}) as any,
   logout: async () => {},
+  datosGuia: {
+    guia: false,
+    nombreGuia: '',
+    activarDesactivarGuia: () => {},
+    NombreGuia: (nombre: string) => {},
+    AgregarGuia: (guiaNueva: Guia[]) => {},
+    listaguia: [],
+    cambiarGuia: (tipo: string, indiceActual: number) => {},
+  },
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -37,11 +61,49 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const [estaLogueado, setEstaLogueado] = useState(false);
 
+  const [listaguia, setlistaguia] = useState<{ indice: number; nombre: string; activo: boolean }[]>(
+    [],
+  );
+
+  const [guia, setguia] = useState<boolean>(false);
+
+  const [nombreGuia, setnombreGuia] = useState('');
+
   const [ultimaConexion, setultimaConexion] = useState('');
 
   const [usuario, setUsuario] = useState<UsuarioToken | undefined>(undefined);
 
   const router = useRouter();
+
+  const cambiarGuia = (tipo: string, indiceActual: number) => {
+    switch (tipo) {
+      case 'siguiente':
+        // cambia el booleano de falso a true el siguiente elemento de la lista guia
+        const indice = listaguia[indiceActual].indice + 1;
+        const guia = listaguia.find((item) => item.indice === indice);
+        if (guia) {
+          setlistaguia([...listaguia, { ...guia, activo: true }]);
+        }
+        break;
+
+      case 'anterior':
+        // agrega el anterior elemento de listado
+        const indice2 = listaguia[indiceActual].indice - 1;
+        const guia2 = listaguia.find((item) => item.indice === indice2);
+        if (guia2) {
+          setlistaguia([guia2]);
+        }
+        break;
+      case 'primera':
+        // cambia el booleano de falso a true del primer elemento de la lista sin eliminar los anteriores
+        const guia3 = listaguia.find((item) => item.indice === 0);
+        if (guia3) {
+          setlistaguia([{ ...guia3, activo: true }]);
+        }
+
+        break;
+    }
+  };
 
   // Recargar usuario del token
   useEffect(() => {
@@ -171,14 +233,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const ActivarDeactivarGuia = () => {
+    setguia(!guia);
+  };
+
+  const agregarGuia = (guiaNueva: Guia[]) => {
+    setlistaguia(guiaNueva);
+  };
+
+  const NombreGuia = (nombre: string) => setnombreGuia(nombre);
+
   const onLoginExitoso = (nuevoUsuario: UsuarioToken) => {
     setUsuario(nuevoUsuario);
     setEstaLogueado(true);
 
     if (nuevoUsuario?.ultimaconexion === null) {
-      setultimaConexion(new Date().toLocaleString());
+      setultimaConexion('');
+      setguia(true);
     } else {
       setultimaConexion(nuevoUsuario?.ultimaconexion as string);
+      setguia(false);
     }
   };
 
@@ -190,6 +264,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         usuario,
         login,
         logout,
+        datosGuia: {
+          guia,
+          nombreGuia,
+          NombreGuia,
+          activarDesactivarGuia: ActivarDeactivarGuia,
+          AgregarGuia: agregarGuia,
+          listaguia,
+          cambiarGuia,
+        },
       }}>
       {children}
     </AuthContext.Provider>

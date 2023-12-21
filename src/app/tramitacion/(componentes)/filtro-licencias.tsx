@@ -1,10 +1,12 @@
 import { ComboSimple, InputFecha, InputRutBusqueda } from '@/components/form';
+import { GuiaUsuario } from '@/components/guia-usuario';
+import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, startOfDay } from 'date-fns';
-import React from 'react';
+import React, { useContext, useRef } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FiltroBusquedaLicencias } from '../(modelos)/filtro-busqueda-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
@@ -19,7 +21,10 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   onFiltrarLicencias,
 }) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
-
+  const target = useRef(null);
+  const {
+    datosGuia: { guia },
+  } = useContext(AuthContext);
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
 
   const [, unidadesRRHH] = useFetch(
@@ -43,8 +48,12 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   return (
     <>
       <FormProvider {...formulario}>
-        <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
-          <div className="row g-3 align-items-baseline">
+        <GuiaUsuario guia={guia} target={target} placement="top-end">
+          Para filtrar las licencias, ingrese los datos que desea filtrar y presione el botón
+          {'Filtrar'}
+        </GuiaUsuario>
+        <form onSubmit={formulario.handleSubmit(filtrarLicencias)} ref={target}>
+          <div className={`row g-3 align-items-baseline ${guia && 'overlay-marco'}`}>
             <InputRutBusqueda
               opcional
               name="folio"

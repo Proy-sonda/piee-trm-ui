@@ -1,5 +1,6 @@
+import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { formatRut, validateRut } from 'rutlib';
 
 interface BarraBusquedaEntidadesEmpleadorasProps {
@@ -10,13 +11,23 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
   onBuscar,
 }) => {
   const [rut, setRut] = useState('');
-  const { usuario } = useContext(AuthContext);
+  const {
+    datosGuia: { listaguia, guia, AgregarGuia },
+  } = useContext(AuthContext);
   const [razonSocial, setRazonSocial] = useState('');
   const [error, seterror] = useState(false);
+  const target = useRef(null);
 
   return (
     <>
-      <form className="row g-2 align-items-end">
+      <GuiaUsuario guia={listaguia[0]!?.activo && guia} target={target} placement="top-start">
+        Filtro para buscar Entidades Empleadoras por RUT o Razón Social
+      </GuiaUsuario>
+      <form
+        className={`row g-2 align-items-end ${
+          listaguia[0]!?.activo && guia ? 'overlay-marco' : ''
+        }`}
+        ref={target}>
         <div className="col-12 col-md-3 col-xxl-2 position-relative">
           <label id="rutBuscar" className="form-label">
             RUT
@@ -69,9 +80,42 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
               Buscar
             </button>
 
+            <GuiaUsuario
+              guia={listaguia[0]!?.activo && guia}
+              target={target}
+              placement="bottom-end">
+              Botón para inscribir una nueva Entidad Empleadora en el sistema <br />
+              <div className="text-end mt-2">
+                <button
+                  className="btn btn-sm text-white"
+                  onClick={() => {
+                    AgregarGuia([
+                      {
+                        indice: 0,
+                        nombre: 'Filtro de búsquedaa',
+                        activo: false,
+                      },
+                      {
+                        indice: 1,
+                        nombre: 'Tabla Entidad Empleadora',
+                        activo: true,
+                      },
+                    ]);
+                  }}
+                  style={{
+                    border: '1px solid white',
+                  }}>
+                  Continuar &nbsp;
+                  <i className="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </GuiaUsuario>
+
             <button
               type="button"
-              className="btn btn-success mt-3 mt-md-0"
+              className={`btn btn-success mt-3 mt-md-0 ${
+                listaguia[0]!?.nombre.includes('Filtro') && guia ? 'overlay-marco' : ''
+              }'}`}
               data-bs-toggle="modal"
               data-bs-target="#Addsempresa">
               Inscribe Entidad Empleadora

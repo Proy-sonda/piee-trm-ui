@@ -3,7 +3,7 @@
 import { AuthContext } from '@/contexts';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './position.module.css';
 
 import dynamic from 'next/dynamic';
@@ -28,7 +28,11 @@ const Position: React.FC<PositionProps> = ({}) => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [Cargando, setCargando] = useState(false);
 
-  const { usuario } = useContext(AuthContext);
+  const {
+    usuario,
+    datosGuia: { guia, listaguia },
+  } = useContext(AuthContext);
+  const target = useRef(null);
 
   const pathname = usePathname();
 
@@ -43,6 +47,8 @@ const Position: React.FC<PositionProps> = ({}) => {
     setTabs(tabsUsuario);
   }, [usuario]);
 
+  useEffect(() => {}, [listaguia]);
+
   const esTabActiva = (tab: Tab) => {
     return pathname.startsWith(tab.href);
   };
@@ -56,7 +62,8 @@ const Position: React.FC<PositionProps> = ({}) => {
       <IfContainer show={Cargando}>
         <SpinnerPantallaCompleta />
       </IfContainer>
-      <div className="container-fluid px-0">
+
+      <div className={`container-fluid px-0`}>
         <div className="bg-white border-bottom border-1 text-center d-flex flex-column flex-md-row justify-content-center">
           {tabs.map((tab, index) => (
             <div
