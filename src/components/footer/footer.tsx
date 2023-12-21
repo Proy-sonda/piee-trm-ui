@@ -16,7 +16,7 @@ const AppFooter: React.FC<AppFooterProps> = ({ children }) => {
     <footer className={styles['footer-container']}>
       <div className={styles['footer-background']}>
         <div className={styles['footer-top']}></div>
-        <div className="row" style={{ height: '125px' }}>
+        <div className="row mb-4">
           <div className="col-12">
             <div className={styles['footer-content']}>
               <div className={styles['contact']}>
