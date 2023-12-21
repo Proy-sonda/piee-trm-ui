@@ -182,6 +182,9 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                   FECHA DE EMISIÓN: {formatearFecha(licencia.fechaemision)}
                 </div>
                 <div className="mb-1 small text-start text-nowrap">
+                  FECHA DE TRAMITACIÓN: {formatearFecha(licencia.fechatramitacion)}
+                </div>
+                <div className="mb-1 small text-start text-nowrap">
                   {licencia.tipolicencia.tipolicencia}
                 </div>
               </td>

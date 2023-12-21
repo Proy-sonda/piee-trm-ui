@@ -2,14 +2,14 @@ export interface FiltroBusquedaLicenciasTramitadas {
   folio?: string;
   runPersonaTrabajadora?: string;
   idEstado?: number;
+  tipoPeriodo?: 'fecha-emision' | 'fecha-tramitacion';
   fechaDesde?: Date;
   fechaHasta?: Date;
   rutEntidadEmpleadora?: string;
   idUnidadRRHH?: string;
-  tipoPeriodo?: 'fecha-emision' | 'fecha-tramitacion';
 }
 
-export const hayFiltros = (filtros: FiltroBusquedaLicenciasTramitadas) => {
+export const hayFiltrosLicenciasTramitadas = (filtros: FiltroBusquedaLicenciasTramitadas) => {
   return (
     filtros.folio !== undefined ||
     filtros.runPersonaTrabajadora !== undefined ||

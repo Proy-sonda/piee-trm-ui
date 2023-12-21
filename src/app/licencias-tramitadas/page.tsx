@@ -3,9 +3,15 @@
 import { Titulo } from '@/components';
 import { useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores } from '@/servicios';
+import { existe, strIncluye } from '@/utilidades';
+import { isWithinInterval } from 'date-fns';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import { FiltroBusquedaLicenciasTramitadas, LicenciaTramitada } from './(modelos)';
+import {
+  FiltroBusquedaLicenciasTramitadas,
+  LicenciaTramitada,
+  hayFiltrosLicenciasTramitadas,
+} from './(modelos)';
 import { buscarEstadosLicencias, buscarLicenciasTramitadas } from './(servicios)';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
@@ -41,7 +47,49 @@ const LicenciasTramitadasPage = () => {
 
   const licenciaCumple = (filtros: FiltroBusquedaLicenciasTramitadas) => {
     return (licencia: LicenciaTramitada) => {
-      return true;
+      if (!hayFiltrosLicenciasTramitadas(filtros)) {
+        return true;
+      }
+
+      const coincideFolio = strIncluye(licencia.foliolicencia, filtros.folio);
+
+      const coincideRun = strIncluye(licencia.ruttrabajador, filtros.runPersonaTrabajadora);
+
+      const coincideEstado = existe(filtros.idEstado)
+        ? licencia.estadolicencia.idestadolicencia === filtros.idEstado
+        : true;
+
+      let enRangoFechas = true;
+      if (filtros.fechaDesde && filtros.fechaHasta) {
+        const coindidePorFechaEmision = isWithinInterval(new Date(licencia.fechaemision), {
+          start: filtros.fechaDesde,
+          end: filtros.fechaHasta,
+        });
+
+        const coincidePorFechaTramitacion = isWithinInterval(new Date(licencia.fechatramitacion), {
+          start: filtros.fechaDesde,
+          end: filtros.fechaHasta,
+        });
+
+        if (!filtros.tipoPeriodo) {
+          enRangoFechas = coindidePorFechaEmision || coincidePorFechaTramitacion;
+        } else if (filtros.tipoPeriodo === 'fecha-emision') {
+          enRangoFechas = coindidePorFechaEmision;
+        } else if (filtros.tipoPeriodo === 'fecha-tramitacion') {
+          enRangoFechas = coincidePorFechaTramitacion;
+        } else {
+          throw new Error('Filtro de licencias tramitadas: Tipo de periodo desconocido');
+        }
+      }
+
+      const coincideEntidadEmpleadora = strIncluye(
+        licencia.licenciazc1.rutempleador,
+        filtros.rutEntidadEmpleadora,
+      );
+
+      return (
+        coincideFolio && coincideEstado && coincideRun && enRangoFechas && coincideEntidadEmpleadora
+      );
     };
   };
 
@@ -66,7 +114,11 @@ const LicenciasTramitadasPage = () => {
           <FiltroLicenciasTramitadas
             empleadores={datosBandeja?.empleadores ?? []}
             estadosLicencias={datosBandeja?.estadosLicencias ?? []}
-            onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
+            onFiltrarLicencias={(x) => {
+              console.log('Filtrando licencias tramitadas');
+              console.table(x);
+              setFiltrosBusqueda(x);
+            }}
           />
         </div>
 
