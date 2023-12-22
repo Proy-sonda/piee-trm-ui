@@ -95,7 +95,7 @@ export const ComboSimple = <T extends Record<string, any>>({
                   return;
                 }
 
-                if (Number.isNaN(valor) || valor === 0) {
+                if (Number.isNaN(valor)) {
                   return 'Este campo es obligatorio';
                 }
 
@@ -105,7 +105,7 @@ export const ComboSimple = <T extends Record<string, any>>({
               },
             },
           })}>
-          <option value={!tipoValor || tipoValor === 'number' ? 0 : ''}>
+          <option value={!tipoValor || tipoValor === 'number' ? NaN : ''}>
             {textoOpcionPorDefecto ?? 'Seleccionar'}
           </option>
           {(datos ?? []).map((dato) => (
