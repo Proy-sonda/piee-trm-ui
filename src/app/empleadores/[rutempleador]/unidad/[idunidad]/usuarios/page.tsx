@@ -47,6 +47,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const [usuarios, setusuarios] = useState<UsuarioEntidadEmpleadora[]>([]);
   const [usuariosAsociados, setusuariosAsociados] = useState<Usuariosunidad[] | undefined>([]);
   const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
+
   const {
     usuario,
     datosGuia: { guia, listaguia, AgregarGuia },
@@ -363,7 +364,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
           <button
             className="btn btn-danger"
             onClick={() => {
-              window.history.back();
+              router.push(`/empleadores/${rutempleador}/unidad`);
             }}>
             Volver
           </button>

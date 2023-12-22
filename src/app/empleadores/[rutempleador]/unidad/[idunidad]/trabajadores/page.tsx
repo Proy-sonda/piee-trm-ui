@@ -67,6 +67,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [rutedit, setrutedit] = useState<string>();
   const [show, setshow] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const cargaNomina = useRef(null);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
@@ -428,12 +429,17 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       {
                         indice: 0,
                         nombre: 'Menu lateral',
-                        activo: true,
+                        activo: false,
                       },
                       {
                         indice: 1,
                         nombre: 'Carga trabajador',
                         activo: false,
+                      },
+                      {
+                        indice: 2,
+                        nombre: 'Carga nomina',
+                        activo: true,
                       },
                     ])
                   }
@@ -445,18 +451,19 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 </button>
               </div>
             </GuiaUsuario>
-            <div
-              className={`row mt-4 ${listaguia[1]!?.activo && guia && 'overlay-marco'}`}
-              ref={cargatrabajador}>
+            <div className={`row mt-4`}>
               <div className="col-md-12 col-xs-12 col-lg-5">
-                <h5>Cargar Personas Trabajadoras</h5>
-                <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
-                <br />
-                <br />
-
                 <form onSubmit={handleAddTrabajador}>
                   <div className="row mt-1">
-                    <div className="col-md-8 position-relative">
+                    <div
+                      className={`col-md-8 position-relative ${
+                        listaguia[1]!?.activo && guia && 'overlay-marco'
+                      }`}
+                      ref={cargatrabajador}>
+                      <h5>Cargar Personas Trabajadoras</h5>
+                      <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
+                      <br />
+                      <br />
                       <input
                         id="run"
                         type="text"
@@ -535,113 +542,179 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               </div>
 
               <div className="col-md-12 col-xs-12 col-lg-7">
-                <h5>Cargar Nómina</h5>
-                <sub className="d-inline d-sm-none d-xl-inline">
-                  Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo
-                  tiene que seleccionar un archivo (formato CSV) según el{' '}
-                  <a
-                    className={styles['span-link']}
-                    download="formato.csv"
-                    href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                    siguiente formato
-                  </a>
-                </sub>
-                <sub className="d-none d-sm-inline d-xl-none">
-                  Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
-                  <a
-                    className={styles['span-link']}
-                    download="formato.csv"
-                    href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                    siguiente formato
-                  </a>
-                </sub>
-                <div className="row mt-4">
-                  <div className="col-md-6 position-relative">
-                    <input
-                      type="file"
-                      accept=".csv"
-                      className={error.file ? 'form-control is-invalid' : 'form-control'}
-                      {...register('file', {
-                        onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                          if (event.target.files?.length == 0) return setValue('file', null);
-                          if (!event.target.files) setValue('file', event.target.files);
-                          if (!getValues('file')![0].name.includes('csv')) {
-                            seterror({ ...error, file: true });
-                          } else {
-                            seterror({ ...error, file: false });
-                            const file = event.target.files![0];
-                            const reader = new FileReader();
-                            reader.onload = (e: any) => {
-                              const content = e.target.result.trim();
-                              const lines = content.split('\n');
-                              setCsvData(lines);
-                            };
-
-                            reader.readAsText(file);
-                          }
-                        },
-                        onBlur: (event: ChangeEvent<HTMLInputElement>) => {
-                          if (event.target.files?.length == 0) return setValue('file', null);
-                          if (!event.target.files) setValue('file', event.target.files);
-                          if (!getValues('file')![0].name.includes('csv')) {
-                            seterror({ ...error, file: true });
-                          } else {
-                            seterror({ ...error, file: false });
-                            const file = event.target.files![0];
-                            const reader = new FileReader();
-                            reader.onload = (e: any) => {
-                              const content = e.target.result.trim();
-                              const lines = content.split('\n');
-                              setCsvData(lines);
-                            };
-
-                            reader.readAsText(file);
-                          }
-                        },
-                      })}
-                    />
-                    <IfContainer show={error.file}>
-                      <div className="invalid-tooltip">
-                        Debe ingresar un archivo con formato .csv
-                      </div>
-                    </IfContainer>
+                <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={cargaNomina}>
+                  Formulario de carga masiva para pesonas trabajadoras <br />
+                  en la unidad <b>{unidad}</b> utilizando archivo .CSV
+                  <br />
+                  <div className="text-end mt-2">
+                    <button
+                      className="btn btn-sm text-white"
+                      onClick={() =>
+                        AgregarGuia([
+                          {
+                            indice: 0,
+                            nombre: 'Menu lateral',
+                            activo: false,
+                          },
+                          {
+                            indice: 1,
+                            nombre: 'Carga trabajador',
+                            activo: true,
+                          },
+                          {
+                            indice: 2,
+                            nombre: 'Carga nomina',
+                            activo: false,
+                          },
+                        ])
+                      }
+                      style={{
+                        border: '1px solid white',
+                      }}>
+                      <i className="bi bi-arrow-left"></i>
+                      &nbsp; Anterior
+                    </button>
+                    &nbsp;
+                    <button
+                      className="btn btn-sm text-white"
+                      onClick={() =>
+                        AgregarGuia([
+                          {
+                            indice: 0,
+                            nombre: 'Menu lateral',
+                            activo: true,
+                          },
+                          {
+                            indice: 1,
+                            nombre: 'Carga trabajador',
+                            activo: false,
+                          },
+                          {
+                            indice: 2,
+                            nombre: 'Carga nomina',
+                            activo: false,
+                          },
+                        ])
+                      }
+                      style={{
+                        border: '1px solid white',
+                      }}>
+                      Continuar &nbsp;
+                      <i className="bi bi-arrow-right"></i>
+                    </button>
                   </div>
-                  <div className="d-block d-sm-none d-md-none">
-                    <div className="col-md-12">
-                      <br />
+                </GuiaUsuario>
+                <div
+                  className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                  ref={cargaNomina}>
+                  <h5>Cargar Nómina</h5>
+                  <sub className="d-inline d-sm-none d-xl-inline">
+                    Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo
+                    tiene que seleccionar un archivo (formato CSV) según el{' '}
+                    <a
+                      className={styles['span-link']}
+                      download="formato.csv"
+                      href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                      siguiente formato
+                    </a>
+                  </sub>
+                  <sub className="d-none d-sm-inline d-xl-none">
+                    Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
+                    <a
+                      className={styles['span-link']}
+                      download="formato.csv"
+                      href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                      siguiente formato
+                    </a>
+                  </sub>
+                  <div className="row mt-4">
+                    <div className="col-md-6 position-relative">
+                      <input
+                        type="file"
+                        accept=".csv"
+                        className={error.file ? 'form-control is-invalid' : 'form-control'}
+                        {...register('file', {
+                          onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                            if (event.target.files?.length == 0) return setValue('file', null);
+                            if (!event.target.files) setValue('file', event.target.files);
+                            if (!getValues('file')![0].name.includes('csv')) {
+                              seterror({ ...error, file: true });
+                            } else {
+                              seterror({ ...error, file: false });
+                              const file = event.target.files![0];
+                              const reader = new FileReader();
+                              reader.onload = (e: any) => {
+                                const content = e.target.result.trim();
+                                const lines = content.split('\n');
+                                setCsvData(lines);
+                              };
+
+                              reader.readAsText(file);
+                            }
+                          },
+                          onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                            if (event.target.files?.length == 0) return setValue('file', null);
+                            if (!event.target.files) setValue('file', event.target.files);
+                            if (!getValues('file')![0].name.includes('csv')) {
+                              seterror({ ...error, file: true });
+                            } else {
+                              seterror({ ...error, file: false });
+                              const file = event.target.files![0];
+                              const reader = new FileReader();
+                              reader.onload = (e: any) => {
+                                const content = e.target.result.trim();
+                                const lines = content.split('\n');
+                                setCsvData(lines);
+                              };
+
+                              reader.readAsText(file);
+                            }
+                          },
+                        })}
+                      />
+                      <IfContainer show={error.file}>
+                        <div className="invalid-tooltip">
+                          Debe ingresar un archivo con formato .csv
+                        </div>
+                      </IfContainer>
                     </div>
-                  </div>
-                  <div className="col-md-6 col-xs-6">
-                    <div className="d-grid gap-2 d-md-flex">
-                      <button
-                        disabled={
-                          getValues('file')?.length === 0 || !getValues('file') ? true : false
-                        }
-                        className="btn btn-success"
-                        onClick={handleClickNomina}>
-                        Cargar
-                      </button>
-                      <button
-                        disabled={
-                          getValues('file')?.length === 0 || getValues('file') === null
-                            ? true
-                            : false
-                        }
-                        className="btn btn-primary"
-                        onClick={async () => {
-                          if (!getValues('file')) return;
-                          const resp = await AlertaConfirmacion.fire({
-                            html: `¿Desea eliminar el fichero <b>${
-                              getValues('file')![0].name
-                            }</b>?`,
-                          });
-                          if (resp.isConfirmed) {
-                            setValue('file', null);
-                            refrescarComponente();
+                    <div className="d-block d-sm-none d-md-none">
+                      <div className="col-md-12">
+                        <br />
+                      </div>
+                    </div>
+                    <div className="col-md-6 col-xs-6">
+                      <div className="d-grid gap-2 d-md-flex">
+                        <button
+                          disabled={
+                            getValues('file')?.length === 0 || !getValues('file') ? true : false
                           }
-                        }}>
-                        Limpiar
-                      </button>
+                          className="btn btn-success"
+                          onClick={handleClickNomina}>
+                          Cargar
+                        </button>
+                        <button
+                          disabled={
+                            getValues('file')?.length === 0 || getValues('file') === null
+                              ? true
+                              : false
+                          }
+                          className="btn btn-primary"
+                          onClick={async () => {
+                            if (!getValues('file')) return;
+                            const resp = await AlertaConfirmacion.fire({
+                              html: `¿Desea eliminar el fichero <b>${
+                                getValues('file')![0].name
+                              }</b>?`,
+                            });
+                            if (resp.isConfirmed) {
+                              setValue('file', null);
+                              refrescarComponente();
+                            }
+                          }}>
+                          Limpiar
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
