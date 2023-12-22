@@ -1,11 +1,13 @@
+import { GuiaUsuario } from '@/components/guia-usuario';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import { AlertaError, AlertaExito } from '@/utilidades';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useContext, useRef, useState } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import Swal from 'sweetalert2';
 import { PermisoPorEmpleador } from '../(modelos)/permiso-por-empleador';
@@ -23,6 +25,10 @@ export default function TablaEntidadesEmpleadoras({
   onEmpleadorDesuscrito,
 }: TablaEntidadesEmpleadorasProps) {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const {
+    datosGuia: { listaguia, guia, AgregarGuia },
+  } = useContext(AuthContext);
+  const target = useRef(null);
 
   const [empleadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: empleadores,
@@ -32,6 +38,12 @@ export default function TablaEntidadesEmpleadoras({
   const desadscribirEntidadEmpleadora = async (empleador: Empleador) => {
     const empresa = empleador.razonsocial;
     const rut = empleador.rutempleador;
+
+    if (empleador.estadoempleador.idestadoempleador === 10) {
+      return AlertaError.fire({
+        html: `La entidad empleadora <b>${empleador.razonsocial}</b> ya se encuentra en proceso de desadscripción.`,
+      });
+    }
 
     const { isConfirmed } = await Swal.fire({
       iconColor: 'white',
@@ -60,9 +72,11 @@ export default function TablaEntidadesEmpleadoras({
 
       onEmpleadorDesuscrito();
 
-      AlertaExito.fire({ html: `Entidad empleadora <b>${empresa}</b> fue desuscrita con éxito` });
+      AlertaExito.fire({
+        html: `Solicitud de desadscripción para la Entidad Empleadora <b>${empresa}</b>, fue realizada con éxito`,
+      });
     } catch (error) {
-      AlertaError.fire({ title: 'Hubo un problema al desadscribir a la entidad empleadora' });
+      AlertaError.fire({ title: 'Hubo un problema al realizar la solicitud de desadscripción' });
     } finally {
       setMostrarSpinner(false);
     }
@@ -83,49 +97,78 @@ export default function TablaEntidadesEmpleadoras({
       <IfContainer show={mostrarSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
-
-      <Table className="table table-hover">
-        <Thead className="align-middle">
-          <Tr>
-            <Th style={{ width: '100px' }}>RUT</Th>
-            <Th style={{ width: '150px' }}>Razón Social</Th>
-
-            <Th style={{ width: '20px' }}></Th>
-          </Tr>
-        </Thead>
-        <Tbody className="align-middle">
-          {empleadoresPaginados.length > 0 ? (
-            empleadoresPaginados.map((empleador: Empleador) => (
-              <Tr key={empleador.rutempleador} className="align-middle">
-                <Td>
-                  <Link
-                    href={`/empleadores/${empleador.rutempleador}/datos`}
-                    className="text-decoration-none">
-                    {empleador.rutempleador}
-                  </Link>
-                </Td>
-                <Td>{empleador.razonsocial}</Td>
-                <Td className="text-center">
-                  <IfContainer show={puedeDesuscribir(empleador)}>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => desadscribirEntidadEmpleadora(empleador)}
-                      title={`Desadscribir empleador ${empleador.razonsocial}`}>
-                      Desadscribir
-                    </button>
-                  </IfContainer>
-                </Td>
-              </Tr>
-            ))
-          ) : (
+      <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={target} placement="bottom-end">
+        Tabla de Entidades Empleadoras
+        <br />
+        <div className="text-end mt-2">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtro de búsquedaa',
+                  activo: true,
+                },
+                {
+                  indice: 1,
+                  nombre: 'Tabla Entidad Empleadora',
+                  activo: false,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+        </div>
+      </GuiaUsuario>
+      <div ref={target} className={listaguia[1]!?.activo && guia ? 'overlay-marco' : ''}>
+        <Table className="table table-hover">
+          <Thead className="align-middle">
             <Tr>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td></Td>
+              <Th style={{ width: '100px' }}>RUT</Th>
+              <Th style={{ width: '150px' }}>Razón Social</Th>
+
+              <Th style={{ width: '20px' }}></Th>
             </Tr>
-          )}
-        </Tbody>
-      </Table>
+          </Thead>
+          <Tbody className="align-middle">
+            {empleadoresPaginados.length > 0 ? (
+              empleadoresPaginados.map((empleador: Empleador) => (
+                <Tr key={empleador.rutempleador} className="align-middle">
+                  <Td>
+                    <Link
+                      href={`/empleadores/${empleador.rutempleador}/datos`}
+                      className="text-decoration-none">
+                      {empleador.rutempleador}
+                    </Link>
+                  </Td>
+                  <Td>{empleador.razonsocial}</Td>
+                  <Td className="text-center">
+                    <IfContainer show={puedeDesuscribir(empleador)}>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => desadscribirEntidadEmpleadora(empleador)}
+                        title={`Desadscribir empleador ${empleador.razonsocial}`}>
+                        Desadscribir
+                      </button>
+                    </IfContainer>
+                  </Td>
+                </Tr>
+              ))
+            ) : (
+              <Tr>
+                <Td>-</Td>
+                <Td>-</Td>
+                <Td></Td>
+              </Tr>
+            )}
+          </Tbody>
+        </Table>
+      </div>
       <div className="mt-3">
         <Paginacion
           numeroDePaginas={totalPaginas}

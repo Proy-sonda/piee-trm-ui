@@ -414,7 +414,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     if (!guardadoExitoso) {
       return;
     }
-
+    setMostrarSpinner(true);
     router.push(`/tramitacion/${foliolicencia}/${idoperador}/c4`);
   };
 

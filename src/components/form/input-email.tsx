@@ -30,7 +30,7 @@ export const InputEmail: React.FC<InputEmailProps> = ({
   className,
   debeCoincidirCon,
 }) => {
-  const { register, getValues } = useFormContext();
+  const { register, getValues, clearErrors } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'email',
@@ -70,6 +70,8 @@ export const InputEmail: React.FC<InputEmailProps> = ({
                 if (email !== getValues(debeCoincidirCon)) {
                   return 'Correos no coinciden';
                 }
+
+                clearErrors(debeCoincidirCon);
               },
             },
           })}

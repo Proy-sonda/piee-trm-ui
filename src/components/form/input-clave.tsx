@@ -112,6 +112,8 @@ export const InputClave: React.FC<InputClaveProps> = ({
           <Form.Control
             type={verClave ? 'text' : 'password'}
             autoComplete="new-custom-value"
+            onPaste={(e) => e.preventDefault()}
+            onCopy={(e) => e.preventDefault()}
             onFocus={() => setMostrarRequerimientos(!!validarFortaleza)}
             isInvalid={tieneError}
             {...register(name, {

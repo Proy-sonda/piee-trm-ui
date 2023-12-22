@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import styles from './semaforo-licencias.module.css';
 
 export type FiltroEstadoLicencia = 'todos' | 'por-tramitar' | 'por-vencer' | 'vencido';
@@ -14,6 +14,7 @@ interface SemaforoLicenciasProps {
 }
 
 export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccionado }) => {
+  const target = useRef(null);
   const semaforos: Semaforo[] = [
     { color: 'circlegreen', label: 'Por Tramitar', value: 'por-tramitar' },
     { color: 'circleyellow', label: 'Por Vencer', value: 'por-vencer' },
@@ -22,7 +23,7 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
 
   return (
     <>
-      <div>
+      <div ref={target}>
         {semaforos.map((semaforo, index) => (
           <div
             key={index}
