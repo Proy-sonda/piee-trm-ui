@@ -20,6 +20,20 @@ interface TablaLicenciasTramitarProps {
   licencias?: LicenciaTramitar[];
 }
 
+const buscarEstadoTramitacion = async (licencia: LicenciaTramitar) => {
+  if (licencia.idEstadoTramitacion !== undefined) {
+    return licencia;
+  }
+
+  const [request] = buscarZona0(licencia.foliolicencia, licencia.operador.idoperador);
+
+  licencia.idEstadoTramitacion = await request().then(
+    (zona0) => zona0?.estadotramitacion?.idestadotramitacion,
+  );
+
+  return licencia;
+};
+
 export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   licencias,
   empleadores,
@@ -27,6 +41,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: licencias,
     tamanoPagina: 5,
+    porCadaElemento: buscarEstadoTramitacion,
   });
   const [loading, setloading] = useState(false);
   const target = useRef(null);
@@ -34,17 +49,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
-  };
-
-  const BuscarActivo = (foliolicencia: string, idoperador: number) => {
-    const busquedazona = async () => {
-      const [resp] = await buscarZona0(foliolicencia, idoperador);
-      return await resp();
-    };
-
-    return busquedazona().then((resp) => {
-      return resp;
-    });
   };
 
   return (
@@ -66,8 +70,10 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
             </tr>
           </thead>
           <tbody>
-            {licenciasPaginadas.map(async (licencia) => (
-              <tr key={licencia.foliolicencia} className="text-center align-middle">
+            {licenciasPaginadas.map((licencia) => (
+              <tr
+                key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
+                className="text-center align-middle">
                 <td className="px-4 py-3">
                   {/* TODO: Cambiar el color del circulo de acuerdo al estado */}
                   <div className={`mb-2 ${styles.circlered}`}></div>
@@ -116,9 +122,8 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <Stack gap={2}>
                     <IfContainer
                       show={
-                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
-                          ?.estadotramitacion.idestadotramitacion === 1 ||
-                        !(await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))
+                        licencia.idEstadoTramitacion === undefined ||
+                        licencia.idEstadoTramitacion === 1
                       }>
                       <Link
                         className="btn btn-sm btn-success"
@@ -129,13 +134,10 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     </IfContainer>
                     <IfContainer
                       show={
-                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
-                          ?.estadotramitacion.idestadotramitacion !== 1 &&
-                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
-                          ?.estadotramitacion.idestadotramitacion
+                        licencia.idEstadoTramitacion !== undefined &&
+                        licencia.idEstadoTramitacion !== 1
                       }>
-                      {(await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
-                        ?.estadotramitacion.idestadotramitacion !== 3 ? (
+                      {licencia.idEstadoTramitacion !== 3 ? (
                         <button
                           className="btn btn-sm btn-warning"
                           onClick={(e) =>
