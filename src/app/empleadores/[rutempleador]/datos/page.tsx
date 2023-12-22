@@ -73,6 +73,8 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
   const regionSeleccionada = formulario.watch('regionId');
 
   const { rolEnEmpleadorActual } = useEmpleadorActual();
+  const guiaCCAFF = useRef(null);
+  const tamanoempresa = useRef(null);
 
   // Parchar fomulario
   useEffect(() => {
@@ -209,12 +211,17 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                   {
                     indice: 0,
                     nombre: 'Menu lateral',
-                    activo: true,
+                    activo: false,
                   },
                   {
                     indice: 1,
                     nombre: 'Datos página',
                     activo: false,
+                  },
+                  {
+                    indice: 2,
+                    nombre: 'CCAFF',
+                    activo: true,
                   },
                 ])
               }
@@ -261,14 +268,88 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <ComboSimple
-                name="cajaCompensacionId"
-                label="Seleccione CCAF a la cual está afiliada"
-                datos={CCAF}
-                idElemento="idccaf"
-                descripcion="nombre"
-                className="col-12 col-md-6 col-lg-4"
-              />
+              <GuiaUsuario
+                guia={guia && listaguia[2]!?.activo}
+                placement="top-start"
+                target={guiaCCAFF}>
+                Cajas de Compensación de Asignación Familiar (CCAF) <br />
+                <div className="text-end mt-2">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() =>
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Menu lateral',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'Datos página',
+                          activo: true,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'CCAFF',
+                          activo: false,
+                        },
+                      ])
+                    }
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() =>
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Menu lateral',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'Datos página',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'CCAFF',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Tamano Empresa',
+                          activo: true,
+                        },
+                      ])
+                    }
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+
+              <div
+                ref={guiaCCAFF}
+                className={`col-12 col-md-6 col-lg-4 ${
+                  listaguia[2]!?.activo && guia && 'overlay-marco'
+                }`}>
+                <ComboSimple
+                  name="cajaCompensacionId"
+                  label="Seleccione CCAF a la cual está afiliada"
+                  datos={CCAF}
+                  idElemento="idccaf"
+                  descripcion="nombre"
+                />
+              </div>
 
               <ComboSimple
                 name="actividadLaboralId"
@@ -281,14 +362,92 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
 
               <InputHolding name="holding" label="Holding" className="col-12 col-md-6 col-lg-4" />
 
-              <ComboSimple
-                name="tamanoEmpresaId"
-                label="N° de trabajadores"
-                datos={comboTamanoEmpresa}
-                idElemento="idtamanoempresa"
-                descripcion="descripcion"
-                className="col-12 col-md-6 col-lg-4"
-              />
+              <GuiaUsuario
+                guia={guia && listaguia[3]!?.activo}
+                placement="top-start"
+                target={tamanoempresa}>
+                Cantidad de personas trabajadoras en la entidad empleadora <br />
+                <div className="text-end mt-2">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() =>
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Menu lateral',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'Datos página',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'CCAFF',
+                          activo: true,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Tamano Empresa',
+                          activo: false,
+                        },
+                      ])
+                    }
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() =>
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Menu lateral',
+                          activo: true,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'Datos página',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'CCAFF',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Tamano Empresa',
+                          activo: false,
+                        },
+                      ])
+                    }
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                ref={tamanoempresa}
+                className={`col-12 col-md-6 col-lg-4 ${
+                  listaguia[3]!?.activo && guia && 'overlay-marco'
+                }`}>
+                <ComboSimple
+                  name="tamanoEmpresaId"
+                  label="N° de trabajadores"
+                  datos={comboTamanoEmpresa}
+                  idElemento="idtamanoempresa"
+                  descripcion="descripcion"
+                />
+              </div>
 
               <ComboSimple
                 name="sistemaRemuneracionId"

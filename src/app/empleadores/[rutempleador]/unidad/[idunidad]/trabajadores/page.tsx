@@ -18,6 +18,7 @@ import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alert
 import 'animate.css';
 import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { ChangeEvent, FormEvent, useContext, useEffect, useRef, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
@@ -240,6 +241,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     ]);
   }, []);
 
+  const router = useRouter();
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
     if (error.run) return;
@@ -716,7 +718,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           }}>
           <div className="col-md-6"></div>
           <div className="col-md-6 text-end">
-            <button className="btn btn-danger" onClick={() => window.history.back()}>
+            <button
+              className="btn btn-danger"
+              onClick={() => router.push(`/empleadores/${rutempleador}/unidad`)}>
               Volver
             </button>
           </div>

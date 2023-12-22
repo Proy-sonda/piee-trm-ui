@@ -14,6 +14,7 @@ import { Titulo } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { useMergeFetchObject } from '@/hooks';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import { Usuarioxrrhh } from '../../(modelos)';
 import { buscarUnidadPorId } from '../../(servicios)';
 import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)';
@@ -50,6 +51,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     usuario,
     datosGuia: { guia, listaguia, AgregarGuia },
   } = useContext(AuthContext);
+
+  const router = useRouter();
 
   const agregaUsuario = useRef(null);
 
