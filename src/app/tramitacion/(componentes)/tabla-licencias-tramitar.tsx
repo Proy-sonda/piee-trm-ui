@@ -8,8 +8,12 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
-import { buscarZona0 } from '../[foliolicencia]/[idoperador]/c1/(servicios)';
+import {
+  LicenciaTramitar,
+  licenciaEnviadaHaciaOperadores,
+  licenciaSePuedeTramitar,
+} from '../(modelos)/licencia-tramitar';
+import { agregarEstadoDeTramitacion } from '../(servicios)/agregar-estado-de-tramitacion';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -27,6 +31,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: licencias,
     tamanoPagina: 5,
+    porCadaElemento: agregarEstadoDeTramitacion,
   });
   const [loading, setloading] = useState(false);
   const target = useRef(null);
@@ -34,17 +39,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
-  };
-
-  const BuscarActivo = (foliolicencia: string, idoperador: number) => {
-    const busquedazona = async () => {
-      const [resp] = await buscarZona0(foliolicencia, idoperador);
-      return await resp();
-    };
-
-    return busquedazona().then((resp) => {
-      return resp;
-    });
   };
 
   return (
@@ -66,8 +60,10 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
             </tr>
           </thead>
           <tbody>
-            {licenciasPaginadas.map(async (licencia) => (
-              <tr key={licencia.foliolicencia} className="text-center align-middle">
+            {licenciasPaginadas.map((licencia) => (
+              <tr
+                key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
+                className="text-center align-middle">
                 <td className="px-4 py-3">
                   {/* TODO: Cambiar el color del circulo de acuerdo al estado */}
                   <div className={`mb-2 ${styles.circlered}`}></div>
@@ -114,12 +110,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <IfContainer
-                      show={
-                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
-                          ?.estadotramitacion.idestadotramitacion === 1 ||
-                        !(await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))
-                      }>
+                    <IfContainer show={licenciaSePuedeTramitar(licencia)}>
                       <Link
                         className="btn btn-sm btn-success"
                         onClick={() => setloading(true)}
@@ -127,15 +118,8 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                         <small className="text-nowrap">TRAMITAR</small>
                       </Link>
                     </IfContainer>
-                    <IfContainer
-                      show={
-                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
-                          ?.estadotramitacion.idestadotramitacion !== 1 &&
-                        (await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
-                          ?.estadotramitacion.idestadotramitacion
-                      }>
-                      {(await BuscarActivo(licencia.foliolicencia, licencia.operador.idoperador))!
-                        ?.estadotramitacion.idestadotramitacion !== 3 ? (
+                    <IfContainer show={!licenciaSePuedeTramitar(licencia)}>
+                      {!licenciaEnviadaHaciaOperadores(licencia) ? (
                         <button
                           className="btn btn-sm btn-warning"
                           onClick={(e) =>
