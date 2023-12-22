@@ -42,7 +42,12 @@ export const usePaginacion = <T>({
     if (!porCadaElemento) {
       setDatosPaginados(datosParaTransformar);
     } else {
-      Promise.all(datosParaTransformar.map(porCadaElemento)).then(setDatosPaginados);
+      Promise.all(datosParaTransformar.map(porCadaElemento))
+        .then(setDatosPaginados)
+        .catch((err) => {
+          console.error('Error al transformar datos de paginacion. ', err);
+          setDatosPaginados([]);
+        });
     }
   };
 

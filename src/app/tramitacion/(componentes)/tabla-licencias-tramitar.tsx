@@ -8,8 +8,12 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import { LicenciaTramitar } from '../(modelos)/licencia-tramitar';
-import { buscarZona0 } from '../[foliolicencia]/[idoperador]/c1/(servicios)';
+import {
+  LicenciaTramitar,
+  licenciaEnviadaHaciaOperadores,
+  licenciaSePuedeTramitar,
+} from '../(modelos)/licencia-tramitar';
+import { agregarEstadoDeTramitacion } from '../(servicios)/agregar-estado-de-tramitacion';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -20,20 +24,6 @@ interface TablaLicenciasTramitarProps {
   licencias?: LicenciaTramitar[];
 }
 
-const buscarEstadoTramitacion = async (licencia: LicenciaTramitar) => {
-  if (licencia.idEstadoTramitacion !== undefined) {
-    return licencia;
-  }
-
-  const [request] = buscarZona0(licencia.foliolicencia, licencia.operador.idoperador);
-
-  licencia.idEstadoTramitacion = await request().then(
-    (zona0) => zona0?.estadotramitacion?.idestadotramitacion,
-  );
-
-  return licencia;
-};
-
 export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   licencias,
   empleadores,
@@ -41,7 +31,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: licencias,
     tamanoPagina: 5,
-    porCadaElemento: buscarEstadoTramitacion,
+    porCadaElemento: agregarEstadoDeTramitacion,
   });
   const [loading, setloading] = useState(false);
   const target = useRef(null);
@@ -120,11 +110,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <IfContainer
-                      show={
-                        licencia.idEstadoTramitacion === undefined ||
-                        licencia.idEstadoTramitacion === 1
-                      }>
+                    <IfContainer show={licenciaSePuedeTramitar(licencia)}>
                       <Link
                         className="btn btn-sm btn-success"
                         onClick={() => setloading(true)}
@@ -132,12 +118,8 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                         <small className="text-nowrap">TRAMITAR</small>
                       </Link>
                     </IfContainer>
-                    <IfContainer
-                      show={
-                        licencia.idEstadoTramitacion !== undefined &&
-                        licencia.idEstadoTramitacion !== 1
-                      }>
-                      {licencia.idEstadoTramitacion !== 3 ? (
+                    <IfContainer show={!licenciaSePuedeTramitar(licencia)}>
+                      {!licenciaEnviadaHaciaOperadores(licencia) ? (
                         <button
                           className="btn btn-sm btn-warning"
                           onClick={(e) =>
