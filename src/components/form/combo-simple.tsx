@@ -95,7 +95,7 @@ export const ComboSimple = <T extends Record<string, any>>({
                   return;
                 }
 
-                if (Number.isNaN(valor)) {
+                if (Number.isNaN(valor) || valor === 0) {
                   return 'Este campo es obligatorio';
                 }
 
