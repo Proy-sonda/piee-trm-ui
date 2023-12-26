@@ -4,7 +4,7 @@ import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, startOfDay } from 'date-fns';
-import React from 'react';
+import React, { useRef } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FiltroBusquedaLicencias } from '../(modelos)/filtro-busqueda-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
@@ -19,7 +19,7 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   onFiltrarLicencias,
 }) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
-
+  const target = useRef(null);
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
 
   const [, unidadesRRHH] = useFetch(
@@ -43,8 +43,8 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   return (
     <>
       <FormProvider {...formulario}>
-        <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
-          <div className="row g-3 align-items-baseline">
+        <form onSubmit={formulario.handleSubmit(filtrarLicencias)} ref={target}>
+          <div className={`row g-3 align-items-baseline`}>
             <InputRutBusqueda
               opcional
               name="folio"

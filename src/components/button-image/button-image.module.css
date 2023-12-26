@@ -3,7 +3,7 @@
 }
 
 .gobimg {
-  width: 45%;
+  width: 45% !important;
   border-radius: 50%;
   margin: 4px;
 }

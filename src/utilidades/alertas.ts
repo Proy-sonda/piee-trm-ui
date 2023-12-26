@@ -37,3 +37,10 @@ export const AlertaConfirmacion = Swal.mixin({
   denyButtonColor: 'var(--bs-danger)',
   denyButtonText: 'NO',
 });
+
+export const AlertaInformacion = Swal.mixin({
+  icon: 'info',
+  showConfirmButton: true,
+  confirmButtonText: 'OK',
+  confirmButtonColor: 'var(--color-blue)',
+});

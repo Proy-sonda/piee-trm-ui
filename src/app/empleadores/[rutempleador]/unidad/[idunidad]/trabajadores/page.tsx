@@ -10,6 +10,7 @@ import {
 
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { Titulo } from '@/components';
+import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks';
 import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
@@ -17,7 +18,8 @@ import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alert
 import 'animate.css';
 import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
-import { ChangeEvent, FormEvent, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { ChangeEvent, FormEvent, useContext, useEffect, useRef, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
@@ -65,6 +67,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [rutedit, setrutedit] = useState<string>();
   const [show, setshow] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const cargaNomina = useRef(null);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
@@ -217,8 +220,29 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
   };
 
-  const { usuario } = useContext(AuthContext);
+  const {
+    usuario,
+    datosGuia: { guia, listaguia, AgregarGuia },
+  } = useContext(AuthContext);
 
+  const cargatrabajador = useRef(null);
+
+  useEffect(() => {
+    AgregarGuia([
+      {
+        indice: 0,
+        nombre: 'Menu lateral',
+        activo: true,
+      },
+      {
+        indice: 1,
+        nombre: 'Carga trabajador',
+        activo: false,
+      },
+    ]);
+  }, []);
+
+  const router = useRouter();
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
     if (error.run) return;
@@ -370,200 +394,333 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         </div>
 
         {rolEnEmpleadorActual === 'administrador' && (
-          <div className="row mt-4">
-            <div className="col-md-12 col-xs-12 col-lg-5">
-              <h5>Cargar Personas Trabajadoras</h5>
-              <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
-              <br />
-              <br />
-
-              <form onSubmit={handleAddTrabajador}>
-                <div className="row mt-1">
-                  <div className="col-md-8 position-relative">
-                    <input
-                      id="run"
-                      type="text"
-                      className={error.run ? 'form-control is-invalid' : 'form-control'}
-                      minLength={4}
-                      maxLength={11}
-                      {...register('run', {
-                        required: {
-                          value: true,
-                          message: 'Este campo es obligatorio',
-                        },
-                        onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                          if (event.target.value.trim() == '') {
-                            return seterror({ ...error, run: false });
-                          }
-                          if (Number(event.target.value.split('-')[0]) > 50000000)
-                            return seterror({ ...error, run: true });
-                          const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
-                          let rut = event.target.value as string;
-
-                          if (regex.test(rut)) {
-                            rut = rut.replaceAll(regex, '');
-                          }
-
-                          seterror({ ...error, run: !validateRut(formatRut(rut)) });
-
-                          setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
-                        },
-                        onBlur: (event: ChangeEvent<HTMLInputElement>) => {
-                          if (event.target.value.trim() == '') {
-                            return seterror({ ...error, run: false });
-                          }
-                          if (Number(event.target.value.split('-')[0]) > 50000000)
-                            return seterror({ ...error, run: true });
-                          const rut = event.target.value as string;
-
-                          seterror({ ...error, run: !validateRut(formatRut(rut)) });
-
-                          setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
-                        },
-                      })}
-                    />
-                    <IfContainer show={error.run}>
-                      <div className="invalid-tooltip">Debe ingresar un RUN valido</div>
-                    </IfContainer>
-                  </div>
-                  <div className="d-block d-sm-none d-md-none d-xs-block">
-                    <div className="col-md-12">
+          <>
+            <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={cargatrabajador}>
+              Formulario de carga de personas trabajadoras <br />
+              en la unidad <b>{unidad}</b> <br />
+              <div className="text-end mt-2">
+                <button
+                  className="btn btn-sm text-white"
+                  onClick={() =>
+                    AgregarGuia([
+                      {
+                        indice: 0,
+                        nombre: 'Menu lateral',
+                        activo: true,
+                      },
+                      {
+                        indice: 1,
+                        nombre: 'Carga trabajador',
+                        activo: false,
+                      },
+                    ])
+                  }
+                  style={{
+                    border: '1px solid white',
+                  }}>
+                  <i className="bi bi-arrow-left"></i>
+                  &nbsp; Anterior
+                </button>
+                &nbsp;
+                <button
+                  className="btn btn-sm text-white"
+                  onClick={() =>
+                    AgregarGuia([
+                      {
+                        indice: 0,
+                        nombre: 'Menu lateral',
+                        activo: false,
+                      },
+                      {
+                        indice: 1,
+                        nombre: 'Carga trabajador',
+                        activo: false,
+                      },
+                      {
+                        indice: 2,
+                        nombre: 'Carga nomina',
+                        activo: true,
+                      },
+                    ])
+                  }
+                  style={{
+                    border: '1px solid white',
+                  }}>
+                  Continuar &nbsp;
+                  <i className="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </GuiaUsuario>
+            <div className={`row mt-4`}>
+              <div className="col-md-12 col-xs-12 col-lg-5">
+                <form onSubmit={handleAddTrabajador}>
+                  <div className="row mt-1">
+                    <div
+                      className={`col-md-8 position-relative ${
+                        listaguia[1]!?.activo && guia && 'overlay-marco'
+                      }`}
+                      ref={cargatrabajador}>
+                      <h5>Cargar Personas Trabajadoras</h5>
+                      <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
                       <br />
+                      <br />
+                      <input
+                        id="run"
+                        type="text"
+                        className={error.run ? 'form-control is-invalid' : 'form-control'}
+                        minLength={4}
+                        maxLength={11}
+                        {...register('run', {
+                          required: {
+                            value: true,
+                            message: 'Este campo es obligatorio',
+                          },
+                          onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                            if (event.target.value.trim() == '') {
+                              return seterror({ ...error, run: false });
+                            }
+                            if (Number(event.target.value.split('-')[0]) > 50000000)
+                              return seterror({ ...error, run: true });
+                            const regex = /[^0-9kK\-]/g; // solo números, puntos, guiones y la letra K
+                            let rut = event.target.value as string;
+
+                            if (regex.test(rut)) {
+                              rut = rut.replaceAll(regex, '');
+                            }
+
+                            seterror({ ...error, run: !validateRut(formatRut(rut)) });
+
+                            setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
+                          },
+                          onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                            if (event.target.value.trim() == '') {
+                              return seterror({ ...error, run: false });
+                            }
+                            if (Number(event.target.value.split('-')[0]) > 50000000)
+                              return seterror({ ...error, run: true });
+                            const rut = event.target.value as string;
+
+                            seterror({ ...error, run: !validateRut(formatRut(rut)) });
+
+                            setValue('run', rut.length > 2 ? formatRut(rut, false) : rut);
+                          },
+                        })}
+                      />
+                      <IfContainer show={error.run}>
+                        <div className="invalid-tooltip">Debe ingresar un RUN valido</div>
+                      </IfContainer>
                     </div>
-                  </div>
-                  <div
-                    className="col-md-4"
-                    style={{
-                      alignSelf: 'end',
-                    }}>
-                    <div className="d-grid gap-2 d-md-flex">
-                      <button type="submit" className="btn btn-success">
-                        Agregar
-                      </button>
+                    <div className="d-block d-sm-none d-md-none d-xs-block">
+                      <div className="col-md-12">
+                        <br />
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-            <div className="d-block d-sm-none d-md-none">
-              <div className="col-md-12">
-                <br />
-              </div>
-            </div>
-
-            <div className="d-none d-md-inline d-lg-none col-md-12">
-              <div className="col-md-12">
-                <br />
-              </div>
-            </div>
-
-            <div className="col-md-12 col-xs-12 col-lg-7">
-              <h5>Cargar Nómina</h5>
-              <sub className="d-inline d-sm-none d-xl-inline">
-                Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo tiene
-                que seleccionar un archivo (formato CSV) según el{' '}
-                <a
-                  className={styles['span-link']}
-                  download="formato.csv"
-                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                  siguiente formato
-                </a>
-              </sub>
-              <sub className="d-none d-sm-inline d-xl-none">
-                Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
-                <a
-                  className={styles['span-link']}
-                  download="formato.csv"
-                  href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                  siguiente formato
-                </a>
-              </sub>
-              <div className="row mt-4">
-                <div className="col-md-6 position-relative">
-                  <input
-                    type="file"
-                    accept=".csv"
-                    className={error.file ? 'form-control is-invalid' : 'form-control'}
-                    {...register('file', {
-                      onChange: (event: ChangeEvent<HTMLInputElement>) => {
-                        if (event.target.files?.length == 0) return setValue('file', null);
-                        if (!event.target.files) setValue('file', event.target.files);
-                        if (!getValues('file')![0].name.includes('csv')) {
-                          seterror({ ...error, file: true });
-                        } else {
-                          seterror({ ...error, file: false });
-                          const file = event.target.files![0];
-                          const reader = new FileReader();
-                          reader.onload = (e: any) => {
-                            const content = e.target.result.trim();
-                            const lines = content.split('\n');
-                            setCsvData(lines);
-                          };
-
-                          reader.readAsText(file);
-                        }
-                      },
-                      onBlur: (event: ChangeEvent<HTMLInputElement>) => {
-                        if (event.target.files?.length == 0) return setValue('file', null);
-                        if (!event.target.files) setValue('file', event.target.files);
-                        if (!getValues('file')![0].name.includes('csv')) {
-                          seterror({ ...error, file: true });
-                        } else {
-                          seterror({ ...error, file: false });
-                          const file = event.target.files![0];
-                          const reader = new FileReader();
-                          reader.onload = (e: any) => {
-                            const content = e.target.result.trim();
-                            const lines = content.split('\n');
-                            setCsvData(lines);
-                          };
-
-                          reader.readAsText(file);
-                        }
-                      },
-                    })}
-                  />
-                  <IfContainer show={error.file}>
-                    <div className="invalid-tooltip">Debe ingresar un archivo con formato .csv</div>
-                  </IfContainer>
-                </div>
-                <div className="d-block d-sm-none d-md-none">
-                  <div className="col-md-12">
-                    <br />
-                  </div>
-                </div>
-                <div className="col-md-6 col-xs-6">
-                  <div className="d-grid gap-2 d-md-flex">
-                    <button
-                      disabled={
-                        getValues('file')?.length === 0 || !getValues('file') ? true : false
-                      }
-                      className="btn btn-success"
-                      onClick={handleClickNomina}>
-                      Cargar
-                    </button>
-                    <button
-                      disabled={
-                        getValues('file')?.length === 0 || getValues('file') === null ? true : false
-                      }
-                      className="btn btn-primary"
-                      onClick={async () => {
-                        if (!getValues('file')) return;
-                        const resp = await AlertaConfirmacion.fire({
-                          html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name}</b>?`,
-                        });
-                        if (resp.isConfirmed) {
-                          setValue('file', null);
-                          refrescarComponente();
-                        }
+                    <div
+                      className="col-md-4"
+                      style={{
+                        alignSelf: 'end',
                       }}>
-                      Limpiar
+                      <div className="d-grid gap-2 d-md-flex">
+                        <button type="submit" className="btn btn-success">
+                          Agregar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div className="d-block d-sm-none d-md-none">
+                <div className="col-md-12">
+                  <br />
+                </div>
+              </div>
+
+              <div className="d-none d-md-inline d-lg-none col-md-12">
+                <div className="col-md-12">
+                  <br />
+                </div>
+              </div>
+
+              <div className="col-md-12 col-xs-12 col-lg-7">
+                <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={cargaNomina}>
+                  Formulario de carga masiva para pesonas trabajadoras <br />
+                  en la unidad <b>{unidad}</b> utilizando archivo .CSV
+                  <br />
+                  <div className="text-end mt-2">
+                    <button
+                      className="btn btn-sm text-white"
+                      onClick={() =>
+                        AgregarGuia([
+                          {
+                            indice: 0,
+                            nombre: 'Menu lateral',
+                            activo: false,
+                          },
+                          {
+                            indice: 1,
+                            nombre: 'Carga trabajador',
+                            activo: true,
+                          },
+                          {
+                            indice: 2,
+                            nombre: 'Carga nomina',
+                            activo: false,
+                          },
+                        ])
+                      }
+                      style={{
+                        border: '1px solid white',
+                      }}>
+                      <i className="bi bi-arrow-left"></i>
+                      &nbsp; Anterior
                     </button>
+                    &nbsp;
+                    <button
+                      className="btn btn-sm text-white"
+                      onClick={() =>
+                        AgregarGuia([
+                          {
+                            indice: 0,
+                            nombre: 'Menu lateral',
+                            activo: true,
+                          },
+                          {
+                            indice: 1,
+                            nombre: 'Carga trabajador',
+                            activo: false,
+                          },
+                          {
+                            indice: 2,
+                            nombre: 'Carga nomina',
+                            activo: false,
+                          },
+                        ])
+                      }
+                      style={{
+                        border: '1px solid white',
+                      }}>
+                      Continuar &nbsp;
+                      <i className="bi bi-arrow-right"></i>
+                    </button>
+                  </div>
+                </GuiaUsuario>
+                <div
+                  className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                  ref={cargaNomina}>
+                  <h5>Cargar Nómina</h5>
+                  <sub className="d-inline d-sm-none d-xl-inline">
+                    Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo
+                    tiene que seleccionar un archivo (formato CSV) según el{' '}
+                    <a
+                      className={styles['span-link']}
+                      download="formato.csv"
+                      href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                      siguiente formato
+                    </a>
+                  </sub>
+                  <sub className="d-none d-sm-inline d-xl-none">
+                    Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
+                    <a
+                      className={styles['span-link']}
+                      download="formato.csv"
+                      href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                      siguiente formato
+                    </a>
+                  </sub>
+                  <div className="row mt-4">
+                    <div className="col-md-6 position-relative">
+                      <input
+                        type="file"
+                        accept=".csv"
+                        className={error.file ? 'form-control is-invalid' : 'form-control'}
+                        {...register('file', {
+                          onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                            if (event.target.files?.length == 0) return setValue('file', null);
+                            if (!event.target.files) setValue('file', event.target.files);
+                            if (!getValues('file')![0].name.includes('csv')) {
+                              seterror({ ...error, file: true });
+                            } else {
+                              seterror({ ...error, file: false });
+                              const file = event.target.files![0];
+                              const reader = new FileReader();
+                              reader.onload = (e: any) => {
+                                const content = e.target.result.trim();
+                                const lines = content.split('\n');
+                                setCsvData(lines);
+                              };
+
+                              reader.readAsText(file);
+                            }
+                          },
+                          onBlur: (event: ChangeEvent<HTMLInputElement>) => {
+                            if (event.target.files?.length == 0) return setValue('file', null);
+                            if (!event.target.files) setValue('file', event.target.files);
+                            if (!getValues('file')![0].name.includes('csv')) {
+                              seterror({ ...error, file: true });
+                            } else {
+                              seterror({ ...error, file: false });
+                              const file = event.target.files![0];
+                              const reader = new FileReader();
+                              reader.onload = (e: any) => {
+                                const content = e.target.result.trim();
+                                const lines = content.split('\n');
+                                setCsvData(lines);
+                              };
+
+                              reader.readAsText(file);
+                            }
+                          },
+                        })}
+                      />
+                      <IfContainer show={error.file}>
+                        <div className="invalid-tooltip">
+                          Debe ingresar un archivo con formato .csv
+                        </div>
+                      </IfContainer>
+                    </div>
+                    <div className="d-block d-sm-none d-md-none">
+                      <div className="col-md-12">
+                        <br />
+                      </div>
+                    </div>
+                    <div className="col-md-6 col-xs-6">
+                      <div className="d-grid gap-2 d-md-flex">
+                        <button
+                          disabled={
+                            getValues('file')?.length === 0 || !getValues('file') ? true : false
+                          }
+                          className="btn btn-success"
+                          onClick={handleClickNomina}>
+                          Cargar
+                        </button>
+                        <button
+                          disabled={
+                            getValues('file')?.length === 0 || getValues('file') === null
+                              ? true
+                              : false
+                          }
+                          className="btn btn-primary"
+                          onClick={async () => {
+                            if (!getValues('file')) return;
+                            const resp = await AlertaConfirmacion.fire({
+                              html: `¿Desea eliminar el fichero <b>${
+                                getValues('file')![0].name
+                              }</b>?`,
+                            });
+                            if (resp.isConfirmed) {
+                              setValue('file', null);
+                              refrescarComponente();
+                            }
+                          }}>
+                          Limpiar
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          </>
         )}
 
         <div className="row mt-5">
@@ -634,7 +791,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           }}>
           <div className="col-md-6"></div>
           <div className="col-md-6 text-end">
-            <button className="btn btn-danger" onClick={() => window.history.back()}>
+            <button
+              className="btn btn-danger"
+              onClick={() => router.push(`/empleadores/${rutempleador}/unidad`)}>
               Volver
             </button>
           </div>

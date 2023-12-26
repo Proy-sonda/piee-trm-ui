@@ -1,12 +1,29 @@
-import { UsuarioToken } from '@/modelos/usuario';
-import { esTokenValido } from '@/servicios/auth';
 import { NextResponse, type NextRequest } from 'next/server';
 
 export const config = {
-  matcher: ['/empleadores/:path*', '/tramitacion', '/consultas', '/licencias-tramitadas'],
+  matcher: ['/empleadores/:path*', '/tramitacion/:path*', '/consultas', '/licencias-tramitadas'],
 };
 
 export async function middleware(request: NextRequest) {
+  // if (request.nextUrl.pathname.startsWith('/tramitacion/')) {
+  //   const tokenCookie = request.cookies.get('token');
+  //   const licencia = request.nextUrl.pathname.split('/')[2];
+  //   const idoperador: number = Number(request.nextUrl.pathname.split('/')[3]);
+  //   const resp = await fetch(`${urlBackendTramitacion()}/licencia/zona0/operadorfolio`, {
+  //     method: 'POST',
+  //     headers: {
+  //       Authorization: tokenCookie!?.value,
+  //       'Content-type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       foliolicencia: licencia,
+  //       idoperador: idoperador,
+  //     }),
+  //   });
+  //   const zona0: LicenciaC0 = await resp.json();
+  //   if (zona0.estadolicencia.idestadolicencia !== 1)
+  //     return NextResponse.rewrite(new URL(`/tramitacion/error`, request.url));
+  // }
   /*const tokenCookie = request.cookies.get('token');
 
   // Verificar que hay cookie
