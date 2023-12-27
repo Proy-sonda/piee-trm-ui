@@ -3,6 +3,23 @@ import { useFormContext } from 'react-hook-form';
 import { InputReciclableBase, UnibleConFormArray } from './base-props';
 import { useInputReciclable } from './hooks';
 
+const VALOR_POR_DEFECTO_EN_TIPO_NUMBER = -99999999;
+
+const VALOR_POR_DEFECTO_EN_TIPO_STRING = '';
+
+type TipoValorComboSimple = 'number' | 'string';
+
+export const esElValorPorDefecto = (
+  value: number | string,
+  tipoValor: TipoValorComboSimple = 'number',
+) => {
+  if (!tipoValor || tipoValor === 'number') {
+    return value === VALOR_POR_DEFECTO_EN_TIPO_NUMBER;
+  } else {
+    return value === VALOR_POR_DEFECTO_EN_TIPO_STRING;
+  }
+};
+
 interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
   /** Datos para rellenar el combo */
   datos?: T[];
@@ -31,12 +48,11 @@ interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
    * Si parsear la propiedad `value` del tag `<option />` a numero o dejarla como string
    * (default: `number`).
    * */
-  tipoValor?: 'number' | 'string';
+  tipoValor?: TipoValorComboSimple;
 }
 
 /**
- * El valor por defecto en caso de ser opcional es un string vacío cuando el combo es tipo `string`
- * o el numero `0` cuando es un combo tipo `number`.
+ * Para ver si se selecciono el valor por defecto del combo usar la funcion {@link esElValorPorDefecto}
  */
 export const ComboSimple = <T extends Record<string, any>>({
   name,
@@ -95,17 +111,18 @@ export const ComboSimple = <T extends Record<string, any>>({
                   return;
                 }
 
-                if (Number.isNaN(valor) || valor === 0) {
-                  return 'Este campo es obligatorio';
-                }
-
-                if (typeof valor === 'string' && valor === '') {
+                if (esElValorPorDefecto(valor)) {
                   return 'Este campo es obligatorio';
                 }
               },
             },
           })}>
-          <option value={!tipoValor || tipoValor === 'number' ? NaN : ''}>
+          <option
+            value={
+              !tipoValor || tipoValor === 'number'
+                ? VALOR_POR_DEFECTO_EN_TIPO_NUMBER
+                : VALOR_POR_DEFECTO_EN_TIPO_STRING
+            }>
             {textoOpcionPorDefecto ?? 'Seleccionar'}
           </option>
           {(datos ?? []).map((dato) => (

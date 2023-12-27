@@ -1,4 +1,4 @@
-import { ComboSimple, InputFecha, InputRutBusqueda } from '@/components/form';
+import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '@/components/form';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
@@ -27,16 +27,23 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
     [rutEmpleadorSeleccionado],
   );
 
-  const filtrarLicencias: SubmitHandler<FormularioFiltrarLicencias> = async (data) => {
+  const filtrarLicencias: SubmitHandler<FormularioFiltrarLicencias> = async ({
+    folio,
+    runPersonaTrabajadora,
+    fechaDesde,
+    fechaHasta,
+    rutEntidadEmpleadora,
+    idUnidadRRHH,
+  }) => {
     onFiltrarLicencias({
-      folio: data.folio.trim() === '' ? undefined : data.folio,
-      fechaDesde: esFechaInvalida(data.fechaDesde) ? undefined : startOfDay(data.fechaDesde),
-      fechaHasta: esFechaInvalida(data.fechaHasta) ? undefined : endOfDay(data.fechaHasta),
-      idUnidadRRHH: Number.isNaN(data.idUnidadRRHH) ? undefined : data.idUnidadRRHH,
-      rutEntidadEmpleadora:
-        data.rutEntidadEmpleadora === '' ? undefined : data.rutEntidadEmpleadora,
-      runPersonaTrabajadora:
-        data.runPersonaTrabajadora === '' ? undefined : data.runPersonaTrabajadora,
+      folio: folio.trim() === '' ? undefined : folio,
+      runPersonaTrabajadora: runPersonaTrabajadora === '' ? undefined : runPersonaTrabajadora,
+      fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
+      fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
+      idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
+      rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora)
+        ? undefined
+        : rutEntidadEmpleadora,
     });
   };
 

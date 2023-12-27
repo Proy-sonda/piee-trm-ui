@@ -1,4 +1,4 @@
-import { ComboSimple, InputFecha, InputRutBusqueda } from '@/components/form';
+import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '@/components/form';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
@@ -30,17 +30,26 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
     [rutEmpleadorSeleccionado],
   );
 
-  const filtrarLicencias: SubmitHandler<FormularioFiltrarLicenciasTramitadas> = async (data) => {
+  const filtrarLicencias: SubmitHandler<FormularioFiltrarLicenciasTramitadas> = async ({
+    folio,
+    runPersonaTrabajadora,
+    idEstado,
+    tipoPeriodo,
+    fechaDesde,
+    fechaHasta,
+    rutEntidadEmpleadora,
+    idUnidadRRHH,
+  }) => {
     // prettier-ignore
     onFiltrarLicencias({
-      folio: data.folio.trim() === '' ? undefined : data.folio,
-      fechaDesde: esFechaInvalida(data.fechaDesde) ? undefined : startOfDay(data.fechaDesde),
-      fechaHasta: esFechaInvalida(data.fechaHasta) ? undefined : endOfDay(data.fechaHasta),
-      idUnidadRRHH: data.idUnidadRRHH === '' ? undefined : data.idUnidadRRHH,
-      rutEntidadEmpleadora: data.rutEntidadEmpleadora === '' ? undefined : data.rutEntidadEmpleadora,
-      runPersonaTrabajadora: data.runPersonaTrabajadora === '' ? undefined : data.runPersonaTrabajadora,
-      tipoPeriodo: (data.tipoPeriodo as string) === '' ? undefined : data.tipoPeriodo,
-      idEstado: data.idEstado === 0 ? undefined : data.idEstado,
+      folio: folio.trim() === '' ? undefined : folio,
+      runPersonaTrabajadora: runPersonaTrabajadora === '' ? undefined : runPersonaTrabajadora,
+      idEstado: esElValorPorDefecto(idEstado) ? undefined : idEstado,
+      tipoPeriodo: esElValorPorDefecto(tipoPeriodo) ? undefined : tipoPeriodo,
+      fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
+      fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
+      rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora) ? undefined : rutEntidadEmpleadora,
+      idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
     });
   };
 
