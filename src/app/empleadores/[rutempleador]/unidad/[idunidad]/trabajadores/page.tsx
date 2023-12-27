@@ -773,7 +773,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                     handleDeleteTrabajador={handleDeleteTrabajador}
                     handleEditTrabajador={handleEditTrabajador}
                     idunidad={Number(idunidad)}
-                    trabajadores={trabajadores || []}
+                    trabajadores={(trabajadores || []).filter(
+                      ({ codigounidadrrhh }) => codigounidadrrhh == idunidad,
+                    )}
                   />
                 </>
               ) : (
