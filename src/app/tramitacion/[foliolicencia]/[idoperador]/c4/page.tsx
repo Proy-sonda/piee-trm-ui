@@ -2,7 +2,7 @@
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { InputFecha } from '@/components/form';
 import { useFetch, useRefrescarPagina } from '@/hooks';
-import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -11,11 +11,7 @@ import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { InputDias } from '../(componentes)/input-dias';
-import {
-  DatosModalConfirmarTramitacion,
-  ModalConfirmarTramitacion,
-  ModalImprimirPdf,
-} from './(componentes)';
+import { DatosModalConfirmarTramitacion, ModalConfirmarTramitacion } from './(componentes)';
 import {
   FormularioC4,
   PasoC4Props,
@@ -32,8 +28,7 @@ const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-panta
 
 const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
   const idOperadorNumber = parseInt(idoperador);
-  const [CargaPDF, setCargaPDF] = useState<boolean>(false);
-  const [actualizaTramitacion, setactualizaTramitacion] = useState(false);
+
   const step = [
     {
       label: 'Entidad Empleadora/Independiente',
@@ -74,8 +69,6 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     control: formulario.control,
     name: 'licenciasAnteriores',
   });
-
-  const [modalimprimir, setmodalimprimir] = useState<boolean>(false);
 
   const informarLicencias = formulario.watch('informarLicencia');
 
@@ -307,21 +300,9 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
       await tramitarLicenciaMedica(foliolicencia, idOperadorNumber);
 
-      AlertaExito.fire({
-        html: 'Licencia tramitada con éxito',
-        didClose: async () => {
-          setMostrarSpinner(false);
-          setactualizaTramitacion(true);
-          const resp = await AlertaConfirmacion.fire({
-            html: '¿Desea exportar a PDF el comprobante de tramitación?',
-          });
-          if (resp.isConfirmed) {
-            setmodalimprimir(true);
-          } else {
-            router.push('/tramitacion');
-          }
-        },
-      });
+      AlertaExito.fire({ html: 'Licencia tramitada con éxito' });
+
+      router.push('/tramitacion');
     } catch (error) {
       AlertaError.fire({
         title: 'Error',
@@ -341,17 +322,6 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   return (
     <>
-      <ModalImprimirPdf
-        foliolicencia={foliolicencia}
-        idOperadorNumber={idOperadorNumber}
-        modalimprimir={modalimprimir}
-        setmodalimprimir={setmodalimprimir}
-        refrescarZona4={refrescarZona4}
-        refresh={refresh}
-        setCargaPDF={setCargaPDF}
-        actualizaTramitacion={actualizaTramitacion}
-      />
-
       <ModalConfirmarTramitacion
         datos={{
           ...datosModalConfirmarTramitacion,
@@ -363,7 +333,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         onTramitacionConfirmada={tramitarLaLicencia}
       />
 
-      <IfContainer show={mostrarSpinner || CargaPDF}>
+      <IfContainer show={mostrarSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
 

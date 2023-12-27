@@ -2,24 +2,27 @@ import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
-import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
+import { esFechaInvalida } from '@/utilidades';
 import { endOfDay, startOfDay } from 'date-fns';
-import React, { useRef } from 'react';
+import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { FiltroBusquedaLicencias } from '../(modelos)/filtro-busqueda-licencias';
-import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
+import { EstadoLicencia } from '../(modelos)';
+import { FiltroBusquedaLicenciasTramitadas } from '../(modelos)/filtro-busqueda-licencias-tramitadas';
+import { FormularioFiltrarLicenciasTramitadas } from '../(modelos)/formulario-filtrar-licencias-tramitadas';
 
-interface FiltroLicenciasProps {
+interface FiltroLicenciasTramitadasProps {
   empleadores: Empleador[];
-  onFiltrarLicencias: (formulario: FiltroBusquedaLicencias) => void | Promise<void>;
+  estadosLicencias: EstadoLicencia[];
+  onFiltrarLicencias: (formulario: FiltroBusquedaLicenciasTramitadas) => void | Promise<void>;
 }
 
-export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
+export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps> = ({
   empleadores,
+  estadosLicencias,
   onFiltrarLicencias,
 }) => {
-  const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
-  const target = useRef(null);
+  const formulario = useForm<FormularioFiltrarLicenciasTramitadas>({ mode: 'onBlur' });
+
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
 
   const [, unidadesRRHH] = useFetch(
@@ -27,31 +30,34 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
     [rutEmpleadorSeleccionado],
   );
 
-  const filtrarLicencias: SubmitHandler<FormularioFiltrarLicencias> = async ({
+  const filtrarLicencias: SubmitHandler<FormularioFiltrarLicenciasTramitadas> = async ({
     folio,
     runPersonaTrabajadora,
+    idEstado,
+    tipoPeriodo,
     fechaDesde,
     fechaHasta,
     rutEntidadEmpleadora,
     idUnidadRRHH,
   }) => {
+    // prettier-ignore
     onFiltrarLicencias({
       folio: folio.trim() === '' ? undefined : folio,
       runPersonaTrabajadora: runPersonaTrabajadora === '' ? undefined : runPersonaTrabajadora,
+      idEstado: esElValorPorDefecto(idEstado) ? undefined : idEstado,
+      tipoPeriodo: esElValorPorDefecto(tipoPeriodo) ? undefined : tipoPeriodo,
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
+      rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora) ? undefined : rutEntidadEmpleadora,
       idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
-      rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora)
-        ? undefined
-        : rutEntidadEmpleadora,
     });
   };
 
   return (
     <>
       <FormProvider {...formulario}>
-        <form onSubmit={formulario.handleSubmit(filtrarLicencias)} ref={target}>
-          <div className={`row g-3 align-items-baseline`}>
+        <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
+          <div className="row g-3 align-items-baseline">
             <InputRutBusqueda
               opcional
               name="folio"
@@ -66,11 +72,35 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               className="col-12 col-md-6 col-lg-3"
             />
 
+            <ComboSimple
+              opcional
+              name="idEstado"
+              label="Estado"
+              datos={estadosLicencias}
+              idElemento="idestadolicencia"
+              descripcion="estadolicencia"
+              className="col-12 col-md-6 col-lg-3"
+            />
+
+            <ComboSimple
+              opcional
+              name="tipoPeriodo"
+              label="Consultar por fecha de"
+              className="col-12 col-md-6 col-lg-3"
+              datos={[
+                { label: 'Emisión', value: 'fecha-emision' },
+                { label: 'Tramitación', value: 'fecha-tramitacion' },
+              ]}
+              idElemento={'value'}
+              descripcion={'label'}
+              tipoValor="string"
+            />
+
             <InputFecha
               opcional
               name="fechaDesde"
               noPosteriorA="fechaHasta"
-              label="Fecha Emisión Desde"
+              label="Fecha Desde"
               className="col-12 col-md-6 col-lg-3"
             />
 
@@ -78,7 +108,7 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               opcional
               name="fechaHasta"
               noAnteriorA="fechaDesde"
-              label="Fecha Emisión Hasta"
+              label="Fecha Hasta"
               className="col-12 col-md-6 col-lg-3"
             />
 
