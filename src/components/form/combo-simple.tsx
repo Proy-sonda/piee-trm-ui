@@ -9,11 +9,8 @@ const VALOR_POR_DEFECTO_EN_TIPO_STRING = '';
 
 type TipoValorComboSimple = 'number' | 'string';
 
-export const esElValorPorDefecto = (
-  value: number | string,
-  tipoValor: TipoValorComboSimple = 'number',
-) => {
-  if (!tipoValor || tipoValor === 'number') {
+export const esElValorPorDefecto = (value: number | string) => {
+  if (typeof value === 'number') {
     return value === VALOR_POR_DEFECTO_EN_TIPO_NUMBER;
   } else {
     return value === VALOR_POR_DEFECTO_EN_TIPO_STRING;
