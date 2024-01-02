@@ -34,6 +34,26 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
         nombre: 'Folio Licencia',
         activo: true,
       },
+      {
+        indice: 1,
+        nombre: 'Rango de fecha',
+        activo: false,
+      },
+      {
+        indice: 2,
+        nombre: 'Botón filtrar',
+        activo: false,
+      },
+      {
+        indice: 3,
+        nombre: 'semaforo',
+        activo: false,
+      },
+      {
+        indice: 4,
+        nombre: 'Tabla de tramitacion',
+        activo: false,
+      },
     ]);
   }, []);
 
@@ -118,7 +138,7 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               className="col-12 col-md-6 col-lg-3"
             />
             <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={rangofecha}>
-              Folio de la Licencia Médica
+              Rango de fecha de emisión de la Licencia Médica
               <br />
               <div className="text-end mt-3">
                 <button

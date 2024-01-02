@@ -5,7 +5,7 @@ import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
@@ -14,6 +14,8 @@ import { buscarZona1 } from '../c1/(servicios)';
 import { InputOtroMotivoDeRechazo } from '../no-tramitar/(componentes)/input-otro-motivo-rechazo';
 
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
+import { GuiaUsuario } from '@/components/guia-usuario';
+import { AuthContext } from '@/contexts';
 import dynamic from 'next/dynamic';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { buscarCalidadTrabajador } from '../(servicios)';
@@ -62,10 +64,25 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     REGIMEN: buscarRegimen(),
     CALIDADTRABAJADOR: buscarCalidadTrabajador(),
     ENTIDADPAGADORA: buscarEntidadPagadora(),
-
     LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
     LMETRM: buscarLicenciasParaTramitar(),
   });
+
+  const regimenPrev = useRef(null);
+  const institucionPrev = useRef(null);
+  const calidadTrabajador = useRef(null);
+  const perteneceAFC = useRef(null);
+
+  const {
+    datosGuia: { AgregarGuia, guia, listaguia },
+  } = useContext(AuthContext);
+
+  useEffect(() => {
+    AgregarGuia([
+      { indice: 0, nombre: 'stepper', activo: true },
+      { indice: 1, nombre: 'Régimen Previsional', activo: false },
+    ]);
+  }, []);
 
   useEffect(() => {
     const BuscarZonaC1 = async () => {
@@ -376,16 +393,142 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             className="animate__animated animate__fadeIn"
             onSubmit={formulario.handleSubmit(onHandleSubmit)}>
             <div className="row align-items-baseline g-3">
-              <ComboSimple
-                label="Régimen Previsional"
-                descripcion="regimenprevisional"
-                idElemento="codigoregimenprevisional"
-                name="regimen"
-                datos={combos?.REGIMEN}
-                className="col-12 col-sm-6 col-lg-4 col-xl-3"
-              />
+              <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={regimenPrev}>
+                Régimen previsional de la persona trabajadora
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: true,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
 
-              <div className="col-12 col-sm-6 col-lg-4 col-xl-3 position-relative">
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: true,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
+                  listaguia[1]!?.activo && guia && 'overlay-marco'
+                }`}
+                ref={regimenPrev}>
+                <ComboSimple
+                  label="Régimen Previsional"
+                  descripcion="regimenprevisional"
+                  idElemento="codigoregimenprevisional"
+                  name="regimen"
+                  datos={combos?.REGIMEN}
+                />
+              </div>
+              <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={institucionPrev}>
+                Institución previsional de la persona trabajadora
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: true,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Calidad persona trabajadora',
+                          activo: true,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-6 col-lg-4 col-xl-3 position-relative ${
+                  listaguia[2]!?.activo && guia && 'overlay-marco'
+                }`}
+                ref={institucionPrev}>
                 <label className="mb-2">Institución Previsional (*)</label>
                 <select
                   {...formulario.register('previsional', {
@@ -457,16 +600,206 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 </IfContainer>
               </div>
 
-              <ComboSimple
-                label="Calidad Persona Trabajadora"
-                descripcion="calidadtrabajador"
-                idElemento="idcalidadtrabajador"
-                name="calidad"
-                datos={combos?.CALIDADTRABAJADOR}
-                className="col-12 col-sm-6 col-lg-4 col-xl-3"
-              />
+              <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={calidadTrabajador}>
+                Sector al que pertenece la persona trabajadora
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: true,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Calidad persona trabajadora',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      esAFC
+                        ? AgregarGuia([
+                            {
+                              indice: 0,
+                              nombre: 'Stepper',
+                              activo: false,
+                            },
+                            {
+                              indice: 1,
+                              nombre: 'regimen previsional',
+                              activo: false,
+                            },
+                            {
+                              indice: 2,
+                              nombre: 'Institución previsional',
+                              activo: false,
+                            },
+                            {
+                              indice: 3,
+                              nombre: 'Calidad persona trabajadora',
+                              activo: false,
+                            },
+                            {
+                              indice: 4,
+                              nombre: 'AFC',
+                              activo: true,
+                            },
+                          ])
+                        : AgregarGuia([
+                            {
+                              indice: 0,
+                              nombre: 'Stepper',
+                              activo: true,
+                            },
+                            {
+                              indice: 1,
+                              nombre: 'regimen previsional',
+                              activo: false,
+                            },
+                            {
+                              indice: 2,
+                              nombre: 'Institución previsional',
+                              activo: false,
+                            },
+                            {
+                              indice: 3,
+                              nombre: 'Calidad persona trabajadora',
+                              activo: false,
+                            },
+                          ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
+                  listaguia[3]!?.activo && guia && 'overlay-marco'
+                }`}
+                ref={calidadTrabajador}>
+                <ComboSimple
+                  label="Calidad Persona Trabajadora"
+                  descripcion="calidadtrabajador"
+                  idElemento="idcalidadtrabajador"
+                  name="calidad"
+                  datos={combos?.CALIDADTRABAJADOR}
+                />
+              </div>
 
-              <div className="col-12 col-sm-6 col-lg-4 col-xl-3">
+              <GuiaUsuario guia={listaguia[4]!?.activo && guia && esAFC} target={perteneceAFC}>
+                Persona trabajadora con seguro cesantia <br />
+                debe tener calidad de trabajador privado dependiente
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Calidad persona trabajadora',
+                          activo: true,
+                        },
+                        {
+                          indice: 4,
+                          nombre: 'AFC',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: true,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Calidad persona trabajadora',
+                          activo: false,
+                        },
+                        {
+                          indice: 4,
+                          nombre: 'AFC',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
+                  listaguia[4]!?.activo && guia && esAFC && 'overlay-marco'
+                }`}
+                ref={perteneceAFC}>
                 <label className="mb-2 animate__animated animate__fadeIn">
                   Persona Pertenece a AFC{' '}
                   {esAFC && LMECABECERA?.ocupacion.idocupacion != 18 && '(*)'}

@@ -1,3 +1,4 @@
+// TODO: Obtener el tipo de reposo
 export interface LicenciaC0 {
   foliolicencia: string;
   operador: Operador;
