@@ -5,12 +5,14 @@ import { ComboSimple, InputArchivo, InputFecha, InputRadioButtons, Titulo } from
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 
+import { GuiaUsuario } from '@/components/guia-usuario';
+import { AuthContext } from '@/contexts';
 import { useMergeFetchArray } from '@/hooks';
 import dynamic from 'next/dynamic';
 import { InformacionLicencia } from '../(componentes)';
@@ -38,11 +40,29 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   const idOperadorNumber = parseInt(idoperador, 10);
 
   const router = useRouter();
+  const {
+    datosGuia: { AgregarGuia, guia, listaguia },
+  } = useContext(AuthContext);
 
   const [erroresCarga, [cajasDeCompensacion, motivosDeRechazo], cargando] = useMergeFetchArray([
     buscarCajasDeCompensacion(),
     buscarMotivosDeRechazo(),
   ]);
+
+  useEffect(() => {
+    AgregarGuia([
+      {
+        indice: 0,
+        nombre: 'Informacion Licencia',
+        activo: true,
+      },
+      { indice: 1, nombre: 'Menú radiobutton', activo: false },
+    ]);
+  }, []);
+
+  const infoLicencia = useRef(null);
+  const radioBtn = useRef(null);
+  const adjuntodoc = useRef(null);
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
@@ -127,11 +147,41 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
         </Row>
 
         <Row className="mt-4">
-          <InformacionLicencia
-            folioLicencia={foliolicencia}
-            idoperador={idOperadorNumber}
-            onLicenciaCargada={setLicencia}
-          />
+          <GuiaUsuario guia={listaguia[0]!?.activo && guia} target={infoLicencia}>
+            Información de la licencia médica
+            <br />
+            <div className="text-end mt-3">
+              <button
+                className="btn btn-sm text-white"
+                onClick={() => {
+                  AgregarGuia([
+                    {
+                      indice: 0,
+                      nombre: 'Informacion Licencia',
+                      activo: false,
+                    },
+                    {
+                      indice: 1,
+                      nombre: 'Menú radiobutton',
+                      activo: true,
+                    },
+                  ]);
+                }}
+                style={{
+                  border: '1px solid white',
+                }}>
+                Continuar &nbsp;
+                <i className="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          </GuiaUsuario>
+          <div className={`${listaguia[0]!?.activo && guia && 'overlay-marco'}`} ref={infoLicencia}>
+            <InformacionLicencia
+              folioLicencia={foliolicencia}
+              idoperador={idOperadorNumber}
+              onLicenciaCargada={setLicencia}
+            />
+          </div>
         </Row>
 
         <IfContainer show={cargando}>
@@ -170,14 +220,76 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
             <Form onSubmit={formulario.handleSubmit(noTramitarLicencia)}>
               <Row>
                 <Col xs={12} md={7} lg={8}>
-                  <InputRadioButtons
-                    name="motivoRechazo"
-                    errores={{ obligatorio: 'Debe seleccionar el motivo para no tramitar' }}
-                    opciones={(motivosDeRechazo ?? []).map((motivo) => ({
-                      label: motivo.motivonorecepcion,
-                      value: motivo.idmotivonorecepcion.toString(),
-                    }))}
-                  />
+                  <GuiaUsuario
+                    guia={listaguia[1]!?.activo && guia}
+                    target={radioBtn}
+                    placement="top-end">
+                    Opciones para la no recepción de la licencia médica
+                    <br />
+                    <div className="text-end mt-3">
+                      <button
+                        className="btn btn-sm text-white"
+                        onClick={() => {
+                          AgregarGuia([
+                            {
+                              indice: 0,
+                              nombre: 'Informacion Licencia',
+                              activo: true,
+                            },
+                            {
+                              indice: 1,
+                              nombre: 'Menú radiobutton',
+                              activo: false,
+                            },
+                          ]);
+                        }}
+                        style={{
+                          border: '1px solid white',
+                        }}>
+                        &nbsp; <i className="bi bi-arrow-left"></i> Anterior
+                      </button>
+                      &nbsp;
+                      <button
+                        className="btn btn-sm text-white"
+                        onClick={() => {
+                          AgregarGuia([
+                            {
+                              indice: 0,
+                              nombre: 'informacion Licencia',
+                              activo: false,
+                            },
+                            {
+                              indice: 1,
+                              nombre: 'Menú radiobutton',
+                              activo: false,
+                            },
+                            {
+                              indice: 2,
+                              nombre: 'Adjunto',
+                              activo: true,
+                            },
+                          ]);
+                        }}
+                        style={{
+                          border: '1px solid white',
+                        }}>
+                        Continuar &nbsp;
+                        <i className="bi bi-arrow-right"></i>
+                      </button>
+                    </div>
+                  </GuiaUsuario>
+                  <div
+                    ref={radioBtn}
+                    className={`${listaguia[1]!?.activo && guia && 'overlay-marco'}`}>
+                    <InputRadioButtons
+                      name="motivoRechazo"
+                      errores={{ obligatorio: 'Debe seleccionar el motivo para no tramitar' }}
+                      opciones={(motivosDeRechazo ?? []).map((motivo) => ({
+                        label: motivo.motivonorecepcion,
+                        value: motivo.idmotivonorecepcion.toString(),
+                      }))}
+                    />
+                  </div>
 
                   <div style={{ maxWidth: '430px' }}>
                     <IfContainer show={esOtroMotivoDeRechazo(motivoRechazo)}>
@@ -198,13 +310,77 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                       />
                     </IfContainer>
 
-                    <InputArchivo
-                      // opcional={esRelacionLaboralTerminada(motivoRechazo)} // TODO: Descomentar cuando subir archivos sea obligatorio
-                      opcional
-                      name="documentoAdjunto"
-                      label="Adjuntar Documento"
-                      className="mt-3"
-                    />
+                    <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={adjuntodoc}>
+                      Campo para adjuntar documento adicional para la no recepción
+                      <br />
+                      <div className="text-end mt-3">
+                        <button
+                          className="btn btn-sm text-white"
+                          onClick={() => {
+                            AgregarGuia([
+                              {
+                                indice: 0,
+                                nombre: 'Informacion Licencia',
+                                activo: false,
+                              },
+                              {
+                                indice: 1,
+                                nombre: 'Menú radiobutton',
+                                activo: true,
+                              },
+                              {
+                                indice: 2,
+                                nombre: 'Adjunto',
+                                activo: false,
+                              },
+                            ]);
+                          }}
+                          style={{
+                            border: '1px solid white',
+                          }}>
+                          &nbsp; <i className="bi bi-arrow-left"></i> Anterior
+                        </button>
+                        &nbsp;
+                        <button
+                          className="btn btn-sm text-white"
+                          onClick={() => {
+                            AgregarGuia([
+                              {
+                                indice: 0,
+                                nombre: 'informacion Licencia',
+                                activo: true,
+                              },
+                              {
+                                indice: 1,
+                                nombre: 'Menú radiobutton',
+                                activo: false,
+                              },
+                              {
+                                indice: 2,
+                                nombre: 'Adjunto',
+                                activo: false,
+                              },
+                            ]);
+                          }}
+                          style={{
+                            border: '1px solid white',
+                          }}>
+                          Continuar &nbsp;
+                          <i className="bi bi-arrow-right"></i>
+                        </button>
+                      </div>
+                    </GuiaUsuario>
+                    <div
+                      className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                      ref={adjuntodoc}>
+                      <InputArchivo
+                        // opcional={esRelacionLaboralTerminada(motivoRechazo)} // TODO: Descomentar cuando subir archivos sea obligatorio
+                        opcional
+                        name="documentoAdjunto"
+                        label="Adjuntar Documento"
+                        className="mt-3"
+                      />
+                    </div>
                   </div>
                 </Col>
 
