@@ -103,7 +103,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       data,
       fileName: `licencias_tramitadas_${format(Date.now(), 'dd_MM_yyyy_HH_mm_ss')}`,
       exportType: exportFromJSON.types.csv,
-      delimiter: ',',
+      delimiter: ';',
       withBOM: true,
     });
 
