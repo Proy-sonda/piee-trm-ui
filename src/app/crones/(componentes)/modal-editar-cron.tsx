@@ -6,7 +6,9 @@ import { useEffect, useState } from 'react';
 import { Form, Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioEditarCron } from '../(modelos)';
-import { actualizarCron, buscarCronPorId } from '../(servicios)';
+import { FormatoFrecuenciaIncorrectoError, actualizarCron, buscarCronPorId } from '../(servicios)';
+import { InputDescripcionCron } from './input-descripcion-cron';
+import { InputFrecuenciaCron } from './input-frecuencia-cron';
 
 interface ModalEditarCronProps {
   show: boolean;
@@ -62,6 +64,14 @@ export const ModalEditarCron: React.FC<ModalEditarCronProps> = ({
 
       handleCerrarModal();
     } catch (error) {
+      if (error instanceof FormatoFrecuenciaIncorrectoError) {
+        formulario.setError('frecuencia', {
+          message: 'Formato incorrecto',
+          type: 'validate',
+        });
+        return;
+      }
+
       AlertaError.fire({
         title: 'Error',
         html: `Hubo un problema al configurar el proceso <b>${data.codigo}</b>`,
@@ -88,17 +98,19 @@ export const ModalEditarCron: React.FC<ModalEditarCronProps> = ({
               </IfContainer>
 
               <IfContainer show={!(cargandoCron || mostrarSpinner) && errorCargarCron}>
-                <div className="modal-body">
-                  <h4 className="my-4 text-center">Error al cargar datos del proceso</h4>
-                </div>
+                <h4 className="my-4 text-center">Error al cargar datos del proceso</h4>
               </IfContainer>
 
               <IfContainer show={!(cargandoCron || mostrarSpinner) && !errorCargarCron}>
-                <div className="row mt-2 g-3 align-items-baseline">
-                  <Form.Group className="mb-3" controlId="formBasicEmail">
+                <div className="row g-3 align-items-baseline">
+                  <Form.Group controlId="codigoCron">
                     <Form.Label>Código</Form.Label>
                     <Form.Control type="text" disabled={true} {...formulario.register('codigo')} />
                   </Form.Group>
+
+                  <InputFrecuenciaCron name="frecuencia" label="Frecuencia" />
+
+                  <InputDescripcionCron opcional name="descripcion" label="Descripción" />
                 </div>
               </IfContainer>
             </Modal.Body>

@@ -8,9 +8,9 @@ import { AlertaConfirmacion, AlertaError, AlertaExito, AlertaInformacion } from 
 import React, { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { ModalEditarCron } from '.';
-import { ConfiguracionCron } from '../(modelos)/configuracion-cron';
+import { ConfiguracionCron } from '../(modelos)';
 import { detenerCron, iniciarCron } from '../(servicios)';
+import { ModalEditarCron } from './modal-editar-cron';
 
 interface TablaCronesProps {
   crones: ConfiguracionCron[];
