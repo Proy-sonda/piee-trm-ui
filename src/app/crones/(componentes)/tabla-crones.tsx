@@ -4,7 +4,8 @@ import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { AlertaConfirmacion, AlertaError, AlertaExito, AlertaInformacion } from '@/utilidades';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades';
+import Link from 'next/link';
 import React, { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
@@ -92,6 +93,10 @@ export const TablaCrones: React.FC<TablaCronesProps> = ({ crones, onCronEditado 
     };
   };
 
+  const linkHistorialCron = (cron: ConfiguracionCron) => {
+    return `/crones/${cron.id}/historial`;
+  };
+
   return (
     <>
       <IfContainer show={mostrarSpinner}>
@@ -159,12 +164,13 @@ export const TablaCrones: React.FC<TablaCronesProps> = ({ crones, onCronEditado 
                         onClick={modificarCronHandler(cron)}>
                         <i className="bi bi-gear" style={{ fontSize: '16px' }}></i>
                       </button>
-                      <button
+                      <Link
+                        href={linkHistorialCron(cron)}
                         className="btn text-primary"
                         title={`Ver historial del proceso`}
-                        onClick={() => AlertaInformacion.fire({ title: 'En construccion...' })}>
+                        onClick={() => setMostrarSpinner(true)}>
                         <i className="bi bi-clock-history" style={{ fontSize: '16px' }}></i>
-                      </button>
+                      </Link>
                     </>
                   </div>
 
@@ -186,7 +192,8 @@ export const TablaCrones: React.FC<TablaCronesProps> = ({ crones, onCronEditado 
                           Configurar
                         </Dropdown.Item>
                         <Dropdown.Item
-                          onClick={() => AlertaInformacion.fire({ title: 'En construccion...' })}>
+                          href={linkHistorialCron(cron)}
+                          onClick={() => setMostrarSpinner(true)}>
                           Ver Historial
                         </Dropdown.Item>
                       </Dropdown.Menu>
