@@ -16,6 +16,7 @@ export interface LicenciaC0 {
   motivodevolucion: Motivodevolucion;
   estadotramitacion: Estadotramitacion;
   entidadsalud: Entidadsalud;
+  tiporeposo: Tiporeposo;
 }
 
 interface Entidadsalud {
@@ -45,4 +46,9 @@ interface Operador {
 interface Tipolicencia {
   idtipolicencia: number;
   tipolicencia: string;
+}
+
+interface Tiporeposo {
+  idtiporeposo: number;
+  tiporeposo: string;
 }
