@@ -92,8 +92,8 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       'Entidad empleadora': nombreEmpleador(licencia),
       'RUN persona trabajadora': licencia.ruttrabajador,
       'Nombre persona trabajadora': nombreTrabajador(licencia),
-      // TODO: Falta incluir el tipo de reposo aqui
-      'Días de Reposo': licencia.ndias,
+      'Tipo de reposo': licencia.tiporeposo.tiporeposo,
+      'Días de reposo': licencia.ndias,
       'Inicio de reposo': formatearFecha(licencia.fechainicioreposo),
       'Fecha de emisión': formatearFecha(licencia.fechaemision),
       'Tipo de licencia': licencia.tipolicencia.tipolicencia,
@@ -171,10 +171,9 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                 <div className="mb-1 small text-nowrap">RUN: {licencia.ruttrabajador}</div>
               </td>
               <td>
-                {/* TODO: Descomentar cuando este disponible el tipo de reposo */}
-                {/* <div className="mb-1 small text-start text-nowrap">
-                  {licencia.tiporesposo.tiporeposo}: {licencia.ndias} día(s)
-                </div> */}
+                <div className="mb-1 small text-start text-nowrap">
+                  {licencia.tiporeposo.tiporeposo}: {licencia.ndias} día(s)
+                </div>
                 <div className="mb-1 small text-start text-nowrap">
                   INICIO REPOSO: {formatearFecha(licencia.fechainicioreposo)}
                 </div>
