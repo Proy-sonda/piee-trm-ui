@@ -8,15 +8,16 @@ import { AlertaConfirmacion, AlertaError, AlertaExito, AlertaInformacion } from 
 import React, { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { ConfiguracionCron } from '../(modelos)';
+import { ConfiguracionCron, cronEstaHabilitado } from '../(modelos)';
 import { detenerCron, iniciarCron } from '../(servicios)';
 import { ModalEditarCron } from './modal-editar-cron';
 
 interface TablaCronesProps {
   crones: ConfiguracionCron[];
+  onCronEditado: () => void | Promise<void>;
 }
 
-export const TablaCrones: React.FC<TablaCronesProps> = ({ crones }) => {
+export const TablaCrones: React.FC<TablaCronesProps> = ({ crones, onCronEditado }) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
   const [abrirModalEditarCron, setAbrirModalEditarCron] = useState(false);
   const [idCronSeleccionado, setIdCronSeleccionado] = useState<number>();
@@ -40,6 +41,8 @@ export const TablaCrones: React.FC<TablaCronesProps> = ({ crones }) => {
         setMostrarSpinner(true);
 
         await iniciarCron(cron.id);
+
+        onCronEditado();
 
         AlertaExito.fire({ html: `Proceso <b>${cron.codigo}</b> ha sido inciado correctamente` });
       } catch (error) {
@@ -67,6 +70,8 @@ export const TablaCrones: React.FC<TablaCronesProps> = ({ crones }) => {
         setMostrarSpinner(true);
 
         await detenerCron(cron.id);
+
+        onCronEditado();
 
         AlertaExito.fire({ html: `Proceso <b>${cron.codigo}</b> ha sido detenido correctamente` });
       } catch (error) {
@@ -99,6 +104,7 @@ export const TablaCrones: React.FC<TablaCronesProps> = ({ crones }) => {
         onCronEditado={() => {
           setAbrirModalEditarCron(false);
           setIdCronSeleccionado(undefined);
+          onCronEditado();
         }}
         onCerrarModal={() => {
           setAbrirModalEditarCron(false);
@@ -129,29 +135,35 @@ export const TablaCrones: React.FC<TablaCronesProps> = ({ crones }) => {
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
                     <>
-                      <button
-                        className="btn text-primary"
-                        title={`Iniciar Cron`}
-                        onClick={inciarCronHandler(cron)}>
-                        <i className="bi bi-play-fill"></i>
-                      </button>
-                      <button
-                        className="btn text-danger"
-                        title={`Detener proceso`}
-                        onClick={detenerCronHandler(cron)}>
-                        <i className="bi bi-stop-fill"></i>
-                      </button>
+                      <IfContainer show={!cronEstaHabilitado(cron)}>
+                        <button
+                          className="btn text-primary"
+                          title={`Iniciar Cron`}
+                          onClick={inciarCronHandler(cron)}>
+                          <i className="bi bi-play-circle" style={{ fontSize: '16px' }}></i>
+                        </button>
+                      </IfContainer>
+
+                      <IfContainer show={cronEstaHabilitado(cron)}>
+                        <button
+                          className="btn text-danger"
+                          title={`Detener proceso`}
+                          onClick={detenerCronHandler(cron)}>
+                          <i className="bi bi-stop-circle" style={{ fontSize: '16px' }}></i>
+                        </button>
+                      </IfContainer>
+
                       <button
                         className="btn text-primary"
                         title={`Configurar proceso`}
                         onClick={modificarCronHandler(cron)}>
-                        <i className="bi bi-pencil-square"></i>
+                        <i className="bi bi-gear" style={{ fontSize: '16px' }}></i>
                       </button>
                       <button
                         className="btn text-primary"
                         title={`Ver historial del proceso`}
                         onClick={() => AlertaInformacion.fire({ title: 'En construccion...' })}>
-                        <i className="bi bi-clock-history"></i>
+                        <i className="bi bi-clock-history" style={{ fontSize: '16px' }}></i>
                       </button>
                     </>
                   </div>
@@ -162,8 +174,14 @@ export const TablaCrones: React.FC<TablaCronesProps> = ({ crones }) => {
                         Acciones
                       </Dropdown.Toggle>
                       <Dropdown.Menu>
-                        <Dropdown.Item onClick={inciarCronHandler(cron)}>Iniciar</Dropdown.Item>
-                        <Dropdown.Item onClick={detenerCronHandler(cron)}>Detener</Dropdown.Item>
+                        <IfContainer show={!cronEstaHabilitado(cron)}>
+                          <Dropdown.Item onClick={inciarCronHandler(cron)}>Iniciar</Dropdown.Item>
+                        </IfContainer>
+
+                        <IfContainer show={cronEstaHabilitado(cron)}>
+                          <Dropdown.Item onClick={detenerCronHandler(cron)}>Detener</Dropdown.Item>
+                        </IfContainer>
+
                         <Dropdown.Item onClick={modificarCronHandler(cron)}>
                           Configurar
                         </Dropdown.Item>

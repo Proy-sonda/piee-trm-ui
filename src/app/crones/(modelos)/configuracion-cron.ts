@@ -10,3 +10,7 @@ interface EstadoCron {
   id: number;
   glosa: string;
 }
+
+export const cronEstaHabilitado = (cron: ConfiguracionCron) => {
+  return cron.estado.id === 1;
+};
