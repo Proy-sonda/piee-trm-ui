@@ -18,6 +18,7 @@ export interface LicenciaTramitada {
   estadolicencia: Estadolicencia;
   entidadsalud: Entidadsalud;
   tipolicencia: Tipolicencia;
+  tiporeposo: Tiporeposo;
   estadotramitacion: Estadotramitacion;
   licenciazc1: Licenciazc1;
 }
@@ -58,4 +59,9 @@ interface Operador {
 interface Tipolicencia {
   idtipolicencia: number;
   tipolicencia: string;
+}
+
+interface Tiporeposo {
+  idtiporeposo: number;
+  tiporeposo: string;
 }
