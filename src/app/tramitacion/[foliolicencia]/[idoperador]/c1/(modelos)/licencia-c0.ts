@@ -17,6 +17,7 @@ export interface LicenciaC0 {
   motivodevolucion: Motivodevolucion;
   estadotramitacion: Estadotramitacion;
   entidadsalud: Entidadsalud;
+  ccaf?: ccaf;
 }
 
 interface Entidadsalud {
@@ -46,4 +47,9 @@ interface Operador {
 interface Tipolicencia {
   idtipolicencia: number;
   tipolicencia: string;
+}
+
+interface ccaf {
+  idccaf: number;
+  nombre: string;
 }

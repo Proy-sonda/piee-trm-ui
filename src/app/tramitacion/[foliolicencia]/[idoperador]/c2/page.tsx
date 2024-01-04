@@ -10,12 +10,14 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { LicenciaC1 } from '../c1/(modelos)';
-import { buscarZona1 } from '../c1/(servicios)';
+import { buscarZona0, buscarZona1 } from '../c1/(servicios)';
 import { InputOtroMotivoDeRechazo } from '../no-tramitar/(componentes)/input-otro-motivo-rechazo';
 
+import { buscarCajasDeCompensacion } from '@/app/empleadores/(servicios)';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
+import { useRefrescarPagina } from '@/hooks';
 import dynamic from 'next/dynamic';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { buscarCalidadTrabajador } from '../(servicios)';
@@ -27,6 +29,8 @@ import {
   buscarZona2,
   crearLicenciaZ2,
 } from './(servicios)/';
+import { ErrorGuardarCCAF, GuardarCCAF } from './(servicios)/actualiza-ccaf';
+import { BuscarIDCCAFPropuesto } from './(servicios)/obtener-idccaf-propuesta';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -50,6 +54,7 @@ interface formularioApp {
   fechacontratotrabajo: string;
   entidadremuneradora: string;
   nombreentidadpagadorasubsidio: string;
+  ccaflm: number;
 }
 
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
@@ -60,13 +65,19 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
   const router = useRouter();
-  const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
-    REGIMEN: buscarRegimen(),
-    CALIDADTRABAJADOR: buscarCalidadTrabajador(),
-    ENTIDADPAGADORA: buscarEntidadPagadora(),
-    LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
-    LMETRM: buscarLicenciasParaTramitar(),
-  });
+  const [refresh, setrefresh] = useRefrescarPagina();
+  const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject(
+    {
+      REGIMEN: buscarRegimen(),
+      CALIDADTRABAJADOR: buscarCalidadTrabajador(),
+      ENTIDADPAGADORA: buscarEntidadPagadora(),
+      ZONA0: buscarZona0(foliolicencia, Number(idoperador)),
+      LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
+      LMETRM: buscarLicenciasParaTramitar(),
+      CCAF: buscarCajasDeCompensacion(),
+    },
+    [refresh],
+  );
 
   const regimenPrev = useRef(null);
   const institucionPrev = useRef(null);
@@ -123,8 +134,87 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     },
   });
 
+  const [ccafvisible, setccafvisible] = useState(false);
+  const [idccaf, setidccaf] = useState<number | undefined>(0);
+
+  useEffect(() => {
+    if (combos?.ZONA0) {
+      if (combos?.ZONA0?.ccaf !== null) {
+        formulario.setValue('ccaflm', combos!?.ZONA0!?.ccaf!?.idccaf);
+      } else {
+        // en caso de que el tipo de licencia sea 5 o 6, se debe cargar el idccaf de la entidad de salud
+        if (
+          combos?.ZONA0.tipolicencia.idtipolicencia == 5 ||
+          combos?.ZONA0.tipolicencia.idtipolicencia == 6
+        ) {
+          setccafvisible(false);
+          return setidccaf(combos?.ZONA0.entidadsalud.identidadsalud);
+        }
+        // si es distinto distinto a 5 o 6, y la entidad de salud es distinta a 1, se debe cargar el idccaf 10100(isapres)
+        if (combos?.ZONA0.entidadsalud.identidadsalud !== 1) {
+          return setidccaf(10100);
+        }
+
+        // aqui cargamos el idccaf propuesto en caso de que el valor sea null
+        const busquedaPropuesta = async () => {
+          const [resp] = await BuscarIDCCAFPropuesto(Number(idoperador), foliolicencia);
+          await resp().then((data) => formulario.setValue('ccaflm', data.codigoccafpropuesta));
+        };
+
+        busquedaPropuesta();
+      }
+    }
+  }, [combos?.ZONA0]);
+
+  const EntidadPagadora = formulario.watch('entidadremuneradora');
+
+  useEffect(() => {
+    if (EntidadPagadora) {
+      if (EntidadPagadora === 'C' && combos?.ZONA0.entidadsalud.identidadsalud === 1) {
+        setccafvisible(true);
+        setidccaf(undefined);
+      } else {
+        setccafvisible(false);
+        if (EntidadPagadora === 'A' && combos?.ZONA0.entidadsalud.identidadsalud === 1) {
+          setidccaf(10100);
+        }
+      }
+    }
+  }, [EntidadPagadora]);
+
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
     await GuardarZ2();
+    await GuardarIDCCAF();
+  };
+
+  const GuardarIDCCAF = async () => {
+    if (idccaf) {
+      try {
+        await GuardarCCAF(idoperador, idccaf.toString(), foliolicencia);
+        AlertaExito.fire({
+          html: 'Se ha actualizado el idccaf con éxito',
+        });
+      } catch (error) {
+        if (error instanceof ErrorGuardarCCAF) {
+          AlertaError.fire({
+            html: `Ha ocurrido un problema: ${ErrorGuardarCCAF}`,
+          });
+        }
+      }
+    } else {
+      try {
+        await GuardarCCAF(idoperador, formulario.getValues('ccaflm').toString(), foliolicencia);
+        AlertaExito.fire({
+          html: 'Se ha actualizado el idccaf con éxito',
+        });
+      } catch (error) {
+        if (error instanceof ErrorGuardarCCAF) {
+          AlertaError.fire({
+            html: `Ha ocurrido un problema: ${ErrorGuardarCCAF}`,
+          });
+        }
+      }
+    }
   };
 
   const GuardarZ2 = async () => {
@@ -881,12 +971,26 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 tipoValor="string"
                 className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
-              <InputOtroMotivoDeRechazo
-                name="nombreentidadpagadorasubsidio"
-                opcional
-                label="Nombre Entidad Pagadora Subsidio"
-                className="col-12 col-sm-6 col-lg-4 col-xl-3"
-              />
+
+              {ccafvisible ? (
+                <ComboSimple
+                  idElemento="idccaf"
+                  descripcion="nombre"
+                  label="Caja de Compensación"
+                  datos={combos!?.CCAF}
+                  opcional={!ccafvisible}
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
+                  name="ccaflm"
+                  tipoValor="number"
+                />
+              ) : (
+                <InputOtroMotivoDeRechazo
+                  name="nombreentidadpagadorasubsidio"
+                  opcional
+                  label="Nombre Entidad Pagadora Subsidio"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
+                />
+              )}
             </div>
 
             <div className="mt-4">
