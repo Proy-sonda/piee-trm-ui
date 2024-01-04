@@ -18,6 +18,7 @@ export interface LicenciaC0 {
   estadotramitacion: Estadotramitacion;
   entidadsalud: Entidadsalud;
   ccaf?: ccaf;
+  tiporeposo: Tiporeposo;
 }
 
 interface Entidadsalud {
@@ -49,7 +50,13 @@ interface Tipolicencia {
   tipolicencia: string;
 }
 
+
 interface ccaf {
   idccaf: number;
   nombre: string;
+}
+
+interface Tiporeposo {
+  idtiporeposo: number;
+  tiporeposo: string;
 }

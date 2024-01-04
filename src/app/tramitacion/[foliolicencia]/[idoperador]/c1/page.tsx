@@ -276,6 +276,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         identidadsalud: licenciaTramite!?.entidadsalud.identidadsalud,
         nombre: licenciaTramite!?.entidadsalud.nombre,
       },
+      tiporeposo: licenciaTramite!.tiporesposo,
     };
 
     let licenciaC1: LicenciaC1 = {

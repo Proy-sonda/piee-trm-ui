@@ -241,12 +241,14 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     <button className="btn btn-sm btn-primary">
                       <small className="text-nowrap">VER PDF</small>
                     </button>
-                    <Link
-                      className="btn btn-sm btn-danger"
-                      onClick={() => setloading(true)}
-                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
-                      <small className="text-nowrap"> NO RECEPCIONAR</small>
-                    </Link>
+                    <IfContainer show={licenciaSePuedeTramitar(licencia)}>
+                      <Link
+                        className="btn btn-sm btn-danger"
+                        onClick={() => setloading(true)}
+                        href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
+                        <small className="text-nowrap"> NO RECEPCIONAR</small>
+                      </Link>
+                    </IfContainer>
                   </Stack>
                 </td>
               </tr>
