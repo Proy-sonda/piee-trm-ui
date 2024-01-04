@@ -5,15 +5,19 @@ import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { LicenciaC1 } from '../c1/(modelos)';
-import { buscarZona1 } from '../c1/(servicios)';
+import { buscarZona0, buscarZona1 } from '../c1/(servicios)';
 import { InputOtroMotivoDeRechazo } from '../no-tramitar/(componentes)/input-otro-motivo-rechazo';
 
+import { buscarCajasDeCompensacion } from '@/app/empleadores/(servicios)';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
+import { GuiaUsuario } from '@/components/guia-usuario';
+import { AuthContext } from '@/contexts';
+import { useRefrescarPagina } from '@/hooks';
 import dynamic from 'next/dynamic';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { buscarCalidadTrabajador } from '../(servicios)';
@@ -25,6 +29,8 @@ import {
   buscarZona2,
   crearLicenciaZ2,
 } from './(servicios)/';
+import { ErrorGuardarCCAF, GuardarCCAF } from './(servicios)/actualiza-ccaf';
+import { BuscarIDCCAFPropuesto } from './(servicios)/obtener-idccaf-propuesta';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -48,6 +54,7 @@ interface formularioApp {
   fechacontratotrabajo: string;
   entidadremuneradora: string;
   nombreentidadpagadorasubsidio: string;
+  ccaflm: number;
 }
 
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
@@ -58,14 +65,35 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
   const router = useRouter();
-  const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject({
-    REGIMEN: buscarRegimen(),
-    CALIDADTRABAJADOR: buscarCalidadTrabajador(),
-    ENTIDADPAGADORA: buscarEntidadPagadora(),
+  const [refresh, setrefresh] = useRefrescarPagina();
+  const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject(
+    {
+      REGIMEN: buscarRegimen(),
+      CALIDADTRABAJADOR: buscarCalidadTrabajador(),
+      ENTIDADPAGADORA: buscarEntidadPagadora(),
+      ZONA0: buscarZona0(foliolicencia, Number(idoperador)),
+      LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
+      LMETRM: buscarLicenciasParaTramitar(),
+      CCAF: buscarCajasDeCompensacion(),
+    },
+    [refresh],
+  );
 
-    LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
-    LMETRM: buscarLicenciasParaTramitar(),
-  });
+  const regimenPrev = useRef(null);
+  const institucionPrev = useRef(null);
+  const calidadTrabajador = useRef(null);
+  const perteneceAFC = useRef(null);
+
+  const {
+    datosGuia: { AgregarGuia, guia, listaguia },
+  } = useContext(AuthContext);
+
+  useEffect(() => {
+    AgregarGuia([
+      { indice: 0, nombre: 'stepper', activo: true },
+      { indice: 1, nombre: 'Régimen Previsional', activo: false },
+    ]);
+  }, []);
 
   useEffect(() => {
     const BuscarZonaC1 = async () => {
@@ -106,8 +134,87 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     },
   });
 
+  const [ccafvisible, setccafvisible] = useState(false);
+  const [idccaf, setidccaf] = useState<number | undefined>(0);
+
+  useEffect(() => {
+    if (combos?.ZONA0) {
+      if (combos?.ZONA0?.ccaf !== null) {
+        formulario.setValue('ccaflm', combos!?.ZONA0!?.ccaf!?.idccaf);
+      } else {
+        // en caso de que el tipo de licencia sea 5 o 6, se debe cargar el idccaf de la entidad de salud
+        if (
+          combos?.ZONA0.tipolicencia.idtipolicencia == 5 ||
+          combos?.ZONA0.tipolicencia.idtipolicencia == 6
+        ) {
+          setccafvisible(false);
+          return setidccaf(combos?.ZONA0.entidadsalud.identidadsalud);
+        }
+        // si es distinto distinto a 5 o 6, y la entidad de salud es distinta a 1, se debe cargar el idccaf 10100(isapres)
+        if (combos?.ZONA0.entidadsalud.identidadsalud !== 1) {
+          return setidccaf(10100);
+        }
+
+        // aqui cargamos el idccaf propuesto en caso de que el valor sea null
+        const busquedaPropuesta = async () => {
+          const [resp] = await BuscarIDCCAFPropuesto(Number(idoperador), foliolicencia);
+          await resp().then((data) => formulario.setValue('ccaflm', data.codigoccafpropuesta));
+        };
+
+        busquedaPropuesta();
+      }
+    }
+  }, [combos?.ZONA0]);
+
+  const EntidadPagadora = formulario.watch('entidadremuneradora');
+
+  useEffect(() => {
+    if (EntidadPagadora) {
+      if (EntidadPagadora === 'C' && combos?.ZONA0.entidadsalud.identidadsalud === 1) {
+        setccafvisible(true);
+        setidccaf(undefined);
+      } else {
+        setccafvisible(false);
+        if (EntidadPagadora === 'A' && combos?.ZONA0.entidadsalud.identidadsalud === 1) {
+          setidccaf(10100);
+        }
+      }
+    }
+  }, [EntidadPagadora]);
+
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
     await GuardarZ2();
+    await GuardarIDCCAF();
+  };
+
+  const GuardarIDCCAF = async () => {
+    if (idccaf) {
+      try {
+        await GuardarCCAF(idoperador, idccaf.toString(), foliolicencia);
+        AlertaExito.fire({
+          html: 'Se ha actualizado el idccaf con éxito',
+        });
+      } catch (error) {
+        if (error instanceof ErrorGuardarCCAF) {
+          AlertaError.fire({
+            html: `Ha ocurrido un problema: ${ErrorGuardarCCAF}`,
+          });
+        }
+      }
+    } else {
+      try {
+        await GuardarCCAF(idoperador, formulario.getValues('ccaflm').toString(), foliolicencia);
+        AlertaExito.fire({
+          html: 'Se ha actualizado el idccaf con éxito',
+        });
+      } catch (error) {
+        if (error instanceof ErrorGuardarCCAF) {
+          AlertaError.fire({
+            html: `Ha ocurrido un problema: ${ErrorGuardarCCAF}`,
+          });
+        }
+      }
+    }
   };
 
   const GuardarZ2 = async () => {
@@ -376,16 +483,142 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             className="animate__animated animate__fadeIn"
             onSubmit={formulario.handleSubmit(onHandleSubmit)}>
             <div className="row align-items-baseline g-3">
-              <ComboSimple
-                label="Régimen Previsional"
-                descripcion="regimenprevisional"
-                idElemento="codigoregimenprevisional"
-                name="regimen"
-                datos={combos?.REGIMEN}
-                className="col-12 col-sm-6 col-lg-4 col-xl-3"
-              />
+              <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={regimenPrev}>
+                Régimen previsional de la persona trabajadora
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: true,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
 
-              <div className="col-12 col-sm-6 col-lg-4 col-xl-3 position-relative">
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: true,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
+                  listaguia[1]!?.activo && guia && 'overlay-marco'
+                }`}
+                ref={regimenPrev}>
+                <ComboSimple
+                  label="Régimen Previsional"
+                  descripcion="regimenprevisional"
+                  idElemento="codigoregimenprevisional"
+                  name="regimen"
+                  datos={combos?.REGIMEN}
+                />
+              </div>
+              <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={institucionPrev}>
+                Institución previsional de la persona trabajadora
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: true,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Calidad persona trabajadora',
+                          activo: true,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-6 col-lg-4 col-xl-3 position-relative ${
+                  listaguia[2]!?.activo && guia && 'overlay-marco'
+                }`}
+                ref={institucionPrev}>
                 <label className="mb-2">Institución Previsional (*)</label>
                 <select
                   {...formulario.register('previsional', {
@@ -457,16 +690,206 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 </IfContainer>
               </div>
 
-              <ComboSimple
-                label="Calidad Persona Trabajadora"
-                descripcion="calidadtrabajador"
-                idElemento="idcalidadtrabajador"
-                name="calidad"
-                datos={combos?.CALIDADTRABAJADOR}
-                className="col-12 col-sm-6 col-lg-4 col-xl-3"
-              />
+              <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={calidadTrabajador}>
+                Sector al que pertenece la persona trabajadora
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: true,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Calidad persona trabajadora',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      esAFC
+                        ? AgregarGuia([
+                            {
+                              indice: 0,
+                              nombre: 'Stepper',
+                              activo: false,
+                            },
+                            {
+                              indice: 1,
+                              nombre: 'regimen previsional',
+                              activo: false,
+                            },
+                            {
+                              indice: 2,
+                              nombre: 'Institución previsional',
+                              activo: false,
+                            },
+                            {
+                              indice: 3,
+                              nombre: 'Calidad persona trabajadora',
+                              activo: false,
+                            },
+                            {
+                              indice: 4,
+                              nombre: 'AFC',
+                              activo: true,
+                            },
+                          ])
+                        : AgregarGuia([
+                            {
+                              indice: 0,
+                              nombre: 'Stepper',
+                              activo: true,
+                            },
+                            {
+                              indice: 1,
+                              nombre: 'regimen previsional',
+                              activo: false,
+                            },
+                            {
+                              indice: 2,
+                              nombre: 'Institución previsional',
+                              activo: false,
+                            },
+                            {
+                              indice: 3,
+                              nombre: 'Calidad persona trabajadora',
+                              activo: false,
+                            },
+                          ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
+                  listaguia[3]!?.activo && guia && 'overlay-marco'
+                }`}
+                ref={calidadTrabajador}>
+                <ComboSimple
+                  label="Calidad Persona Trabajadora"
+                  descripcion="calidadtrabajador"
+                  idElemento="idcalidadtrabajador"
+                  name="calidad"
+                  datos={combos?.CALIDADTRABAJADOR}
+                />
+              </div>
 
-              <div className="col-12 col-sm-6 col-lg-4 col-xl-3">
+              <GuiaUsuario guia={listaguia[4]!?.activo && guia && esAFC} target={perteneceAFC}>
+                Persona trabajadora con seguro cesantia <br />
+                debe tener calidad de trabajador privado dependiente
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Calidad persona trabajadora',
+                          activo: true,
+                        },
+                        {
+                          indice: 4,
+                          nombre: 'AFC',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: true,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'regimen previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Institución previsional',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Calidad persona trabajadora',
+                          activo: false,
+                        },
+                        {
+                          indice: 4,
+                          nombre: 'AFC',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
+                  listaguia[4]!?.activo && guia && esAFC && 'overlay-marco'
+                }`}
+                ref={perteneceAFC}>
                 <label className="mb-2 animate__animated animate__fadeIn">
                   Persona Pertenece a AFC{' '}
                   {esAFC && LMECABECERA?.ocupacion.idocupacion != 18 && '(*)'}
@@ -548,12 +971,26 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 tipoValor="string"
                 className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
-              <InputOtroMotivoDeRechazo
-                name="nombreentidadpagadorasubsidio"
-                opcional
-                label="Nombre Entidad Pagadora Subsidio"
-                className="col-12 col-sm-6 col-lg-4 col-xl-3"
-              />
+
+              {ccafvisible ? (
+                <ComboSimple
+                  idElemento="idccaf"
+                  descripcion="nombre"
+                  label="Caja de Compensación"
+                  datos={combos!?.CCAF}
+                  opcional={!ccafvisible}
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
+                  name="ccaflm"
+                  tipoValor="number"
+                />
+              ) : (
+                <InputOtroMotivoDeRechazo
+                  name="nombreentidadpagadorasubsidio"
+                  opcional
+                  label="Nombre Entidad Pagadora Subsidio"
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
+                />
+              )}
             </div>
 
             <div className="mt-4">
