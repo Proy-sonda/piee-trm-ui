@@ -190,10 +190,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   const GuardarIDCCAF = async () => {
     if (idccaf) {
       try {
-        await GuardarCCAF(idoperador, idccaf.toString(), foliolicencia);
-        AlertaExito.fire({
-          html: 'Se ha actualizado el idccaf con éxito',
-        });
+        await GuardarCCAF(Number(idoperador), idccaf.toString(), foliolicencia);
       } catch (error) {
         if (error instanceof ErrorGuardarCCAF) {
           AlertaError.fire({
@@ -203,10 +200,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       }
     } else {
       try {
-        await GuardarCCAF(idoperador, formulario.getValues('ccaflm').toString(), foliolicencia);
-        AlertaExito.fire({
-          html: 'Se ha actualizado el idccaf con éxito',
-        });
+        await GuardarCCAF(
+          Number(idoperador),
+          formulario.getValues('ccaflm').toString(),
+          foliolicencia,
+        );
       } catch (error) {
         if (error instanceof ErrorGuardarCCAF) {
           AlertaError.fire({
