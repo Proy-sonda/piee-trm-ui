@@ -3,13 +3,13 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 
 export default async function Version() {
-  let version = 'DESARROLLO';
+  let version = 'DESARROLLO 1';
   const rutaArchivoInformacionApp = path.join(process.cwd(), 'public', 'appinfo.json');
 
   if (existsSync(rutaArchivoInformacionApp)) {
     const appInfoJSON = await readFile(rutaArchivoInformacionApp, 'utf-8');
     const appInfo = JSON.parse(appInfoJSON);
-    version = appInfo.version ?? 'DESARROLLO';
+    version = appInfo.version ?? 'DESARROLLO 2';
   }
 
   return <div className="mt-2 text-center text-secondary">Versión: {version}</div>;
