@@ -14,7 +14,7 @@ import { buscarEventosCron } from './(servicios)';
 
 interface HistorialCronProps {}
 
-export const HistorialCron: React.FC<HistorialCronProps> = ({}) => {
+const HistorialCronPage: React.FC<HistorialCronProps> = ({}) => {
   const TAMANO_PAGINA = 8;
 
   const { idcron } = useParams();
@@ -75,4 +75,4 @@ export const HistorialCron: React.FC<HistorialCronProps> = ({}) => {
   );
 };
 
-export default HistorialCron;
+export default HistorialCronPage;
