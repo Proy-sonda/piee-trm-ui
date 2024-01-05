@@ -147,8 +147,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           combos?.ZONA0.tipolicencia.idtipolicencia == 6
         ) {
           setccafvisible(false);
-          // TODO verificar si es necesario cargar el idccaf de la entidad de salud como ID
-          return setidccaf(undefined);
+          return setidccaf(combos?.ZONA0.entidadsalud.identidadsalud);
         }
         // si es distinto distinto a 5 o 6, y la entidad de salud es distinta a 1, se debe cargar el idccaf 10100(isapres)
         if (
