@@ -11,7 +11,6 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { LicenciaC1 } from '../c1/(modelos)';
 import { buscarZona0, buscarZona1 } from '../c1/(servicios)';
-import { InputOtroMotivoDeRechazo } from '../no-tramitar/(componentes)/input-otro-motivo-rechazo';
 
 import { buscarCajasDeCompensacion } from '@/app/empleadores/(servicios)';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
@@ -151,7 +150,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           return setidccaf(combos?.ZONA0.entidadsalud.identidadsalud);
         }
         // si es distinto distinto a 5 o 6, y la entidad de salud es distinta a 1, se debe cargar el idccaf 10100(isapres)
-        if (combos?.ZONA0.entidadsalud.identidadsalud !== 1) {
+        if (
+          combos?.ZONA0.tipolicencia.idtipolicencia !== 5 &&
+          combos?.ZONA0.tipolicencia.idtipolicencia !== 6 &&
+          combos?.ZONA0.entidadsalud.identidadsalud !== 1
+        ) {
           return setidccaf(10100);
         }
 
@@ -970,25 +973,28 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
 
-              {ccafvisible ? (
-                <ComboSimple
-                  idElemento="idccaf"
-                  descripcion="nombre"
-                  label="Caja de Compensación"
-                  datos={combos!?.CCAF}
-                  opcional={!ccafvisible}
-                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
-                  name="ccaflm"
-                  tipoValor="number"
-                />
-              ) : (
-                <InputOtroMotivoDeRechazo
-                  name="nombreentidadpagadorasubsidio"
-                  opcional
-                  label="Nombre Entidad Pagadora Subsidio"
-                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
-                />
-              )}
+              {
+                ccafvisible && (
+                  <ComboSimple
+                    idElemento="idccaf"
+                    descripcion="nombre"
+                    label="Caja de Compensación"
+                    datos={combos!?.CCAF}
+                    opcional={!ccafvisible}
+                    className="col-12 col-sm-6 col-lg-4 col-xl-3"
+                    name="ccaflm"
+                    tipoValor="number"
+                  />
+                )
+                // : (
+                //   <InputOtroMotivoDeRechazo
+                //     name="nombreentidadpagadorasubsidio"
+                //     opcional
+                //     label="Nombre Entidad Pagadora Subsidio"
+                //     className="col-12 col-sm-6 col-lg-4 col-xl-3"
+                //   />
+                // )
+              }
             </div>
 
             <div className="mt-4">

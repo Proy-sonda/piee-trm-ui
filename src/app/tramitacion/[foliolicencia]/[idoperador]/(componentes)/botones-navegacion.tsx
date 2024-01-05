@@ -32,9 +32,9 @@ export const BotonesNavegacion: React.FC<mypropsApp> = ({
             </button>
           </div>
           <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-            <button className="btn btn-danger" onClick={() => router.push('/tramitacion')}>
+            <a className="btn btn-danger" href="/tramitacion">
               Tramitación
-            </button>
+            </a>
           </div>
           <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
             <button
