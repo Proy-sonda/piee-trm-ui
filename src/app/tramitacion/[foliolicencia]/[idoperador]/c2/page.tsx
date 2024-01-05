@@ -147,7 +147,8 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           combos?.ZONA0.tipolicencia.idtipolicencia == 6
         ) {
           setccafvisible(false);
-          return setidccaf(combos?.ZONA0.entidadsalud.identidadsalud);
+          // TODO verificar si es necesario cargar el idccaf de la entidad de salud como ID
+          return setidccaf(undefined);
         }
         // si es distinto distinto a 5 o 6, y la entidad de salud es distinta a 1, se debe cargar el idccaf 10100(isapres)
         if (
@@ -311,16 +312,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       setesAFC(false);
       formulario.setValue('perteneceAFC', '0');
     }
-
-    if (
-      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
-        .identidadsalud !== 1
-    ) {
-      return setentePagador(
-        combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora == 'B'),
-      );
-    }
-
     if (
       combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
         .idtipolicencia == 5 ||
@@ -333,6 +324,15 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         ),
       );
       return;
+    }
+
+    if (
+      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
+        .identidadsalud !== 1
+    ) {
+      return setentePagador(
+        combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora == 'B'),
+      );
     }
 
     setentePagador(
