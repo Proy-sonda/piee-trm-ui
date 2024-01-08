@@ -242,6 +242,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       },
       fecharecepcionccaf: '1900-01-01',
       // nombrepagador: formulario.getValues('nombreentidadpagadorasubsidio'),
+      nombrepagador: '',
       entidadprevisional: {
         codigoentidadprevisional: Number(
           formulario.getValues('regimen') == 2
@@ -441,7 +442,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         setspinner(false);
       }, 2000);
 
-      // formulario.setValue('nombreentidadpagadorasubsidio', combos!?.LMEEXISTEZONA2.nombrepagador);
+      formulario.setValue('nombreentidadpagadorasubsidio', '');
     }
 
     setTimeout(() => {
