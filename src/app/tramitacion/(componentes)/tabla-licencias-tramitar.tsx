@@ -1,4 +1,6 @@
+import { GuiaUsuario } from '@/components/guia-usuario';
 import Paginacion from '@/components/paginacion';
+import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import { AlertaInformacion } from '@/utilidades';
@@ -6,7 +8,7 @@ import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
-import React, { useRef, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import {
   LicenciaTramitar,
@@ -36,6 +38,10 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const [loading, setloading] = useState(false);
   const target = useRef(null);
 
+  const {
+    datosGuia: { listaguia, guia, AgregarGuia },
+  } = useContext(AuthContext);
+
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
@@ -46,7 +52,93 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
       <IfContainer show={loading}>
         <SpinnerPantallaCompleta />
       </IfContainer>
-      <div className="table-responsive">
+      <GuiaUsuario guia={listaguia[4]!?.activo && guia} target={target} placement="top-start">
+        Tabla de licencias para tramitar
+        <br />
+        <div className="text-end mt-3">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Folio Licencia',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'Rango de fecha',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Botón filtrar',
+                  activo: false,
+                },
+
+                {
+                  indice: 3,
+                  nombre: 'semaforo',
+                  activo: true,
+                },
+
+                {
+                  indice: 4,
+                  nombre: 'Tabla de tramitacion',
+                  activo: false,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+          &nbsp;
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Folio Licencia',
+                  activo: true,
+                },
+                {
+                  indice: 1,
+                  nombre: 'Rango de fecha',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Botón filtrar',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'semaforo',
+                  activo: false,
+                },
+                {
+                  indice: 4,
+                  nombre: 'Tabla de tramitacion',
+                  activo: false,
+                },
+              ]);
+              window.scrollTo(0, 0);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            Continuar &nbsp;
+            <i className="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </GuiaUsuario>
+      <div
+        className={`table-responsive  ${listaguia[4]!?.activo && guia ? 'overlay-marco' : ''}`}
+        ref={target}>
         <Table striped hover responsive ref={target}>
           {/* <Table striped hover  className="table table-hover table-striped"> */}
           <thead>
@@ -149,12 +241,14 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     <button className="btn btn-sm btn-primary">
                       <small className="text-nowrap">VER PDF</small>
                     </button>
-                    <Link
-                      className="btn btn-sm btn-danger"
-                      onClick={() => setloading(true)}
-                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
-                      <small className="text-nowrap"> NO RECEPCIONAR</small>
-                    </Link>
+                    <IfContainer show={licenciaSePuedeTramitar(licencia)}>
+                      <Link
+                        className="btn btn-sm btn-danger"
+                        onClick={() => setloading(true)}
+                        href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
+                        <small className="text-nowrap"> NO RECEPCIONAR</small>
+                      </Link>
+                    </IfContainer>
                   </Stack>
                 </td>
               </tr>

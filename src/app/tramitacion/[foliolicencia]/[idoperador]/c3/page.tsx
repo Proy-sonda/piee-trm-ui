@@ -12,6 +12,7 @@ import {
   remuneracionTieneAlgunCampoValido,
 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
 
+import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch, useRefrescarPagina } from '@/hooks';
 import { capitalizar } from '@/utilidades';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
@@ -19,7 +20,7 @@ import { format, subMonths } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
@@ -139,7 +140,26 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     name: 'remuneracionesMaternidad',
   });
 
-  // Determina si hay algun error en la pagina
+  const {
+    datosGuia: { guia, AgregarGuia, listaguia },
+  } = useContext(AuthContext);
+
+  useEffect(() => {
+    AgregarGuia([
+      {
+        indice: 0,
+        nombre: 'Menu pasos',
+        activo: true,
+      },
+      {
+        indice: 1,
+        nombre: 'Nro dias',
+        activo: false,
+      },
+    ]);
+  }, []);
+
+  // Determina si hay algún error en la pagina
   useEffect(() => {
     const errores = [errZona2, errZona3, errPrevision, errTipoDocumentos];
     if (errores.some((err) => err !== undefined)) {

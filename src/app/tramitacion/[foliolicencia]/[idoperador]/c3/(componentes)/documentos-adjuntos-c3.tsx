@@ -5,10 +5,12 @@ import {
   esLicenciaDiatDiep,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { ComboSimple, InputArchivo } from '@/components/form';
+import { GuiaUsuario } from '@/components/guia-usuario';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
 import { AlertaConfirmacion, AlertaError, AlertaExito, formatBytes } from '@/utilidades';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Col, Form, Row } from 'react-bootstrap';
 import {
   FieldError,
@@ -54,6 +56,12 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   const [tiposDocumentosFiltrados, setTiposDocumentosFiltrados] = useState<TipoDocumento[]>([]);
 
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+
+  const tipoDoc = useRef(null);
+  const btnAdjuntarDoc = useRef(null);
+  const {
+    datosGuia: { guia, listaguia, AgregarGuia },
+  } = useContext(AuthContext);
 
   // Filtrar documentos
   useEffect(() => {
@@ -222,15 +230,110 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
         <FormProvider {...formulario}>
           <Form id="adjuntarDocumentoC3" onSubmit={formulario.handleSubmit(adjuntarDocumento)}>
             <Row className="g-3 align-items-baseline">
-              <ComboSimple
-                deshabilitado={limiteDeArchivosAlcanzado()}
-                label="Tipo de documento"
-                name="idTipoDocumento"
-                descripcion="tipoadjunto"
-                idElemento="idtipoadjunto"
-                datos={tiposDocumentosFiltrados}
-                className="col-12 col-sm-5 col-md-4 col-lg-4 col-xl-3 col-xxl-2"
-              />
+              <GuiaUsuario guia={listaguia[4]!?.activo && guia} target={tipoDoc}>
+                Seleccione el tipo de documento a adjuntar
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'nro dias',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'total remuneracion',
+                          activo: false,
+                        },
+
+                        {
+                          indice: 3,
+                          nombre: 'btn desgloce',
+                          activo: true,
+                        },
+
+                        {
+                          indice: 4,
+                          nombre: 'tipo doc',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'nro dias',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'total remuneracion',
+                          activo: false,
+                        },
+
+                        {
+                          indice: 3,
+                          nombre: 'btn desgloce',
+                          activo: false,
+                        },
+
+                        {
+                          indice: 4,
+                          nombre: 'tipo doc',
+                          activo: false,
+                        },
+                        {
+                          indice: 5,
+                          nombre: 'adjuntar doc btn',
+                          activo: true,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`col-12 col-sm-5 col-md-4 col-lg-4 col-xl-3 col-xxl-2 ${
+                  listaguia[4]!?.activo && guia && 'overlay-marco'
+                }`}
+                ref={tipoDoc}>
+                <ComboSimple
+                  deshabilitado={limiteDeArchivosAlcanzado()}
+                  label="Tipo de documento"
+                  name="idTipoDocumento"
+                  descripcion="tipoadjunto"
+                  idElemento="idtipoadjunto"
+                  datos={tiposDocumentosFiltrados}
+                />
+              </div>
 
               <InputArchivo
                 name="documentos"
@@ -244,15 +347,117 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
               />
 
               <div
-                className="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-5 col-xxl-7 d-flex flex-column flex-sm-row "
+                className={`col-12 col-sm-12 col-md-4 col-lg-3 col-xl-5 col-xxl-7 d-flex flex-column flex-sm-row`}
                 style={{ alignSelf: 'end' }}>
-                <button
-                  type="submit"
-                  form="adjuntarDocumentoC3"
-                  className="btn btn-primary"
-                  disabled={limiteDeArchivosAlcanzado()}>
-                  Adjuntar Documento
-                </button>
+                <GuiaUsuario guia={listaguia[5]!?.activo && guia} target={btnAdjuntarDoc}>
+                  Botón para adjuntar el documento <br />
+                  seleccionado
+                  <br />
+                  <div className="text-end mt-3">
+                    <button
+                      className="btn btn-sm text-white"
+                      onClick={() => {
+                        AgregarGuia([
+                          {
+                            indice: 0,
+                            nombre: 'stepper',
+                            activo: false,
+                          },
+                          {
+                            indice: 1,
+                            nombre: 'nro dias',
+                            activo: false,
+                          },
+                          {
+                            indice: 2,
+                            nombre: 'total remuneracion',
+                            activo: false,
+                          },
+
+                          {
+                            indice: 3,
+                            nombre: 'btn desgloce',
+                            activo: false,
+                          },
+
+                          {
+                            indice: 4,
+                            nombre: 'tipo doc',
+                            activo: true,
+                          },
+                          {
+                            indice: 5,
+                            nombre: 'adjuntar doc btn',
+                            activo: false,
+                          },
+                        ]);
+                      }}
+                      style={{
+                        border: '1px solid white',
+                      }}>
+                      <i className="bi bi-arrow-left"></i>
+                      &nbsp; Anterior
+                    </button>
+                    &nbsp;
+                    <button
+                      className="btn btn-sm text-white"
+                      onClick={() => {
+                        AgregarGuia([
+                          {
+                            indice: 0,
+                            nombre: 'stepper',
+                            activo: true,
+                          },
+                          {
+                            indice: 1,
+                            nombre: 'nro dias',
+                            activo: false,
+                          },
+                          {
+                            indice: 2,
+                            nombre: 'total remuneracion',
+                            activo: false,
+                          },
+
+                          {
+                            indice: 3,
+                            nombre: 'btn desgloce',
+                            activo: false,
+                          },
+
+                          {
+                            indice: 4,
+                            nombre: 'tipo doc',
+                            activo: false,
+                          },
+                          {
+                            indice: 5,
+                            nombre: 'adjuntar doc btn',
+                            activo: false,
+                          },
+                        ]);
+                        // subir el focus al inicio de la pagina
+                        window.scrollTo(0, 0);
+                      }}
+                      style={{
+                        border: '1px solid white',
+                      }}>
+                      Continuar &nbsp;
+                      <i className="bi bi-arrow-right"></i>
+                    </button>
+                  </div>
+                </GuiaUsuario>
+                <div
+                  className={`${listaguia[5]!?.activo && guia && 'overlay-marco'}`}
+                  ref={btnAdjuntarDoc}>
+                  <button
+                    type="submit"
+                    form="adjuntarDocumentoC3"
+                    className="btn btn-primary"
+                    disabled={limiteDeArchivosAlcanzado()}>
+                    Adjuntar Documento
+                  </button>
+                </div>
               </div>
             </Row>
           </Form>

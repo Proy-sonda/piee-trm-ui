@@ -58,7 +58,7 @@ export const InputFecha: React.FC<InputFechaProps> = ({
   deshabilitado,
   unirConFieldArray,
 }) => {
-  const { register, getValues } = useFormContext();
+  const { register, getValues, clearErrors } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'fecha',
@@ -117,6 +117,8 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 if (esFechaInvalida(fecha) && !esFechaInvalida(hasta)) {
                   return 'Debe incluir la fecha desde';
                 }
+
+                clearErrors(noPosteriorA);
               },
               noPosteriorAHasta: (fecha: Date) => {
                 // Este input es de "tipo desde"
@@ -132,6 +134,8 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 if (!esFechaInvalida(hasta) && isAfter(fecha, hasta)) {
                   return 'No puede ser posterior a hasta';
                 }
+
+                clearErrors(noPosteriorA);
               },
               obligatorioSiHayFechaDesde: (fecha: Date, otrosCampos: Record<string, any>) => {
                 // Este input es de "tipo hasta"
@@ -148,6 +152,8 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 if (esFechaInvalida(fecha) && !esFechaInvalida(desde)) {
                   return 'Debe incluir la fecha hasta';
                 }
+
+                clearErrors(noAnteriorA);
               },
               noAnteriorADesde: (fecha: Date) => {
                 // Este input es de "tipo hasta"
@@ -165,6 +171,8 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                     ? 'La fecha no puede ser menor a la emisión'
                     : 'No puede ser anterior a desde';
                 }
+
+                clearErrors(noAnteriorA);
               },
             },
           })}

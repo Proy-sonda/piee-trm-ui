@@ -1,3 +1,5 @@
+'use client';
+import { useRouter } from 'next/navigation';
 import { UseFormReturn } from 'react-hook-form';
 
 interface mypropsApp {
@@ -13,6 +15,7 @@ export const BotonesNavegacion: React.FC<mypropsApp> = ({
   anterior,
   finaliza,
 }) => {
+  const router = useRouter();
   return (
     <div className="row">
       {anterior ? (
