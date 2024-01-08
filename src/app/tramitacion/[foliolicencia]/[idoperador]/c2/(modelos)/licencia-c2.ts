@@ -6,7 +6,7 @@ export interface Licenciac2 {
   codigocontratoindef: number;
   fechaafiliacion: string;
   fechacontrato: string;
-  nombrepagador: string;
+  nombrepagador?: string;
   calidadtrabajador: Calidadtrabajador;
   entidadprevisional: Entidadprevisional;
   entidadpagadora: Entidadpagadora;
