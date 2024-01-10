@@ -39,6 +39,10 @@ export const InputApellidos: React.FC<InputApellidosProps> = ({ name, label, cla
               value: 80,
               message: 'Debe tener a lo más 80 caracteres',
             },
+            pattern: {
+              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/,
+              message: 'Solo puede contener letras y espacios',
+            },
             onBlur: (event: any) => {
               const value = event.target.value;
 
