@@ -19,7 +19,7 @@ export default async function Version() {
       <span style={{ display: 'none' }}>
         {JSON.stringify({ rutaArchivoInformacionApp, archivos, existeArchivoDeVersion })}
       </span>
-      <div className="mt-2 text-center text-secondary">Versión: {version}</div>;
+      <div className="mt-2 text-center text-secondary">Versión: {version}</div>
     </>
   );
 }
