@@ -1,7 +1,7 @@
+import { useMemo } from 'react';
 import { UnibleConFormArray } from '../base-props';
 import { InputLabelHookParams, useInputLabel } from './use-input-label';
 import { useManejarError } from './use-manejar-error';
-import { useRandomId } from './use-random-id';
 
 export type InputReciclableHookParams = UnibleConFormArray & {
   prefijoId: string;
@@ -26,7 +26,7 @@ export const useInputReciclable = ({
   label,
   unirConFieldArray,
 }: InputReciclableHookParams): InputReciclableReturn => {
-  const idInput = useRandomId(prefijoId);
+  const idInput = useMemo(() => `${prefijoId}_${Math.round(Math.random() * 1_000_000)}`, []);
 
   const textoLabel = useInputLabel(label);
 
