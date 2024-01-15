@@ -1,4 +1,4 @@
-import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
+import { ErroresEditables, InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, isAfter, isBefore, parse, startOfDay } from 'date-fns';
 import React from 'react';
@@ -6,7 +6,10 @@ import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { useInputReciclable } from './hooks';
 
-interface InputFechaProps extends InputReciclableBase, UnibleConFormArray {
+interface InputFechaProps
+  extends InputReciclableBase,
+    UnibleConFormArray,
+    ErroresEditables<'anteriorADesde'> {
   /**
    * Propiedad `name` del `InputFecha` tal que la fecha de este input no sea anterior que el input
    * indicado.
@@ -38,8 +41,6 @@ interface InputFechaProps extends InputReciclableBase, UnibleConFormArray {
    *  ```
    */
   noPosteriorA?: string;
-
-  esEmision?: boolean;
 }
 
 /**
@@ -54,11 +55,11 @@ export const InputFecha: React.FC<InputFechaProps> = ({
   opcional,
   noAnteriorA,
   noPosteriorA,
-  esEmision,
   deshabilitado,
   unirConFieldArray,
+  errores,
 }) => {
-  const { register, getValues, clearErrors } = useFormContext();
+  const { register, getValues, clearErrors, trigger, setError } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'fecha',
@@ -113,15 +114,12 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 }
 
                 const hasta: Date = getValues(noPosteriorA);
-
                 if (esFechaInvalida(fecha) && !esFechaInvalida(hasta)) {
                   return 'Debe incluir la fecha desde';
                 }
-
-                clearErrors(noPosteriorA);
               },
               noPosteriorAHasta: (fecha: Date) => {
-                // Este input es de "tipo desde"
+                // Este input es de "tipo desde". Se asume que la fecha de este input es valida
                 if (noPosteriorA === name) {
                   throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
                 }
@@ -135,9 +133,11 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   return 'No puede ser posterior a hasta';
                 }
 
-                clearErrors(noPosteriorA);
+                if (!esFechaInvalida(hasta) && isBefore(fecha, hasta)) {
+                  clearErrors(noPosteriorA);
+                }
               },
-              obligatorioSiHayFechaDesde: (fecha: Date, otrosCampos: Record<string, any>) => {
+              obligatorioSiHayFechaDesde: (fecha: Date) => {
                 // Este input es de "tipo hasta"
                 if (noAnteriorA === name) {
                   throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
@@ -152,11 +152,9 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 if (esFechaInvalida(fecha) && !esFechaInvalida(desde)) {
                   return 'Debe incluir la fecha hasta';
                 }
-
-                clearErrors(noAnteriorA);
               },
               noAnteriorADesde: (fecha: Date) => {
-                // Este input es de "tipo hasta"
+                // Este input es de tipo "hasta". Se asume que la fecha de este input es valida
                 if (noAnteriorA === name) {
                   throw new Error(`No se puede validar InputFecha "${name}" contra si mismo`);
                 }
@@ -167,12 +165,12 @@ export const InputFecha: React.FC<InputFechaProps> = ({
 
                 const desde: Date = getValues(noAnteriorA);
                 if (!esFechaInvalida(desde) && isBefore(fecha, desde)) {
-                  return esEmision
-                    ? 'La fecha no puede ser menor a la emisión'
-                    : 'No puede ser anterior a desde';
+                  return errores?.anteriorADesde ?? 'No puede ser anterior a desde';
                 }
 
-                clearErrors(noAnteriorA);
+                if (!esFechaInvalida(desde) && isAfter(fecha, desde)) {
+                  clearErrors(noPosteriorA);
+                }
               },
             },
           })}

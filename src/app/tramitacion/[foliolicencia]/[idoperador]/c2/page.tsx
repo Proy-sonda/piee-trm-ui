@@ -126,7 +126,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   ];
 
   const formulario = useForm<formularioApp>({
-    mode: 'onSubmit',
+    mode: 'onBlur',
     defaultValues: {
       accion: 'siguiente',
       linkNavegacion: '',
