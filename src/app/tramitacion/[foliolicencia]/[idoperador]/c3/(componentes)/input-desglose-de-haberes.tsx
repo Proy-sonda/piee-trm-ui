@@ -3,8 +3,7 @@ import { useInputReciclable } from '@/components/form/hooks';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { DesgloseDeHaberes } from '../(modelos)/desglose-de-haberes';
-import { tieneDesglose } from '../(modelos)/formulario-c3';
+import { DesgloseDeHaberes, tieneDesglose, totalDesglose } from '../(modelos)';
 
 interface InputDesgloseDeHaberes extends InputReciclableBase, UnibleConFormArray {
   /**
@@ -51,12 +50,7 @@ export const InputDesgloseDeHaberes: React.FC<InputDesgloseDeHaberes> = ({
                   ? 0
                   : getValues(montoImponibleName);
 
-                const totalDesglose = Object.values(desglose).reduce(
-                  (total, monto: number) => total + monto,
-                  0,
-                );
-
-                if (totalDesglose !== montoImponible) {
+                if (totalDesglose(desglose) !== montoImponible) {
                   return 'No coincide con monto imponible';
                 }
               },

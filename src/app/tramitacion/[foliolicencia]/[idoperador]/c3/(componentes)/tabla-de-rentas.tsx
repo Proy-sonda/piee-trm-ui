@@ -353,6 +353,9 @@ export const TablaDeRentas = <
                               className={`btn btn-primary`}
                               onClick={() => {
                                 onClickBotonDesglose({
+                                  montoTotal: formulario.getValues(
+                                    `${fieldArray}.${index}.montoImponible`,
+                                  ),
                                   // prettier-ignore
                                   periodoRenta: formulario.getValues(`${fieldArray}.${index}.periodoRenta`),
                                   fieldArray: fieldArray,
@@ -446,7 +449,10 @@ export const TablaDeRentas = <
                                 onClick={() => {
                                   onClickBotonDesglose({
                                     // prettier-ignore
-                                    periodoRenta: formulario.getValues(`${fieldArray}.${index}.periodoRenta`),
+                                    montoTotal: formulario.getValues(`${fieldArray}.${index}.montoImponible`),
+                                    periodoRenta: formulario.getValues(
+                                      `${fieldArray}.${index}.periodoRenta`,
+                                    ),
                                     fieldArray: fieldArray,
                                     indexInput: index,
                                     show: true,

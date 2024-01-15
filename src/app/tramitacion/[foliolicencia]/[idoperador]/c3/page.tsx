@@ -106,6 +106,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   const [datosModalDesglose, setDatosModalDesglose] = useState<DatosModalDesgloseHaberes>({
     show: false,
+    montoTotal: 0,
     periodoRenta: new Date(),
     fieldArray: 'remuneraciones',
     indexInput: -1,
@@ -520,6 +521,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   const limpiarModalDesglose = () => {
     setDatosModalDesglose({
+      montoTotal: 0,
       periodoRenta: new Date(),
       show: false,
       fieldArray: 'remuneraciones',

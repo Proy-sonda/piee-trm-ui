@@ -1,15 +1,16 @@
+import IfContainer from '@/components/if-container';
 import { capitalizar, esFechaInvalida } from '@/utilidades';
 import { format } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
-import React, { useEffect } from 'react';
-import { Form, Modal, Table } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Alert, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { DesgloseDeHaberes } from '../(modelos)/desglose-de-haberes';
-import { FormularioC3 } from '../(modelos)/formulario-c3';
+import { DesgloseDeHaberes, FormularioC3, tieneDesglose, totalDesglose } from '../(modelos)';
 import { InputMonto } from './input-monto';
 
 export interface DatosModalDesgloseHaberes {
   show: boolean;
+  montoTotal: number;
   periodoRenta: Date;
   fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>;
   indexInput: number;
@@ -40,6 +41,8 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
 }) => {
   const formulario = useForm<FormularioDesgloseHaberes>({ mode: 'onBlur' });
 
+  const [mensajeErrorGlobal, setMensajeErrorGlobal] = useState<string>();
+
   useEffect(() => {
     if (!datos.desgloseInicial) {
       return;
@@ -56,20 +59,43 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
     formulario.setValue('bono5', datos.desgloseInicial.bono5);
   }, [datos.desgloseInicial, formulario]);
 
-  const handleCerrarModal = () => {
+  const limpiarModal = () => {
     formulario.reset();
-    onCerrar();
+    setMensajeErrorGlobal(undefined);
   };
 
   const guardarDesglose: SubmitHandler<FormularioDesgloseHaberes> = async (desglose) => {
-    formulario.reset();
+    if (!desgloseCoincideConMontoTotal(desglose, datos.montoTotal)) {
+      setMensajeErrorGlobal(
+        `El Desglose no coincide con el monto imponible de $${datos.montoTotal}.`,
+      );
+      formulario.setFocus('sueldoBase');
+      return;
+    }
 
+    limpiarModal();
     onGuardarDesglose(datos.fieldArray, datos.indexInput, desglose);
   };
 
+  const desgloseCoincideConMontoTotal = (
+    desglose: DesgloseDeHaberes | Record<string, never>,
+    montoTotal: number,
+  ) => {
+    if (!tieneDesglose(desglose)) {
+      return true;
+    }
+
+    return totalDesglose(desglose) === montoTotal;
+  };
+
   const descartarCambios = () => {
-    formulario.reset();
+    limpiarModal();
     onDescartarDesglose(datos.fieldArray, datos.indexInput);
+  };
+
+  const handleCerrarModal = () => {
+    limpiarModal();
+    onCerrar();
   };
 
   return (
@@ -87,6 +113,17 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
         <FormProvider {...formulario}>
           <Form id="formularioDesgloseHaberes" onSubmit={formulario.handleSubmit(guardarDesglose)}>
             <Modal.Body className="p-2 p-sm-3">
+              <IfContainer show={mensajeErrorGlobal}>
+                <Row>
+                  <Col xs={12}>
+                    <Alert variant="danger" className="d-flex align-items-center fade show">
+                      <i className="bi bi-exclamation-triangle me-2"></i>
+                      <span>{mensajeErrorGlobal}</span>
+                    </Alert>
+                  </Col>
+                </Row>
+              </IfContainer>
+
               <Table bordered>
                 <thead>
                   <tr>

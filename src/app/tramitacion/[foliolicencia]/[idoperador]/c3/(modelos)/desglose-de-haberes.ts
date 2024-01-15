@@ -46,3 +46,7 @@ export const desgloseFromGlosas = (xs: { tipohaber: string; montohaber: number }
 
   return desglose as DesgloseDeHaberes;
 };
+
+export const totalDesglose = (desglose: DesgloseDeHaberes) => {
+  return Object.values(desglose).reduce((total, monto: number) => total + monto, 0);
+};
