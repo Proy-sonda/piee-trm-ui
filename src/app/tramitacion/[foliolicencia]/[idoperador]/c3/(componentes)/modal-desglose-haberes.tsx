@@ -6,10 +6,12 @@ import React, { useEffect, useState } from 'react';
 import { Alert, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { DesgloseDeHaberes, FormularioC3, tieneDesglose, totalDesglose } from '../(modelos)';
+import { Licenciac2, entidadPrevisionalEsAFP } from '../../c2/(modelos)';
 import { InputMonto } from './input-monto';
 
 export interface DatosModalDesgloseHaberes {
   show: boolean;
+  zona2?: Licenciac2;
   montoTotal: number;
   periodoRenta: Date;
   fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>;
@@ -65,9 +67,18 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
   };
 
   const guardarDesglose: SubmitHandler<FormularioDesgloseHaberes> = async (desglose) => {
-    if (!desgloseCoincideConMontoTotal(desglose, datos.montoTotal)) {
+    if (!datos.zona2) {
+      throw new Error('No existe la zona 2');
+    }
+
+    if (tieneDesglose(desglose) && totalDesglose(desglose) !== datos.montoTotal) {
+      const tipoMonto = entidadPrevisionalEsAFP(datos.zona2.entidadprevisional)
+        ? 'total remuneración'
+        : 'imponible desahucio';
       setMensajeErrorGlobal(
-        `El Desglose no coincide con el monto imponible de $${datos.montoTotal}.`,
+        `El total del desglose ($${totalDesglose(
+          desglose,
+        )}) no coincide con el ${tipoMonto} ($${datos.montoTotal.toLocaleString()})`,
       );
       formulario.setFocus('sueldoBase');
       return;
@@ -75,17 +86,6 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
 
     limpiarModal();
     onGuardarDesglose(datos.fieldArray, datos.indexInput, desglose);
-  };
-
-  const desgloseCoincideConMontoTotal = (
-    desglose: DesgloseDeHaberes | Record<string, never>,
-    montoTotal: number,
-  ) => {
-    if (!tieneDesglose(desglose)) {
-      return true;
-    }
-
-    return totalDesglose(desglose) === montoTotal;
   };
 
   const descartarCambios = () => {

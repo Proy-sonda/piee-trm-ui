@@ -8,9 +8,11 @@ import { UseFieldArrayReturn, useFormContext } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { FormularioC3 } from '../(modelos)/formulario-c3';
 import { InputDias } from '../../(componentes)/input-dias';
+import { Licenciac2 } from '../../c2/(modelos)';
 import {
   EntidadPrevisional,
   crearIdEntidadPrevisional,
+  entidadPrevisionalEsAFP,
   glosaCompletaEntidadPrevisional,
 } from '../../c2/(modelos)/entidad-previsional';
 import { InputDesgloseDeHaberes } from './input-desglose-de-haberes';
@@ -23,6 +25,7 @@ interface TablaDeRentasProps<
   titulo: string;
   filasIncompletas: number[];
   tiposPrevisiones: EntidadPrevisional[];
+  zona2: Licenciac2;
   fieldArray: T;
   remuneraciones: UseFieldArrayReturn<FormularioC3, T, 'id'>;
   onClickBotonDesglose: (datos: DatosModalDesgloseHaberes) => void | Promise<void>;
@@ -32,6 +35,7 @@ export const TablaDeRentas = <
   T extends keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
 >({
   titulo,
+  zona2,
   fieldArray,
   filasIncompletas,
   tiposPrevisiones,
@@ -96,8 +100,11 @@ export const TablaDeRentas = <
                   <Th>
                     <span className="text-nowrap">N° Días</span>
                   </Th>
-                  <Th>Monto Imponible</Th>
-                  <Th>Total Remuneración</Th>
+                  {entidadPrevisionalEsAFP(zona2.entidadprevisional) ? (
+                    <Th>Total Remuneración</Th>
+                  ) : (
+                    <Th>Imponible Desahucio</Th>
+                  )}
                   <Th>Monto Incapacidad</Th>
                   <Th>Días Incapacidad</Th>
                   <Th>Registrar Desglose de haberes</Th>
@@ -221,28 +228,29 @@ export const TablaDeRentas = <
                       )}
                     </Td>
                     <Td>
-                      <InputMonto
-                        opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
-                        name={`${fieldArray}.${index}.montoImponible`}
-                        unirConFieldArray={{
-                          index,
-                          campo: 'montoImponible',
-                          fieldArrayName: fieldArray,
-                        }}
-                      />
-                    </Td>
-                    <Td>
                       {index != 0 ? (
                         <div className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}>
-                          <InputMonto
-                            opcional
-                            name={`${fieldArray}.${index}.totalRemuneracion`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'totalRemuneracion',
-                              fieldArrayName: fieldArray,
-                            }}
-                          />
+                          {entidadPrevisionalEsAFP(zona2.entidadprevisional) ? (
+                            <InputMonto
+                              opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
+                              name={`${fieldArray}.${index}.totalRemuneracion`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'totalRemuneracion',
+                                fieldArrayName: fieldArray,
+                              }}
+                            />
+                          ) : (
+                            <InputMonto
+                              opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
+                              name={`${fieldArray}.${index}.montoImponible`}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'montoImponible',
+                                fieldArrayName: fieldArray,
+                              }}
+                            />
+                          )}
                         </div>
                       ) : (
                         <>
@@ -309,15 +317,27 @@ export const TablaDeRentas = <
                           <div
                             className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
                             ref={totalRemuneracion}>
-                            <InputMonto
-                              opcional
-                              name={`${fieldArray}.${index}.totalRemuneracion`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'totalRemuneracion',
-                                fieldArrayName: fieldArray,
-                              }}
-                            />
+                            {entidadPrevisionalEsAFP(zona2.entidadprevisional) ? (
+                              <InputMonto
+                                opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
+                                name={`${fieldArray}.${index}.totalRemuneracion`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'totalRemuneracion',
+                                  fieldArrayName: fieldArray,
+                                }}
+                              />
+                            ) : (
+                              <InputMonto
+                                opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
+                                name={`${fieldArray}.${index}.montoImponible`}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'montoImponible',
+                                  fieldArrayName: fieldArray,
+                                }}
+                              />
+                            )}
                           </div>
                         </>
                       )}
@@ -353,8 +373,13 @@ export const TablaDeRentas = <
                               className={`btn btn-primary`}
                               onClick={() => {
                                 onClickBotonDesglose({
+                                  zona2: zona2,
                                   montoTotal: formulario.getValues(
-                                    `${fieldArray}.${index}.montoImponible`,
+                                    `${fieldArray}.${index}.${
+                                      entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                                        ? 'totalRemuneracion'
+                                        : 'montoImponible'
+                                    }`,
                                   ),
                                   // prettier-ignore
                                   periodoRenta: formulario.getValues(`${fieldArray}.${index}.periodoRenta`),
@@ -448,16 +473,23 @@ export const TablaDeRentas = <
                                 className={`btn btn-primary`}
                                 onClick={() => {
                                   onClickBotonDesglose({
-                                    // prettier-ignore
-                                    montoTotal: formulario.getValues(`${fieldArray}.${index}.montoImponible`),
+                                    zona2: zona2,
+                                    montoTotal: formulario.getValues(
+                                      `${fieldArray}.${index}.${
+                                        entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                                          ? 'totalRemuneracion'
+                                          : 'montoImponible'
+                                      }`,
+                                    ),
                                     periodoRenta: formulario.getValues(
                                       `${fieldArray}.${index}.periodoRenta`,
                                     ),
                                     fieldArray: fieldArray,
                                     indexInput: index,
                                     show: true,
-                                    // prettier-ignore
-                                    desgloseInicial: formulario.getValues(`${fieldArray}.${index}.desgloseHaberes`),
+                                    desgloseInicial: formulario.getValues(
+                                      `${fieldArray}.${index}.desgloseHaberes`,
+                                    ),
                                   });
                                 }}>
                                 <i className="bi bi-bounding-box-circles"></i>
@@ -469,7 +501,11 @@ export const TablaDeRentas = <
                         <InputDesgloseDeHaberes
                           opcional
                           name={`${fieldArray}.${index}.desgloseHaberes`}
-                          montoImponibleName={`${fieldArray}.${index}.montoImponible`}
+                          montoImponibleName={`${fieldArray}.${index}.${
+                            entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                              ? 'totalRemuneracion'
+                              : 'montoImponible'
+                          }`}
                           unirConFieldArray={{
                             index,
                             campo: 'desgloseHaberes',

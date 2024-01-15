@@ -21,6 +21,7 @@ export interface Remuneracion {
   prevision: string;
   periodoRenta: Date;
   dias: number;
+  /** Ahora se llama "Imponible Desahucio" */
   montoImponible: number;
   totalRemuneracion: number;
   montoIncapacidad: number;
@@ -39,7 +40,7 @@ export const estaRemuneracionCompleta = (fila: Remuneracion) => {
     fila.prevision !== '' &&
     !esFechaInvalida(fila.periodoRenta) &&
     !isNaN(fila.dias) &&
-    !isNaN(fila.montoImponible)
+    !(isNaN(fila.montoImponible) && isNaN(fila.totalRemuneracion))
   );
 };
 

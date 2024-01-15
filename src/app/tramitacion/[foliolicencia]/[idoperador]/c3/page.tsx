@@ -368,17 +368,21 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   };
 
   const onSubmitForm: SubmitHandler<FormularioC3> = async (datos) => {
-    if (!(await formulario.trigger()))
+    if (!(await formulario.trigger())) {
+      formulario.setFocus('remuneraciones.0.dias');
       return AlertaError.fire({
         title: 'Campos Inválidos',
         html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
+    }
 
-    if (!validarCompletitudDeFilas(datos))
+    if (!validarCompletitudDeFilas(datos)) {
+      formulario.setFocus('remuneraciones.0.dias');
       return AlertaError.fire({
         title: 'Remuneraciones Incompletas',
         html: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
       });
+    }
 
     const datosLimpios: FormularioC3 = {
       ...datos,
@@ -591,14 +595,17 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
               }}
             />
 
-            <TablaDeRentas
-              titulo="RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD"
-              fieldArray="remuneraciones"
-              remuneraciones={remuneraciones}
-              filasIncompletas={completitudRemuneraciones.normales}
-              tiposPrevisiones={tiposPrevisiones ?? []}
-              onClickBotonDesglose={setDatosModalDesglose}
-            />
+            {zona2 && (
+              <TablaDeRentas
+                titulo="RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD"
+                fieldArray="remuneraciones"
+                zona2={zona2}
+                remuneraciones={remuneraciones}
+                filasIncompletas={completitudRemuneraciones.normales}
+                tiposPrevisiones={tiposPrevisiones ?? []}
+                onClickBotonDesglose={setDatosModalDesglose}
+              />
+            )}
 
             <Row className="mt-2">
               <Col
@@ -652,14 +659,17 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
               {/* Esta solo para hacer espacio */}
               <div className="mt-5 mb-3"></div>
 
-              <TablaDeRentas
-                titulo="EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE"
-                fieldArray="remuneracionesMaternidad"
-                remuneraciones={remuneracionesMaternidad}
-                filasIncompletas={completitudRemuneraciones.maternidad}
-                tiposPrevisiones={tiposPrevisiones ?? []}
-                onClickBotonDesglose={setDatosModalDesglose}
-              />
+              {zona2 && (
+                <TablaDeRentas
+                  titulo="EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE"
+                  fieldArray="remuneracionesMaternidad"
+                  zona2={zona2}
+                  remuneraciones={remuneracionesMaternidad}
+                  filasIncompletas={completitudRemuneraciones.maternidad}
+                  tiposPrevisiones={tiposPrevisiones ?? []}
+                  onClickBotonDesglose={setDatosModalDesglose}
+                />
+              )}
             </IfContainer>
           </Form>
         </FormProvider>

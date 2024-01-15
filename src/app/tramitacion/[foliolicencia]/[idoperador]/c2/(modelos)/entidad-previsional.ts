@@ -38,3 +38,7 @@ export const glosaCompletaEntidadPrevisional = (entidad: EntidadPrevisional) => 
     ? capitalizar(entidad.glosa)
     : `[${entidad.letraentidadprevisional}] ${capitalizar(entidad.glosa)}`;
 };
+
+export const entidadPrevisionalEsAFP = (entidad: EntidadPrevisionalBasica) => {
+  return entidad.codigoregimenprevisional === 2;
+};
