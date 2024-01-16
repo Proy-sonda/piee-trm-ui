@@ -19,6 +19,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
   opcional,
   montoMinimo,
   montoMaximo,
+  deshabilitado,
   unirConFieldArray,
 }) => {
   const montoMinimoFinal = montoMinimo ?? 0;
@@ -28,7 +29,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     name,
-    prefijoId: 'combo',
+    prefijoId: 'monto',
     label: { texto: label },
     unirConFieldArray,
   });
@@ -41,6 +42,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
         <Form.Control
           type="number"
           inputMode="numeric"
+          disabled={deshabilitado}
           isInvalid={tieneError}
           {...register(name, {
             valueAsNumber: true,

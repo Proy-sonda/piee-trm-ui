@@ -97,11 +97,8 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                   <Th>
                     <span className="text-nowrap">N° Días</span>
                   </Th>
-                  <Th>
-                    {entidadPrevisionalEsAFP(zona2.entidadprevisional)
-                      ? 'Total Remuneración'
-                      : 'Imponible Desahucio'}
-                  </Th>
+                  <Th>Imponible Desahucio</Th>
+                  <Th> Total Remuneración </Th>
                   <Th>Monto Incapacidad</Th>
                   <Th>Días Incapacidad</Th>
                   <Th>Registrar Desglose de haberes</Th>
@@ -211,6 +208,26 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                       </div>
                     </Td>
                     <Td>
+                      <div
+                        className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                        ref={index === 0 ? totalRemuneracion : undefined}>
+                        <InputMonto
+                          opcional={
+                            fieldArray === 'remuneracionesMaternidad' ||
+                            index !== 0 ||
+                            entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                          }
+                          deshabilitado={entidadPrevisionalEsAFP(zona2.entidadprevisional)}
+                          name={`${fieldArray}.${index}.montoImponible`}
+                          unirConFieldArray={{
+                            index,
+                            campo: 'montoImponible',
+                            fieldArrayName: fieldArray,
+                          }}
+                        />
+                      </div>
+                    </Td>
+                    <Td>
                       {index === 0 && (
                         <GuiaUsuario
                           guia={listaguia[2]!?.activo && guia}
@@ -277,11 +294,16 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                         className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
                         ref={index === 0 ? totalRemuneracion : undefined}>
                         <InputMonto
-                          opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
-                          name={`${fieldArray}.${index}.${TIPO_MONTO_NAME}`}
+                          opcional={
+                            fieldArray === 'remuneracionesMaternidad' ||
+                            index !== 0 ||
+                            !entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                          }
+                          deshabilitado={!entidadPrevisionalEsAFP(zona2.entidadprevisional)}
+                          name={`${fieldArray}.${index}.totalRemuneracion`}
                           unirConFieldArray={{
                             index,
-                            campo: TIPO_MONTO_NAME,
+                            campo: 'totalRemuneracion',
                             fieldArrayName: fieldArray,
                           }}
                         />
