@@ -4,14 +4,6 @@ import {
   LicenciaTramitar,
   esLicenciaMaternidad,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
-import { InputMonto } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(componentes)/input-monto';
-import {
-  FormularioC3,
-  estaRemuneracionCompleta,
-  limpiarRemuneracion,
-  remuneracionTieneAlgunCampoValido,
-} from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
-
 import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch, useRefrescarPagina } from '@/hooks';
 import { capitalizar } from '@/utilidades';
@@ -30,9 +22,16 @@ import { buscarEntidadPrevisional, buscarZona2 } from '../c2/(servicios)';
 import {
   DatosModalDesgloseHaberes,
   DocumentosAdjuntosC3,
+  InputMonto,
   ModalDesgloseDeHaberes,
   TablaDeRentas,
 } from './(componentes)';
+import {
+  FormularioC3,
+  limpiarRemuneracion,
+  remuneracionEstaCompleta,
+  remuneracionTieneAlgunCampoValido,
+} from './(modelos)';
 import { buscarZona3, crearLicenciaZ3 } from './(servicios)';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
@@ -391,10 +390,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         ? 0
         : datos.remuneracionImponiblePrevisional,
       remuneraciones: datos.remuneraciones
-        .filter(estaRemuneracionCompleta)
+        .filter(remuneracionEstaCompleta)
         .map(limpiarRemuneracion),
       remuneracionesMaternidad: datos.remuneracionesMaternidad
-        .filter(estaRemuneracionCompleta)
+        .filter(remuneracionEstaCompleta)
         .map(limpiarRemuneracion),
     };
 
@@ -502,7 +501,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
       if (
         remuneracionTieneAlgunCampoValido(remuneracion) &&
-        !estaRemuneracionCompleta(remuneracion)
+        !remuneracionEstaCompleta(remuneracion)
       ) {
         errores.normales.push(i + 1);
       }
@@ -513,7 +512,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
       if (
         remuneracionTieneAlgunCampoValido(remuneracion) &&
-        !estaRemuneracionCompleta(remuneracion)
+        !remuneracionEstaCompleta(remuneracion)
       ) {
         errores.maternidad.push(i + 1);
       }
@@ -600,7 +599,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                 titulo="RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD"
                 fieldArray="remuneraciones"
                 zona2={zona2}
-                remuneraciones={remuneraciones}
+                remuneraciones={remuneraciones as any}
                 filasIncompletas={completitudRemuneraciones.normales}
                 tiposPrevisiones={tiposPrevisiones ?? []}
                 onClickBotonDesglose={setDatosModalDesglose}
@@ -664,7 +663,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                   titulo="EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE"
                   fieldArray="remuneracionesMaternidad"
                   zona2={zona2}
-                  remuneraciones={remuneracionesMaternidad}
+                  remuneraciones={remuneracionesMaternidad as any}
                   filasIncompletas={completitudRemuneraciones.maternidad}
                   tiposPrevisiones={tiposPrevisiones ?? []}
                   onClickBotonDesglose={setDatosModalDesglose}

@@ -6,7 +6,7 @@ import { useContext, useRef } from 'react';
 import { Alert, Col, Row } from 'react-bootstrap';
 import { UseFieldArrayReturn, useFormContext } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
-import { FormularioC3 } from '../(modelos)/formulario-c3';
+import { FormularioC3, TipoRemuneracion } from '../(modelos)/formulario-c3';
 import { InputDias } from '../../(componentes)/input-dias';
 import { Licenciac2 } from '../../c2/(modelos)';
 import {
@@ -19,21 +19,17 @@ import { InputDesgloseDeHaberes } from './input-desglose-de-haberes';
 import { InputMonto } from './input-monto';
 import { DatosModalDesgloseHaberes } from './modal-desglose-haberes';
 
-interface TablaDeRentasProps<
-  T extends keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
-> {
+interface TablaDeRentasProps {
   titulo: string;
   filasIncompletas: number[];
   tiposPrevisiones: EntidadPrevisional[];
   zona2: Licenciac2;
-  fieldArray: T;
-  remuneraciones: UseFieldArrayReturn<FormularioC3, T, 'id'>;
+  fieldArray: TipoRemuneracion;
+  remuneraciones: UseFieldArrayReturn<FormularioC3, TipoRemuneracion, 'id'>;
   onClickBotonDesglose: (datos: DatosModalDesgloseHaberes) => void | Promise<void>;
 }
 
-export const TablaDeRentas = <
-  T extends keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
->({
+export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
   titulo,
   zona2,
   fieldArray,
@@ -41,13 +37,14 @@ export const TablaDeRentas = <
   tiposPrevisiones,
   remuneraciones,
   onClickBotonDesglose,
-}: TablaDeRentasProps<T>) => {
+}) => {
+  const TIPO_MONTO_NAME = entidadPrevisionalEsAFP(zona2.entidadprevisional)
+    ? 'totalRemuneracion'
+    : 'montoImponible';
+
   const formulario = useFormContext<FormularioC3>();
 
-  const limpiarFila = (
-    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
-    index: number,
-  ) => {
+  const limpiarFila = (fieldArray: TipoRemuneracion, index: number) => {
     formulario.setValue(`${fieldArray}.${index}`, {
       prevision: '',
       periodoRenta: null,
@@ -100,11 +97,11 @@ export const TablaDeRentas = <
                   <Th>
                     <span className="text-nowrap">N° Días</span>
                   </Th>
-                  {entidadPrevisionalEsAFP(zona2.entidadprevisional) ? (
-                    <Th>Total Remuneración</Th>
-                  ) : (
-                    <Th>Imponible Desahucio</Th>
-                  )}
+                  <Th>
+                    {entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                      ? 'Total Remuneración'
+                      : 'Imponible Desahucio'}
+                  </Th>
                   <Th>Monto Incapacidad</Th>
                   <Th>Días Incapacidad</Th>
                   <Th>Registrar Desglose de haberes</Th>
@@ -141,123 +138,182 @@ export const TablaDeRentas = <
                       />
                     </Td>
                     <Td>
-                      {index != 0 ? (
-                        <div className={guia && listaguia[1]!?.activo ? 'overlay-marco' : ''}>
-                          <InputDias
-                            opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
-                            name={`${fieldArray}.${index}.dias`}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'dias',
-                              fieldArrayName: fieldArray,
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={nrodias}>
-                            Cantidad de días trabajados en el periodo de renta
-                            <br />
-                            <div className="text-end mt-3">
-                              <button
-                                className="btn btn-sm text-white"
-                                onClick={() => {
-                                  AgregarGuia([
-                                    {
-                                      indice: 0,
-                                      nombre: 'Stepper',
-                                      activo: true,
-                                    },
-                                    {
-                                      indice: 1,
-                                      nombre: 'nro dias',
-                                      activo: false,
-                                    },
-                                  ]);
-                                }}
-                                style={{
-                                  border: '1px solid white',
-                                }}>
-                                <i className="bi bi-arrow-left"></i>
-                                &nbsp; Anterior
-                              </button>
-                              &nbsp;
-                              <button
-                                className="btn btn-sm text-white"
-                                onClick={() => {
-                                  AgregarGuia([
-                                    {
-                                      indice: 0,
-                                      nombre: 'Stepper',
-                                      activo: false,
-                                    },
-                                    {
-                                      indice: 1,
-                                      nombre: 'nro dias',
-                                      activo: false,
-                                    },
-                                    {
-                                      indice: 2,
-                                      nombre: 'total remuneración',
-                                      activo: true,
-                                    },
-                                  ]);
-                                }}
-                                style={{
-                                  border: '1px solid white',
-                                }}>
-                                Continuar &nbsp;
-                                <i className="bi bi-arrow-right"></i>
-                              </button>
-                            </div>
-                          </GuiaUsuario>
-                          <div
-                            ref={nrodias}
-                            className={guia && listaguia[1]!?.activo ? 'overlay-marco' : ''}>
-                            <InputDias
-                              opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
-                              name={`${fieldArray}.${index}.dias`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'dias',
-                                fieldArrayName: fieldArray,
+                      {index === 0 && (
+                        <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={nrodias}>
+                          Cantidad de días trabajados en el periodo de renta
+                          <br />
+                          <div className="text-end mt-3">
+                            <button
+                              className="btn btn-sm text-white"
+                              onClick={() => {
+                                AgregarGuia([
+                                  {
+                                    indice: 0,
+                                    nombre: 'Stepper',
+                                    activo: true,
+                                  },
+                                  {
+                                    indice: 1,
+                                    nombre: 'nro dias',
+                                    activo: false,
+                                  },
+                                ]);
                               }}
-                            />
+                              style={{
+                                border: '1px solid white',
+                              }}>
+                              <i className="bi bi-arrow-left"></i>
+                              &nbsp; Anterior
+                            </button>
+                            &nbsp;
+                            <button
+                              className="btn btn-sm text-white"
+                              onClick={() => {
+                                AgregarGuia([
+                                  {
+                                    indice: 0,
+                                    nombre: 'Stepper',
+                                    activo: false,
+                                  },
+                                  {
+                                    indice: 1,
+                                    nombre: 'nro dias',
+                                    activo: false,
+                                  },
+                                  {
+                                    indice: 2,
+                                    nombre: 'total remuneración',
+                                    activo: true,
+                                  },
+                                ]);
+                              }}
+                              style={{
+                                border: '1px solid white',
+                              }}>
+                              Continuar &nbsp;
+                              <i className="bi bi-arrow-right"></i>
+                            </button>
                           </div>
-                        </>
+                        </GuiaUsuario>
                       )}
+                      <div
+                        ref={index === 0 ? nrodias : undefined}
+                        className={guia && listaguia[1]!?.activo ? 'overlay-marco' : ''}>
+                        <InputDias
+                          opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
+                          name={`${fieldArray}.${index}.dias`}
+                          unirConFieldArray={{
+                            index,
+                            campo: 'dias',
+                            fieldArrayName: fieldArray,
+                          }}
+                        />
+                      </div>
                     </Td>
                     <Td>
-                      {index != 0 ? (
-                        <div className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}>
-                          {entidadPrevisionalEsAFP(zona2.entidadprevisional) ? (
-                            <InputMonto
-                              opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
-                              name={`${fieldArray}.${index}.totalRemuneracion`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'totalRemuneracion',
-                                fieldArrayName: fieldArray,
+                      {index === 0 && (
+                        <GuiaUsuario
+                          guia={listaguia[2]!?.activo && guia}
+                          target={totalRemuneracion}>
+                          Total de la remuneración del periodo de renta
+                          <br />
+                          <div className="text-end mt-3">
+                            <button
+                              className="btn btn-sm text-white"
+                              onClick={() => {
+                                AgregarGuia([
+                                  { indice: 0, nombre: 'stepper', activo: false },
+                                  {
+                                    indice: 1,
+                                    nombre: 'nro dias',
+                                    activo: true,
+                                  },
+                                  {
+                                    indice: 2,
+                                    nombre: 'total remuneración',
+                                    activo: false,
+                                  },
+                                ]);
                               }}
-                            />
-                          ) : (
-                            <InputMonto
-                              opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
-                              name={`${fieldArray}.${index}.montoImponible`}
-                              unirConFieldArray={{
-                                index,
-                                campo: 'montoImponible',
-                                fieldArrayName: fieldArray,
+                              style={{
+                                border: '1px solid white',
+                              }}>
+                              <i className="bi bi-arrow-left"></i>
+                              &nbsp; Anterior
+                            </button>
+                            &nbsp;
+                            <button
+                              className="btn btn-sm text-white"
+                              onClick={() => {
+                                AgregarGuia([
+                                  { indice: 0, nombre: 'stepper', activo: false },
+                                  {
+                                    indice: 1,
+                                    nombre: 'nro dias',
+                                    activo: false,
+                                  },
+                                  {
+                                    indice: 2,
+                                    nombre: 'total remuneración',
+                                    activo: false,
+                                  },
+                                  {
+                                    indice: 3,
+                                    nombre: 'desglose haberes',
+                                    activo: true,
+                                  },
+                                ]);
                               }}
-                            />
-                          )}
-                        </div>
-                      ) : (
-                        <>
-                          <GuiaUsuario
-                            guia={listaguia[2]!?.activo && guia}
-                            target={totalRemuneracion}>
-                            Total de la remuneración del periodo de renta
+                              style={{
+                                border: '1px solid white',
+                              }}>
+                              Continuar &nbsp;
+                              <i className="bi bi-arrow-right"></i>
+                            </button>
+                          </div>
+                        </GuiaUsuario>
+                      )}
+                      <div
+                        className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                        ref={index === 0 ? totalRemuneracion : undefined}>
+                        <InputMonto
+                          opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
+                          name={`${fieldArray}.${index}.${TIPO_MONTO_NAME}`}
+                          unirConFieldArray={{
+                            index,
+                            campo: TIPO_MONTO_NAME,
+                            fieldArrayName: fieldArray,
+                          }}
+                        />
+                      </div>
+                    </Td>
+                    <Td>
+                      <InputMonto
+                        opcional
+                        name={`${fieldArray}.${index}.montoIncapacidad`}
+                        unirConFieldArray={{
+                          index,
+                          campo: 'montoIncapacidad',
+                          fieldArrayName: fieldArray,
+                        }}
+                      />
+                    </Td>
+                    <Td>
+                      <InputDias
+                        opcional
+                        name={`${fieldArray}.${index}.diasIncapacidad`}
+                        unirConFieldArray={{
+                          index,
+                          campo: 'diasIncapacidad',
+                          fieldArrayName: fieldArray,
+                        }}
+                      />
+                    </Td>
+                    <Td>
+                      <div className="align-middle text-center">
+                        {index === 0 && (
+                          <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={btnDesglose}>
+                            Detallar la remuneración del periodo de renta
                             <br />
                             <div className="text-end mt-3">
                               <button
@@ -268,11 +324,16 @@ export const TablaDeRentas = <
                                     {
                                       indice: 1,
                                       nombre: 'nro dias',
-                                      activo: true,
+                                      activo: false,
                                     },
                                     {
                                       indice: 2,
                                       nombre: 'total remuneración',
+                                      activo: true,
+                                    },
+                                    {
+                                      indice: 3,
+                                      nombre: 'desglose haberes',
                                       activo: false,
                                     },
                                   ]);
@@ -302,9 +363,16 @@ export const TablaDeRentas = <
                                     {
                                       indice: 3,
                                       nombre: 'desglose haberes',
+                                      activo: false,
+                                    },
+                                    {
+                                      indice: 4,
+                                      nombre: 'Tipo de documento',
                                       activo: true,
                                     },
                                   ]);
+                                  // bajar focus de pantalla abajo
+                                  window.scrollTo(0, document.body.scrollHeight);
                                 }}
                                 style={{
                                   border: '1px solid white',
@@ -314,198 +382,38 @@ export const TablaDeRentas = <
                               </button>
                             </div>
                           </GuiaUsuario>
-                          <div
-                            className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
-                            ref={totalRemuneracion}>
-                            {entidadPrevisionalEsAFP(zona2.entidadprevisional) ? (
-                              <InputMonto
-                                opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
-                                name={`${fieldArray}.${index}.totalRemuneracion`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'totalRemuneracion',
-                                  fieldArrayName: fieldArray,
-                                }}
-                              />
-                            ) : (
-                              <InputMonto
-                                opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
-                                name={`${fieldArray}.${index}.montoImponible`}
-                                unirConFieldArray={{
-                                  index,
-                                  campo: 'montoImponible',
-                                  fieldArrayName: fieldArray,
-                                }}
-                              />
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </Td>
-                    <Td>
-                      <InputMonto
-                        opcional
-                        name={`${fieldArray}.${index}.montoIncapacidad`}
-                        unirConFieldArray={{
-                          index,
-                          campo: 'montoIncapacidad',
-                          fieldArrayName: fieldArray,
-                        }}
-                      />
-                    </Td>
-                    <Td>
-                      <InputDias
-                        opcional
-                        name={`${fieldArray}.${index}.diasIncapacidad`}
-                        unirConFieldArray={{
-                          index,
-                          campo: 'diasIncapacidad',
-                          fieldArrayName: fieldArray,
-                        }}
-                      />
-                    </Td>
-                    <Td>
-                      <div className="align-middle text-center">
-                        {index != 0 ? (
-                          <div className={`${listaguia[3]!?.activo && guia && 'overlay-marco'}`}>
-                            <button
-                              type="button"
-                              className={`btn btn-primary`}
-                              onClick={() => {
-                                onClickBotonDesglose({
-                                  zona2: zona2,
-                                  montoTotal: formulario.getValues(
-                                    `${fieldArray}.${index}.${
-                                      entidadPrevisionalEsAFP(zona2.entidadprevisional)
-                                        ? 'totalRemuneracion'
-                                        : 'montoImponible'
-                                    }`,
-                                  ),
-                                  // prettier-ignore
-                                  periodoRenta: formulario.getValues(`${fieldArray}.${index}.periodoRenta`),
-                                  fieldArray: fieldArray,
-                                  indexInput: index,
-                                  show: true,
-                                  // prettier-ignore
-                                  desgloseInicial: formulario.getValues(`${fieldArray}.${index}.desgloseHaberes`),
-                                });
-                              }}>
-                              <i className="bi bi-bounding-box-circles"></i>
-                            </button>
-                          </div>
-                        ) : (
-                          <>
-                            <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={btnDesglose}>
-                              Detallar la remuneración del periodo de renta
-                              <br />
-                              <div className="text-end mt-3">
-                                <button
-                                  className="btn btn-sm text-white"
-                                  onClick={() => {
-                                    AgregarGuia([
-                                      { indice: 0, nombre: 'stepper', activo: false },
-                                      {
-                                        indice: 1,
-                                        nombre: 'nro dias',
-                                        activo: false,
-                                      },
-                                      {
-                                        indice: 2,
-                                        nombre: 'total remuneración',
-                                        activo: true,
-                                      },
-                                      {
-                                        indice: 3,
-                                        nombre: 'desglose haberes',
-                                        activo: false,
-                                      },
-                                    ]);
-                                  }}
-                                  style={{
-                                    border: '1px solid white',
-                                  }}>
-                                  <i className="bi bi-arrow-left"></i>
-                                  &nbsp; Anterior
-                                </button>
-                                &nbsp;
-                                <button
-                                  className="btn btn-sm text-white"
-                                  onClick={() => {
-                                    AgregarGuia([
-                                      { indice: 0, nombre: 'stepper', activo: false },
-                                      {
-                                        indice: 1,
-                                        nombre: 'nro dias',
-                                        activo: false,
-                                      },
-                                      {
-                                        indice: 2,
-                                        nombre: 'total remuneración',
-                                        activo: false,
-                                      },
-                                      {
-                                        indice: 3,
-                                        nombre: 'desglose haberes',
-                                        activo: false,
-                                      },
-                                      {
-                                        indice: 4,
-                                        nombre: 'Tipo de documento',
-                                        activo: true,
-                                      },
-                                    ]);
-                                    // bajar focus de pantalla abajo
-                                    window.scrollTo(0, document.body.scrollHeight);
-                                  }}
-                                  style={{
-                                    border: '1px solid white',
-                                  }}>
-                                  Continuar &nbsp;
-                                  <i className="bi bi-arrow-right"></i>
-                                </button>
-                              </div>
-                            </GuiaUsuario>
-                            <div
-                              className={`${listaguia[3]!?.activo && guia && 'overlay-marco'}`}
-                              ref={btnDesglose}>
-                              <button
-                                type="button"
-                                className={`btn btn-primary`}
-                                onClick={() => {
-                                  onClickBotonDesglose({
-                                    zona2: zona2,
-                                    montoTotal: formulario.getValues(
-                                      `${fieldArray}.${index}.${
-                                        entidadPrevisionalEsAFP(zona2.entidadprevisional)
-                                          ? 'totalRemuneracion'
-                                          : 'montoImponible'
-                                      }`,
-                                    ),
-                                    periodoRenta: formulario.getValues(
-                                      `${fieldArray}.${index}.periodoRenta`,
-                                    ),
-                                    fieldArray: fieldArray,
-                                    indexInput: index,
-                                    show: true,
-                                    desgloseInicial: formulario.getValues(
-                                      `${fieldArray}.${index}.desgloseHaberes`,
-                                    ),
-                                  });
-                                }}>
-                                <i className="bi bi-bounding-box-circles"></i>
-                              </button>
-                            </div>
-                          </>
                         )}
+                        <div
+                          className={`${listaguia[3]!?.activo && guia && 'overlay-marco'}`}
+                          ref={index === 0 ? btnDesglose : undefined}>
+                          <button
+                            type="button"
+                            className={`btn btn-primary`}
+                            onClick={() => {
+                              onClickBotonDesglose({
+                                zona2: zona2,
+                                montoTotal: formulario.getValues(
+                                  `${fieldArray}.${index}.${TIPO_MONTO_NAME}`,
+                                ),
+                                periodoRenta: formulario.getValues(
+                                  `${fieldArray}.${index}.periodoRenta`,
+                                ),
+                                fieldArray: fieldArray,
+                                indexInput: index,
+                                show: true,
+                                desgloseInicial: formulario.getValues(
+                                  `${fieldArray}.${index}.desgloseHaberes`,
+                                ),
+                              });
+                            }}>
+                            <i className="bi bi-bounding-box-circles"></i>
+                          </button>
+                        </div>
 
                         <InputDesgloseDeHaberes
                           opcional
                           name={`${fieldArray}.${index}.desgloseHaberes`}
-                          montoImponibleName={`${fieldArray}.${index}.${
-                            entidadPrevisionalEsAFP(zona2.entidadprevisional)
-                              ? 'totalRemuneracion'
-                              : 'montoImponible'
-                          }`}
+                          montoImponibleName={`${fieldArray}.${index}.${TIPO_MONTO_NAME}`}
                           unirConFieldArray={{
                             index,
                             campo: 'desgloseHaberes',

@@ -5,7 +5,7 @@ import esLocale from 'date-fns/locale/es';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { DesgloseDeHaberes, FormularioC3, tieneDesglose, totalDesglose } from '../(modelos)';
+import { DesgloseDeHaberes, TipoRemuneracion, existeDesglose, totalDesglose } from '../(modelos)';
 import { Licenciac2, entidadPrevisionalEsAFP } from '../../c2/(modelos)';
 import { InputMonto } from './input-monto';
 
@@ -14,7 +14,7 @@ export interface DatosModalDesgloseHaberes {
   zona2?: Licenciac2;
   montoTotal: number;
   periodoRenta: Date;
-  fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>;
+  fieldArray: TipoRemuneracion;
   indexInput: number;
   desgloseInicial?: DesgloseDeHaberes | Record<string, never>;
 }
@@ -23,14 +23,11 @@ interface ModalDesgloseDeHaberesProps {
   datos: DatosModalDesgloseHaberes;
   onCerrar: () => void;
   onGuardarDesglose: (
-    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
+    fieldArray: TipoRemuneracion,
     indexInput: number,
     desglose: DesgloseDeHaberes,
   ) => void;
-  onDescartarDesglose: (
-    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
-    indexInput: number,
-  ) => void;
+  onDescartarDesglose: (fieldArray: TipoRemuneracion, indexInput: number) => void;
 }
 
 type FormularioDesgloseHaberes = DesgloseDeHaberes;
@@ -71,15 +68,16 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
       throw new Error('No existe la zona 2');
     }
 
-    if (tieneDesglose(desglose) && totalDesglose(desglose) !== datos.montoTotal) {
+    if (existeDesglose(desglose) && totalDesglose(desglose) !== datos.montoTotal) {
       const tipoMonto = entidadPrevisionalEsAFP(datos.zona2.entidadprevisional)
         ? 'total remuneración'
         : 'imponible desahucio';
+
+      // prettier-ignore
       setMensajeErrorGlobal(
-        `El total del desglose ($${totalDesglose(
-          desglose,
-        )}) no coincide con el ${tipoMonto} ($${datos.montoTotal.toLocaleString()})`,
+        `El total del desglose ($${totalDesglose(desglose).toLocaleString()}) no coincide con el ${tipoMonto} ($${datos.montoTotal.toLocaleString()})`,
       );
+
       formulario.setFocus('sueldoBase');
       return;
     }
