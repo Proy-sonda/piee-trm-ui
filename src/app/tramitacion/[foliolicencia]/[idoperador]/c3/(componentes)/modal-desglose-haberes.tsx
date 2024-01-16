@@ -5,7 +5,12 @@ import esLocale from 'date-fns/locale/es';
 import React, { useEffect, useState } from 'react';
 import { Alert, Col, Form, Modal, Row, Table } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { DesgloseDeHaberes, TipoRemuneracion, existeDesglose, totalDesglose } from '../(modelos)';
+import {
+  DesgloseDeHaberes,
+  TipoRemuneracion,
+  existeDesglose,
+  totalDesglose as sumaMontosDesglose,
+} from '../(modelos)';
 import { Licenciac2, entidadPrevisionalEsAFP } from '../../c2/(modelos)';
 import { InputMonto } from './input-monto';
 
@@ -38,8 +43,9 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
   onGuardarDesglose,
   onDescartarDesglose,
 }) => {
-  const formulario = useForm<FormularioDesgloseHaberes>({ mode: 'onBlur' });
+  const montoTotalCorregido = isNaN(datos.montoTotal) ? 0 : datos.montoTotal;
 
+  const formulario = useForm<FormularioDesgloseHaberes>({ mode: 'onBlur' });
   const [mensajeErrorGlobal, setMensajeErrorGlobal] = useState<string>();
 
   useEffect(() => {
@@ -68,14 +74,14 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
       throw new Error('No existe la zona 2');
     }
 
-    if (existeDesglose(desglose) && totalDesglose(desglose) !== datos.montoTotal) {
+    if (existeDesglose(desglose) && sumaMontosDesglose(desglose) !== montoTotalCorregido) {
       const tipoMonto = entidadPrevisionalEsAFP(datos.zona2.entidadprevisional)
         ? 'total remuneración'
         : 'imponible desahucio';
 
       // prettier-ignore
       setMensajeErrorGlobal(
-        `El total del desglose ($${totalDesglose(desglose).toLocaleString()}) no coincide con el ${tipoMonto} ($${datos.montoTotal.toLocaleString()})`,
+        `El total del desglose ($${sumaMontosDesglose(desglose).toLocaleString()}) no coincide con el ${tipoMonto} ($${montoTotalCorregido.toLocaleString()})`,
       );
 
       formulario.setFocus('sueldoBase');
