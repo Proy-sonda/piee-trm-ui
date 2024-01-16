@@ -88,7 +88,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
 
       <Row>
         <Col xs={12}>
-          <div className="table-responsive">
+          <div className="table-responsive" style={{ overflow: 'visible' }}>
             <Table className="table table-bordered">
               <Thead>
                 <Tr className="align-middle text-center">
