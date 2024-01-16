@@ -13,7 +13,7 @@ import esLocale from 'date-fns/locale/es';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { Col, Form, FormGroup, Row } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { buscarTiposDocumento } from '../(servicios)';
@@ -26,6 +26,7 @@ import {
   ModalDesgloseDeHaberes,
   TablaDeRentas,
 } from './(componentes)';
+import { InputPorcentajeDesahucio } from './(componentes)/input-porcentaje-desahucio';
 import {
   FormularioC3,
   limpiarRemuneracion,
@@ -630,27 +631,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
               </Col>
 
               <Col xs={12} sm={6} md={2}>
-                <FormGroup controlId={'porcentajeDesahucio'} className="position-relative">
-                  <Form.Control
-                    type="number"
-                    step={0.02}
-                    isInvalid={!!formulario.formState.errors.porcentajeDesahucio}
-                    {...formulario.register('porcentajeDesahucio', {
-                      valueAsNumber: true,
-                      min: {
-                        value: 0,
-                        message: 'No puede ser menor a 0%',
-                      },
-                      max: {
-                        value: 100,
-                        message: 'No puede ser mayor a 100%',
-                      },
-                    })}
-                  />
-                  <Form.Control.Feedback type="invalid" tooltip>
-                    {formulario.formState.errors.porcentajeDesahucio?.message?.toString()}
-                  </Form.Control.Feedback>
-                </FormGroup>
+                <InputPorcentajeDesahucio opcional name="porcentajeDesahucio" />
               </Col>
             </Row>
 
