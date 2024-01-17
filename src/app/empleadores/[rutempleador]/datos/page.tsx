@@ -32,7 +32,6 @@ import {
   buscarTamanosEmpresa,
   buscarTiposDeEmpleadores,
 } from '../../(servicios)';
-import { InputHolding, InputNombreFantasia } from './(componentes)';
 import { CamposFormularioEmpleador } from './(modelos)';
 import { actualizarEmpleador } from './(servicios)/actualizar-empleador';
 
@@ -253,12 +252,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <InputNombreFantasia
-                name="nombreFantasia"
-                label="Nombre Fantasía"
-                className="col-12 col-md-6 col-lg-4"
-              />
-
               <ComboSimple
                 name="tipoEntidadEmpleadoraId"
                 label="Tipo de Entidad Empleadora"
@@ -359,8 +352,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 descripcion="actividadlaboral"
                 className="col-12 col-md-6 col-lg-4"
               />
-
-              <InputHolding name="holding" label="Holding" className="col-12 col-md-6 col-lg-4" />
 
               <GuiaUsuario
                 guia={guia && listaguia[3]!?.activo}
@@ -486,9 +477,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              {/* Para mover filas a la siguiente linea */}
-              <div className="d-none d-lg-block col-lg-4"></div>
-
               <InputTelefono
                 name="telefono1"
                 label="Teléfono 1"
@@ -501,8 +489,10 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 label="Teléfono 2"
                 className="col-12 col-md-6 col-lg-4"
               />
-            </div>
-            <div className="row">
+
+              {/* Para mover filas a la siguiente linea */}
+              <div className="d-none d-lg-block col-lg-4"></div>
+
               <InputEmail
                 name="email"
                 label="Correo electrónico empleador"
@@ -516,6 +506,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
             </div>
+
             <div className="row mt-5">
               <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
                 <IfContainer show={rolEnEmpleadorActual === 'administrador'}>
