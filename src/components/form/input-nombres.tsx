@@ -39,7 +39,7 @@ export const InputNombres: React.FC<InputNombresProps> = ({ name, label, classNa
             },
             pattern: {
               value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/,
-              message: 'Solo puede contener letras y espacios',
+              message: 'Solo puede contener letras',
             },
             onBlur: (event: any) => {
               const value = event.target.value;
