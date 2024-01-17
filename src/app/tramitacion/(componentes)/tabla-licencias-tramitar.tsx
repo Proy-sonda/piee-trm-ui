@@ -238,7 +238,14 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                       )}
                     </IfContainer>
 
-                    <button className="btn btn-sm btn-primary">
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => {
+                        AlertaInformacion.fire(
+                          'Funcionalidad en desarrollo',
+                          'Esta funcionalidad se encuentra en desarrollo, por favor intente más tarde.',
+                        );
+                      }}>
                       <small className="text-nowrap">VER PDF</small>
                     </button>
                     <IfContainer show={licenciaSePuedeTramitar(licencia)}>
