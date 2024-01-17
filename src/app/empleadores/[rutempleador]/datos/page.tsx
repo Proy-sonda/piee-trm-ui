@@ -32,7 +32,6 @@ import {
   buscarTamanosEmpresa,
   buscarTiposDeEmpleadores,
 } from '../../(servicios)';
-import { InputHolding, InputNombreFantasia } from './(componentes)';
 import { CamposFormularioEmpleador } from './(modelos)';
 import { actualizarEmpleador } from './(servicios)/actualizar-empleador';
 
@@ -128,10 +127,10 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
           idEmpleador: empleadorActual.idempleador,
           rutEmpleador: data.rut,
           razonSocial: data.razonSocial,
-          nombreFantasia: data.nombreFantasia,
+          nombreFantasia: '',
           email: data.email,
           emailconfirma: data.emailConfirma,
-          holding: data.holding,
+          holding: '',
           telefono1: data.telefono1,
           telefono2: data.telefono2,
           calle: data.calle,
@@ -253,11 +252,11 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <InputNombreFantasia
+              {/* <InputNombreFantasia
                 name="nombreFantasia"
                 label="Nombre Fantasía"
                 className="col-12 col-md-6 col-lg-4"
-              />
+              /> */}
 
               <ComboSimple
                 name="tipoEntidadEmpleadoraId"
@@ -360,7 +359,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <InputHolding name="holding" label="Holding" className="col-12 col-md-6 col-lg-4" />
+              {/* <InputHolding name="holding" label="Holding" className="col-12 col-md-6 col-lg-4" /> */}
 
               <GuiaUsuario
                 guia={guia && listaguia[3]!?.activo}
