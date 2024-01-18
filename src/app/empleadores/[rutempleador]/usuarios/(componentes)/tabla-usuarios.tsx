@@ -164,7 +164,11 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                 <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
                 <IfContainer show={noEsTablet()}>
                   <Td>{usuario.usuarioempleadorActual.telefonouno?.trim() ?? ' '}</Td>
-                  <Td>{usuario.usuarioempleadorActual.email?.trim() ?? ' '}</Td>
+                  <Td>
+                    <span className="text-uppercase">
+                      {usuario.usuarioempleadorActual.email?.trim() ?? ' '}
+                    </span>
+                  </Td>
                 </IfContainer>
                 <Td>{usuario.usuarioempleadorActual.rol.rol}</Td>
                 {rolEnEmpleadorActual === 'administrador' && (
