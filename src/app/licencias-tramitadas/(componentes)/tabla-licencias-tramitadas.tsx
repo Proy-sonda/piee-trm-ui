@@ -1,7 +1,7 @@
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
-import { AlertaConfirmacion } from '@/utilidades';
+import { AlertaConfirmacion, AlertaInformacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
@@ -197,7 +197,14 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     </small>
                   </button>
 
-                  <button className="btn btn-sm btn-primary">
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={() => {
+                      AlertaInformacion.fire(
+                        'Funcionalidad en desarrollo',
+                        'Esta funcionalidad se encuentra en desarrollo, por favor intente más tarde.',
+                      );
+                    }}>
                     <small className="text-nowrap">VER PDF</small>
                   </button>
                 </Stack>
