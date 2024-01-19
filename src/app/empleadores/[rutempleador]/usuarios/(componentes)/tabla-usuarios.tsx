@@ -42,7 +42,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
   const reenviarContrasena = async (usuario: UsuarioEntidadEmpleadora) => {
     const rut = usuario.rutusuario;
-    const email = usuario.usuarioempleadorActual.email;
+    const email = (usuario.usuarioempleadorActual.email ?? '').toUpperCase();
 
     const mensaje = esElUsuarioConectado(usuario)
       ? `<p>A continuación se enviará una nueva clave temporal a su correo <b>${email}</b>` +
