@@ -1,3 +1,4 @@
+// TODO: Obtener el tipo de reposo
 export interface LicenciaC0 {
   foliolicencia: string;
   operador: Operador;
@@ -16,6 +17,8 @@ export interface LicenciaC0 {
   motivodevolucion: Motivodevolucion;
   estadotramitacion: Estadotramitacion;
   entidadsalud: Entidadsalud;
+  ccaf?: ccaf;
+  tiporeposo: Tiporeposo;
 }
 
 interface Entidadsalud {
@@ -45,4 +48,15 @@ interface Operador {
 interface Tipolicencia {
   idtipolicencia: number;
   tipolicencia: string;
+}
+
+
+interface ccaf {
+  idccaf: number;
+  nombre: string;
+}
+
+interface Tiporeposo {
+  idtiporeposo: number;
+  tiporeposo: string;
 }

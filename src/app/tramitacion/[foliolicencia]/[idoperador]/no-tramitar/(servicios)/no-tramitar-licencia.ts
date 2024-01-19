@@ -1,4 +1,5 @@
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
+import { esElValorPorDefecto } from '@/components';
 import { obtenerToken } from '@/servicios/auth';
 import { urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
@@ -43,6 +44,7 @@ export const noTamitarLicenciaMedica = async (
         identidadsalud: licencia.entidadsalud.identidadsalud,
         nombre: licencia.entidadsalud.nombre,
       },
+      tiporeposo: licencia.tiporesposo,
     });
   } catch (error) {
     throw new NoPuedeCrearZona0Error();
@@ -63,7 +65,7 @@ export const noTamitarLicenciaMedica = async (
         motivonorecepcion: ' ',
       },
       ccaf: {
-        idccaf: isNaN(request.entidadPagadoraId) ? 10100 : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
+        idccaf: esElValorPorDefecto(request.entidadPagadoraId) ? 10100 : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
         nombre: ' ',
       },
       otromotivonorecepcion: request.otroMotivoDeRechazo,

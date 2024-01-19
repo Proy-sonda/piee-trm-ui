@@ -17,3 +17,11 @@ export const thresholdAlertaExpiraSesion = () => {
 export const urlBackendTramitacion = () => {
   return process.env.NEXT_PUBLIC_URL_BACKEND_TRAMITACION!;
 };
+
+export const urlBackendWorkers = () => {
+  return process.env.NEXT_PUBLIC_URL_BACKEND_WORKERS!;
+};
+
+export const urlBackendSuperUsuario = () => {
+  return process.env.NEXT_PUBLIC_URL_BACKEND_SUPER_USUARIO!;
+};

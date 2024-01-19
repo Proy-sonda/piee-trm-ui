@@ -24,7 +24,7 @@ export const TablaTrabajadores: React.FC<props> = ({
   idunidad,
 }) => {
   const [trabajadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
-    datos: trabajadores.filter(({ codigounidadrrhh }) => codigounidadrrhh == idunidad.toString()),
+    datos: trabajadores,
     tamanoPagina: 5,
   });
 

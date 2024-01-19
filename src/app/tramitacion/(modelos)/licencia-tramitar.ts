@@ -17,6 +17,8 @@ export interface LicenciaTramitar {
   jornadareposo: Jornadareposo;
   tiporesposo: Tiporesposo;
   entidadsalud: Entidadsalud;
+
+  estadoTramitacion?: Estadotramitacion;
 }
 
 interface Entidadsalud {
@@ -60,6 +62,11 @@ interface Ccaf {
   nombre: string;
 }
 
+interface Estadotramitacion {
+  idestadotramitacion: number;
+  estadotramitacion: string;
+}
+
 export const esLicenciaMaternidad = (licencia: LicenciaTramitar) => {
   return licencia.tipolicencia.idtipolicencia === 3;
 };
@@ -70,4 +77,12 @@ export const esLicenciaFONASA = (licencia: LicenciaTramitar) => {
 
 export const esLicenciaDiatDiep = (licencia: LicenciaTramitar) => {
   return [5, 6].includes(licencia.tipolicencia.idtipolicencia);
+};
+
+export const licenciaSePuedeTramitar = ({ estadoTramitacion }: LicenciaTramitar) => {
+  return estadoTramitacion === undefined || estadoTramitacion.idestadotramitacion === 1;
+};
+
+export const licenciaEnviadaHaciaOperadores = ({ estadoTramitacion }: LicenciaTramitar) => {
+  return estadoTramitacion !== undefined && estadoTramitacion.idestadotramitacion === 3;
 };

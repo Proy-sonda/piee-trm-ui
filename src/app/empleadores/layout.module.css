@@ -1,0 +1,14 @@
+.menu-guia {
+    border: 1px solid var(--color-blue);
+    background-color: var(--color-blue);
+    border-radius: 10px;
+    color: white;
+    
+    opacity: 1;
+    font-weight: bold;
+    z-index: 1000;
+    position: fixed;
+    left :45%;
+    bottom:2%;
+
+}

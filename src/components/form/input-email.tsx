@@ -1,3 +1,4 @@
+import { existe } from '@/utilidades';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
@@ -46,11 +47,13 @@ export const InputEmail: React.FC<InputEmailProps> = ({
         <Form.Control
           type="email"
           isInvalid={tieneError}
+          className="text-uppercase"
           autoComplete="new-custom-value"
           placeholder="ejemplo@ejemplo.cl"
           onPaste={(e) => e.preventDefault()}
           onCopy={(e) => e.preventDefault()}
           {...register(name, {
+            setValueAs: (email: string) => (existe(email) ? email.toUpperCase() : ''),
             required: 'Este campo es obligatorio',
             validate: {
               esEmail: (email) => {
@@ -58,7 +61,7 @@ export const InputEmail: React.FC<InputEmailProps> = ({
                   return 'Correo inválido';
                 }
               },
-              emailCoinciden: (email) => {
+              emailCoinciden: (email: string) => {
                 if (!debeCoincidirCon) {
                   return;
                 }
@@ -67,7 +70,8 @@ export const InputEmail: React.FC<InputEmailProps> = ({
                   throw new Error('No se puede evaluar email para que coincida consigo mismo');
                 }
 
-                if (email !== getValues(debeCoincidirCon)) {
+                const otroEmail = getValues(debeCoincidirCon) as string;
+                if (email.toUpperCase() !== otroEmail.toUpperCase()) {
                   return 'Correos no coinciden';
                 }
 

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 interface PaginacionHookProps<T> {
   datos?: T[];
   tamanoPagina: number;
+  porCadaElemento?: (elemento: T) => Promise<T>;
 }
 
 type PaginacionHookReturn<T> = [T[], number, number, (paginaActual: number) => void];
@@ -18,27 +19,47 @@ type PaginacionHookReturn<T> = [T[], number, number, (paginaActual: number) => v
 export const usePaginacion = <T>({
   datos,
   tamanoPagina,
+  porCadaElemento,
 }: PaginacionHookProps<T>): PaginacionHookReturn<T> => {
   const [paginaActual, setPaginaActual] = useState(0);
+  const [datosPaginados, setDatosPaginados] = useState<T[]>([]);
 
   const datosPorPaginar = datos ?? [];
   const totalPaginas = Math.ceil(datosPorPaginar.length / tamanoPagina);
-  const desde = paginaActual * tamanoPagina;
-  const hasta = desde + tamanoPagina;
 
   useEffect(() => {
     cambiarPagina(paginaActual);
   }, [datos]);
 
   const cambiarPagina = (pagina: number) => {
-    if (pagina >= totalPaginas) {
-      setPaginaActual(totalPaginas - 1);
-    } else if (pagina < 0) {
-      setPaginaActual(0);
+    const nuevaPaginaActual = corregirPagina(pagina);
+
+    setPaginaActual(nuevaPaginaActual);
+
+    const desde = pagina * tamanoPagina;
+    const hasta = desde + tamanoPagina;
+    const datosParaTransformar = datosPorPaginar.slice(desde, hasta);
+    if (!porCadaElemento) {
+      setDatosPaginados(datosParaTransformar);
     } else {
-      setPaginaActual(pagina);
+      Promise.all(datosParaTransformar.map(porCadaElemento))
+        .then(setDatosPaginados)
+        .catch((err) => {
+          console.error('Error al transformar datos de paginacion. ', err);
+          setDatosPaginados([]);
+        });
     }
   };
 
-  return [datosPorPaginar.slice(desde, hasta), paginaActual, totalPaginas, cambiarPagina];
+  const corregirPagina = (pagina: number) => {
+    if (pagina <= 0) {
+      return 0;
+    } else if (totalPaginas > 0 && pagina >= totalPaginas) {
+      return totalPaginas - 1;
+    } else {
+      return pagina;
+    }
+  };
+
+  return [datosPaginados, paginaActual, totalPaginas, cambiarPagina];
 };

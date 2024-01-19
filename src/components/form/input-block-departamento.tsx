@@ -42,8 +42,8 @@ export const InputBlockDepartamento: React.FC<InputBlockDepartamentoProps> = ({
               message: 'No puede tener más de 20 carcateres',
             },
             pattern: {
-              value: /^[a-zA-Z0-9#\s]+$/g,
-              message: 'Solo debe tener números, letras o #',
+              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s\d#&]+$/,
+              message: 'Solo puede contener letras, números, # y/o &',
             },
             onBlur: (event: any) => {
               const value = event.target.value;

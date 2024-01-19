@@ -16,11 +16,12 @@ import { AuthContext } from '@/contexts';
 import { useMergeFetchArray } from '@/hooks/use-merge-fetch';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 
 import { Titulo } from '@/components';
+import { GuiaUsuario } from '@/components/guia-usuario';
 import dynamic from 'next/dynamic';
 import {
   buscarActividadesLaborales,
@@ -31,7 +32,6 @@ import {
   buscarTamanosEmpresa,
   buscarTiposDeEmpleadores,
 } from '../../(servicios)';
-import { InputHolding, InputNombreFantasia } from './(componentes)';
 import { CamposFormularioEmpleador } from './(modelos)';
 import { actualizarEmpleador } from './(servicios)/actualizar-empleador';
 
@@ -46,7 +46,10 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
 
   const [spinnerCargar, setSpinnerCargar] = useState(false);
 
-  const { usuario } = useContext(AuthContext);
+  const {
+    usuario,
+    datosGuia: { listaguia, guia, AgregarGuia },
+  } = useContext(AuthContext);
 
   const [
     errorCombos,
@@ -62,11 +65,15 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
     buscarTamanosEmpresa(),
   ]);
 
+  const datos = useRef(null);
+
   const formulario = useForm<CamposFormularioEmpleador>({ mode: 'onBlur' });
 
   const regionSeleccionada = formulario.watch('regionId');
 
   const { rolEnEmpleadorActual } = useEmpleadorActual();
+  const guiaCCAFF = useRef(null);
+  const tamanoempresa = useRef(null);
 
   // Parchar fomulario
   useEffect(() => {
@@ -120,10 +127,10 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
           idEmpleador: empleadorActual.idempleador,
           rutEmpleador: data.rut,
           razonSocial: data.razonSocial,
-          nombreFantasia: data.nombreFantasia,
+          nombreFantasia: '',
           email: data.email,
           emailconfirma: data.emailConfirma,
-          holding: data.holding,
+          holding: '',
           telefono1: data.telefono1,
           telefono2: data.telefono2,
           calle: data.calle,
@@ -170,9 +177,67 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
           Entidad Empleadora - <b>{empleadorActual?.razonsocial ?? 'Cargando...'}</b> / Datos
           Entidad Empleadora
         </Titulo>
+        <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={datos} placement="top-start">
+          Datos registrados de la entidad empleadora <br />
+          <div className="text-end mt-2">
+            <button
+              className="btn btn-sm text-white"
+              onClick={() =>
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Menu lateral',
+                    activo: true,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'Datos página',
+                    activo: false,
+                  },
+                ])
+              }
+              style={{
+                border: '1px solid white',
+              }}>
+              <i className="bi bi-arrow-left"></i>
+              &nbsp; Anterior
+            </button>
+            &nbsp;
+            <button
+              className="btn btn-sm text-white"
+              onClick={() =>
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Menu lateral',
+                    activo: false,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'Datos página',
+                    activo: false,
+                  },
+                  {
+                    indice: 2,
+                    nombre: 'CCAFF',
+                    activo: true,
+                  },
+                ])
+              }
+              style={{
+                border: '1px solid white',
+              }}>
+              Continuar &nbsp;
+              <i className="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </GuiaUsuario>
 
         <FormProvider {...formulario}>
-          <form onSubmit={formulario.handleSubmit(onGuardarCambios)}>
+          <form
+            onSubmit={formulario.handleSubmit(onGuardarCambios)}
+            ref={datos}
+            className={listaguia[1]!?.activo && guia ? 'overlay-marco' : ''}>
             <div className="row mt-3 g-3 align-items-baseline">
               <InputRut
                 deshabilitado
@@ -187,12 +252,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <InputNombreFantasia
-                name="nombreFantasia"
-                label="Nombre Fantasía"
-                className="col-12 col-md-6 col-lg-4"
-              />
-
               <ComboSimple
                 name="tipoEntidadEmpleadoraId"
                 label="Tipo de Entidad Empleadora"
@@ -202,14 +261,88 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <ComboSimple
-                name="cajaCompensacionId"
-                label="Seleccione CCAF a la cual está afiliada"
-                datos={CCAF}
-                idElemento="idccaf"
-                descripcion="nombre"
-                className="col-12 col-md-6 col-lg-4"
-              />
+              <GuiaUsuario
+                guia={guia && listaguia[2]!?.activo}
+                placement="top-start"
+                target={guiaCCAFF}>
+                Cajas de Compensación de Asignación Familiar (CCAF) <br />
+                <div className="text-end mt-2">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() =>
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Menu lateral',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'Datos página',
+                          activo: true,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'CCAFF',
+                          activo: false,
+                        },
+                      ])
+                    }
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() =>
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Menu lateral',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'Datos página',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'CCAFF',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Tamano Empresa',
+                          activo: true,
+                        },
+                      ])
+                    }
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+
+              <div
+                ref={guiaCCAFF}
+                className={`col-12 col-md-6 col-lg-4 ${
+                  listaguia[2]!?.activo && guia && 'overlay-marco'
+                }`}>
+                <ComboSimple
+                  name="cajaCompensacionId"
+                  label="Seleccione CCAF a la cual está afiliada"
+                  datos={CCAF}
+                  idElemento="idccaf"
+                  descripcion="nombre"
+                />
+              </div>
 
               <ComboSimple
                 name="actividadLaboralId"
@@ -220,16 +353,92 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <InputHolding name="holding" label="Holding" className="col-12 col-md-6 col-lg-4" />
-
-              <ComboSimple
-                name="tamanoEmpresaId"
-                label="N° de trabajadores"
-                datos={comboTamanoEmpresa}
-                idElemento="idtamanoempresa"
-                descripcion="descripcion"
-                className="col-12 col-md-6 col-lg-4"
-              />
+              <GuiaUsuario
+                guia={guia && listaguia[3]!?.activo}
+                placement="top-start"
+                target={tamanoempresa}>
+                Cantidad de personas trabajadoras en la entidad empleadora <br />
+                <div className="text-end mt-2">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() =>
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Menu lateral',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'Datos página',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'CCAFF',
+                          activo: true,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Tamano Empresa',
+                          activo: false,
+                        },
+                      ])
+                    }
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() =>
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Menu lateral',
+                          activo: true,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'Datos página',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'CCAFF',
+                          activo: false,
+                        },
+                        {
+                          indice: 3,
+                          nombre: 'Tamano Empresa',
+                          activo: false,
+                        },
+                      ])
+                    }
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                ref={tamanoempresa}
+                className={`col-12 col-md-6 col-lg-4 ${
+                  listaguia[3]!?.activo && guia && 'overlay-marco'
+                }`}>
+                <ComboSimple
+                  name="tamanoEmpresaId"
+                  label="N° de trabajadores"
+                  datos={comboTamanoEmpresa}
+                  idElemento="idtamanoempresa"
+                  descripcion="descripcion"
+                />
+              </div>
 
               <ComboSimple
                 name="sistemaRemuneracionId"
@@ -268,9 +477,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              {/* Para mover filas a la siguiente linea */}
-              <div className="d-none d-lg-block col-lg-4"></div>
-
               <InputTelefono
                 name="telefono1"
                 label="Teléfono 1"
@@ -283,8 +489,10 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 label="Teléfono 2"
                 className="col-12 col-md-6 col-lg-4"
               />
-            </div>
-            <div className="row">
+
+              {/* Para mover filas a la siguiente linea */}
+              <div className="d-none d-lg-block col-lg-4"></div>
+
               <InputEmail
                 name="email"
                 label="Correo electrónico empleador"
@@ -298,6 +506,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
             </div>
+
             <div className="row mt-5">
               <div className="d-flex flex-column flex-sm-row flex-sm-row-reverse">
                 <IfContainer show={rolEnEmpleadorActual === 'administrador'}>

@@ -1,21 +1,19 @@
 'use client';
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { InputFecha } from '@/components/form';
+import { GuiaUsuario } from '@/components/guia-usuario';
+import { AuthContext } from '@/contexts';
 import { useFetch, useRefrescarPagina } from '@/hooks';
-import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
+import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { InputDias } from '../(componentes)/input-dias';
-import {
-  DatosModalConfirmarTramitacion,
-  ModalConfirmarTramitacion,
-  ModalImprimirPdf,
-} from './(componentes)';
+import { DatosModalConfirmarTramitacion, ModalConfirmarTramitacion } from './(componentes)';
 import {
   FormularioC4,
   PasoC4Props,
@@ -32,8 +30,7 @@ const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-panta
 
 const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
   const idOperadorNumber = parseInt(idoperador);
-  const [CargaPDF, setCargaPDF] = useState<boolean>(false);
-  const [actualizaTramitacion, setactualizaTramitacion] = useState(false);
+
   const step = [
     {
       label: 'Entidad Empleadora/Independiente',
@@ -57,6 +54,12 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   ];
 
   const router = useRouter();
+  const chkInforLicencia = useRef(null);
+  const totalDias = useRef(null);
+  const btnEliminar = useRef(null);
+  const {
+    datosGuia: { listaguia, AgregarGuia, guia },
+  } = useContext(AuthContext);
 
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
@@ -74,8 +77,6 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     control: formulario.control,
     name: 'licenciasAnteriores',
   });
-
-  const [modalimprimir, setmodalimprimir] = useState<boolean>(false);
 
   const informarLicencias = formulario.watch('informarLicencia');
 
@@ -307,21 +308,9 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
       await tramitarLicenciaMedica(foliolicencia, idOperadorNumber);
 
-      AlertaExito.fire({
-        html: 'Licencia tramitada con éxito',
-        didClose: async () => {
-          setMostrarSpinner(false);
-          setactualizaTramitacion(true);
-          const resp = await AlertaConfirmacion.fire({
-            html: '¿Desea exportar a PDF el comprobante de tramitación?',
-          });
-          if (resp.isConfirmed) {
-            setmodalimprimir(true);
-          } else {
-            router.push('/tramitacion');
-          }
-        },
-      });
+      AlertaExito.fire({ html: 'Licencia tramitada con éxito' });
+
+      router.push('/tramitacion');
     } catch (error) {
       AlertaError.fire({
         title: 'Error',
@@ -341,17 +330,6 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   return (
     <>
-      <ModalImprimirPdf
-        foliolicencia={foliolicencia}
-        idOperadorNumber={idOperadorNumber}
-        modalimprimir={modalimprimir}
-        setmodalimprimir={setmodalimprimir}
-        refrescarZona4={refrescarZona4}
-        refresh={refresh}
-        setCargaPDF={setCargaPDF}
-        actualizaTramitacion={actualizaTramitacion}
-      />
-
       <ModalConfirmarTramitacion
         datos={{
           ...datosModalConfirmarTramitacion,
@@ -363,7 +341,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         onTramitacionConfirmada={tramitarLaLicencia}
       />
 
-      <IfContainer show={mostrarSpinner || CargaPDF}>
+      <IfContainer show={mostrarSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
 
@@ -399,11 +377,72 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         <Row className="mt-2 mb-3">
           <Col xs={12}>
             <FormGroup controlId="informarLicencias" className="ps-0">
-              <Form.Check
-                type="checkbox"
-                label="Informar Licencias Médicas Anteriores últimos 6 meses"
-                {...formulario.register('informarLicencia')}
-              />
+              <GuiaUsuario guia={guia && listaguia[1]!?.activo} target={chkInforLicencia}>
+                Al marcar este campo, se pueden informar licencias médicas <br /> anteriores a la
+                actual.
+                <br />
+                <div className="text-end mt-3">
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: true,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'CheckinformarLicencias',
+                          activo: false,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    <i className="bi bi-arrow-left"></i>
+                    &nbsp; Anterior
+                  </button>
+                  &nbsp;
+                  <button
+                    className="btn btn-sm text-white"
+                    onClick={() => {
+                      AgregarGuia([
+                        {
+                          indice: 0,
+                          nombre: 'Stepper',
+                          activo: false,
+                        },
+                        {
+                          indice: 1,
+                          nombre: 'CheckinformarLicencias',
+                          activo: false,
+                        },
+                        {
+                          indice: 2,
+                          nombre: 'Total días',
+                          activo: true,
+                        },
+                      ]);
+                    }}
+                    style={{
+                      border: '1px solid white',
+                    }}>
+                    Continuar &nbsp;
+                    <i className="bi bi-arrow-right"></i>
+                  </button>
+                </div>
+              </GuiaUsuario>
+              <div
+                className={`${listaguia[1]!?.activo && guia && 'overlay-marco'}`}
+                ref={chkInforLicencia}>
+                <Form.Check
+                  type="checkbox"
+                  label="Informar Licencias Médicas Anteriores últimos 6 meses"
+                  {...formulario.register('informarLicencia')}
+                />
+              </div>
             </FormGroup>
           </Col>
         </Row>
@@ -441,23 +480,114 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                   <Tbody>
                     {licenciasAnteriores.fields.map((field, index) => (
                       <Tr key={field.id}>
-                        <Td>
-                          <InputDias
-                            opcional={!informarLicencias || (informarLicencias && index !== 0)}
-                            maxDias={184}
-                            deshabilitado={!informarLicencias}
-                            name={`licenciasAnteriores.${index}.dias`}
-                            coincideConRango={{
-                              desde: `licenciasAnteriores.${index}.desde`,
-                              hasta: `licenciasAnteriores.${index}.hasta`,
-                            }}
-                            unirConFieldArray={{
-                              index,
-                              campo: 'dias',
-                              fieldArrayName: 'licenciasAnteriores',
-                            }}
-                          />
-                        </Td>
+                        {index === 0 ? (
+                          <Td>
+                            <GuiaUsuario guia={guia && listaguia[2]!?.activo} target={totalDias}>
+                              Total de días entre los rangos de fecha <b>Desde y Hasta</b>
+                              <br />
+                              <div className="text-end mt-3">
+                                <button
+                                  className="btn btn-sm text-white"
+                                  onClick={() => {
+                                    AgregarGuia([
+                                      {
+                                        indice: 0,
+                                        nombre: 'stepper',
+                                        activo: false,
+                                      },
+                                      {
+                                        indice: 1,
+                                        nombre: 'CheckinformarLicencias',
+                                        activo: true,
+                                      },
+                                      {
+                                        indice: 2,
+                                        nombre: 'Total días',
+                                        activo: false,
+                                      },
+                                    ]);
+                                  }}
+                                  style={{
+                                    border: '1px solid white',
+                                  }}>
+                                  <i className="bi bi-arrow-left"></i>
+                                  &nbsp; Anterior
+                                </button>
+                                &nbsp;
+                                <button
+                                  className="btn btn-sm text-white"
+                                  onClick={() => {
+                                    AgregarGuia([
+                                      {
+                                        indice: 0,
+                                        nombre: 'stepper',
+                                        activo: false,
+                                      },
+                                      {
+                                        indice: 1,
+                                        nombre: 'CheckinformarLicencias',
+                                        activo: false,
+                                      },
+                                      {
+                                        indice: 2,
+                                        nombre: 'Total días',
+                                        activo: false,
+                                      },
+                                      {
+                                        indice: 3,
+                                        nombre: 'btn eliminar',
+                                        activo: true,
+                                      },
+                                    ]);
+                                  }}
+                                  style={{
+                                    border: '1px solid white',
+                                  }}>
+                                  Continuar &nbsp;
+                                  <i className="bi bi-arrow-right"></i>
+                                </button>
+                              </div>
+                            </GuiaUsuario>
+                            <div ref={totalDias}>
+                              <InputDias
+                                className={`${guia && listaguia[2]!?.activo && 'overlay-marco'}`}
+                                opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                                maxDias={184}
+                                deshabilitado={!informarLicencias}
+                                name={`licenciasAnteriores.${index}.dias`}
+                                coincideConRango={{
+                                  desde: `licenciasAnteriores.${index}.desde`,
+                                  hasta: `licenciasAnteriores.${index}.hasta`,
+                                }}
+                                unirConFieldArray={{
+                                  index,
+                                  campo: 'dias',
+                                  fieldArrayName: 'licenciasAnteriores',
+                                }}
+                              />
+                            </div>
+                          </Td>
+                        ) : (
+                          <Td>
+                            <InputDias
+                              className={`${guia && listaguia[2]!?.activo && 'overlay-marco'}`}
+                              opcional={!informarLicencias || (informarLicencias && index !== 0)}
+                              maxDias={184}
+                              deshabilitado={!informarLicencias}
+                              name={`licenciasAnteriores.${index}.dias`}
+                              coincideConRango={{
+                                desde: `licenciasAnteriores.${index}.desde`,
+                                hasta: `licenciasAnteriores.${index}.hasta`,
+                              }}
+                              unirConFieldArray={{
+                                index,
+                                campo: 'dias',
+                                fieldArrayName: 'licenciasAnteriores',
+                              }}
+                            />
+                          </Td>
+                        )}
+
                         <Td>
                           <InputFecha
                             opcional={!informarLicencias || (informarLicencias && index !== 0)}
@@ -484,27 +614,127 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                             }}
                           />
                         </Td>
-                        <Td className="text-center align-middle">
-                          <span
-                            className="text-danger"
-                            onClick={() => {
-                              formulario.setValue(
-                                `licenciasAnteriores.${index}.dias`,
-                                undefined as any,
-                              );
-                              formulario.setValue(
-                                `licenciasAnteriores.${index}.desde`,
-                                undefined as any,
-                              );
-                              formulario.setValue(
-                                `licenciasAnteriores.${index}.hasta`,
-                                undefined as any,
-                              );
-                            }}
-                            style={{ cursor: 'pointer' }}>
-                            <i className="bi bi-trash"></i>
-                          </span>
-                        </Td>
+                        {index === 0 ? (
+                          <Td className="text-center align-middle">
+                            <GuiaUsuario guia={guia && listaguia[3]!?.activo} target={btnEliminar}>
+                              Eliminar datos ingresados en la fila
+                              <br />
+                              <div className="text-end mt-3">
+                                <button
+                                  className="btn btn-sm text-white"
+                                  onClick={() => {
+                                    AgregarGuia([
+                                      {
+                                        indice: 0,
+                                        nombre: 'stepper',
+                                        activo: false,
+                                      },
+                                      {
+                                        indice: 1,
+                                        nombre: 'CheckinformarLicencias',
+                                        activo: false,
+                                      },
+                                      {
+                                        indice: 2,
+                                        nombre: 'Total días',
+                                        activo: true,
+                                      },
+                                      {
+                                        indice: 3,
+                                        nombre: 'btn eliminar',
+                                        activo: false,
+                                      },
+                                    ]);
+                                  }}
+                                  style={{
+                                    border: '1px solid white',
+                                  }}>
+                                  <i className="bi bi-arrow-left"></i>
+                                  &nbsp; Anterior
+                                </button>
+                                &nbsp;
+                                <button
+                                  className="btn btn-sm text-white"
+                                  onClick={() => {
+                                    AgregarGuia([
+                                      {
+                                        indice: 0,
+                                        nombre: 'stepper',
+                                        activo: true,
+                                      },
+                                      {
+                                        indice: 1,
+                                        nombre: 'CheckinformarLicencias',
+                                        activo: false,
+                                      },
+                                      {
+                                        indice: 2,
+                                        nombre: 'Total días',
+                                        activo: false,
+                                      },
+                                      {
+                                        indice: 3,
+                                        nombre: 'btn eliminar',
+                                        activo: false,
+                                      },
+                                    ]);
+                                  }}
+                                  style={{
+                                    border: '1px solid white',
+                                  }}>
+                                  Continuar &nbsp;
+                                  <i className="bi bi-arrow-right"></i>
+                                </button>
+                              </div>
+                            </GuiaUsuario>
+                            <span
+                              ref={btnEliminar}
+                              className={`text-danger ${
+                                guia && listaguia[3]!?.activo && 'overlay-marco'
+                              }`}
+                              onClick={() => {
+                                formulario.setValue(
+                                  `licenciasAnteriores.${index}.dias`,
+                                  undefined as any,
+                                );
+                                formulario.setValue(
+                                  `licenciasAnteriores.${index}.desde`,
+                                  undefined as any,
+                                );
+                                formulario.setValue(
+                                  `licenciasAnteriores.${index}.hasta`,
+                                  undefined as any,
+                                );
+                              }}
+                              style={{ cursor: 'pointer' }}>
+                              <i className="bi bi-trash"></i>
+                            </span>
+                          </Td>
+                        ) : (
+                          <Td className="text-center align-middle">
+                            <span
+                              className={`text-danger ${
+                                guia && listaguia[3]!?.activo && 'overlay-marco'
+                              }`}
+                              onClick={() => {
+                                formulario.setValue(
+                                  `licenciasAnteriores.${index}.dias`,
+                                  undefined as any,
+                                );
+                                formulario.setValue(
+                                  `licenciasAnteriores.${index}.desde`,
+                                  undefined as any,
+                                );
+                                formulario.setValue(
+                                  `licenciasAnteriores.${index}.hasta`,
+                                  undefined as any,
+                                );
+                              }}
+                              style={{ cursor: 'pointer' }}>
+                              <i className="bi bi-trash"></i>
+                            </span>
+                          </Td>
+                        )}
                       </Tr>
                     ))}
                   </Tbody>

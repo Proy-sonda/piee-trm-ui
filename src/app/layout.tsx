@@ -38,6 +38,7 @@ export default function RootLayout(
 
             <main className="bg-white shadow-sm">
               <Position />
+
               <div>{children}</div>
             </main>
 

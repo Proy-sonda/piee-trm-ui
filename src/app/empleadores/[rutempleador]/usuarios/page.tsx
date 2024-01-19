@@ -1,12 +1,13 @@
 'use client';
 
 import { Titulo } from '@/components';
+import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { strIncluye } from '@/utilidades';
 import dynamic from 'next/dynamic';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import { ModalCrearUsuario, ModalEditarUsuario } from './(componentes)';
@@ -23,7 +24,10 @@ const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
 interface UsuariosPageProps {}
 
 const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
-  const { usuario } = useContext(AuthContext);
+  const {
+    usuario,
+    datosGuia: { guia, listaguia, AgregarGuia },
+  } = useContext(AuthContext);
 
   const {
     cargandoEmpleador,
@@ -61,6 +65,23 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
 
     setCantidadUsuariosAdmin(usuarios.filter(esUsuarioAdminHabilitado).length);
   }, [usuarios]);
+
+  useEffect(() => {
+    AgregarGuia([
+      {
+        indice: 0,
+        nombre: 'Menu Lateral',
+        activo: true,
+      },
+      {
+        indice: 1,
+        nombre: 'Agregar Usuario',
+        activo: false,
+      },
+    ]);
+  }, []);
+
+  const agregaUsuario = useRef(null);
 
   // Filtrar usuarios
   useEffect(() => {
@@ -107,7 +128,64 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
             lg={7}
             xxl={8}
             className="d-flex flex-column flex-md-row justify-content-sm-end">
-            <button className="btn btn-success" onClick={() => setAbrirModalCrearUsuario(true)}>
+            <GuiaUsuario
+              guia={listaguia[1]!?.activo && guia}
+              placement="top-start"
+              target={agregaUsuario}>
+              Agregar nuevos usuarios a la entidad empleadora
+              <br />
+              <div className="text-end mt-2">
+                <button
+                  className="btn btn-sm text-white"
+                  onClick={() =>
+                    AgregarGuia([
+                      {
+                        indice: 0,
+                        nombre: 'Menu lateral',
+                        activo: true,
+                      },
+                      {
+                        indice: 1,
+                        nombre: 'Carga trabajador',
+                        activo: false,
+                      },
+                    ])
+                  }
+                  style={{
+                    border: '1px solid white',
+                  }}>
+                  <i className="bi bi-arrow-left"></i>
+                  &nbsp; Anterior
+                </button>
+                &nbsp;
+                <button
+                  className="btn btn-sm text-white"
+                  onClick={() =>
+                    AgregarGuia([
+                      {
+                        indice: 0,
+                        nombre: 'Menu lateral',
+                        activo: true,
+                      },
+                      {
+                        indice: 1,
+                        nombre: 'Carga trabajador',
+                        activo: false,
+                      },
+                    ])
+                  }
+                  style={{
+                    border: '1px solid white',
+                  }}>
+                  Continuar &nbsp;
+                  <i className="bi bi-arrow-right"></i>
+                </button>
+              </div>
+            </GuiaUsuario>
+            <button
+              className={`btn btn-success ${listaguia[1]!?.activo && guia && 'overlay-marco'}`}
+              onClick={() => setAbrirModalCrearUsuario(true)}
+              ref={agregaUsuario}>
               + Agregar Usuario
             </button>
           </Col>
