@@ -1,10 +1,11 @@
 'use client';
 
 import { Titulo } from '@/components';
+import ExportarTabla from '@/components/exportar-tabla';
 import { useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores } from '@/servicios';
 import { strIncluye } from '@/utilidades';
-import { isWithinInterval } from 'date-fns';
+import { format, isWithinInterval } from 'date-fns';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import {
@@ -110,6 +111,28 @@ const TramitacionPage = () => {
 
         <div className="row mt-3">
           <div className="col-md-12">
+            <div className="text-end">
+              <ExportarTabla
+                data={datosBandeja?.empleadores.map((value) => {
+                  return {
+                    idempleador: value.idempleador,
+                    'Rut Empleador': value.rutempleador,
+                    'Razón Social': value.razonsocial,
+                    Teléfono: value.telefonohabitual,
+                    'Télefono movil': value.telefonomovil,
+                    Email: value.email,
+                    Estado: value.estadoempleador.estadoempleador,
+                    Dirección: `${value.direccionempleador.calle} ${value.direccionempleador.numero} ${value.direccionempleador.comuna.nombre}`,
+                    'Caja de Compensación': value.ccaf.nombre,
+                    Tamaño: value.tamanoempresa.nrotrabajadores,
+                    'Tipo de Entidad Empleadora': value.tipoempleador.tipoempleador,
+                    'Sistema remuneración': value.sistemaremuneracion.descripcion,
+                    'Fecha Registro': format(new Date(value.fecharegistro), 'dd/MM/yyyy'),
+                    'Actividad Laboral': value.actividadlaboral.actividadlaboral,
+                  };
+                })}
+              />
+            </div>
             <TablaLicenciasTramitar
               empleadores={datosBandeja?.empleadores ?? []}
               licencias={licenciasFiltradas}
