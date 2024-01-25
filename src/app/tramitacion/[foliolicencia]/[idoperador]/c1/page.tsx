@@ -498,7 +498,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                     name="fecharecepcionlme"
                     opcional
                     noAnteriorA="fechaemision"
-                    esEmision
+                    errores={{
+                      anteriorADesde: 'La fecha no puede ser menor a la emisión',
+                    }}
                   />
                 </div>
 
