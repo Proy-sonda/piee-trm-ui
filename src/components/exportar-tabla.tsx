@@ -1,6 +1,6 @@
 import { AlertaConfirmacion } from '@/utilidades';
 
-export default function ExportarTabla({ data }: any) {
+export default function ExportarTabla({ data, nombre }: any) {
   // exportar los datos a csv
   const exportarCSV = async () => {
     const resp = await AlertaConfirmacion.fire({ html: '¿Desea exportar los datos a CSV?' });
@@ -13,7 +13,7 @@ export default function ExportarTabla({ data }: any) {
     const a = document.createElement('a');
     a.href = 'data:attachment/csv,' + encodeURIComponent(csvArray);
     a.target = '_blank';
-    a.download = 'datos.csv';
+    a.download = `${nombre}.csv`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

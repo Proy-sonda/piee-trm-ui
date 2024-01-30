@@ -113,22 +113,26 @@ const TramitacionPage = () => {
           <div className="col-md-12">
             <div className="text-end">
               <ExportarTabla
+                nombre={`bandeja-tramitacion-${format(new Date(), "dd-MM-yyyy '-' HH-mm")}`}
                 data={datosBandeja?.empleadores.map((value) => {
                   return {
                     idempleador: value.idempleador,
                     'Rut Empleador': value.rutempleador,
-                    'Razón Social': value.razonsocial,
-                    Teléfono: value.telefonohabitual,
-                    'Télefono movil': value.telefonomovil,
+                    'Razon Social': value.razonsocial,
+                    Telefono: value.telefonohabitual,
+                    'Telefono movil': value.telefonomovil,
                     Email: value.email,
                     Estado: value.estadoempleador.estadoempleador,
-                    Dirección: `${value.direccionempleador.calle} ${value.direccionempleador.numero} ${value.direccionempleador.comuna.nombre}`,
-                    'Caja de Compensación': value.ccaf.nombre,
-                    Tamaño: value.tamanoempresa.nrotrabajadores,
+                    Direccion: `${value.direccionempleador.calle} ${value.direccionempleador.numero} ${value.direccionempleador.comuna.nombre}`,
+                    CCAF: value.ccaf.nombre,
+                    Tamano: value.tamanoempresa.descripcion,
                     'Tipo de Entidad Empleadora': value.tipoempleador.tipoempleador,
-                    'Sistema remuneración': value.sistemaremuneracion.descripcion,
-                    'Fecha Registro': format(new Date(value.fecharegistro), 'dd/MM/yyyy'),
-                    'Actividad Laboral': value.actividadlaboral.actividadlaboral,
+                    'Sistema remuneracion': value.sistemaremuneracion.descripcion,
+                    'Fecha Registro': format(new Date(value.fecharegistro), 'dd/MM/yyyy HH:mm:ss'),
+                    'Actividad Laboral': value.actividadlaboral.actividadlaboral.replaceAll(
+                      ',',
+                      ' ',
+                    ),
                   };
                 })}
               />
