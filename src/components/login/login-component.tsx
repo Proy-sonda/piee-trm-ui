@@ -2,12 +2,15 @@
 
 import { InputClave, InputRut } from '@/components/form';
 import { AuthContext } from '@/contexts';
+import { useFetch } from '@/hooks';
 import {
   AutenticacionTransitoriaError,
   LoginPasswordInvalidoError,
   RutInvalidoError,
   UsuarioNoExisteError,
 } from '@/servicios/auth';
+import { obtenerMensajes } from '@/servicios/obtiene-mensajes';
+import { AlertaExito } from '@/utilidades';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -29,6 +32,7 @@ export const LoginComponent: React.FC<{}> = () => {
   const [showModalRecuperarClave, setShowModalRecuperarClave] = useState(false);
   const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
+  const [err, mensajes, pendiente] = useFetch(obtenerMensajes());
 
   const router = useRouter();
 
@@ -55,12 +59,30 @@ export const LoginComponent: React.FC<{}> = () => {
 
       await login(rut, clave);
 
-      Swal.fire({
-        html: 'Sesión iniciada correctamente',
-        icon: 'success',
-        timer: 2000,
-        showConfirmButton: false,
-      });
+      if (mensajes) {
+        // primero verificamos si hay mensaje general vigente entre fechas de inicio y termino
+        if (mensajes.find((m) => m.idmensajegeneral === 2)!?.mensaje) {
+          const fechainicio = mensajes.find((m) => m.idmensajegeneral === 2)!?.fechainicio || '';
+          const fechafin = mensajes.find((m) => m.idmensajegeneral === 2)!?.fechatermino || '';
+          const fechaactual = new Date();
+          if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
+            AlertaExito.fire({ html: mensajes.find((m) => m.idmensajegeneral === 2)!?.mensaje });
+            return;
+          }
+        }
+        console.log(mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje);
+        if (mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje) {
+          //validamos si el mensaje se encuentra en la fecha de inicio y fin
+          const fechainicio = mensajes.find((m) => m.idmensajegeneral === 3)!?.fechainicio || '';
+          const fechafin = mensajes.find((m) => m.idmensajegeneral === 3)!?.fechatermino || '';
+          const fechaactual = new Date();
+          if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
+            AlertaExito.fire({ html: mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje });
+          } else {
+            AlertaExito.fire({ html: 'Sesión iniciada correctamente' });
+          }
+        }
+      }
     } catch (error) {
       let messageError = '';
 
