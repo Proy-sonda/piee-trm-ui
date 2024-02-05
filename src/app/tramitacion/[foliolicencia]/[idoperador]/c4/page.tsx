@@ -745,7 +745,14 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
               </Col>
             </Row>
 
-            <BotonesNavegacion formId="tramitacionC4" formulario={formulario} anterior finaliza />
+            <BotonesNavegacion
+              formId="tramitacionC4"
+              formulario={formulario}
+              finaliza
+              onAnterior={{
+                linkAnterior: `/tramitacion/${foliolicencia}/${idoperador}/c3`,
+              }}
+            />
           </form>
         </FormProvider>
       </IfContainer>

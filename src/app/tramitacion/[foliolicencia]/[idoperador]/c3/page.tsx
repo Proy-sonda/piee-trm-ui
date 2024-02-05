@@ -671,7 +671,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         />
 
         <FormProvider {...formulario}>
-          <BotonesNavegacion formId="tramitacionC3" formulario={formulario} anterior />
+          <BotonesNavegacion
+            formId="tramitacionC3"
+            formulario={formulario}
+            onAnterior={{
+              linkAnterior: `/tramitacion/${foliolicencia}/${idoperador}/c2`,
+            }}
+          />
         </FormProvider>
       </IfContainer>
     </>

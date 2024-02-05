@@ -999,7 +999,13 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             </div>
 
             <div className="mt-4">
-              <BotonesNavegacion formId="tramitacionC2" formulario={formulario} anterior />
+              <BotonesNavegacion
+                formId="tramitacionC2"
+                formulario={formulario}
+                onAnterior={{
+                  linkAnterior: `/tramitacion/${foliolicencia}/${idoperador}/c1`,
+                }}
+              />
             </div>
           </form>
         </FormProvider>
