@@ -163,12 +163,15 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   useEffect(() => {
     if (runEmpleador == '') return;
     const busquedaEmpleador = async () => {
-      const [empleador, resp] = await buscarEmpleador(runEmpleador);
-      if ((await empleador()) === undefined) {
+      const [requestEmpleador] = buscarEmpleador(runEmpleador);
+
+      const empleador = await requestEmpleador();
+      if (empleador === undefined) {
         seterrorEmpleador(true);
         return;
       }
-      formulario.setValue('razon', (await empleador()).razonsocial);
+
+      formulario.setValue('razon', empleador.razonsocial);
       if (LMEEXIS != undefined) {
         formulario.setValue('region', LMEEXIS.comuna.idcomuna.substring(0, 2));
         formulario.setValue('calle', LMEEXIS.direccion);
@@ -190,17 +193,17 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         return;
       }
 
-      formulario.setValue('region', (await empleador()).direccionempleador.comuna.region.idregion);
-      formulario.setValue('comuna', (await empleador()).direccionempleador.comuna.idcomuna);
-      formulario.setValue('calle', (await empleador()).direccionempleador.calle);
-      formulario.setValue('numero', (await empleador()).direccionempleador.numero);
-      formulario.setValue('departamento', (await empleador()).direccionempleador.depto);
-      formulario.setValue('telefono', (await empleador()).telefonohabitual);
+      formulario.setValue('region', empleador.direccionempleador.comuna.region.idregion);
+      formulario.setValue('comuna', empleador.direccionempleador.comuna.idcomuna);
+      formulario.setValue('calle', empleador.direccionempleador.calle);
+      formulario.setValue('numero', empleador.direccionempleador.numero);
+      formulario.setValue('departamento', empleador.direccionempleador.depto);
+      formulario.setValue('telefono', empleador.telefonohabitual);
       formulario.setValue('fecharecepcionlme', format(new Date(), 'yyyy-MM-dd'));
 
       formulario.setValue(
         'actividadlaboral',
-        (await empleador()).actividadlaboral.idactividadlaboral.toString(),
+        empleador.actividadlaboral.idactividadlaboral.toString(),
       );
     };
     busquedaEmpleador();
