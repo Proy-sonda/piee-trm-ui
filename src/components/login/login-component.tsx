@@ -49,6 +49,26 @@ export const LoginComponent: React.FC<{}> = () => {
     if (!usuario) {
       return;
     }
+    // validamos si existe un mensaje vigente entre las fechas de inicio y termino, tanto general como en especifico de tramitación
+    if (mensajes?.find((m) => m.idmensajegeneral === 2)!?.mensaje) {
+      const fechainicio = mensajes?.find((m) => m.idmensajegeneral === 2)!?.fechainicio || '';
+      const fechafin = mensajes?.find((m) => m.idmensajegeneral === 2)!?.fechatermino || '';
+      const fechaactual = new Date();
+      if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
+        return;
+      }
+    }
+
+    if (mensajes?.find((m) => m.idmensajegeneral === 3)!?.mensaje) {
+      const fechainicio = mensajes?.find((m) => m.idmensajegeneral === 3)!?.fechainicio || '';
+      const fechafin = mensajes?.find((m) => m.idmensajegeneral === 3)!?.fechatermino || '';
+      const fechaactual = new Date();
+      if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
+        return;
+      }
+    }
+
+    // en caso contrario mostrara mensaje por default
 
     router.push(searchParams.get('redirectTo') ?? '/tramitacion');
   }, [usuario]);
@@ -66,18 +86,28 @@ export const LoginComponent: React.FC<{}> = () => {
           const fechafin = mensajes.find((m) => m.idmensajegeneral === 2)!?.fechatermino || '';
           const fechaactual = new Date();
           if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
-            AlertaExito.fire({ html: mensajes.find((m) => m.idmensajegeneral === 2)!?.mensaje });
+            AlertaExito.fire({
+              html: `${mensajes.find((m) => m.idmensajegeneral === 2)!?.mensaje} <br/>
+                     Cargando página de tramitación...`,
+              timer: 6000,
+              didClose: () => router.push(searchParams.get('redirectTo') ?? '/tramitacion'),
+            });
             return;
           }
         }
-        console.log(mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje);
+
         if (mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje) {
           //validamos si el mensaje se encuentra en la fecha de inicio y fin
           const fechainicio = mensajes.find((m) => m.idmensajegeneral === 3)!?.fechainicio || '';
           const fechafin = mensajes.find((m) => m.idmensajegeneral === 3)!?.fechatermino || '';
           const fechaactual = new Date();
           if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
-            AlertaExito.fire({ html: mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje });
+            AlertaExito.fire({
+              html: `${mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje} <br/>
+              Cargando página de tramitación...`,
+              timer: 6000,
+              didClose: () => router.push(searchParams.get('redirectTo') ?? '/tramitacion'),
+            });
           } else {
             AlertaExito.fire({ html: 'Sesión iniciada correctamente' });
           }
