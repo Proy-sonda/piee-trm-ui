@@ -2,10 +2,12 @@ import { ComboSimple, InputMesAno } from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import IfContainer from '@/components/if-container';
 import { AuthContext } from '@/contexts';
+import { existe } from '@/utilidades';
 import { useContext, useRef } from 'react';
 import { Alert, Col, Row } from 'react-bootstrap';
 import { UseFieldArrayReturn, useFormContext } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
+import { Remuneracion } from '../(modelos)';
 import { FormularioC3, TipoRemuneracion } from '../(modelos)/formulario-c3';
 import { InputDias } from '../../(componentes)/input-dias';
 import { Licenciac2 } from '../../c2/(modelos)';
@@ -63,6 +65,22 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
   const {
     datosGuia: { guia, listaguia, AgregarGuia },
   } = useContext(AuthContext);
+
+  const autoCompletarColumna = (index: number, campo: keyof Remuneracion) => {
+    return (value: any) => {
+      if (!existe(value) || index !== 0) {
+        return;
+      }
+
+      if (typeof value === 'number' && isNaN(value)) {
+        return;
+      }
+
+      for (let index = 1; index < remuneraciones.fields.length; index++) {
+        formulario.setValue(`${fieldArray}.${index}.${campo}`, value);
+      }
+    };
+  };
 
   return (
     <>
@@ -204,6 +222,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                             campo: 'dias',
                             fieldArrayName: fieldArray,
                           }}
+                          onBlur={autoCompletarColumna(index, 'dias')}
                         />
                       </div>
                     </Td>
@@ -224,6 +243,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                             campo: 'montoImponible',
                             fieldArrayName: fieldArray,
                           }}
+                          onBlur={autoCompletarColumna(index, 'montoImponible')}
                         />
                       </div>
                     </Td>
@@ -306,6 +326,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                             campo: 'totalRemuneracion',
                             fieldArrayName: fieldArray,
                           }}
+                          onBlur={autoCompletarColumna(index, 'totalRemuneracion')}
                         />
                       </div>
                     </Td>
@@ -318,6 +339,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                           campo: 'montoIncapacidad',
                           fieldArrayName: fieldArray,
                         }}
+                        onBlur={autoCompletarColumna(index, 'montoIncapacidad')}
                       />
                     </Td>
                     <Td>
@@ -329,6 +351,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                           campo: 'diasIncapacidad',
                           fieldArrayName: fieldArray,
                         }}
+                        onBlur={autoCompletarColumna(index, 'diasIncapacidad')}
                       />
                     </Td>
                     <Td>

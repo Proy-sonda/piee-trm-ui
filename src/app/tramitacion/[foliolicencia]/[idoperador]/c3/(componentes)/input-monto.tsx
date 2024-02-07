@@ -10,6 +10,12 @@ interface InputMontoImponibleProps extends InputReciclableBase, UnibleConFormArr
 
   /** (defecto: lo definido por la función {@link montoMaximoPorDefecto} ) */
   montoMaximo?: number;
+
+  /**
+   * Solo llamar para cosas que no se puedan hacer dentro del input mismo. Para cosas como
+   * validaciones o formatear el valor del input hacerlo dentro del componente mismo.
+   */
+  onBlur?: (monto: number) => Promise<void> | void;
 }
 
 export const InputMonto: React.FC<InputMontoImponibleProps> = ({
@@ -21,6 +27,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
   montoMaximo,
   deshabilitado,
   unirConFieldArray,
+  onBlur: onBlurHandler,
 }) => {
   const montoMinimoFinal = montoMinimo ?? 0;
   const montoMaximoFinal = montoMaximo ?? 5_000_000;
@@ -69,6 +76,10 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
                   shouldValidate: true,
                 });
               }
+            },
+            onBlur: (event) => {
+              const monto = event.target.valueAsNumber ?? NaN;
+              onBlurHandler?.(monto);
             },
           })}
         />

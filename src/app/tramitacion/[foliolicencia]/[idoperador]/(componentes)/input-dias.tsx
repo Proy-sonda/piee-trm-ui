@@ -20,6 +20,12 @@ interface InputDiasProps extends InputReciclableBase, UnibleConFormArray {
     /** Nombre del input en la función `register` para la fecha hasta */
     hasta: string;
   };
+
+  /**
+   * Solo llamar para cosas que no se puedan hacer dentro del input mismo. Para cosas como
+   * validaciones o formatear el valor del input hacerlo dentro del componente mismo.
+   */
+  onBlur?: (dias: number) => Promise<void> | void;
 }
 
 export const InputDias: React.FC<InputDiasProps> = ({
@@ -32,6 +38,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
   deshabilitado,
   unirConFieldArray,
   coincideConRango,
+  onBlur: onBlurHandler,
 }) => {
   const minDiasFinal = minDias ?? 0;
   const maxDiasFinal = maxDias ?? 31;
@@ -98,6 +105,10 @@ export const InputDias: React.FC<InputDiasProps> = ({
                 dias = dias.replaceAll(regex, '');
                 setValue(name, dias === '' ? undefined : parseInt(dias), { shouldValidate: true });
               }
+            },
+            onBlur: (event) => {
+              const monto = event.target.valueAsNumber ?? NaN;
+              onBlurHandler?.(monto);
             },
           })}
         />
