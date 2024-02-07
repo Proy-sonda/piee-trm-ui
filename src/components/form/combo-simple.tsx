@@ -46,6 +46,12 @@ interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
    * (default: `number`).
    * */
   tipoValor?: TipoValorComboSimple;
+
+  /**
+   * Solo llamar para cosas que no se puedan hacer dentro del input mismo. Para cosas como
+   * validaciones o formatear el valor del input hacerlo dentro del componente mismo.
+   */
+  onBlur?: (value: number | string) => Promise<void> | void;
 }
 
 /**
@@ -63,6 +69,7 @@ export const ComboSimple = <T extends Record<string, any>>({
   tipoValor,
   opcional,
   unirConFieldArray,
+  onBlur: onBlurHandler,
 }: ComboSimpleProps<T>) => {
   const { register } = useFormContext();
 
@@ -112,6 +119,10 @@ export const ComboSimple = <T extends Record<string, any>>({
                   return 'Este campo es obligatorio';
                 }
               },
+            },
+            onBlur: (event) => {
+              const value = event.target.value;
+              onBlurHandler?.(!tipoValor || tipoValor === 'number' ? parseInt(value, 10) : value);
             },
           })}>
           <option

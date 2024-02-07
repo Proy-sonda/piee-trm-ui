@@ -139,6 +139,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                           campo: 'prevision',
                           fieldArrayName: fieldArray,
                         }}
+                        onBlur={autoCompletarColumna(index, 'prevision')}
                       />
                     </Td>
                     <Td>
