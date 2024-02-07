@@ -30,6 +30,7 @@ export const InputPorcentajeDesahucio: React.FC<InputPorcentajeDesahucioProps> =
           type="number"
           step={0.01}
           disabled={deshabilitado === true}
+          style={{ textAlign: 'right' }}
           isInvalid={tieneError}
           {...register(name, {
             valueAsNumber: true,

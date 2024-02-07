@@ -54,6 +54,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
           type="number"
           inputMode="numeric"
           disabled={deshabilitado === true}
+          style={{ textAlign: 'right' }}
           isInvalid={tieneError}
           {...register(name, {
             valueAsNumber: true,
