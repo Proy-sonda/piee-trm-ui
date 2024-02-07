@@ -17,7 +17,11 @@ import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { buscarTiposDocumento } from '../(servicios)';
-import { crearIdEntidadPrevisional, esTrabajadorIndependiente } from '../c2/(modelos)';
+import {
+  crearIdEntidadPrevisional,
+  entidadPrevisionalEsAFP,
+  esTrabajadorIndependiente,
+} from '../c2/(modelos)';
 import { buscarEntidadPrevisional, buscarZona2 } from '../c2/(servicios)';
 import {
   DatosModalDesgloseHaberes,
@@ -631,7 +635,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
               </Col>
 
               <Col xs={12} sm={6} md={2}>
-                <InputPorcentajeDesahucio opcional name="porcentajeDesahucio" />
+                <InputPorcentajeDesahucio
+                  opcional
+                  name="porcentajeDesahucio"
+                  deshabilitado={zona2 && entidadPrevisionalEsAFP(zona2.entidadprevisional)}
+                />
               </Col>
             </Row>
 

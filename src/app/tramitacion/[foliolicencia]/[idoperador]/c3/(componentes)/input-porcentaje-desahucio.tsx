@@ -11,6 +11,7 @@ export const InputPorcentajeDesahucio: React.FC<InputPorcentajeDesahucioProps> =
   label,
   className,
   opcional,
+  deshabilitado,
 }) => {
   const { register } = useFormContext();
 
@@ -28,6 +29,7 @@ export const InputPorcentajeDesahucio: React.FC<InputPorcentajeDesahucioProps> =
         <Form.Control
           type="number"
           step={0.01}
+          disabled={deshabilitado === true}
           isInvalid={tieneError}
           {...register(name, {
             valueAsNumber: true,
