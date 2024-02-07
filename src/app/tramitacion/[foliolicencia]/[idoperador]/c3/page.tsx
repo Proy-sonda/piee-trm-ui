@@ -5,7 +5,13 @@ import {
   esLicenciaMaternidad,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import { AuthContext } from '@/contexts';
-import { emptyFetch, useFetch, useRefrescarPagina } from '@/hooks';
+import {
+  BootstrapBreakpoint,
+  emptyFetch,
+  useFetch,
+  useRefrescarPagina,
+  useWindowSize,
+} from '@/hooks';
 import { capitalizar } from '@/utilidades';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { format, subMonths } from 'date-fns';
@@ -51,6 +57,8 @@ interface C3PageProps {
 
 const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }) => {
   const idOperadorNumber = parseInt(idoperador);
+
+  const [width] = useWindowSize();
 
   const step = [
     {
@@ -611,30 +619,39 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
               />
             )}
 
-            <Row className="mt-2">
+            <Row className="mt-2 g-2">
+              {width < BootstrapBreakpoint.LG ? (
+                <>
+                  <Col xs={12} sm={8} className="d-flex align-items-center justify-content-start">
+                    <span className="small fw-bold">
+                      Remuneración imponible previsional mes anterior inicio licencia médica:
+                    </span>
+                  </Col>
+
+                  <Col xs={12} sm={4}>
+                    <InputMonto opcional name="remuneracionImponiblePrevisional" />
+                  </Col>
+                </>
+              ) : (
+                <Col lg={8} className="d-flex align-items-center justify-content-start">
+                  <span className="small fw-bold me-3">
+                    Remuneración imponible previsional mes anterior inicio licencia médica:
+                  </span>
+
+                  <InputMonto opcional name="remuneracionImponiblePrevisional" />
+                </Col>
+              )}
+
               <Col
                 xs={12}
-                sm={6}
-                md={6}
-                className="mt-2 mb-2 mt-sm-0 d-flex align-items-center justify-content-start">
-                <span className="small fw-bold">
-                  Remuneración imponible previsional mes anterior inicio licencia médica:
-                </span>
+                sm={8}
+                lg={2}
+                xxl={3}
+                className="mt-4 mt-sm-0 d-flex align-items-center justify-content-start justify-content-lg-end">
+                <div className="small fw-bold text-start text-lg-end">% Desahucio:</div>
               </Col>
 
-              <Col xs={12} sm={6} md={2}>
-                <InputMonto opcional name="remuneracionImponiblePrevisional" />
-              </Col>
-
-              <Col
-                xs={12}
-                sm={6}
-                md={2}
-                className="mt-3 mb-2 mt-sm-0 d-flex align-items-center justify-content-start">
-                <span className="small fw-bold">% Desahucio:</span>
-              </Col>
-
-              <Col xs={12} sm={6} md={2}>
+              <Col xs={12} sm={4} lg={2} xxl={1}>
                 <InputPorcentajeDesahucio
                   opcional
                   name="porcentajeDesahucio"
