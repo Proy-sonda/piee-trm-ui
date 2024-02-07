@@ -42,6 +42,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
         <Form.Control
           type="number"
           inputMode="numeric"
+          style={{ textAlign: 'right' }}
           disabled={deshabilitado}
           isInvalid={tieneError}
           {...register(name, {
