@@ -1,17 +1,25 @@
+import IfContainer from '@/components/if-container';
 import { capitalizar, esFechaInvalida } from '@/utilidades';
 import { format } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
-import React, { useEffect } from 'react';
-import { Form, Modal, Table } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Alert, Col, Collapse, Form, Modal, Row, Table } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { DesgloseDeHaberes } from '../(modelos)/desglose-de-haberes';
-import { FormularioC3 } from '../(modelos)/formulario-c3';
+import {
+  DesgloseDeHaberes,
+  TipoRemuneracion,
+  existeDesglose,
+  totalDesglose as sumaMontosDesglose,
+} from '../(modelos)';
+import { Licenciac2, entidadPrevisionalEsAFP } from '../../c2/(modelos)';
 import { InputMonto } from './input-monto';
 
 export interface DatosModalDesgloseHaberes {
   show: boolean;
+  zona2?: Licenciac2;
+  montoTotal: number;
   periodoRenta: Date;
-  fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>;
+  fieldArray: TipoRemuneracion;
   indexInput: number;
   desgloseInicial?: DesgloseDeHaberes | Record<string, never>;
 }
@@ -20,14 +28,11 @@ interface ModalDesgloseDeHaberesProps {
   datos: DatosModalDesgloseHaberes;
   onCerrar: () => void;
   onGuardarDesglose: (
-    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
+    fieldArray: TipoRemuneracion,
     indexInput: number,
     desglose: DesgloseDeHaberes,
   ) => void;
-  onDescartarDesglose: (
-    fieldArray: keyof Pick<FormularioC3, 'remuneraciones' | 'remuneracionesMaternidad'>,
-    indexInput: number,
-  ) => void;
+  onDescartarDesglose: (fieldArray: TipoRemuneracion, indexInput: number) => void;
 }
 
 type FormularioDesgloseHaberes = DesgloseDeHaberes;
@@ -38,7 +43,11 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
   onGuardarDesglose,
   onDescartarDesglose,
 }) => {
+  const montoTotalCorregido = isNaN(datos.montoTotal) ? 0 : datos.montoTotal;
+
   const formulario = useForm<FormularioDesgloseHaberes>({ mode: 'onBlur' });
+  const [mensajeErrorGlobal, setMensajeErrorGlobal] = useState<string>();
+  const [abrirPasosDesgloseDeHaberes, setAbrirPasosDesgloseDeHaberes] = useState(false);
 
   useEffect(() => {
     if (!datos.desgloseInicial) {
@@ -56,26 +65,48 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
     formulario.setValue('bono5', datos.desgloseInicial.bono5);
   }, [datos.desgloseInicial, formulario]);
 
-  const handleCerrarModal = () => {
+  const limpiarModal = () => {
     formulario.reset();
-    onCerrar();
+    setMensajeErrorGlobal(undefined);
   };
 
   const guardarDesglose: SubmitHandler<FormularioDesgloseHaberes> = async (desglose) => {
-    formulario.reset();
+    if (!datos.zona2) {
+      throw new Error('No existe la zona 2');
+    }
 
+    if (existeDesglose(desglose) && sumaMontosDesglose(desglose) !== montoTotalCorregido) {
+      const tipoMonto = entidadPrevisionalEsAFP(datos.zona2.entidadprevisional)
+        ? 'total remuneración'
+        : 'imponible desahucio';
+
+      // prettier-ignore
+      setMensajeErrorGlobal(
+        `El total del desglose ($${sumaMontosDesglose(desglose).toLocaleString()}) no coincide con el ${tipoMonto} ($${montoTotalCorregido.toLocaleString()})`,
+      );
+
+      formulario.setFocus('sueldoBase');
+      return;
+    }
+
+    limpiarModal();
     onGuardarDesglose(datos.fieldArray, datos.indexInput, desglose);
   };
 
   const descartarCambios = () => {
-    formulario.reset();
+    limpiarModal();
     onDescartarDesglose(datos.fieldArray, datos.indexInput);
+  };
+
+  const handleCerrarModal = () => {
+    limpiarModal();
+    onCerrar();
   };
 
   return (
     <>
-      <Modal show={datos.show} centered backdrop="static">
-        <Modal.Header closeButton onClick={handleCerrarModal}>
+      <Modal show={datos.show} centered backdrop="static" keyboard={false}>
+        <Modal.Header closeButton onHide={handleCerrarModal}>
           <Modal.Title className="fs-5">
             Desglose de Haberes Periodo{' '}
             {esFechaInvalida(datos.periodoRenta)
@@ -87,6 +118,57 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
         <FormProvider {...formulario}>
           <Form id="formularioDesgloseHaberes" onSubmit={formulario.handleSubmit(guardarDesglose)}>
             <Modal.Body className="p-2 p-sm-3">
+              <div className="mb-3">
+                <a
+                  className="text-primary small cursor-pointer"
+                  onClick={() => setAbrirPasosDesgloseDeHaberes((x) => !x)}>
+                  {abrirPasosDesgloseDeHaberes
+                    ? 'Cerrar pasos para completar el desglose de haberes'
+                    : '¿Cómo completar el desglose de haberes?'}
+                </a>
+                <Collapse in={abrirPasosDesgloseDeHaberes}>
+                  <div>
+                    <Alert variant="warning" className="mt-2">
+                      <div className="small">
+                        Para completar el desglose de haberes debe tener en cuenta lo siguiente:
+                        <ul className="my-2">
+                          <li className="mb-2">
+                            Debe ingresar los montos por cada concepto de la liquidación del sueldo
+                            mensual de la persona trabajadora.
+                          </li>
+                          <li className="mb-2">
+                            En caso de que un concepto de la liquidación no aplique debe ingresar 0
+                            como monto.
+                          </li>
+                          <li>
+                            La suma de los montos ingresados a continuación debe coincidir con el
+                            monto ingresado en la columna{' '}
+                            <b>
+                              {
+                                // prettier-ignore
+                                datos.zona2 && entidadPrevisionalEsAFP(datos.zona2.entidadprevisional) ? 'Total Remuneración' : 'Imponible Desahucio'
+                              }
+                            </b>
+                            .
+                          </li>
+                        </ul>
+                      </div>
+                    </Alert>
+                  </div>
+                </Collapse>
+              </div>
+
+              <IfContainer show={mensajeErrorGlobal}>
+                <Row>
+                  <Col xs={12}>
+                    <Alert variant="danger" className="d-flex align-items-center fade show">
+                      <i className="bi bi-exclamation-triangle me-2"></i>
+                      <span>{mensajeErrorGlobal}</span>
+                    </Alert>
+                  </Col>
+                </Row>
+              </IfContainer>
+
               <Table bordered>
                 <thead>
                   <tr>

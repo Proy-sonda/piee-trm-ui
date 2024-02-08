@@ -2,7 +2,7 @@ import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, getYear, isAfter, isBefore } from 'date-fns';
 import { default as es } from 'date-fns/locale/es';
-import React from 'react';
+import React, { useRef } from 'react';
 import { Form, FormGroup, InputGroup } from 'react-bootstrap';
 import DatePicker, { registerLocale, setDefaultLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -35,12 +35,14 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
     unirConFieldArray,
   });
 
+  const inputRef = useRef(null);
+
   return (
     <>
       <FormGroup className={className}>
         {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
-        <InputGroup className="flex-nowrap" style={{ minWidth: '120px' }}>
+        <InputGroup className="flex-nowrap" style={{ minWidth: '100px' }}>
           <Controller
             control={control}
             name={name}
@@ -69,12 +71,15 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
             }}
             render={({ field: { onChange, onBlur, value } }) => (
               <DatePicker
+                ref={inputRef}
                 id={idInput}
-                className={`form-control cursor-pointer position-relative border rounded-end-0 border-end-0  ${
-                  tieneError ? 'is-invalid border-danger' : ''
-                }`}
+                className={
+                  'form-control cursor-pointer position-relative border rounded-end-0 border-end-0 ' +
+                  `${tieneError ? 'is-invalid border-danger background-img-none' : ''}`
+                }
                 showMonthYearPicker
-                showTwoColumnMonthYearPicker
+                showFullMonthYearPicker
+                showFourColumnMonthYearPicker
                 dateFormat="MMM yyyy"
                 onChange={onChange}
                 onBlur={onBlur}
@@ -118,9 +123,15 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
             )}
           />
           <InputGroup.Text
-            className={`bg-white border border-start-0 border-top border-end border-bottom ${
-              tieneError ? 'border-danger' : ''
-            }`}>
+            className={
+              'bg-white border border-start-0 border-top border-end border-bottom cursor-pointer ' +
+              `${tieneError ? 'border-danger' : ''}`
+            }
+            onClick={() => {
+              // NOTA: Los nombres de estos metodos se obtuvieron al loguear a la consola el componente
+              (inputRef.current as any)?.setOpen?.(true);
+              (inputRef.current as any)?.setFocus?.(true);
+            }}>
             <i className="bi bi-calendar" style={{ fontSize: '14px' }}></i>
           </InputGroup.Text>
         </InputGroup>
