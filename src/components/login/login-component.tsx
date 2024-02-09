@@ -54,22 +54,17 @@ export const LoginComponent: React.FC<{}> = () => {
       const fechainicio = mensajes?.find((m) => m.idmensajegeneral === 2)!?.fechainicio || '';
       const fechafin = mensajes?.find((m) => m.idmensajegeneral === 2)!?.fechatermino || '';
       const fechaactual = new Date();
-      if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
-        return;
-      }
+      if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) return;
     }
 
     if (mensajes?.find((m) => m.idmensajegeneral === 3)!?.mensaje) {
       const fechainicio = mensajes?.find((m) => m.idmensajegeneral === 3)!?.fechainicio || '';
       const fechafin = mensajes?.find((m) => m.idmensajegeneral === 3)!?.fechatermino || '';
       const fechaactual = new Date();
-      if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
-        return;
-      }
+      if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) return;
     }
 
     // en caso contrario mostrara mensaje por default
-
     router.push(searchParams.get('redirectTo') ?? '/tramitacion');
   }, [usuario]);
 
