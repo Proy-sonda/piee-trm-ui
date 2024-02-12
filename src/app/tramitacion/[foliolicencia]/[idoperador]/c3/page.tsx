@@ -4,16 +4,14 @@ import {
   LicenciaTramitar,
   esLicenciaMaternidad,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
-import { InputMonto } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(componentes)/input-monto';
-import {
-  FormularioC3,
-  estaRemuneracionCompleta,
-  limpiarRemuneracion,
-  remuneracionTieneAlgunCampoValido,
-} from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(modelos)/formulario-c3';
-
 import { AuthContext } from '@/contexts';
-import { emptyFetch, useFetch, useRefrescarPagina } from '@/hooks';
+import {
+  BootstrapBreakpoint,
+  emptyFetch,
+  useFetch,
+  useRefrescarPagina,
+  useWindowSize,
+} from '@/hooks';
 import { capitalizar } from '@/utilidades';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { format, subMonths } from 'date-fns';
@@ -21,18 +19,30 @@ import esLocale from 'date-fns/locale/es';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { Col, Form, FormGroup, Row } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { buscarTiposDocumento } from '../(servicios)';
-import { crearIdEntidadPrevisional, esTrabajadorIndependiente } from '../c2/(modelos)';
+import {
+  crearIdEntidadPrevisional,
+  entidadPrevisionalEsAFP,
+  esTrabajadorIndependiente,
+} from '../c2/(modelos)';
 import { buscarEntidadPrevisional, buscarZona2 } from '../c2/(servicios)';
 import {
   DatosModalDesgloseHaberes,
   DocumentosAdjuntosC3,
+  InputMonto,
   ModalDesgloseDeHaberes,
   TablaDeRentas,
 } from './(componentes)';
+import { InputPorcentajeDesahucio } from './(componentes)/input-porcentaje-desahucio';
+import {
+  FormularioC3,
+  limpiarRemuneracion,
+  remuneracionEstaCompleta,
+  remuneracionTieneAlgunCampoValido,
+} from './(modelos)';
 import { buscarZona3, crearLicenciaZ3 } from './(servicios)';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
@@ -47,6 +57,8 @@ interface C3PageProps {
 
 const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }) => {
   const idOperadorNumber = parseInt(idoperador);
+
+  const [width] = useWindowSize();
 
   const step = [
     {
@@ -106,6 +118,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   const [datosModalDesglose, setDatosModalDesglose] = useState<DatosModalDesgloseHaberes>({
     show: false,
+    montoTotal: 0,
     periodoRenta: new Date(),
     fieldArray: 'remuneraciones',
     indexInput: -1,
@@ -367,17 +380,21 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   };
 
   const onSubmitForm: SubmitHandler<FormularioC3> = async (datos) => {
-    if (!(await formulario.trigger()))
+    if (!(await formulario.trigger())) {
+      formulario.setFocus('remuneraciones.0.dias');
       return AlertaError.fire({
         title: 'Campos Inválidos',
         html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
+    }
 
-    if (!validarCompletitudDeFilas(datos))
+    if (!validarCompletitudDeFilas(datos)) {
+      formulario.setFocus('remuneraciones.0.dias');
       return AlertaError.fire({
         title: 'Remuneraciones Incompletas',
         html: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
       });
+    }
 
     const datosLimpios: FormularioC3 = {
       ...datos,
@@ -386,10 +403,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         ? 0
         : datos.remuneracionImponiblePrevisional,
       remuneraciones: datos.remuneraciones
-        .filter(estaRemuneracionCompleta)
+        .filter(remuneracionEstaCompleta)
         .map(limpiarRemuneracion),
       remuneracionesMaternidad: datos.remuneracionesMaternidad
-        .filter(estaRemuneracionCompleta)
+        .filter(remuneracionEstaCompleta)
         .map(limpiarRemuneracion),
     };
 
@@ -497,7 +514,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
       if (
         remuneracionTieneAlgunCampoValido(remuneracion) &&
-        !estaRemuneracionCompleta(remuneracion)
+        !remuneracionEstaCompleta(remuneracion)
       ) {
         errores.normales.push(i + 1);
       }
@@ -508,7 +525,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
       if (
         remuneracionTieneAlgunCampoValido(remuneracion) &&
-        !estaRemuneracionCompleta(remuneracion)
+        !remuneracionEstaCompleta(remuneracion)
       ) {
         errores.maternidad.push(i + 1);
       }
@@ -520,6 +537,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   const limpiarModalDesglose = () => {
     setDatosModalDesglose({
+      montoTotal: 0,
       periodoRenta: new Date(),
       show: false,
       fieldArray: 'remuneraciones',
@@ -589,60 +607,56 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
               }}
             />
 
-            <TablaDeRentas
-              titulo="RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD"
-              fieldArray="remuneraciones"
-              remuneraciones={remuneraciones}
-              filasIncompletas={completitudRemuneraciones.normales}
-              tiposPrevisiones={tiposPrevisiones ?? []}
-              onClickBotonDesglose={setDatosModalDesglose}
-            />
+            {zona2 && (
+              <TablaDeRentas
+                titulo="RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD"
+                fieldArray="remuneraciones"
+                zona2={zona2}
+                remuneraciones={remuneraciones as any}
+                filasIncompletas={completitudRemuneraciones.normales}
+                tiposPrevisiones={tiposPrevisiones ?? []}
+                onClickBotonDesglose={setDatosModalDesglose}
+              />
+            )}
 
-            <Row className="mt-2">
+            <Row className="mt-2 g-2">
+              {width < BootstrapBreakpoint.LG ? (
+                <>
+                  <Col xs={12} sm={8} className="d-flex align-items-center justify-content-start">
+                    <span className="small fw-bold">
+                      Remuneración imponible previsional mes anterior inicio licencia médica:
+                    </span>
+                  </Col>
+
+                  <Col xs={12} sm={4}>
+                    <InputMonto opcional name="remuneracionImponiblePrevisional" />
+                  </Col>
+                </>
+              ) : (
+                <Col lg={8} className="d-flex align-items-center justify-content-start">
+                  <span className="small fw-bold me-3">
+                    Remuneración imponible previsional mes anterior inicio licencia médica:
+                  </span>
+
+                  <InputMonto opcional name="remuneracionImponiblePrevisional" />
+                </Col>
+              )}
+
               <Col
                 xs={12}
-                sm={6}
-                md={6}
-                className="mt-2 mb-2 mt-sm-0 d-flex align-items-center justify-content-start">
-                <span className="small fw-bold">
-                  Remuneración imponible previsional mes anterior inicio licencia médica:
-                </span>
+                sm={8}
+                lg={2}
+                xxl={3}
+                className="mt-4 mt-sm-0 d-flex align-items-center justify-content-start justify-content-lg-end">
+                <div className="small fw-bold text-start text-lg-end">% Desahucio:</div>
               </Col>
 
-              <Col xs={12} sm={6} md={2}>
-                <InputMonto opcional name="remuneracionImponiblePrevisional" />
-              </Col>
-
-              <Col
-                xs={12}
-                sm={6}
-                md={2}
-                className="mt-3 mb-2 mt-sm-0 d-flex align-items-center justify-content-start">
-                <span className="small fw-bold">% Desahucio:</span>
-              </Col>
-
-              <Col xs={12} sm={6} md={2}>
-                <FormGroup controlId={'porcentajeDesahucio'} className="position-relative">
-                  <Form.Control
-                    type="number"
-                    step={0.02}
-                    isInvalid={!!formulario.formState.errors.porcentajeDesahucio}
-                    {...formulario.register('porcentajeDesahucio', {
-                      valueAsNumber: true,
-                      min: {
-                        value: 0,
-                        message: 'No puede ser menor a 0%',
-                      },
-                      max: {
-                        value: 100,
-                        message: 'No puede ser mayor a 100%',
-                      },
-                    })}
-                  />
-                  <Form.Control.Feedback type="invalid" tooltip>
-                    {formulario.formState.errors.porcentajeDesahucio?.message?.toString()}
-                  </Form.Control.Feedback>
-                </FormGroup>
+              <Col xs={12} sm={4} lg={2} xxl={1}>
+                <InputPorcentajeDesahucio
+                  opcional
+                  name="porcentajeDesahucio"
+                  deshabilitado={zona2 && entidadPrevisionalEsAFP(zona2.entidadprevisional)}
+                />
               </Col>
             </Row>
 
@@ -650,14 +664,17 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
               {/* Esta solo para hacer espacio */}
               <div className="mt-5 mb-3"></div>
 
-              <TablaDeRentas
-                titulo="EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE"
-                fieldArray="remuneracionesMaternidad"
-                remuneraciones={remuneracionesMaternidad}
-                filasIncompletas={completitudRemuneraciones.maternidad}
-                tiposPrevisiones={tiposPrevisiones ?? []}
-                onClickBotonDesglose={setDatosModalDesglose}
-              />
+              {zona2 && (
+                <TablaDeRentas
+                  titulo="EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE"
+                  fieldArray="remuneracionesMaternidad"
+                  zona2={zona2}
+                  remuneraciones={remuneracionesMaternidad as any}
+                  filasIncompletas={completitudRemuneraciones.maternidad}
+                  tiposPrevisiones={tiposPrevisiones ?? []}
+                  onClickBotonDesglose={setDatosModalDesglose}
+                />
+              )}
             </IfContainer>
           </Form>
         </FormProvider>
@@ -671,7 +688,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         />
 
         <FormProvider {...formulario}>
-          <BotonesNavegacion formId="tramitacionC3" formulario={formulario} anterior />
+          <BotonesNavegacion
+            formId="tramitacionC3"
+            formulario={formulario}
+            onAnterior={{
+              linkAnterior: `/tramitacion/${foliolicencia}/${idoperador}/c2`,
+            }}
+          />
         </FormProvider>
       </IfContainer>
     </>

@@ -46,3 +46,12 @@ export const desgloseFromGlosas = (xs: { tipohaber: string; montohaber: number }
 
   return desglose as DesgloseDeHaberes;
 };
+
+// prettier-ignore
+export const existeDesglose = (x: DesgloseDeHaberes | Record<string, never>): x is DesgloseDeHaberes => {
+  return Object.values(x).length !== 0;
+};
+
+export const totalDesglose = (desglose: DesgloseDeHaberes): number => {
+  return Object.values(desglose).reduce((total, monto) => total + monto, 0);
+};

@@ -308,7 +308,10 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
       await tramitarLicenciaMedica(foliolicencia, idOperadorNumber);
 
-      AlertaExito.fire({ html: 'Licencia tramitada con éxito' });
+      AlertaExito.fire({
+        html: `Su licencia <b>${foliolicencia}</b> ha sido enviada al operador <b>${licencia?.operador.operador}</b>, cuando el operador la reciba se generará el comprobante de tramitación, el cual podrá verificar en la pestaña <b>Licencias Tramitadas</b>`,
+        timer: 10000,
+      });
 
       router.push('/tramitacion');
     } catch (error) {
@@ -742,7 +745,14 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
               </Col>
             </Row>
 
-            <BotonesNavegacion formId="tramitacionC4" formulario={formulario} anterior finaliza />
+            <BotonesNavegacion
+              formId="tramitacionC4"
+              formulario={formulario}
+              finaliza
+              onAnterior={{
+                linkAnterior: `/tramitacion/${foliolicencia}/${idoperador}/c3`,
+              }}
+            />
           </form>
         </FormProvider>
       </IfContainer>

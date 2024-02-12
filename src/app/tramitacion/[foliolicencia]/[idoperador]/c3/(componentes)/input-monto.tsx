@@ -10,6 +10,12 @@ interface InputMontoImponibleProps extends InputReciclableBase, UnibleConFormArr
 
   /** (defecto: lo definido por la función {@link montoMaximoPorDefecto} ) */
   montoMaximo?: number;
+
+  /**
+   * Solo llamar para cosas que no se puedan hacer dentro del input mismo. Para cosas como
+   * validaciones o formatear el valor del input hacerlo dentro del componente mismo.
+   */
+  onBlur?: (monto: number) => Promise<void> | void;
 }
 
 export const InputMonto: React.FC<InputMontoImponibleProps> = ({
@@ -19,7 +25,9 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
   opcional,
   montoMinimo,
   montoMaximo,
+  deshabilitado,
   unirConFieldArray,
+  onBlur: onBlurHandler,
 }) => {
   const montoMinimoFinal = montoMinimo ?? 0;
   const montoMaximoFinal = montoMaximo ?? 5_000_000;
@@ -28,7 +36,7 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     name,
-    prefijoId: 'combo',
+    prefijoId: 'monto',
     label: { texto: label },
     unirConFieldArray,
   });
@@ -41,6 +49,8 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
         <Form.Control
           type="number"
           inputMode="numeric"
+          style={{ textAlign: 'right' }}
+          disabled={deshabilitado}
           isInvalid={tieneError}
           {...register(name, {
             valueAsNumber: true,
@@ -66,6 +76,10 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
                   shouldValidate: true,
                 });
               }
+            },
+            onBlur: (event) => {
+              const monto = event.target.valueAsNumber ?? NaN;
+              onBlurHandler?.(monto);
             },
           })}
         />

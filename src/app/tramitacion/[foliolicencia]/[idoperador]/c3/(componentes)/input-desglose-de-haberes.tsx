@@ -3,8 +3,7 @@ import { useInputReciclable } from '@/components/form/hooks';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { DesgloseDeHaberes } from '../(modelos)/desglose-de-haberes';
-import { tieneDesglose } from '../(modelos)/formulario-c3';
+import { DesgloseDeHaberes, existeDesglose, totalDesglose } from '../(modelos)';
 
 interface InputDesgloseDeHaberes extends InputReciclableBase, UnibleConFormArray {
   /**
@@ -41,22 +40,14 @@ export const InputDesgloseDeHaberes: React.FC<InputDesgloseDeHaberes> = ({
               message: 'El desglose de haberes es obligatorio',
             },
             validate: {
-              coincideConMontoImponible: (desglose: DesgloseDeHaberes | Record<string, never>) => {
-                if (!tieneDesglose(desglose)) {
+              coincideConMontoTotal: (desglose: DesgloseDeHaberes | Record<string, never>) => {
+                if (!existeDesglose(desglose)) {
                   return;
                 }
 
-                const montoImponibleEnBruto = getValues(montoImponibleName);
-                const montoImponible = isNaN(montoImponibleEnBruto)
-                  ? 0
-                  : getValues(montoImponibleName);
-
-                const totalDesglose = Object.values(desglose).reduce(
-                  (total, monto: number) => total + monto,
-                  0,
-                );
-
-                if (totalDesglose !== montoImponible) {
+                const montoTotalEnBruto = getValues(montoImponibleName);
+                const montoTotal = isNaN(montoTotalEnBruto) ? 0 : getValues(montoImponibleName);
+                if (totalDesglose(desglose) !== montoTotal) {
                   return 'No coincide con monto imponible';
                 }
               },

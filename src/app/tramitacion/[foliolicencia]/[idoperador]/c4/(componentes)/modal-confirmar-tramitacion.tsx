@@ -156,7 +156,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
     <>
       <Modal show={datos.show} size="xl" backdrop="static" centered>
         <Modal.Header closeButton onClick={handleCerrar}>
-          <Modal.Title className="fs-5">Resumen Tramitación</Modal.Title>
+          <Modal.Title className="fs-5">Resumen de Tramitación</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -200,87 +200,89 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
             <Row>
               <Col xs={12}>
                 <Alert variant="warning">
-                  Antes de enviar a tramitación, por favor revise que todos los datos estén
-                  correctos.
+                  Antes de enviar a tramitación, por favor revise que todos los datos de la LME con{' '}
+                  <b>Folio {zona0?.foliolicencia}</b> estén correctos.
                 </Alert>
               </Col>
             </Row>
 
-            <Row className="mt-3">
-              <Col xs={12}>
-                <Alert variant="warning">
-                  <div className="row">
-                    <div className="col-md-6">
-                      <p>
-                        <b>Run Entidad Empleadora:</b> {datos.licencia?.rutempleador}
-                      </p>
-                    </div>
-                    <div className="col-md-6">
-                      <p>
-                        <b>Calidad de la Persona Trabajadora:</b>{' '}
-                        {zona2?.calidadtrabajador.calidadtrabajador}
-                      </p>
-                    </div>
-                  </div>
-                </Alert>
-              </Col>
-            </Row>
+            <Row className="mt-3 row  g-3 align-items-baseline">
+              <div className="col-12 col-md-6">
+                <b>RUT Entidad Empleadora:</b> {datos.licencia?.rutempleador}
+              </div>
 
-            <Row className="mt-3">
-              <Col xs={12} md={6}>
-                <p>
-                  <b>RUN: </b> {zona0?.ruttrabajador}
-                </p>
-                <p>
-                  <b>Nombre:</b>{' '}
-                  {!zona0
-                    ? ''
-                    : `${zona0.nombres} ${zona0?.apellidopaterno} ${zona0?.apellidomaterno}`}
-                </p>
-                <p>
-                  <b>Razón social Entidad Empleadora:</b> {empleador?.razonsocial}
-                </p>
-                <p>
-                  <b>Dirección donde cumple funciones:</b> {formatearDireccion()}
-                </p>
-                <p>
-                  <b>Actividad Laboral:</b> {zona1?.actividadlaboral.actividadlaboral}
-                </p>
-                <p>
-                  <b>Ocupación:</b> {zona1?.ocupacion.ocupacion}
-                </p>
-                <p>
-                  <b>Nombre Entidad Pagadora Subsidio:</b> {zona2?.entidadpagadora.entidadpagadora}
-                </p>
-              </Col>
+              <div className="col-12 col-md-6">
+                <b>Razón Social Entidad Empleadora:</b> {empleador?.razonsocial}
+              </div>
 
-              <Col xs={12} md={6}>
-                <p>
+              <div className="col-12 col-md-6">
+                {' '}
+                <b>RUN Persona Trabajadora: </b> {zona0?.ruttrabajador}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <div
+                  className="py-1 border border-warning-subtle"
+                  style={{ backgroundColor: 'var(--bs-warning-bg-subtle)' }}>
                   <b>Folio LME: </b> {zona0?.foliolicencia}
-                </p>
-                <p>
-                  <b>Fecha primera afiliación:</b> {formatearFecha(zona2?.fechaafiliacion)}
-                </p>
-                <p>
-                  <b>Institución Provisional:</b> {zona2?.entidadprevisional.glosa}
-                </p>
-                <p>
-                  <b>Afiliado a AFC:</b> {zona2 && zona2.codigoseguroafc === 1 ? 'SÍ' : 'NO'}
-                </p>
-                <p>
-                  <b>Contrato de duración Indefinida:</b>{' '}
-                  {zona2 && zona2.codigocontratoindef === 1 ? 'SÍ' : 'NO'}
-                </p>
-                <p>
-                  <b>Fecha Contrato:</b> {formatearFecha(zona2?.fechacontrato)}
-                </p>
-                <p>
-                  <b>{datos.licencia?.tiporesposo.tiporeposo}</b> por{' '}
-                  <b>{datos.licencia?.diasreposo} días(s)</b> desde el{' '}
-                  <b>{formatearFecha(datos.licencia?.fechainicioreposo)} </b>
-                  al <b>{calcularFechaFin(datos.licencia)}</b>
-                </p>
-              </Col>
+                </div>
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Nombre:</b>{' '}
+                {!zona0
+                  ? ''
+                  : `${zona0.nombres} ${zona0?.apellidopaterno} ${zona0?.apellidomaterno}`}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Fecha Primera Afiliación:</b> {formatearFecha(zona2?.fechaafiliacion)}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Calidad de la Persona Trabajadora:</b>{' '}
+                {zona2?.calidadtrabajador.calidadtrabajador}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Institución Previsional:</b> {zona2?.entidadprevisional.glosa}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Dirección donde cumple funciones:</b> {formatearDireccion()}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Afiliado a AFC:</b> {zona2 && zona2.codigoseguroafc === 1 ? 'SÍ' : 'NO'}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Actividad Laboral:</b> {zona1?.actividadlaboral.actividadlaboral}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Contrato de Duración Indefinida: </b>
+                {zona2 && zona2.codigocontratoindef === 1 ? 'SÍ' : 'NO'}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Ocupación:</b> {zona1?.ocupacion.ocupacion}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Fecha Contrato:</b> {formatearFecha(zona2?.fechacontrato)}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>Nombre Entidad Pagadora Subsidio:</b> {zona2?.entidadpagadora.entidadpagadora}
+              </div>
+
+              <div className="col-12 col-md-6">
+                <b>{datos.licencia?.tiporesposo.tiporeposo}</b> por{' '}
+                <b>{datos.licencia?.diasreposo} días(s)</b> desde el{' '}
+                <b>{formatearFecha(datos.licencia?.fechainicioreposo)} </b>
+                al <b>{calcularFechaFin(datos.licencia)}</b>
+              </div>
             </Row>
 
             <hr />
@@ -366,7 +368,6 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                     </Tr>
                   </Thead>
                   <Tbody className="text-center">
-
                     {(zona3?.licenciazc3adjuntos ?? []).map(
                       ({ idtipoadjunto, nombrelocal, idpiielicenciaszc3adjuntos }) => (
                         <Tr key={idpiielicenciaszc3adjuntos}>

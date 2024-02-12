@@ -1,5 +1,13 @@
 import { useLayoutEffect, useState } from 'react';
 
+export enum BootstrapBreakpoint {
+  SM = 576,
+  MD = 768,
+  LG = 992,
+  XL = 1200,
+  XXL = 1400,
+}
+
 /**
  * Hook para obtener el ancho de la centana
  * @returns

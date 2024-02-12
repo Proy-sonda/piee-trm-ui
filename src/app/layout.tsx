@@ -1,6 +1,7 @@
 import AppFooter from '@/components/footer/footer';
 import Version from '@/components/footer/version';
 import AppHeader from '@/components/header/header';
+import Marquesina from '@/components/marquesina';
 import Position from '@/components/stage/position';
 import { AuthProvider } from '@/contexts';
 import 'animate.css';
@@ -37,6 +38,7 @@ export default function RootLayout(
             <AppHeader />
 
             <main className="bg-white shadow-sm">
+              <Marquesina />
               <Position />
 
               <div>{children}</div>

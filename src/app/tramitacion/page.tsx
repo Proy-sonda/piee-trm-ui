@@ -1,10 +1,11 @@
 'use client';
 
 import { Titulo } from '@/components';
+import ExportarTabla from '@/components/exportar-tabla';
 import { useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores } from '@/servicios';
 import { strIncluye } from '@/utilidades';
-import { isWithinInterval } from 'date-fns';
+import { format, isWithinInterval } from 'date-fns';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 import {
@@ -110,6 +111,32 @@ const TramitacionPage = () => {
 
         <div className="row mt-3">
           <div className="col-md-12">
+            <div className="text-end">
+              <ExportarTabla
+                nombre={`bandeja-tramitacion-${format(new Date(), "dd-MM-yyyy '-' HH-mm")}`}
+                data={datosBandeja?.empleadores.map((value) => {
+                  return {
+                    idempleador: value.idempleador,
+                    'Rut Empleador': value.rutempleador,
+                    'Razon Social': value.razonsocial,
+                    Telefono: value.telefonohabitual,
+                    'Telefono movil': value.telefonomovil,
+                    Email: value.email,
+                    Estado: value.estadoempleador.estadoempleador,
+                    Direccion: `${value.direccionempleador.calle} ${value.direccionempleador.numero} ${value.direccionempleador.comuna.nombre}`,
+                    CCAF: value.ccaf.nombre,
+                    Tamano: value.tamanoempresa.descripcion,
+                    'Tipo de Entidad Empleadora': value.tipoempleador.tipoempleador,
+                    'Sistema remuneracion': value.sistemaremuneracion.descripcion,
+                    'Fecha Registro': format(new Date(value.fecharegistro), 'dd/MM/yyyy HH:mm:ss'),
+                    'Actividad Laboral': value.actividadlaboral.actividadlaboral.replaceAll(
+                      ',',
+                      ' ',
+                    ),
+                  };
+                })}
+              />
+            </div>
             <TablaLicenciasTramitar
               empleadores={datosBandeja?.empleadores ?? []}
               licencias={licenciasFiltradas}
