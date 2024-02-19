@@ -157,8 +157,16 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
                 className="text-center align-middle">
                 <td className="px-4 py-3">
-                  {/* TODO: Cambiar el color del circulo de acuerdo al estado */}
-                  <div className={`mb-2 ${styles.circlered}`}></div>
+                  {/* Validamos si la fecha de hoy es menor a la fechaultimodiatramite y si es el mismo día debe mostrar el circulo amarillo */}
+                  {new Date(licencia.fechaultimodiatramite) > new Date() ? (
+                    <div className={`mb-2 ${styles.circlegreen}`}></div>
+                  ) : new Date(licencia.fechaultimodiatramite).getDate() ===
+                    new Date().getDate() ? ( // Si es el mismo día
+                    <div className={`mb-2 ${styles.circleyellow}`}></div>
+                  ) : (
+                    <div className={`mb-2 ${styles.circlered}`}></div>
+                  )}
+
                   <div className="small mb-1 text-nowrap">{licencia.operador.operador}</div>
                   <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
                   <div className="small mb-1 text-nowrap">{licencia.entidadsalud.nombre}</div>

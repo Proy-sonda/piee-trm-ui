@@ -43,3 +43,7 @@
 .filtrocolor:hover {
   background-color: var(--color-blue);
 }
+
+.active-color {
+  background-color: var(--color-blue);
+}
