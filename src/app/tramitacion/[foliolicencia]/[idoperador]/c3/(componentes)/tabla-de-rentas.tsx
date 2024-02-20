@@ -49,29 +49,10 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
 
   const formulario = useFormContext<FormularioC3>();
   const [, configuracion] = useFetch(BuscarConfiguracion());
-  const [valorMontoMaxRenta, setvalorMontoMaxRenta] = useState(0);
   const [desglosehaberesopcional, setdesglosehaberesopcional] = useState(true);
 
   useEffect(() => {
     if (configuracion) {
-      // validamos la fecha de vigencia sea mayor a la actual
-      const fechaVigenciamtmax = new Date(
-        configuracion?.find((x) => x.codigoparametro === ENUM_CONFIGURACION.MONTO_MAXIMO_RENTA)!
-          ?.fechavigencia!,
-      );
-      const fechaActualmtmax = new Date();
-      if (fechaVigenciamtmax < fechaActualmtmax) {
-        // en caso de estar fuera de la fecha de vigencia lo seteamos en 5 millones como por default
-        setvalorMontoMaxRenta(5000000);
-      } else {
-        setvalorMontoMaxRenta(
-          Number(
-            configuracion?.find((x) => x.codigoparametro === ENUM_CONFIGURACION.MONTO_MAXIMO_RENTA)!
-              ?.valor,
-          ),
-        );
-      }
-
       // validamos la fecha de vigencia sea mayor a la fecha actual
       const fechaVigencia = new Date(
         configuracion?.find((x) => x.codigoparametro === ENUM_CONFIGURACION.VALIDA_INGRESO_HABERES)!
@@ -278,7 +259,6 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                         className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
                         ref={index === 0 ? totalRemuneracion : undefined}>
                         <InputMonto
-                          montoMaximo={valorMontoMaxRenta}
                           opcional={
                             fieldArray === 'remuneracionesMaternidad' ||
                             index !== 0 ||
@@ -362,7 +342,6 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                         className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
                         ref={index === 0 ? totalRemuneracion : undefined}>
                         <InputMonto
-                          montoMaximo={valorMontoMaxRenta}
                           opcional={
                             fieldArray === 'remuneracionesMaternidad' ||
                             index !== 0 ||
@@ -381,7 +360,6 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                     </Td>
                     <Td>
                       <InputMonto
-                        montoMaximo={valorMontoMaxRenta}
                         opcional
                         name={`${fieldArray}.${index}.montoIncapacidad`}
                         unirConFieldArray={{
@@ -506,7 +484,6 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                         </div>
 
                         <InputDesgloseDeHaberes
-                          montoMaximo={valorMontoMaxRenta}
                           opcional={desglosehaberesopcional}
                           name={`${fieldArray}.${index}.desgloseHaberes`}
                           montoImponibleName={`${fieldArray}.${index}.${TIPO_MONTO_NAME}`}

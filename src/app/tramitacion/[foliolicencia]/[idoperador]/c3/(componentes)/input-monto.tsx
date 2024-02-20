@@ -34,10 +34,17 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
 }) => {
   const montoMinimoFinal = montoMinimo ?? 0;
   const [, configuracion] = useFetch(BuscarConfiguracion());
-  const [montoMaximoFinal, setmontoMaximoFinal] = useState(5000000);
+  const [montoMaximoFinal, setmontoMaximoFinal] = useState(montoMaximo ?? 5000000);
   useEffect(() => {
     if (configuracion) {
+      const fechaActual = new Date();
       if (name === 'remuneracionImponiblePrevisional') {
+        const fechavigencia = new Date(
+          configuracion.find(
+            (c) => c.codigoparametro === ENUM_CONFIGURACION.MONTO_MAXIMO_ULTIMA_RENTA,
+          )!?.fechavigencia,
+        );
+        if (fechaActual > fechavigencia) return;
         return setmontoMaximoFinal(
           Number(
             configuracion.find(
@@ -46,6 +53,12 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
           ),
         );
       }
+
+      const fechaVigencia = new Date(
+        configuracion.find((c) => c.codigoparametro === ENUM_CONFIGURACION.MONTO_MAXIMO_RENTA)!
+          ?.fechavigencia,
+      );
+      if (fechaActual > fechaVigencia) return;
       setmontoMaximoFinal(
         Number(
           configuracion.find((c) => c.codigoparametro === ENUM_CONFIGURACION.MONTO_MAXIMO_RENTA)
