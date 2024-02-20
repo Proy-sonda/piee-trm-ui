@@ -40,47 +40,30 @@ const TramitacionPage = () => {
 
   // Filtrar licencias
   useEffect(() => {
-    const licenciasParaFiltrar =
-      datosBandeja?.licenciasParaTramitar.filter((x) =>
-        filtroEstado === 'todos'
-          ? true
-          : filtroEstado === 'por-tramitar'
-          ? new Date(x.fechaultimodiatramite) > new Date()
-          : filtroEstado === 'por-vencer'
-          ? new Date(x.fechaultimodiatramite).getDate() === new Date().getDate()
-          : filtroEstado === 'vencido'
-          ? new Date(x.fechaultimodiatramite) < new Date()
-          : true,
-      ) ?? [];
+    const licenciasParaFiltrar = datosBandeja?.licenciasParaTramitar ?? [];
 
     setLicenciasFiltradas(
       licenciasParaFiltrar.filter(licenciaCumple(filtrosBusqueda, filtroEstado)),
     );
-    if (licenciasParaFiltrar.length === 0) {
-      setnoExisteLicencia(true);
-    } else {
-      setnoExisteLicencia(false);
-    }
   }, [filtrosBusqueda, filtroEstado, datosBandeja?.licenciasParaTramitar]);
 
   const licenciaCumple = (filtros: FiltroBusquedaLicencias, filtroEstado: FiltroEstadoLicencia) => {
     return (licencia: LicenciaTramitar) => {
-      if (!hayFiltros(filtros)) {
-        return true;
-      }
-
       const coincideColor =
-        filtroEstado === 'vencido'
-          ? new Date(licencia.fechaultimodiatramite) < new Date()
-          : filtroEstado === 'por-vencer'
-          ? new Date(licencia.fechaultimodiatramite).getDate() === new Date().getDate()
+        filtroEstado === 'todos'
+          ? true
           : filtroEstado === 'por-tramitar'
           ? new Date(licencia.fechaultimodiatramite) > new Date()
-          : filtroEstado === 'todos'
-          ? true
-          : false;
-      const coincideFolio = strIncluye(licencia.foliolicencia, filtros.folio);
+          : filtroEstado === 'por-vencer'
+          ? new Date(licencia.fechaultimodiatramite).getDate() === new Date().getDate()
+          : filtroEstado === 'vencido'
+          ? new Date(licencia.fechaultimodiatramite).getDate() < new Date().getDate()
+          : true;
 
+      if (!hayFiltros(filtros)) {
+        return coincideColor;
+      }
+      const coincideFolio = strIncluye(licencia.foliolicencia, filtros.folio);
       const coincideRun = strIncluye(licencia.runtrabajador, filtros.runPersonaTrabajadora);
 
       let enRangoFechas = true;
@@ -95,6 +78,11 @@ const TramitacionPage = () => {
         licencia.rutempleador,
         filtros.rutEntidadEmpleadora,
       );
+      if (licenciasFiltradas.length == 0) {
+        setnoExisteLicencia(true);
+      } else {
+        setnoExisteLicencia(false);
+      }
 
       return (
         coincideFolio && coincideRun && enRangoFechas && coincideEntidadEmpleadora && coincideColor

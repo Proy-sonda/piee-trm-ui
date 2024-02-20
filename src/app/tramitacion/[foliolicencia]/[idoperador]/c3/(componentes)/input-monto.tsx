@@ -1,6 +1,9 @@
 import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { useInputReciclable } from '@/components/form/hooks';
-import React from 'react';
+import { useFetch } from '@/hooks';
+import { ENUM_CONFIGURACION } from '@/modelos/enum/configuracion';
+import { BuscarConfiguracion } from '@/servicios/buscar-configuracion';
+import React, { useEffect, useState } from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
@@ -30,7 +33,27 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
   onBlur: onBlurHandler,
 }) => {
   const montoMinimoFinal = montoMinimo ?? 0;
-  const montoMaximoFinal = montoMaximo ?? 5_000_000;
+  const [, configuracion] = useFetch(BuscarConfiguracion());
+  const [montoMaximoFinal, setmontoMaximoFinal] = useState(5000000);
+  useEffect(() => {
+    if (configuracion) {
+      if (name === 'remuneracionImponiblePrevisional') {
+        return setmontoMaximoFinal(
+          Number(
+            configuracion.find(
+              (c) => c.codigoparametro === ENUM_CONFIGURACION.MONTO_MAXIMO_ULTIMA_RENTA,
+            )?.valor,
+          ),
+        );
+      }
+      setmontoMaximoFinal(
+        Number(
+          configuracion.find((c) => c.codigoparametro === ENUM_CONFIGURACION.MONTO_MAXIMO_RENTA)
+            ?.valor,
+        ),
+      );
+    }
+  }, [configuracion]);
 
   const { register, setValue } = useFormContext();
 
@@ -67,6 +90,9 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
               message: `No puede ser mayor a $${montoMaximoFinal.toLocaleString()}`,
             },
             onChange: (event: any) => {
+              if (event.target.value.length > 9) {
+                event.target.value = event.target.value.slice(0, 9);
+              }
               const regex = /[^0-9-]/g; // Solo numeros enteros
               let montoImponible = event.target.value as string;
 

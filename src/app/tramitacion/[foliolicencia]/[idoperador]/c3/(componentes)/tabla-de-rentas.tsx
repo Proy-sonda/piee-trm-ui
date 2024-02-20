@@ -381,6 +381,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                     </Td>
                     <Td>
                       <InputMonto
+                        montoMaximo={valorMontoMaxRenta}
                         opcional
                         name={`${fieldArray}.${index}.montoIncapacidad`}
                         unirConFieldArray={{
@@ -505,6 +506,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                         </div>
 
                         <InputDesgloseDeHaberes
+                          montoMaximo={valorMontoMaxRenta}
                           opcional={desglosehaberesopcional}
                           name={`${fieldArray}.${index}.desgloseHaberes`}
                           montoImponibleName={`${fieldArray}.${index}.${TIPO_MONTO_NAME}`}
