@@ -1,6 +1,8 @@
 'use client';
 
+import { useFetch } from '@/hooks';
 import { useUrl } from '@/hooks/use-url';
+import { ENUM_CONFIGURACION } from '@/modelos/enum/configuracion';
 import { UsuarioToken } from '@/modelos/usuario';
 import {
   desloguearUsuario,
@@ -10,6 +12,7 @@ import {
   obtenerUsuarioDeCookie,
   renovarToken,
 } from '@/servicios/auth';
+import { BuscarConfigSesion, BuscarConfiguracion } from '@/servicios/buscar-configuracion';
 import { thresholdAlertaExpiraSesion } from '@/servicios/environment';
 import { AlertaConfirmacion, AlertaError } from '@/utilidades';
 import { useRouter } from 'next/navigation';
@@ -64,6 +67,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [listaguia, setlistaguia] = useState<{ indice: number; nombre: string; activo: boolean }[]>(
     [],
   );
+
+  const [, configuracion] = useFetch(BuscarConfiguracion());
+  const [, configuracionSesion] = useFetch(BuscarConfigSesion());
 
   const [guia, setguia] = useState<boolean>(false);
 
@@ -131,6 +137,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   // Alerta de expiracion de sesion
   useEffect(() => {
+    if (!configuracion) return;
     const usuario = obtenerUsuarioDeCookie();
     if (!usuario) {
       return;
@@ -140,7 +147,36 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     clearTimeout(idTimeoutAlerta);
 
     // prettier-ignore
-    const tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+
+    // verificamos si el tiempo de configuración esta en la fecha correcta
+    let tiempoParaMostrarAlerta;
+    if (configuracion.find((c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION)) {
+      const fechaConfiguracion = new Date(
+        configuracion.find(
+          (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION,
+        )!.fechavigencia,
+      );
+      const fechaActual = new Date();
+      if (fechaActual > fechaConfiguracion) {
+        tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+      } else {
+        let tiempo = configuracionSesion?.find(
+          (cs) =>
+            cs.idtiemposesion ==
+            Number(
+              configuracion.find(
+                (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION,
+              )!.valor,
+            ),
+        )!.descripcion;
+
+        let tiempoEnMilisegundos = Number(tiempo?.substring(0, 2).trim()) * 60000;
+
+        tiempoParaMostrarAlerta = tiempoEnMilisegundos - thresholdAlertaExpiraSesion();
+      }
+    } else {
+      tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+    }
     if (tiempoParaMostrarAlerta < 0) {
       logout(); // por si acaso
       redirigirConSesionExpirada();
@@ -152,7 +188,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return () => {
       clearTimeout(idTimeoutAlerta);
     };
-  }, [usuario]);
+  }, [usuario, configuracion]);
 
   const redirigirConSesionExpirada = () => {
     const searchParams = new URLSearchParams({ redirectTo: fullPath });

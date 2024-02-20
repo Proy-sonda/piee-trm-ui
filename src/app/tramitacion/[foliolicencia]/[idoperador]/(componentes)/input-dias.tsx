@@ -60,6 +60,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
         <Form.Control
           type="number"
           inputMode="numeric"
+          maxLength={2}
           disabled={deshabilitado === true}
           style={{ textAlign: 'right' }}
           isInvalid={tieneError}
@@ -98,6 +99,9 @@ export const InputDias: React.FC<InputDiasProps> = ({
               },
             },
             onChange: (event: any) => {
+              if (event.target.value.length > 2) {
+                event.target.value = event.target.value.slice(0, 2);
+              }
               const regex = /[^0-9-]/g; // solo números enteros
               let dias = event.target.value as string;
 
