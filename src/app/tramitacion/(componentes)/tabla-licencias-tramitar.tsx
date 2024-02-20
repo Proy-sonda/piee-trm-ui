@@ -10,12 +10,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import {
-  LicenciaTramitar,
-  licenciaEnviadaHaciaOperadores,
-  licenciaSePuedeTramitar,
-} from '../(modelos)/licencia-tramitar';
-import { agregarEstadoDeTramitacion } from '../(servicios)/agregar-estado-de-tramitacion';
+import { LicenciaTramitar } from '../(modelos)';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -33,8 +28,8 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: licencias,
     tamanoPagina: 5,
-    porCadaElemento: agregarEstadoDeTramitacion,
   });
+
   const [loading, setloading] = useState(false);
   const target = useRef(null);
 
@@ -210,41 +205,12 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <IfContainer show={licenciaSePuedeTramitar(licencia)}>
-                      <Link
-                        className="btn btn-sm btn-success"
-                        onClick={() => setloading(true)}
-                        href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
-                        <small className="text-nowrap">TRAMITAR</small>
-                      </Link>
-                    </IfContainer>
-                    <IfContainer show={!licenciaSePuedeTramitar(licencia)}>
-                      {!licenciaEnviadaHaciaOperadores(licencia) ? (
-                        <button
-                          className="btn btn-sm btn-warning"
-                          onClick={(e) =>
-                            AlertaInformacion.fire(
-                              'En Proceso...',
-                              `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en proceso de tramitación.`,
-                            )
-                          }
-                          title="En proceso de tramitación">
-                          En Proceso...
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-sm btn-warning"
-                          onClick={(e) =>
-                            AlertaInformacion.fire(
-                              'Recibido por operador...',
-                              `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en el operador.`,
-                            )
-                          }
-                          title="Recibido por operador">
-                          Recibido...
-                        </button>
-                      )}
-                    </IfContainer>
+                    <Link
+                      className="btn btn-sm btn-success"
+                      onClick={() => setloading(true)}
+                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
+                      <small className="text-nowrap">TRAMITAR</small>
+                    </Link>
 
                     <button
                       className="btn btn-sm btn-primary"
@@ -256,14 +222,13 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                       }}>
                       <small className="text-nowrap">VER PDF</small>
                     </button>
-                    <IfContainer show={licenciaSePuedeTramitar(licencia)}>
-                      <Link
-                        className="btn btn-sm btn-danger"
-                        onClick={() => setloading(true)}
-                        href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
-                        <small className="text-nowrap"> NO RECEPCIONAR</small>
-                      </Link>
-                    </IfContainer>
+
+                    <Link
+                      className="btn btn-sm btn-danger"
+                      onClick={() => setloading(true)}
+                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
+                      <small className="text-nowrap"> NO RECEPCIONAR</small>
+                    </Link>
                   </Stack>
                 </td>
               </tr>

@@ -8,7 +8,12 @@ import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import { LicenciaTramitada } from '../(modelos)';
+import {
+  LicenciaTramitada,
+  licenciaFueEnviadaAlOperador,
+  licenciaFueTramitadaPorEmpleador,
+  licenciaFueTramitadaPorOperador,
+} from '../(modelos)';
 import styles from './tabla-licencias-tramitadas.module.css';
 
 // prettier-ignore
@@ -189,13 +194,43 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
               </td>
               <td>
                 <Stack gap={2}>
-                  <button className="btn btn-sm btn-primary">
-                    <small
-                      className="text-nowrap"
-                      onClick={() => imprimirComprobanteTramitacion(licencia)}>
-                      COMPROBANTE TRAMITACIÓN
-                    </small>
-                  </button>
+                  <IfContainer show={licenciaFueEnviadaAlOperador(licencia)}>
+                    <button
+                      className="btn btn-sm btn-warning"
+                      onClick={() => {
+                        AlertaInformacion.fire(
+                          'Recibido por operador...',
+                          `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en el operador.`,
+                        );
+                      }}
+                      title="Recibido por operador">
+                      Recibido...
+                    </button>
+                  </IfContainer>
+
+                  <IfContainer show={licenciaFueTramitadaPorEmpleador(licencia)}>
+                    <button
+                      className="btn btn-sm btn-warning"
+                      onClick={() => {
+                        AlertaInformacion.fire(
+                          'En Proceso...',
+                          `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en proceso de tramitación.`,
+                        );
+                      }}
+                      title="En proceso de tramitación">
+                      En Proceso...
+                    </button>
+                  </IfContainer>
+
+                  <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
+                    <button className="btn btn-sm btn-primary">
+                      <small
+                        className="text-nowrap"
+                        onClick={() => imprimirComprobanteTramitacion(licencia)}>
+                        COMPROBANTE TRAMITACIÓN
+                      </small>
+                    </button>
+                  </IfContainer>
 
                   <button
                     className="btn btn-sm btn-primary"
