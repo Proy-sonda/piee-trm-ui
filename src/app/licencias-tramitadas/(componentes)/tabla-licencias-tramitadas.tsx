@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import {
   LicenciaTramitada,
+  licenciaConErrorDeEnvio,
   licenciaFueEnviadaAlOperador,
   licenciaFueTramitadaPorEmpleador,
   licenciaFueTramitadaPorOperador,
@@ -219,6 +220,20 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                       }}
                       title="En proceso de tramitación">
                       En Proceso...
+                    </button>
+                  </IfContainer>
+
+                  <IfContainer show={licenciaConErrorDeEnvio(licencia)}>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => {
+                        AlertaInformacion.fire(
+                          'En reproceso',
+                          `Hubo en error en el envio de la licencia con folio <b>${licencia.foliolicencia}</b> y se encuentra a la espera de ser enviada nuevamente al operador.`,
+                        );
+                      }}
+                      title="En proceso de tramitación">
+                      En reproceso...
                     </button>
                   </IfContainer>
 

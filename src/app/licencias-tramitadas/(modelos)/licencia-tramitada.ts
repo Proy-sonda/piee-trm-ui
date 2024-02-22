@@ -75,3 +75,7 @@ export const licenciaFueEnviadaAlOperador = ({ estadotramitacion }: LicenciaTram
 export const licenciaFueTramitadaPorOperador = ({ estadotramitacion }: LicenciaTramitada) => {
   return estadotramitacion.idestadotramitacion === 4;
 };
+
+export const licenciaConErrorDeEnvio = ({ estadotramitacion }: LicenciaTramitada) => {
+  return estadotramitacion.idestadotramitacion === 30;
+};
