@@ -10,6 +10,7 @@ import {
   loguearUsuario,
   obtenerToken,
   obtenerUsuarioDeCookie,
+  obtenerValidacionAdscripcion,
   renovarToken,
 } from '@/servicios/auth';
 import { BuscarConfigSesion, BuscarConfiguracion } from '@/servicios/buscar-configuracion';
@@ -114,6 +115,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   // Recargar usuario del token
   useEffect(() => {
     const usuario = obtenerUsuarioDeCookie();
+
     if (!usuario) {
       return;
     }
@@ -142,6 +144,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!usuario) {
       return;
     }
+    const validaAds = obtenerValidacionAdscripcion();
 
     let idTimeoutAlerta: NodeJS.Timeout | undefined;
     clearTimeout(idTimeoutAlerta);
@@ -150,33 +153,75 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     // verificamos si el tiempo de configuración esta en la fecha correcta
     let tiempoParaMostrarAlerta;
-    if (configuracion.find((c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION)) {
-      const fechaConfiguracion = new Date(
+
+    if (!validaAds) {
+      if (
         configuracion.find(
-          (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION,
-        )!.fechavigencia,
-      );
-      const fechaActual = new Date();
-      if (fechaActual > fechaConfiguracion) {
-        tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+          (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION_TRAMITACION,
+        )
+      ) {
+        const fechaConfiguracion = new Date(
+          configuracion.find(
+            (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION_TRAMITACION,
+          )!.fechavigencia,
+        );
+        const fechaActual = new Date();
+        if (fechaActual > fechaConfiguracion) {
+          tiempoParaMostrarAlerta =
+            usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+        } else {
+          let tiempo = configuracionSesion?.find(
+            (cs) =>
+              cs.idtiemposesion ==
+              Number(
+                configuracion.find(
+                  (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION_TRAMITACION,
+                )!.valor,
+              ),
+          )!?.descripcion;
+
+          let tiempoEnMilisegundos = Number(tiempo?.substring(0, 2).trim()) * 60000;
+
+          tiempoParaMostrarAlerta = tiempoEnMilisegundos - thresholdAlertaExpiraSesion();
+        }
       } else {
-        let tiempo = configuracionSesion?.find(
-          (cs) =>
-            cs.idtiemposesion ==
-            Number(
-              configuracion.find(
-                (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION,
-              )!.valor,
-            ),
-        )!.descripcion;
-
-        let tiempoEnMilisegundos = Number(tiempo?.substring(0, 2).trim()) * 60000;
-
-        tiempoParaMostrarAlerta = tiempoEnMilisegundos - thresholdAlertaExpiraSesion();
+        tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
       }
     } else {
-      tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+      if (
+        configuracion.find(
+          (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION_ADSCRIPCION,
+        )
+      ) {
+        const fechaConfiguracion = new Date(
+          configuracion.find(
+            (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION_ADSCRIPCION,
+          )!.fechavigencia,
+        );
+        const fechaActual = new Date();
+        if (fechaActual > fechaConfiguracion) {
+          tiempoParaMostrarAlerta =
+            usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+        } else {
+          let tiempo = configuracionSesion?.find(
+            (cs) =>
+              cs.idtiemposesion ==
+              Number(
+                configuracion.find(
+                  (c) => c.codigoparametro === ENUM_CONFIGURACION.ACTIVA_CIERRE_SESION_ADSCRIPCION,
+                )!.valor,
+              ),
+          )!?.descripcion;
+
+          let tiempoEnMilisegundos = Number(tiempo?.substring(0, 2).trim()) * 60000;
+
+          tiempoParaMostrarAlerta = tiempoEnMilisegundos - thresholdAlertaExpiraSesion();
+        }
+      } else {
+        tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
+      }
     }
+
     if (tiempoParaMostrarAlerta < 0) {
       logout(); // por si acaso
       redirigirConSesionExpirada();
