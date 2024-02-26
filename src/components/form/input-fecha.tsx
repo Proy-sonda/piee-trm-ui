@@ -176,6 +176,10 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   clearErrors(noPosteriorA);
                 }
 
+                if (!esFechaInvalida(desde) && isAfter(fecha, desde)) {
+                  clearErrors(noPosteriorA);
+                }
+
                 clearErrors(noAnteriorA);
               },
             },

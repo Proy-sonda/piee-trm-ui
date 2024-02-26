@@ -1,6 +1,6 @@
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import styles from './semaforo-licencias.module.css';
 
 export type FiltroEstadoLicencia = 'todos' | 'por-tramitar' | 'por-vencer' | 'vencido';
@@ -25,6 +25,7 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
     { color: 'circleyellow', label: 'Por Vencer', value: 'por-vencer' },
     { color: 'circlered', label: 'Vencido', value: 'vencido' },
   ];
+  const [activo, setactivo] = useState('');
 
   return (
     <>
@@ -119,8 +120,15 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
             key={index}
             className={`text-start cursor-pointer ${styles.filtrocolor} ${
               listaguia[3]!?.activo && guia ? 'overlay-marco' : ''
-            }`}
-            onClick={() => onEstadoSeleccionado(semaforo.value)}>
+            }${activo === semaforo.value ? `${styles['active-color']}` : ''}`}
+            onClick={() => {
+              onEstadoSeleccionado(semaforo.value);
+              setactivo(semaforo.value);
+              if (activo === semaforo.value) {
+                setactivo('');
+                onEstadoSeleccionado('todos');
+              }
+            }}>
             <span className={`me-1 ${styles.circle} ${styles[semaforo.color]}`}></span>
             <label className="cursor-pointer">{semaforo.label}</label>
           </div>

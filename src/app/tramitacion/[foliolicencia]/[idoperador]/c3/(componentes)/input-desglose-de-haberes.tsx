@@ -40,7 +40,10 @@ export const InputDesgloseDeHaberes: React.FC<InputDesgloseDeHaberes> = ({
               message: 'El desglose de haberes es obligatorio',
             },
             validate: {
-              coincideConMontoTotal: (desglose: DesgloseDeHaberes | Record<string, never>) => {
+              coincideConMontoTotal: (desglose: DesgloseDeHaberes) => {
+                if (!opcional && !existeDesglose(desglose)) {
+                  return 'El desglose de haberes es obligatorio';
+                }
                 if (!existeDesglose(desglose)) {
                   return;
                 }

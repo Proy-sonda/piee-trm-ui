@@ -29,6 +29,7 @@ const TramitacionPage = () => {
   const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitar[]>([]);
   const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltroBusquedaLicencias>({});
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstadoLicencia>('todos');
+  const [noExisteLicencia, setnoExisteLicencia] = useState(false);
 
   // Actualizar listado de licencias
   useEffect(() => {
@@ -48,12 +49,21 @@ const TramitacionPage = () => {
 
   const licenciaCumple = (filtros: FiltroBusquedaLicencias, filtroEstado: FiltroEstadoLicencia) => {
     return (licencia: LicenciaTramitar) => {
+      const coincideColor =
+        filtroEstado === 'todos'
+          ? true
+          : filtroEstado === 'por-tramitar'
+          ? new Date(licencia.fechaultimodiatramite) > new Date()
+          : filtroEstado === 'por-vencer'
+          ? new Date(licencia.fechaultimodiatramite).getDate() === new Date().getDate()
+          : filtroEstado === 'vencido'
+          ? new Date(licencia.fechaultimodiatramite).getDate() < new Date().getDate()
+          : true;
+
       if (!hayFiltros(filtros)) {
-        return true;
+        return coincideColor;
       }
-
       const coincideFolio = strIncluye(licencia.foliolicencia, filtros.folio);
-
       const coincideRun = strIncluye(licencia.runtrabajador, filtros.runPersonaTrabajadora);
 
       let enRangoFechas = true;
@@ -68,8 +78,15 @@ const TramitacionPage = () => {
         licencia.rutempleador,
         filtros.rutEntidadEmpleadora,
       );
+      if (licenciasFiltradas.length == 0) {
+        setnoExisteLicencia(true);
+      } else {
+        setnoExisteLicencia(false);
+      }
 
-      return coincideFolio && coincideRun && enRangoFechas && coincideEntidadEmpleadora;
+      return (
+        coincideFolio && coincideRun && enRangoFechas && coincideEntidadEmpleadora && coincideColor
+      );
     };
   };
 
@@ -112,35 +129,46 @@ const TramitacionPage = () => {
         <div className="row mt-3">
           <div className="col-md-12">
             <div className="text-end">
-              <ExportarTabla
-                nombre={`bandeja-tramitacion-${format(new Date(), "dd-MM-yyyy '-' HH-mm")}`}
-                data={datosBandeja?.empleadores.map((value) => {
-                  return {
-                    idempleador: value.idempleador,
-                    'Rut Empleador': value.rutempleador,
-                    'Razon Social': value.razonsocial,
-                    Telefono: value.telefonohabitual,
-                    'Telefono movil': value.telefonomovil,
-                    Email: value.email,
-                    Estado: value.estadoempleador.estadoempleador,
-                    Direccion: `${value.direccionempleador.calle} ${value.direccionempleador.numero} ${value.direccionempleador.comuna.nombre}`,
-                    CCAF: value.ccaf.nombre,
-                    Tamano: value.tamanoempresa.descripcion,
-                    'Tipo de Entidad Empleadora': value.tipoempleador.tipoempleador,
-                    'Sistema remuneracion': value.sistemaremuneracion.descripcion,
-                    'Fecha Registro': format(new Date(value.fecharegistro), 'dd/MM/yyyy HH:mm:ss'),
-                    'Actividad Laboral': value.actividadlaboral.actividadlaboral.replaceAll(
-                      ',',
-                      ' ',
-                    ),
-                  };
-                })}
-              />
+              <IfContainer show={!noExisteLicencia}>
+                <ExportarTabla
+                  nombre={`bandeja-tramitacion-${format(new Date(), "dd-MM-yyyy '-' HH-mm")}`}
+                  data={datosBandeja?.empleadores.map((value) => {
+                    return {
+                      idempleador: value.idempleador,
+                      'Rut Empleador': value.rutempleador,
+                      'Razon Social': value.razonsocial,
+                      Telefono: value.telefonohabitual,
+                      'Telefono movil': value.telefonomovil,
+                      Email: value.email,
+                      Estado: value.estadoempleador.estadoempleador,
+                      Direccion: `${value.direccionempleador.calle} ${value.direccionempleador.numero} ${value.direccionempleador.comuna.nombre}`,
+                      CCAF: value.ccaf.nombre,
+                      Tamano: value.tamanoempresa.descripcion,
+                      'Tipo de Entidad Empleadora': value.tipoempleador.tipoempleador,
+                      'Sistema remuneracion': value.sistemaremuneracion.descripcion,
+                      'Fecha Registro': format(
+                        new Date(value.fecharegistro),
+                        'dd/MM/yyyy HH:mm:ss',
+                      ),
+                      'Actividad Laboral': value.actividadlaboral.actividadlaboral.replaceAll(
+                        ',',
+                        ' ',
+                      ),
+                    };
+                  })}
+                />
+              </IfContainer>
             </div>
-            <TablaLicenciasTramitar
-              empleadores={datosBandeja?.empleadores ?? []}
-              licencias={licenciasFiltradas}
-            />
+
+            <IfContainer show={noExisteLicencia}>
+              <h4 className="text-center mt-5">No existen licencias para mostrar</h4>
+            </IfContainer>
+            <IfContainer show={!noExisteLicencia}>
+              <TablaLicenciasTramitar
+                empleadores={datosBandeja?.empleadores ?? []}
+                licencias={licenciasFiltradas}
+              />
+            </IfContainer>
           </div>
         </div>
       </IfContainer>

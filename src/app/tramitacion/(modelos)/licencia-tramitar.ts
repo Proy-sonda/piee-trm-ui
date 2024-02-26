@@ -17,8 +17,8 @@ export interface LicenciaTramitar {
   jornadareposo: Jornadareposo;
   tiporesposo: Tiporesposo;
   entidadsalud: Entidadsalud;
-
   estadoTramitacion?: Estadotramitacion;
+  fechaultimodiatramite: Date;
 }
 
 interface Entidadsalud {

@@ -10,12 +10,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import {
-  LicenciaTramitar,
-  licenciaEnviadaHaciaOperadores,
-  licenciaSePuedeTramitar,
-} from '../(modelos)/licencia-tramitar';
-import { agregarEstadoDeTramitacion } from '../(servicios)/agregar-estado-de-tramitacion';
+import { LicenciaTramitar } from '../(modelos)';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -35,6 +30,13 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     tamanoPagina: 5,
     porCadaElemento: agregarEstadoDeTramitacion,
   });
+  const [loading, setloading] = useState(false);
+  const target = useRef(null);
+
+  const {
+    datosGuia: { listaguia, guia, AgregarGuia },
+  } = useContext(AuthContext);
+
   const [loading, setloading] = useState(false);
   const target = useRef(null);
 
@@ -157,8 +159,16 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
                 className="text-center align-middle">
                 <td className="px-4 py-3">
-                  {/* TODO: Cambiar el color del circulo de acuerdo al estado */}
-                  <div className={`mb-2 ${styles.circlered}`}></div>
+                  {/* Validamos si la fecha de hoy es menor a la fechaultimodiatramite y si es el mismo día debe mostrar el circulo amarillo */}
+                  {new Date(licencia.fechaultimodiatramite) > new Date() ? (
+                    <div className={`mb-2 ${styles.circlegreen}`}></div>
+                  ) : new Date(licencia.fechaultimodiatramite).getDate() ===
+                    new Date().getDate() ? ( // Si es el mismo día
+                    <div className={`mb-2 ${styles.circleyellow}`}></div>
+                  ) : (
+                    <div className={`mb-2 ${styles.circlered}`}></div>
+                  )}
+
                   <div className="small mb-1 text-nowrap">{licencia.operador.operador}</div>
                   <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
                   <div className="small mb-1 text-nowrap">{licencia.entidadsalud.nombre}</div>
@@ -202,41 +212,12 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <IfContainer show={licenciaSePuedeTramitar(licencia)}>
-                      <Link
-                        className="btn btn-sm btn-success"
-                        onClick={() => setloading(true)}
-                        href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
-                        <small className="text-nowrap">TRAMITAR</small>
-                      </Link>
-                    </IfContainer>
-                    <IfContainer show={!licenciaSePuedeTramitar(licencia)}>
-                      {!licenciaEnviadaHaciaOperadores(licencia) ? (
-                        <button
-                          className="btn btn-sm btn-warning"
-                          onClick={(e) =>
-                            AlertaInformacion.fire(
-                              'En Proceso...',
-                              `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en proceso de tramitación.`,
-                            )
-                          }
-                          title="En proceso de tramitación">
-                          En Proceso...
-                        </button>
-                      ) : (
-                        <button
-                          className="btn btn-sm btn-warning"
-                          onClick={(e) =>
-                            AlertaInformacion.fire(
-                              'Recibido por operador...',
-                              `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en el operador.`,
-                            )
-                          }
-                          title="Recibido por operador">
-                          Recibido...
-                        </button>
-                      )}
-                    </IfContainer>
+                    <Link
+                      className="btn btn-sm btn-success"
+                      onClick={() => setloading(true)}
+                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
+                      <small className="text-nowrap">TRAMITAR</small>
+                    </Link>
 
                     <button
                       className="btn btn-sm btn-primary"
@@ -248,14 +229,13 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                       }}>
                       <small className="text-nowrap">VER PDF</small>
                     </button>
-                    <IfContainer show={licenciaSePuedeTramitar(licencia)}>
-                      <Link
-                        className="btn btn-sm btn-danger"
-                        onClick={() => setloading(true)}
-                        href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
-                        <small className="text-nowrap"> NO RECEPCIONAR</small>
-                      </Link>
-                    </IfContainer>
+
+                    <Link
+                      className="btn btn-sm btn-danger"
+                      onClick={() => setloading(true)}
+                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
+                      <small className="text-nowrap"> NO RECEPCIONAR</small>
+                    </Link>
                   </Stack>
                 </td>
               </tr>
