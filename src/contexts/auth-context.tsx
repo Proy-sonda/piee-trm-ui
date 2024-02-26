@@ -227,20 +227,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       redirigirConSesionExpirada();
       return;
     }
-
-    idTimeoutAlerta = setTimeout(renovarTokenCallback, tiempoParaMostrarAlerta);
-
-    let idTimeoutAlerta: NodeJS.Timeout | undefined;
-    clearTimeout(idTimeoutAlerta);
-
-    // prettier-ignore
-    const tiempoParaMostrarAlerta = usuario.tiempoRestanteDeSesion() - thresholdAlertaExpiraSesion();
-    if (tiempoParaMostrarAlerta < 0) {
-      logout(); // por si acaso
-      redirigirConSesionExpirada();
-      return;
-    }
-
     idTimeoutAlerta = setTimeout(renovarTokenCallback, tiempoParaMostrarAlerta);
 
     return () => {
