@@ -227,6 +227,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       redirigirConSesionExpirada();
       return;
     }
+
     idTimeoutAlerta = setTimeout(renovarTokenCallback, tiempoParaMostrarAlerta);
 
     return () => {
