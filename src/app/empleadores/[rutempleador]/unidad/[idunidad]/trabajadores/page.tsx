@@ -61,13 +61,14 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       codigounidad: '',
     },
   });
-  const { register, setValue, getValues } = useForm<{ run: string; file: FileList | null }>({
+  const { register, setValue, getValues, watch } = useForm<{ run: string; file: FileList | null }>({
     mode: 'onBlur',
   });
   const [rutedit, setrutedit] = useState<string>();
   const [show, setshow] = useState(false);
   const [refresh, setRefresh] = useState(0);
   const cargaNomina = useRef(null);
+  const [btnenable, setbtnenable] = useState(false);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
@@ -165,6 +166,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     ActualizaTrabajador();
   };
 
+  useEffect(() => {
+    setbtnenable(getValues('run').length > 0 ? true : false);
+  }, [getValues('run')]);
+
   const handleDeleteAll = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const resp = await AlertaConfirmacion.fire({
@@ -245,6 +250,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const router = useRouter();
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
+    if (!getValues('run')) return;
     if (error.run) return;
 
     const crearTrabajadorAux = async () => {
@@ -521,7 +527,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                         alignSelf: 'end',
                       }}>
                       <div className="d-grid gap-2 d-md-flex">
-                        <button type="submit" className="btn btn-success">
+                        <button type="submit" className="btn btn-success" disabled={!btnenable}>
                           Agregar
                         </button>
                       </div>
