@@ -11,6 +11,7 @@ import Link from 'next/link';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { LicenciaTramitar } from '../(modelos)';
+import { agregarEstadoDeTramitacion } from '../(servicios)/agregar-estado-de-tramitacion';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -30,13 +31,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     tamanoPagina: 5,
     porCadaElemento: agregarEstadoDeTramitacion,
   });
-  const [loading, setloading] = useState(false);
-  const target = useRef(null);
-
-  const {
-    datosGuia: { listaguia, guia, AgregarGuia },
-  } = useContext(AuthContext);
-
   const [loading, setloading] = useState(false);
   const target = useRef(null);
 
