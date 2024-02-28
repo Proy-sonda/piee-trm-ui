@@ -20,6 +20,7 @@ import SpinnerPantallaCompleta from '../spinner-pantalla-completa';
 import styles from './login.module.css';
 import ModalCambiarClaveTemporal from './modal-cambiar-clave-temporal';
 import ModalClaveEnviada from './modal-clave-enviada';
+import { ModalSuperUsuario } from './modal-login-sup';
 import ModalRecuperarClave from './modal-recuperar-clave';
 
 interface FormularioLogin {
@@ -141,6 +142,8 @@ export const LoginComponent: React.FC<{}> = () => {
       <IfContainer show={showSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
+
+      <ModalSuperUsuario show={true} />
 
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(handleLoginUsuario)} className={styles.formlogin}>
