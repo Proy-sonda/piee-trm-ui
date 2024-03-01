@@ -6,5 +6,6 @@ export type TokenAutenticacion = {
     nombres: string;
     rutusuario: string;
     ultimaconexion: string;
+    rutsuper: string;
   };
 };

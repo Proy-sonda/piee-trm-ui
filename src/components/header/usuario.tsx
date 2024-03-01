@@ -76,6 +76,7 @@ const Usuario: React.FC = () => {
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+        <br />
       </IfContainer>
     </>
   );

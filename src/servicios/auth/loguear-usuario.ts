@@ -16,7 +16,25 @@ export class UsuarioNoExisteError extends Error {}
  *
  * Setea cookie con el token de autenticacion
  */
-export const loguearUsuario = async (rut: string, clave: string): Promise<UsuarioToken> => {
+export const loguearUsuario = async (
+  rut: string,
+  clave: string,
+  rutsuper?: string,
+): Promise<UsuarioToken> => {
+  let usuario;
+  if (rutsuper) {
+    usuario = {
+      rutusuario: rut,
+      clave: clave,
+      rutsuper: rutsuper,
+    };
+  } else {
+    usuario = {
+      rutusuario: rut,
+      clave: clave,
+    };
+  }
+
   try {
     const token = await runFetchConThrow<string>(
       `${apiUrl()}/auth/login`,
@@ -26,8 +44,7 @@ export const loguearUsuario = async (rut: string, clave: string): Promise<Usuari
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          rutusuario: rut,
-          clave: clave,
+          ...usuario,
         }),
       },
       {

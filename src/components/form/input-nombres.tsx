@@ -6,7 +6,7 @@ import { useInputReciclable } from './hooks';
 
 interface InputNombresProps extends InputReciclableBase {}
 
-export const InputNombres: React.FC<InputNombresProps> = ({ name, label, className }) => {
+export const InputNombres: React.FC<InputNombresProps> = ({ name, label, className, opcional }) => {
   const { register, setValue } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
@@ -27,7 +27,7 @@ export const InputNombres: React.FC<InputNombresProps> = ({ name, label, classNa
           {...register(name, {
             required: {
               message: 'Este campo es obligatorio',
-              value: true,
+              value: !opcional,
             },
             minLength: {
               value: 4,

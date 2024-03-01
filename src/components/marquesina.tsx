@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 const Marquesina = () => {
   const [error, mensajes, pendiente] = useFetch(obtenerMensajes());
   const [mensajemarquesina, setmensajemarquesina] = useState<string>('');
+
   useEffect(() => {
     if (mensajes) {
       const marquesina = mensajes.find((m) => m.idmensajegeneral === 1)!?.mensaje || '';

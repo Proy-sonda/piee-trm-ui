@@ -9,8 +9,9 @@ import {
   RutInvalidoError,
   UsuarioNoExisteError,
 } from '@/servicios/auth';
+import { BuscarUsuarioSu } from '@/servicios/buscar-super-usuario';
 import { obtenerMensajes } from '@/servicios/obtiene-mensajes';
-import { AlertaExito } from '@/utilidades';
+import { AlertaConfirmacion, AlertaExito } from '@/utilidades';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -20,7 +21,6 @@ import SpinnerPantallaCompleta from '../spinner-pantalla-completa';
 import styles from './login.module.css';
 import ModalCambiarClaveTemporal from './modal-cambiar-clave-temporal';
 import ModalClaveEnviada from './modal-clave-enviada';
-import { ModalSuperUsuario } from './modal-login-sup';
 import ModalRecuperarClave from './modal-recuperar-clave';
 
 interface FormularioLogin {
@@ -34,6 +34,7 @@ export const LoginComponent: React.FC<{}> = () => {
   const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
   const [err, mensajes, pendiente] = useFetch(obtenerMensajes());
+  const [inicioComoSuperusuario, setinicioComoSuperusuario] = useState(false);
 
   const router = useRouter();
 
@@ -65,13 +66,31 @@ export const LoginComponent: React.FC<{}> = () => {
       if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) return;
     }
 
-    // en caso contrario mostrara mensaje por default
-    router.push(searchParams.get('redirectTo') ?? '/tramitacion');
+    if (inicioComoSuperusuario) {
+      const resp = AlertaConfirmacion.fire({
+        title: 'RUN ingresado es de superusuario',
+        html: '¿Desea ingresar como superusuario?',
+      });
+
+      resp.then((result) => {
+        if (result.isConfirmed) {
+          router.push('/superusuario');
+        } else {
+          // en caso contrario mostrara mensaje por default
+          router.push(searchParams.get('redirectTo') ?? '/tramitacion');
+        }
+      });
+    }
   }, [usuario]);
 
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
     try {
       setShowSpinner(true);
+      const [resp] = await BuscarUsuarioSu(rut);
+      if ((await resp()) === true) {
+        setinicioComoSuperusuario(true);
+        setShowSpinner(false);
+      }
 
       await login(rut, clave);
 
@@ -142,8 +161,6 @@ export const LoginComponent: React.FC<{}> = () => {
       <IfContainer show={showSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
-
-      <ModalSuperUsuario show={true} />
 
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(handleLoginUsuario)} className={styles.formlogin}>
