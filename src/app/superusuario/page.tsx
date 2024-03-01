@@ -19,7 +19,7 @@ import {
 } from './(servicios)/verificar-superusuario';
 
 const SuperUsuario = () => {
-  const { usuario, estaLogueado, setUsuario } = useContext(AuthContext);
+  const { usuario, estaLogueado, setUsuario, logout } = useContext(AuthContext);
   const [Cargando, setCargando] = useState(false);
   const [usuarios, setusuarios] = useState<Usuarios[]>([]);
   const [usuarioseleccionado, setusuarioseleccionado] = useState<number | undefined>(undefined);
@@ -152,7 +152,7 @@ const SuperUsuario = () => {
           </div>
           <div className="row">
             <div className="col-md-4 float-end">
-              <button className="btn btn-danger" onClick={() => router.push('/')}>
+              <button className="btn btn-danger" onClick={() => logout()}>
                 Salir
               </button>
             </div>
