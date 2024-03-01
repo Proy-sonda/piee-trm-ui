@@ -30,8 +30,9 @@ type AuthContextType = {
   ultimaConexion: string;
   estaLogueado: boolean;
   usuario?: UsuarioToken;
-  login: (rut: string, clave: string) => Promise<UsuarioToken>;
+  login: (rut: string, clave: string, rutsuper?: string) => Promise<UsuarioToken>;
   logout: () => Promise<void>;
+  setUsuario: (usuario: UsuarioToken | undefined) => void;
   datosGuia: {
     guia: boolean;
     nombreGuia: string;
@@ -49,6 +50,7 @@ export const AuthContext = createContext<AuthContextType>({
   usuario: undefined,
   login: async () => ({}) as any,
   logout: async () => {},
+  setUsuario: () => {},
   datosGuia: {
     guia: false,
     nombreGuia: '',
@@ -294,8 +296,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const login = async (rut: string, clave: string) => {
-    const usuario = await loguearUsuario(rut, clave);
+  const login = async (rut: string, clave: string, rutsuper?: string) => {
+    const usuario = await loguearUsuario(rut, clave, rutsuper);
 
     onLoginExitoso(usuario);
 
@@ -345,6 +347,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         usuario,
         login,
         logout,
+        setUsuario,
         datosGuia: {
           guia,
           nombreGuia,
