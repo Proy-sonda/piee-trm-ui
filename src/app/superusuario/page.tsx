@@ -32,6 +32,13 @@ const SuperUsuario = () => {
   }>();
 
   useEffect(() => {
+    // obtener la cookie desde el login de adscripcion con nookies
+    const cookie = document.cookie;
+    const token = cookie.split('token=')[1];
+    if (token) {
+      return;
+    }
+
     if (!usuario?.rut) {
       router.push('/');
     }
