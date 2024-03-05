@@ -40,11 +40,12 @@ const TablaUsuarios: React.FC<myAppProps> = ({
                 style={{
                   cursor: 'pointer',
                 }}
-                onClick={() =>
+                onClick={() => {
                   usuario.idusuario != usuarioseleccionado
                     ? setusuarioseleccionado(usuario.idusuario)
-                    : setusuarioseleccionado(undefined)
-                }
+                    : setusuarioseleccionado(undefined);
+                  ConfirmarSeleccion(usuario.rutusuario, usuario.nombres);
+                }}
                 key={usuario.rutusuario}>
                 <Td className={usuarioseleccionado === usuario.idusuario && styles['table-active']}>
                   {usuario.rutusuario}
