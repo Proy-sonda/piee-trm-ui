@@ -55,7 +55,9 @@ const TablaUsuarios: React.FC<myAppProps> = ({
                 <Td className={usuarioseleccionado === usuario.idusuario && styles['table-active']}>
                   {/* botón para seleccionar usuario y continuar*/}
                   <button
-                    className="btn btn-sm btn-primary"
+                    className={`btn btn-sm ${
+                      usuario.idusuario === usuarioseleccionado ? 'btn-danger' : 'btn-primary'
+                    }`}
                     onClick={() =>
                       !(usuario.idusuario === usuarioseleccionado) &&
                       ConfirmarSeleccion(usuario.rutusuario, usuario.nombres)
