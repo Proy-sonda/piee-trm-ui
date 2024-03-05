@@ -26,12 +26,17 @@ const Marquesina = () => {
 
   return (
     <div
-      className="alert alert-warning"
+      className="alert alert-warning alert-dismissible fade show"
       role="alert"
       style={{
         display: mensajemarquesina ? 'block' : 'none',
       }}>
       <b dangerouslySetInnerHTML={{ __html: mensajemarquesina }} />
+      <button
+        type="button"
+        className="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"></button>
     </div>
   );
 };
