@@ -5,4 +5,5 @@ export enum ENUM_CONFIGURACION {
   ACTIVA_CIERRE_SESION_TRAMITACION = 'ActCierreSesionTramitacion',
   ACTIVA_CIERRE_SESION_ADSCRIPCION = 'ActCierreSesionAdscripcion',
   ACTIVA_CIERRE_SESION_SUPERUSUARIO = 'ActCierreSesionSuperUsuario',
+  PESO_ARCHIVO = 'PesoArchivoAdjunto',
 }

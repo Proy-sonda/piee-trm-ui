@@ -9,6 +9,9 @@ import { GuiaUsuario } from '@/components/guia-usuario';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { AuthContext } from '@/contexts';
+import { useFetch } from '@/hooks';
+import { ENUM_CONFIGURACION } from '@/modelos/enum/configuracion';
+import { BuscarConfiguracion } from '@/servicios/buscar-configuracion';
 import { AlertaConfirmacion, AlertaError, AlertaExito, formatBytes } from '@/utilidades';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Col, Form, Row } from 'react-bootstrap';
@@ -46,10 +49,28 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
   errorDocumentosAdjuntos,
   onDocumentoEliminado,
 }) => {
+  const [, configuracion] = useFetch(BuscarConfiguracion());
   const extensionesPermitidas = ['.xls', '.xlsx', '.doc', '.docx', '.pdf']; // Nuevas extensions deben ir en minuscula
   const maximaCantidadDeArchivos = 15;
   const tamanoMinimoDocumentoBytes = 2_000;
-  const tamanoMaximoDocumentoBytes = 5_000_000;
+  const [tamanoMaximoDocumentoBytes, settamanoMaximoDocumentoBytes] = useState(5_000_000);
+
+  useEffect(() => {
+    if (configuracion) {
+      // validamos la fecha de la configuración si se encuentra vigente
+      const fechaHoy = new Date();
+      const fechaInicio = new Date(
+        configuracion.find((c) => c.codigoparametro === ENUM_CONFIGURACION.PESO_ARCHIVO)
+          ?.fechavigencia || '',
+      );
+      if (fechaHoy < fechaInicio)
+        return settamanoMaximoDocumentoBytes(
+          Number(
+            configuracion.find((c) => c.codigoparametro === ENUM_CONFIGURACION.PESO_ARCHIVO)?.valor,
+          ) * 1000000 || 5_000_000,
+        );
+    }
+  }, [configuracion]);
 
   const formulario = useForm<FormularioAdjuntarDocumentoC3>({ mode: 'onBlur' });
 
