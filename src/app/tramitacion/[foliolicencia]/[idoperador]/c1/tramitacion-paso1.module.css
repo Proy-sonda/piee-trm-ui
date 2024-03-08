@@ -1,0 +1,4 @@
+.hover-mouse:hover {
+    background-color: var(--color-blue);
+    color: white;
+}
