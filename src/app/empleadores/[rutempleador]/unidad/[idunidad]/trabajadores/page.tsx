@@ -167,7 +167,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   };
 
   useEffect(() => {
-    setbtnenable(getValues('run').length > 0 ? true : false);
+    setbtnenable((getValues('run') ?? '').length > 0 ? true : false);
   }, [getValues('run')]);
 
   const handleDeleteAll = async (e: FormEvent<HTMLButtonElement>) => {
