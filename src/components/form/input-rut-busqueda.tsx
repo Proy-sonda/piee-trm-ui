@@ -4,16 +4,20 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import { InputReciclableBase } from './base-props';
+import { ErroresEditables, InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputRutBusquedaProps extends InputReciclableBase {
+interface InputRutBusquedaProps
+  extends InputReciclableBase,
+    ErroresEditables<'obligatorio' | 'rutInvalido'> {
   /** Define si usar RUT o RUN en los mensajes de error (defecto: `rut`) */
   tipo?: 'rut' | 'run';
+
+  noValidarRut?: boolean;
 }
 
 /**
- * Como un `InputRut`, pero que solo valida y formatea cuando se ingresan mas de 8 caracteres
+ * Como un `InputRut`, pero que solo valida y formatea cuando se ingresan mas de 8 caracteres.
  */
 export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
   label,
@@ -21,6 +25,8 @@ export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
   className,
   tipo,
   opcional,
+  noValidarRut,
+  errores,
 }) => {
   const largoRutValidar = 8;
 
@@ -50,16 +56,20 @@ export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
           {...register(name, {
             required: {
               value: !opcional,
-              message: `El ${tipoInput()} es obligatorio`,
+              message: errores?.obligatorio ?? `El ${tipoInput()} es obligatorio`,
             },
             validate: {
               esRut: (rut) => {
+                if (noValidarRut) {
+                  return;
+                }
+
                 if (opcional && rut === '') {
                   return;
                 }
 
                 if (rut.length > largoRutValidar && !validateRut(rut)) {
-                  return `El ${tipoInput()} es inválido`;
+                  return errores?.rutInvalido ?? `El ${tipoInput()} es inválido`;
                 }
               },
             },
