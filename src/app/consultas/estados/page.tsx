@@ -14,6 +14,7 @@ import {
 import { HttpError, buscarUsuarioPorRut } from '@/servicios';
 import { AlertaConfirmacion, AlertaError, AlertaInformacion } from '@/utilidades';
 import { format } from 'date-fns';
+import exportFromJSON from 'export-from-json';
 import React, { useEffect, useState } from 'react';
 import { Stack } from 'react-bootstrap';
 import { FormularioEstadoLME, TablaEstadosLME } from './(componentes)';
@@ -23,7 +24,7 @@ import { buscarEstadosLME, buscarOperadores } from './(servicios)';
 
 interface EstadosLicenciaPageProps {}
 
-export const EstadosLicenciaPage: React.FC<EstadosLicenciaPageProps> = ({}) => {
+const EstadosLicenciaPage: React.FC<EstadosLicenciaPageProps> = ({}) => {
   const [filtros, setFiltros] = useState<FormularioBusquedaEstadoLME>();
 
   const [erroresInfoLicencia, [estadoLME, zona0], cargandoInfoLicencia] = useMergeFetchArray(
@@ -83,8 +84,6 @@ export const EstadosLicenciaPage: React.FC<EstadosLicenciaPageProps> = ({}) => {
       Estado: licencia.estadolicencia,
       Fecha: format(new Date(licencia.fechaevento), 'dd/MM/yyyy HH:mm:ss'),
     }));
-
-    const exportFromJSON = (await import('export-from-json')).default;
 
     exportFromJSON({
       data,

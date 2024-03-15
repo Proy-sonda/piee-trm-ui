@@ -2,7 +2,7 @@ import React from 'react';
 
 interface ConsultaHistoricosPageProps {}
 
-export const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
+const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
   return (
     <>
       <div className="text-center">

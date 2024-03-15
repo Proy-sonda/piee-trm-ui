@@ -35,13 +35,13 @@ import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licenci
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { LicenciaC1 } from './(modelos)';
 import { formularioApp } from './(modelos)/formulario-type';
-import { LicenciaC0 } from './(modelos)/licencia-c0';
 
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { LicenciasAnteriores } from '../(modelo)/licencias-anteriores';
 import { BuscarLicenciasAnteriores } from '../(servicios)/buscar-licencias-anteriores';
 import {
+  CrearLicenciaC0Request,
   ErrorCrearLicencia,
   ErrorCrearLicenciaC1,
   buscarZona1,
@@ -313,7 +313,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       });
       return false;
     }
-    let licenciaC0: LicenciaC0 = {
+    let licenciaC0: CrearLicenciaC0Request = {
       estadolicencia: licenciaTramite!?.estadolicencia,
       fechaemision: format(new Date(licenciaTramite!?.fechaemision), 'yyyy-MM-dd'),
       fechainicioreposo: format(new Date(licenciaTramite!?.fechainicioreposo), 'yyy-MM-dd'),
