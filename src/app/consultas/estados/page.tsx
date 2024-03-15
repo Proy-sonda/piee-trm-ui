@@ -12,8 +12,10 @@ import {
   useWindowSize,
 } from '@/hooks';
 import { HttpError, buscarUsuarioPorRut } from '@/servicios';
-import { AlertaError } from '@/utilidades';
+import { AlertaConfirmacion, AlertaError, AlertaInformacion } from '@/utilidades';
+import { format } from 'date-fns';
 import React, { useEffect, useState } from 'react';
+import { Stack } from 'react-bootstrap';
 import { FormularioEstadoLME, TablaEstadosLME } from './(componentes)';
 import { DatosLicencia } from './(componentes)/datos-licencia';
 import { FormularioBusquedaEstadoLME } from './(modelos)';
@@ -58,6 +60,40 @@ export const EstadosLicenciaPage: React.FC<EstadosLicenciaPageProps> = ({}) => {
       html: mensajeError,
     });
   }, [erroresInfoLicencia]);
+
+  const handleExportarCSV = async () => {
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      html: `¿Desea exportar los estados de la licencia a CSV?`,
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    if (!estadoLME) {
+      return AlertaError.fire({
+        title: 'Error',
+        html: 'No se han buscado los estados de la licencia para exportar',
+      });
+    }
+
+    const data = (estadoLME.listaestados ?? []).map((licencia) => ({
+      'Folio Licencia': estadoLME?.foliolicencia,
+      'ID Estado': licencia.idestadolicencia,
+      Estado: licencia.estadolicencia,
+      Fecha: format(new Date(licencia.fechaevento), 'dd/MM/yyyy HH:mm:ss'),
+    }));
+
+    const exportFromJSON = (await import('export-from-json')).default;
+
+    exportFromJSON({
+      data,
+      fileName: `estados_licencia_${format(Date.now(), 'dd_MM_yyyy_HH_mm_ss')}`,
+      exportType: exportFromJSON.types.csv,
+      delimiter: ';',
+      withBOM: true,
+    });
+  };
 
   return (
     <>
@@ -113,6 +149,22 @@ export const EstadosLicenciaPage: React.FC<EstadosLicenciaPageProps> = ({}) => {
           </div>
         </IfContainer>
       </div>
+
+      <Stack
+        className="mt-3"
+        direction={width >= BootstrapBreakpoint.SM ? 'horizontal' : 'vertical'}
+        gap={2}>
+        {/* Este div sirve para empujar los elementos hacia la derecha en modo horizontal */}
+        <div className="me-auto"></div>
+        <button
+          className="btn btn-primary"
+          onClick={() => AlertaInformacion.fire({ html: 'Funcionalidad en construcción' })}>
+          Ver PDF
+        </button>
+        <button className="btn btn-primary" onClick={() => handleExportarCSV()}>
+          Exportar a CSV
+        </button>
+      </Stack>
     </>
   );
 };
