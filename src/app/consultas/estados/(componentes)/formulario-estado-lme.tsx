@@ -33,7 +33,14 @@ export const FormularioEstadoLME: React.FC<FormularioEstadoLMEProps> = ({
               />
             </div>
             <div className="col-12">
-              <InputRutBusqueda name="folioLicencia" label="Folio Licencia" />
+              <InputRutBusqueda
+                noValidarRut
+                name="folioLicencia"
+                label="Folio Licencia"
+                errores={{
+                  obligatorio: 'El folio de la licencia es obligatorio',
+                }}
+              />
             </div>
             <div className="col-12">
               <button type="submit" className={`btn btn-primary`}>
