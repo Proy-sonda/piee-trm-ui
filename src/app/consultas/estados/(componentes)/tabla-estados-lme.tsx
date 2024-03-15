@@ -16,10 +16,8 @@ export const TablaEstadosLME: React.FC<TablaEstadosLMEProps> = ({ estado }) => {
         <table className="table table-striped table-hover ">
           <thead>
             <tr className={`text-center ${styles['text-tr']}`}>
-              <th>ESTADO</th>
               <th>FECHA</th>
-              <th>PERSONA TRABAJADORA</th>
-              <th>DESCRIPCIÓN</th>
+              <th>ESTADO</th>
             </tr>
           </thead>
           <tbody>
@@ -28,21 +26,17 @@ export const TablaEstadosLME: React.FC<TablaEstadosLMEProps> = ({ estado }) => {
                 <tr
                   key={`${listaEstado.fechaevento}/${listaEstado.idestadolicencia}`}
                   className="text-center align-middle">
+                  <td>{format(new Date(listaEstado.fechaevento), 'dd/MM/yyyy HH:mm:ss')}</td>
                   <td>
                     <div className="mb-1 small text-nowrap">
                       Estado {listaEstado.idestadolicencia}
                     </div>
                     <div className="mb-1 small text-nowrap">{listaEstado.estadolicencia}</div>
                   </td>
-                  <td>{format(new Date(listaEstado.fechaevento), 'dd/MM/yyyy HH:mm:ss')}</td>
-                  <td>NO DISPONIBLE</td>
-                  <td>NO DISPONIBLE</td>
                 </tr>
               ))
             ) : (
               <tr className={`text-center ${styles['text-tr']}`}>
-                <td>-</td>
-                <td>-</td>
                 <td>-</td>
                 <td>-</td>
               </tr>
