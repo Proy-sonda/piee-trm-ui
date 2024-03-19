@@ -2,60 +2,47 @@ import AppFooter from '@/components/footer/footer';
 import Version from '@/components/footer/version';
 import AppHeader from '@/components/header/header';
 import Marquesina from '@/components/marquesina';
-import Position from '@/components/stage/position';
 import { AuthProvider } from '@/contexts';
 import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Head from 'next/head';
+import { Metadata } from 'next';
 import './globals.css';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Portal de Tramitación',
   description: 'Nuevo Portal de Integración',
 };
 
-export default function RootLayout(
-  {
-    children,
-  }: {
-    children: React.ReactNode;
-  },
-  title: string,
-  dsc: string,
-) {
+type RootLayoutProps = {
+  children: React.ReactNode;
+};
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <>
-      <Head>
-        <title>Portal Tramitación LME - {title} </title>
-        <meta name="description" content={dsc} />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <AuthProvider>
-        <html>
-          <body>
+      <html>
+        <body>
+          <AuthProvider>
             <AppHeader />
 
             <main className="bg-white shadow-sm">
               <Marquesina />
-              <Position />
-
               <div>{children}</div>
             </main>
 
             <AppFooter>
               <Version /> {/* Se tiene que pasar asi porque Version es un SSC. */}
             </AppFooter>
-          </body>
+          </AuthProvider>
+        </body>
 
-          <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
-            crossOrigin={'anonymous'}
-            async></script>
-        </html>
-      </AuthProvider>
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+          crossOrigin={'anonymous'}
+          async></script>
+      </html>
     </>
   );
 }

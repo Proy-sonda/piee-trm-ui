@@ -1,4 +1,4 @@
-import LoadingSpinner from '@/components/loading-spinner';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import React from 'react';
 
 interface LoadingComponentProps {}
@@ -6,9 +6,8 @@ interface LoadingComponentProps {}
 const LoadingComponent: React.FC<LoadingComponentProps> = ({}) => {
   return (
     <>
-      <div className="container-fluid py-5" style={{ backgroundColor: 'white' }}>
-        <LoadingSpinner size={150} />
-      </div>
+      <SpinnerPantallaCompleta />
+      <div className="container-fluid py-5" style={{ backgroundColor: 'white' }}></div>
     </>
   );
 };
