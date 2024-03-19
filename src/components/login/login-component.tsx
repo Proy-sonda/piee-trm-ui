@@ -3,6 +3,7 @@
 import { InputClave, InputRut } from '@/components/form';
 import { AuthContext } from '@/contexts';
 import { useFetch } from '@/hooks';
+import { Mensaje, estaMensajeVigente } from '@/modelos/mensaje';
 import {
   AutenticacionTransitoriaError,
   LoginPasswordInvalidoError,
@@ -11,7 +12,7 @@ import {
 } from '@/servicios/auth';
 import { BuscarUsuarioSu } from '@/servicios/buscar-super-usuario';
 import { obtenerMensajes } from '@/servicios/obtiene-mensajes';
-import { AlertaConfirmacion, AlertaExito } from '@/utilidades';
+import { AlertaConfirmacion, AlertaExito, existe } from '@/utilidades';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -29,105 +30,75 @@ interface FormularioLogin {
 }
 
 export const LoginComponent: React.FC<{}> = () => {
+  const MENSAJE_BIENVENIDA_POR_DEFECTO = '<p>Bienvenido al Portal de Tramitación</p>';
+
   const [showModalCambiarClave, setShowModalCambiarClave] = useState(false);
   const [showModalRecuperarClave, setShowModalRecuperarClave] = useState(false);
   const [showModalClaveEnviada, setShowModalClaveEnviada] = useState(false);
   const [showSpinner, setShowSpinner] = useState(false);
-  const [err, mensajes, pendiente] = useFetch(obtenerMensajes());
-  const [inicioComoSuperusuario, setinicioComoSuperusuario] = useState(false);
+  const [, mensajes] = useFetch(obtenerMensajes());
+  const [inicioComoSuperusuario, setInicioComoSuperusuario] = useState(false);
 
   const router = useRouter();
-
   const searchParams = useSearchParams();
-
   const { usuario, login } = useContext(AuthContext);
-
   const formulario = useForm<FormularioLogin>({ mode: 'onBlur' });
-
   const rutUsuario = formulario.watch('rut');
 
   // Redirigir al usuario si esta logueado
   useEffect(() => {
-    if (!usuario) {
+    if (!usuario || !mensajes) {
       return;
     }
-    // validamos si existe un mensaje vigente entre las fechas de inicio y termino, tanto general como en especifico de tramitación
-    if (mensajes?.find((m) => m.idmensajegeneral === 2)!?.mensaje) {
-      const fechainicio = mensajes?.find((m) => m.idmensajegeneral === 2)!?.fechainicio || '';
-      const fechafin = mensajes?.find((m) => m.idmensajegeneral === 2)!?.fechatermino || '';
-      const fechaactual = new Date();
-      if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) return;
-    }
 
-    if (mensajes?.find((m) => m.idmensajegeneral === 3)!?.mensaje) {
-      const fechainicio = mensajes?.find((m) => m.idmensajegeneral === 3)!?.fechainicio || '';
-      const fechafin = mensajes?.find((m) => m.idmensajegeneral === 3)!?.fechatermino || '';
-      const fechaactual = new Date();
-      if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) return;
-    }
+    const modalBienvenida = AlertaExito.mixin({
+      html: `
+      ${obtenerMensajesDeBienvenida(mensajes)} 
+      <p>Cargando bandeja de tramitación...</p>
+      `,
+      timer: 6000,
+      didClose: () => router.push(searchParams.get('redirectTo') ?? '/tramitacion'),
+    });
 
     if (inicioComoSuperusuario) {
-      const resp = AlertaConfirmacion.fire({
+      AlertaConfirmacion.fire({
         title: 'RUN ingresado es de superusuario',
         html: '¿Desea ingresar como superusuario?',
-      });
-
-      resp.then((result) => {
+      }).then((result) => {
         if (result.isConfirmed) {
           router.push('/superusuario');
         } else {
-          // en caso contrario mostrara mensaje por default
-          router.push(searchParams.get('redirectTo') ?? '/tramitacion');
+          modalBienvenida.fire();
         }
       });
+    } else {
+      modalBienvenida.fire();
     }
-  }, [usuario]);
+  }, [usuario, mensajes]);
+
+  const obtenerMensajesDeBienvenida = (mensajes?: Mensaje[]) => {
+    const bienvenidaGeneral = (mensajes ?? []).find((m) => m.idmensajegeneral === 2);
+    const bienvenidaTramitacion = (mensajes ?? []).find((m) => m.idmensajegeneral === 3);
+
+    if (existe(bienvenidaGeneral) && estaMensajeVigente(bienvenidaGeneral)) {
+      return bienvenidaGeneral.mensaje;
+    } else if (existe(bienvenidaTramitacion) && estaMensajeVigente(bienvenidaTramitacion)) {
+      return bienvenidaTramitacion.mensaje;
+    } else {
+      return MENSAJE_BIENVENIDA_POR_DEFECTO;
+    }
+  };
 
   const handleLoginUsuario: SubmitHandler<FormularioLogin> = async ({ rut, clave }) => {
     try {
       setShowSpinner(true);
-      const [resp] = await BuscarUsuarioSu(rut);
-      if ((await resp()) === true) {
-        setinicioComoSuperusuario(true);
-        setShowSpinner(false);
+
+      const esRutSuperusuario = await BuscarUsuarioSu(rut);
+      if (esRutSuperusuario === true) {
+        setInicioComoSuperusuario(true);
       }
 
       await login(rut, clave);
-
-      if (mensajes) {
-        // primero verificamos si hay mensaje general vigente entre fechas de inicio y termino
-        if (mensajes.find((m) => m.idmensajegeneral === 2)!?.mensaje) {
-          const fechainicio = mensajes.find((m) => m.idmensajegeneral === 2)!?.fechainicio || '';
-          const fechafin = mensajes.find((m) => m.idmensajegeneral === 2)!?.fechatermino || '';
-          const fechaactual = new Date();
-          if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
-            AlertaExito.fire({
-              html: `${mensajes.find((m) => m.idmensajegeneral === 2)!?.mensaje} <br/>
-                     Cargando página de tramitación...`,
-              timer: 6000,
-              didClose: () => router.push(searchParams.get('redirectTo') ?? '/tramitacion'),
-            });
-            return;
-          }
-        }
-
-        if (mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje) {
-          //validamos si el mensaje se encuentra en la fecha de inicio y fin
-          const fechainicio = mensajes.find((m) => m.idmensajegeneral === 3)!?.fechainicio || '';
-          const fechafin = mensajes.find((m) => m.idmensajegeneral === 3)!?.fechatermino || '';
-          const fechaactual = new Date();
-          if (fechaactual >= new Date(fechainicio) && fechaactual <= new Date(fechafin)) {
-            AlertaExito.fire({
-              html: `${mensajes.find((m) => m.idmensajegeneral === 3)!?.mensaje} <br/>
-              Cargando página de tramitación...`,
-              timer: 6000,
-              didClose: () => router.push(searchParams.get('redirectTo') ?? '/tramitacion'),
-            });
-          } else {
-            AlertaExito.fire({ html: 'Sesión iniciada correctamente' });
-          }
-        }
-      }
     } catch (error) {
       let messageError = '';
 
