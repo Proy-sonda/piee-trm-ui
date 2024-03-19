@@ -1,7 +1,7 @@
 'use client';
 
 import { buscarZona0 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c1/(servicios)';
-import { Titulo } from '@/components';
+import { BotonVerPdfLicencia, Titulo } from '@/components';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import {
@@ -12,7 +12,7 @@ import {
   useWindowSize,
 } from '@/hooks';
 import { HttpError, buscarUsuarioPorRut } from '@/servicios';
-import { AlertaConfirmacion, AlertaError, AlertaInformacion } from '@/utilidades';
+import { AlertaConfirmacion, AlertaError } from '@/utilidades';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import React, { useEffect, useState } from 'react';
@@ -25,6 +25,7 @@ import { buscarEstadosLME, buscarOperadores } from './(servicios)';
 interface EstadosLicenciaPageProps {}
 
 const EstadosLicenciaPage: React.FC<EstadosLicenciaPageProps> = ({}) => {
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
   const [filtros, setFiltros] = useState<FormularioBusquedaEstadoLME>();
 
   const [erroresInfoLicencia, [estadoLME, zona0], cargandoInfoLicencia] = useMergeFetchArray(
@@ -113,7 +114,8 @@ const EstadosLicenciaPage: React.FC<EstadosLicenciaPageProps> = ({}) => {
         </div>
       </div>
 
-      <IfContainer show={cargandoInfoLicencia || cargandoCombos || cargandoUsuarioTramita}>
+      <IfContainer
+        show={mostrarSpinner || cargandoInfoLicencia || cargandoCombos || cargandoUsuarioTramita}>
         <SpinnerPantallaCompleta />
       </IfContainer>
 
@@ -155,11 +157,21 @@ const EstadosLicenciaPage: React.FC<EstadosLicenciaPageProps> = ({}) => {
         gap={2}>
         {/* Este div sirve para empujar los elementos hacia la derecha en modo horizontal */}
         <div className="me-auto"></div>
-        <button
-          className="btn btn-primary"
-          onClick={() => AlertaInformacion.fire({ html: 'Funcionalidad en construcción' })}>
-          Ver PDF
-        </button>
+
+        {filtros ? (
+          <BotonVerPdfLicencia
+            folioLicencia={filtros.folioLicencia}
+            idOperador={filtros.idoperador}
+            onGenerarPdf={() => setMostrarSpinner(true)}
+            onPdfGenerado={() => setMostrarSpinner(false)}>
+            Ver PDF
+          </BotonVerPdfLicencia>
+        ) : (
+          <button disabled className="btn btn-primary">
+            Ver PDF
+          </button>
+        )}
+
         <button className="btn btn-primary" onClick={() => handleExportarCSV()}>
           Exportar a CSV
         </button>

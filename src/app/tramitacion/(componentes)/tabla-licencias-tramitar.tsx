@@ -1,9 +1,9 @@
+import { BotonVerPdfLicencia } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
-import { AlertaInformacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
@@ -212,16 +212,14 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                       <small className="text-nowrap">TRAMITAR</small>
                     </Link>
 
-                    <button
-                      className="btn btn-sm btn-primary"
-                      onClick={() => {
-                        AlertaInformacion.fire(
-                          'Funcionalidad en desarrollo',
-                          'Esta funcionalidad se encuentra en desarrollo, por favor intente más tarde.',
-                        );
-                      }}>
+                    <BotonVerPdfLicencia
+                      folioLicencia={licencia.foliolicencia}
+                      idOperador={licencia.operador.idoperador}
+                      size="sm"
+                      onGenerarPdf={() => setloading(true)}
+                      onPdfGenerado={() => setloading(false)}>
                       <small className="text-nowrap">VER PDF</small>
-                    </button>
+                    </BotonVerPdfLicencia>
 
                     <Link
                       className="btn btn-sm btn-danger"
