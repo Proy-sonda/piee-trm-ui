@@ -27,6 +27,8 @@ export const InputRut: React.FC<InputRutProps> = ({
   omitirSignoObligatorio,
   onBlur: onBlurInterno,
 }) => {
+  const MAXIMO_CARACTERES_EN_RUT = 12;
+
   const { register, setValue } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
@@ -75,8 +77,8 @@ export const InputRut: React.FC<InputRutProps> = ({
                 rut = rut.replaceAll(regex, '');
               }
 
-              if (rut.length > 10) {
-                rut = rut.substring(0, 10);
+              if (rut.length > MAXIMO_CARACTERES_EN_RUT) {
+                rut = rut.substring(0, MAXIMO_CARACTERES_EN_RUT);
               }
 
               setValue(name, rut.length > 2 ? formatRut(rut, false) : rut);
