@@ -1,7 +1,4 @@
 import { buscarEmpleadorRut } from '@/app/empleadores/(servicios)/buscar-empleador-rut';
-import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
-import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
-import { LicenciaC1 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c1/(modelos)';
 import {
   buscarZona0,
   buscarZona1,
@@ -24,13 +21,12 @@ export const ModalImprimirPdf: React.FC<ModalImprimirPdfProps> = ({
   idOperadorNumber,
   onComprobanteGenerado,
 }) => {
-  const [zona1, setzona1] = useState<LicenciaC1 | undefined>();
   const [modalimprimir, setmodalimprimir] = useState(false);
-  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
   const [, zonas] = useMergeFetchObject(
     {
       zona0: buscarZona0(foliolicencia, idOperadorNumber),
+      zona1: buscarZona1(foliolicencia, idOperadorNumber),
       zona2: buscarZona2(foliolicencia, idOperadorNumber),
       zona3: buscarZona3(foliolicencia, idOperadorNumber),
       zona4: buscarZona4(foliolicencia, idOperadorNumber),
@@ -38,28 +34,18 @@ export const ModalImprimirPdf: React.FC<ModalImprimirPdfProps> = ({
     [foliolicencia, idOperadorNumber],
   );
 
-  const [, licenciasTramitar] = useFetch(buscarLicenciasParaTramitar());
-
+  const zona1 = zonas?.zona1;
   const [, empleador] = useFetch(zona1 ? buscarEmpleadorRut(zona1.rutempleador) : emptyFetch(), [
     zona1,
   ]);
 
   useEffect(() => {
-    const x = (licenciasTramitar ?? []).find((lic) => lic.foliolicencia === foliolicencia);
-    setLicencia(x);
-  }, [licenciasTramitar]);
-
-  useEffect(() => {
-    buscarZona1(foliolicencia, idOperadorNumber).then((zona1) => setzona1(zona1));
-  }, [foliolicencia, idOperadorNumber]);
-
-  useEffect(() => {
-    if (!zonas || !zona1 || !licencia || !empleador) {
+    if (!zonas || !empleador) {
       return;
     }
 
     setmodalimprimir(true);
-  }, [zonas, zona1, licencia, empleador]);
+  }, [zonas, empleador]);
 
   useEffect(() => {
     if (!modalimprimir) {
@@ -92,8 +78,11 @@ export const ModalImprimirPdf: React.FC<ModalImprimirPdfProps> = ({
   };
 
   const calcularFechaFin = () => {
-    if (licencia?.fechainicioreposo === undefined) return new Date('01/01/1900');
-    return addDays(new Date(licencia!?.fechainicioreposo), licencia!?.diasreposo) ?? '01/01/1900';
+    if (!zonas || !zonas.zona0.fechainicioreposo) {
+      return new Date(1900, 0, 1);
+    }
+
+    return addDays(new Date(zonas.zona0.fechainicioreposo), zonas.zona0.ndias);
   };
 
   return (
@@ -111,9 +100,7 @@ export const ModalImprimirPdf: React.FC<ModalImprimirPdfProps> = ({
                   position: 'absolute',
                   alignItems: 'center',
                   alignSelf: 'center',
-                }}>
-                {/* <Image src={imgfonasa.src} alt="Fonasa header" width={80} height={40} /> */}
-              </div>
+                }}></div>
               <p>Comprobante de Tramitación</p>
             </div>
 
@@ -149,11 +136,7 @@ export const ModalImprimirPdf: React.FC<ModalImprimirPdfProps> = ({
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <label>
                     <b>NOMBRE: </b>
-                    {zonas?.zona0.nombres +
-                      ' ' +
-                      zonas?.zona0.apellidopaterno +
-                      ' ' +
-                      zonas?.zona0.apellidomaterno}
+                    {`${zonas?.zona0.nombres} ${zonas?.zona0.apellidopaterno} ${zonas?.zona0.apellidomaterno}`}
                   </label>
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
