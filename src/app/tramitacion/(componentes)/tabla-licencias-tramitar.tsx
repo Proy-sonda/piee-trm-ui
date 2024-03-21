@@ -207,7 +207,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <Stack gap={2}>
                     <Link
                       className="btn btn-sm btn-success"
-                      onClick={() => setloading(true)}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
                       <small className="text-nowrap">TRAMITAR</small>
                     </Link>
@@ -223,7 +222,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
 
                     <Link
                       className="btn btn-sm btn-danger"
-                      onClick={() => setloading(true)}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
                       <small className="text-nowrap"> NO RECEPCIONAR</small>
                     </Link>

@@ -28,7 +28,8 @@ export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
   noValidarRut,
   errores,
 }) => {
-  const largoRutValidar = 8;
+  const LARGO_RUT_VALIDAR = 8;
+  const MAXIMO_CARACTERES_EN_RUT = 12;
 
   const { register, setValue } = useFormContext();
 
@@ -68,7 +69,7 @@ export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
                   return;
                 }
 
-                if (rut.length > largoRutValidar && !validateRut(rut)) {
+                if (rut.length > LARGO_RUT_VALIDAR && !validateRut(rut)) {
                   return errores?.rutInvalido ?? `El ${tipoInput()} es inválido`;
                 }
               },
@@ -81,15 +82,15 @@ export const InputRutBusqueda: React.FC<InputRutBusquedaProps> = ({
                 rut = rut.replaceAll(regex, '');
               }
 
-              if (rut.length > 10) {
-                rut = rut.substring(0, 10);
+              if (rut.length > MAXIMO_CARACTERES_EN_RUT) {
+                rut = rut.substring(0, MAXIMO_CARACTERES_EN_RUT);
               }
 
-              setValue(name, rut.length > 8 ? formatRut(rut, false) : rut);
+              setValue(name, rut.length > LARGO_RUT_VALIDAR ? formatRut(rut, false) : rut);
             },
             onBlur: (event) => {
               const rut = event.target.value;
-              if (validateRut(rut) && rut.length > largoRutValidar) {
+              if (validateRut(rut) && rut.length > LARGO_RUT_VALIDAR) {
                 setValue(name, formatRut(rut, false));
               }
             },

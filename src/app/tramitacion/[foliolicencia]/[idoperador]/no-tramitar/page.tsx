@@ -1,6 +1,6 @@
 'use client';
 
-import { LicenciaTramitar } from '@/app/tramitacion/(modelos)';
+import { LicenciaTramitar, esLicenciaFONASA } from '@/app/tramitacion/(modelos)';
 import {
   ComboSimple,
   InputArchivo,
@@ -30,7 +30,6 @@ import {
   esOtroMotivoDeRechazo,
   esRelacionLaboralTerminada,
   motivoRechazoSolicitaAdjunto,
-  motivoRechazoSolicitaEntidadPagadora,
 } from './(modelos)';
 import {
   NoPuedeCrearZona0Error,
@@ -95,7 +94,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     try {
       setMostrarSpinner(true);
 
-      if (datos.documentoAdjunto.length > 0) {
+      if (datos.documentoAdjunto && datos.documentoAdjunto.length > 0) {
         await subirAdjuntoNoTramitar({
           folioLicencia: foliolicencia,
           idOperador: idOperadorNumber,
@@ -113,6 +112,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
       router.push('/tramitacion');
     } catch (error) {
+      console.error(error);
+
       let mensajeError = 'Hubo un error inesperado. Por favor intente más tarde.';
 
       if (error instanceof NoPuedeSubirAdjuntoNoTramitarError) {
@@ -388,35 +389,34 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                         </button>
                       </div>
                     </GuiaUsuario>
-                    <div
-                      className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
-                      ref={adjuntodoc}>
-                      <InputArchivo
-                        opcional={
-                          !motivoRechazoSeleccionado ||
-                          !motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
-                        }
-                        name="documentoAdjunto"
-                        label="Adjuntar Documento"
-                        className="mt-3"
-                      />
-                    </div>
+                    <IfContainer
+                      show={
+                        motivoRechazoSeleccionado &&
+                        motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
+                      }>
+                      <div
+                        className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                        ref={adjuntodoc}>
+                        <InputArchivo
+                          opcional={
+                            !motivoRechazoSeleccionado ||
+                            !motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
+                          }
+                          name="documentoAdjunto"
+                          label="Adjuntar Documento"
+                          className="mt-3"
+                        />
+                      </div>
+                    </IfContainer>
                   </div>
                 </Col>
 
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
-                  <IfContainer
-                    show={
-                      motivoRechazoSeleccionado &&
-                      motivoRechazoSolicitaEntidadPagadora(motivoRechazoSeleccionado)
-                    }>
+                  <IfContainer show={licencia && esLicenciaFONASA(licencia)}>
                     <ComboSimple
-                      opcional={
-                        !motivoRechazoSeleccionado ||
-                        !motivoRechazoSolicitaEntidadPagadora(motivoRechazoSeleccionado)
-                      }
+                      opcional={!licencia || !esLicenciaFONASA(licencia)}
                       name="entidadPagadoraId"
-                      label="Entidad que debe pagar subsidio o Mantener remuneración"
+                      label="Entidad que debe pagar subsidio o mantener remuneración"
                       datos={cajasDeCompensacion}
                       idElemento="idccaf"
                       descripcion="nombre"

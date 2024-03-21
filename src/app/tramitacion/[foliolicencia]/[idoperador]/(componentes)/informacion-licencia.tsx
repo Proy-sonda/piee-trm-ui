@@ -47,14 +47,15 @@ export const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
             <p>
               Licencia otorgada el día{' '}
               <b>{format(new Date(licencia!.fechaemision), 'dd/MM/yyyy')}</b> en plataforma operador{' '}
-              <b>{licencia?.operador.operador}</b> con Folio <b>{folioLicencia}</b> por{' '}
-              <b>{licencia?.tipolicencia.tipolicencia}</b>, a la persona trabajadora{' '}
+              <b>{licencia?.operador.operador}</b> por <b>{licencia?.entidadsalud.nombre}</b> con
+              Folio <b>{folioLicencia}</b> por <b>{licencia?.tipolicencia.tipolicencia}</b>, a la
+              persona trabajadora{' '}
               <b>
                 {licencia?.runtrabajador} {licencia?.nombres} {licencia?.apellidopaterno}{' '}
                 {licencia?.apellidomaterno}
               </b>{' '}
               estableciendo <b>{licencia?.tiporesposo.tiporeposo}</b> por{' '}
-              <b>{licencia?.diasreposo} días(s)</b> desde{' '}
+              <b>{licencia?.diasreposo} día(s)</b> desde{' '}
               <b>{format(new Date(licencia!?.fechainicioreposo), 'dd/MM/yyyy')} </b>
               al <b>{format(calcularFechaFin(), 'dd/MM/yyyy')}</b>
             </p>

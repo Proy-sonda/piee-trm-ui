@@ -1,6 +1,6 @@
 'use client';
 import { ComboSimple, InputFecha, InputRadioButtons } from '@/components/form';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
 import { format } from 'date-fns';
@@ -9,7 +9,6 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
-import { LicenciaC1 } from '../c1/(modelos)';
 import { buscarZona0, buscarZona1 } from '../c1/(servicios)';
 
 import { buscarCajasDeCompensacion } from '@/app/empleadores/(servicios)';
@@ -61,13 +60,16 @@ interface formularioApp {
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
   const [esAFC, setesAFC] = useState(false);
   const [entePagador, setentePagador] = useState<EntidadPagadora[]>([]);
-  const [LMECABECERA, setLMECABECERA] = useState<LicenciaC1>();
   const [fadeinOut, setfadeinOut] = useState('');
   const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
   const [LicenciasAnteriores, setLicenciasAnteriores] = useState<LicenciasAnteriores[]>([]);
   const router = useRouter();
   const [refresh, setrefresh] = useRefrescarPagina();
+  const [, LMECABECERA] = useFetch(buscarZona1(foliolicencia, Number(idoperador)), [
+    foliolicencia,
+    idoperador,
+  ]);
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject(
     {
       REGIMEN: buscarRegimen(),
@@ -160,15 +162,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       });
     }
   }, [LicenciasAnteriores]);
-
-  useEffect(() => {
-    const BuscarZonaC1 = async () => {
-      const data = await buscarZona1(foliolicencia, Number(idoperador));
-      if (data !== undefined) setLMECABECERA(data);
-    };
-
-    BuscarZonaC1();
-  }, [foliolicencia, idoperador]);
 
   const step = [
     {

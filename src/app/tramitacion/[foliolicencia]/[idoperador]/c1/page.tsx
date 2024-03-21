@@ -11,7 +11,7 @@ import {
   InputRut,
   InputTelefono,
 } from '@/components/form';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
@@ -93,7 +93,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   const [fadeinOut, setfadeinOut] = useState('');
   const [runEmpleador, setrunEmpleador] = useState<string>('');
   const [licenciaTramite, setlicenciaTramite] = useState<LicenciaTramitar>();
-  const [LMEEXIS, setLMEEXIS] = useState<LicenciaC1>();
   const [refrescar, refrescarPagina] = useRefrescarPagina();
   const [errorEmpleador, seterrorEmpleador] = useState(false);
   const [Cargando, setCargando] = useState(false);
@@ -107,6 +106,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
   const [licenciasAnteriores, setlicenciasAnteriores] = useState<LicenciasAnteriores[]>([]);
 
+  const [, LMEEXIS] = useFetch(buscarZona1(folio, Number(idoperador)), [folio, idoperador]);
   const [, licencia, cargandoData] = useMergeFetchObject(
     {
       LMETRM: buscarLicenciasParaTramitar(),
@@ -173,14 +173,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   const {
     datosGuia: { guia, AgregarGuia, listaguia },
   } = useContext(AuthContext);
-
-  useEffect(() => {
-    const BuscarLMExistente = async () => {
-      const data = await buscarZona1(folio, Number(idoperador));
-      if (data !== undefined) setLMEEXIS(data);
-    };
-    BuscarLMExistente();
-  }, [folio, idoperador]);
 
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');

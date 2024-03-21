@@ -1,8 +1,8 @@
 import { SuperUsuarioMsg } from '@/modelos/obtener-usuario-sup';
-import { runFetchAbortable, urlBackendSuperUsuario } from '.';
+import { runFetchConThrow, urlBackendSuperUsuario } from '.';
 
 export const BuscarUsuarioSu = (rut: string) => {
-  return runFetchAbortable<boolean | SuperUsuarioMsg>(
+  return runFetchConThrow<boolean | SuperUsuarioMsg>(
     `${urlBackendSuperUsuario()}/usuario/isrutexists`,
     {
       method: 'POST',
