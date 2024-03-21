@@ -1,7 +1,12 @@
 import { obtenerToken, runFetchAbortable, urlBackendTramitacion } from '@/servicios';
-import { EstadoLME, FormularioBusquedaEstadoLME } from '../(modelos)';
+import { EstadoLME } from '../(modelos)';
 
-export const buscarEstadosLME = (filtros: FormularioBusquedaEstadoLME) => {
+export interface BuscarEstadosLmeRequest {
+  idoperador: number;
+  folioLicencia: string;
+}
+
+export const buscarEstadosLME = (filtros: BuscarEstadosLmeRequest) => {
   const payload = {
     foliolicencia: filtros.folioLicencia,
     idoperador: filtros.idoperador,

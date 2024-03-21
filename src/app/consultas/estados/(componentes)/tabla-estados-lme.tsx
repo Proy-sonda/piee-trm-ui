@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import React from 'react';
-import { EstadoLME } from '../(modelos)';
+import { EstadoLME } from '../../(modelos)';
 import styles from './tabla-estados-lme.module.css';
 
 interface TablaEstadosLMEProps {

@@ -17,10 +17,11 @@ import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import React, { useEffect, useState } from 'react';
 import { Stack } from 'react-bootstrap';
+import { buscarEstadosLME } from '../(servicios)';
 import { FormularioEstadoLME, TablaEstadosLME } from './(componentes)';
 import { DatosLicencia } from './(componentes)/datos-licencia';
 import { FormularioBusquedaEstadoLME } from './(modelos)';
-import { buscarEstadosLME, buscarOperadores } from './(servicios)';
+import { buscarOperadores } from './(servicios)';
 
 interface EstadosLicenciaPageProps {}
 
