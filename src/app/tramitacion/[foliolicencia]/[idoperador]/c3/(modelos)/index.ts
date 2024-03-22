@@ -3,4 +3,5 @@ export * from './documento-adjunto-z3';
 export * from './formulario-c3';
 export * from './licencia-c3';
 export * from './licencia-c3-api';
+export * from './periodos-sugeridos';
 export * from './remuneracion';

@@ -1,6 +1,7 @@
 import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
+import { existe } from '@/utilidades';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
-import { endOfDay, getYear, isAfter, isBefore } from 'date-fns';
+import { endOfDay, endOfMonth, getYear, isAfter, isBefore, parse, startOfMonth } from 'date-fns';
 import { default as es } from 'date-fns/locale/es';
 import React, { useRef } from 'react';
 import { Form, FormGroup, InputGroup } from 'react-bootstrap';
@@ -13,7 +14,13 @@ import { useInputReciclable } from './hooks';
 registerLocale('es', es);
 setDefaultLocale('es');
 
-interface InputMesAnoProps extends InputReciclableBase, UnibleConFormArray {}
+interface InputMesAnoProps extends InputReciclableBase, UnibleConFormArray {
+  /** Fecha en formato `yyyy-MM-dd` */
+  minDate?: string;
+
+  /** Fecha en formato `yyyy-MM-dd` */
+  maxDate?: string;
+}
 
 /**
  * El valor del input va a ser un objeto `Date` con la fecha seleccionada. En caso de que la fecha
@@ -25,7 +32,26 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
   className,
   opcional,
   unirConFieldArray,
+  minDate,
+  maxDate,
 }) => {
+  const FECHA_MINIMA_POR_DEFECTO = new Date(1920, 11, 31);
+
+  const fechaMinima = existe(minDate)
+    ? parse(minDate, 'yyyy-MM', startOfMonth(new Date()))
+    : undefined;
+  const fechaMaxima = existe(maxDate)
+    ? parse(maxDate, 'yyyy-MM', endOfMonth(new Date()))
+    : undefined;
+
+  if (fechaMinima && fechaMinima < FECHA_MINIMA_POR_DEFECTO) {
+    throw new Error('InputMesAno: La fecha minima no puede ser inferior a 1920');
+  }
+
+  if (fechaMaxima && fechaMaxima < FECHA_MINIMA_POR_DEFECTO) {
+    throw new Error('InputMesAno: La fecha maxima no puede ser inferior a 1920');
+  }
+
   const { control } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
@@ -57,14 +83,22 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
                     return 'La fecha es inválida';
                   }
                 },
-                despuesDe1920: (fecha: Date) => {
-                  if (isBefore(fecha, new Date(1920, 11, 31))) {
+                posteriorAFechaMinima: (fecha: Date) => {
+                  if (!fechaMinima && isBefore(fecha, FECHA_MINIMA_POR_DEFECTO)) {
                     return 'Debe ser mayor o igual a enero de 1921';
                   }
+
+                  if (fechaMinima && isBefore(fecha, fechaMinima)) {
+                    return `Debe ser mayor o igual a ${minDate}`;
+                  }
                 },
-                noMayorQueHoy: (fecha: Date) => {
-                  if (isAfter(fecha, endOfDay(Date.now()))) {
+                anteriorAfechaMaxima: (fecha: Date) => {
+                  if (!fechaMaxima && isAfter(fecha, endOfDay(Date.now()))) {
                     return 'No puede ser posterior a hoy';
+                  }
+
+                  if (fechaMaxima && isAfter(fecha, fechaMaxima)) {
+                    return `Debe ser menor o igual a ${maxDate}`;
                   }
                 },
               },
@@ -77,6 +111,8 @@ export const InputMesAno: React.FC<InputMesAnoProps> = ({
                   'form-control cursor-pointer position-relative border rounded-end-0 border-end-0 ' +
                   `${tieneError ? 'is-invalid border-danger background-img-none' : ''}`
                 }
+                minDate={fechaMinima}
+                maxDate={fechaMaxima}
                 showMonthYearPicker
                 showFullMonthYearPicker
                 showFourColumnMonthYearPicker

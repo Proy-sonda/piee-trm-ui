@@ -32,6 +32,10 @@ interface TablaDeRentasProps {
   fieldArray: TipoRemuneracion;
   remuneraciones: UseFieldArrayReturn<FormularioC3, TipoRemuneracion, 'id'>;
   onClickBotonDesglose: (datos: DatosModalDesgloseHaberes) => void | Promise<void>;
+  rangoPeriodo?: {
+    desde: string;
+    hasta: string;
+  };
 }
 
 export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
@@ -42,6 +46,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
   tiposPrevisiones,
   remuneraciones,
   onClickBotonDesglose,
+  rangoPeriodo,
 }) => {
   const TIPO_MONTO_NAME = entidadPrevisionalEsAFP(zona2.entidadprevisional)
     ? 'totalRemuneracion'
@@ -173,6 +178,8 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                       <InputMesAno
                         opcional={fieldArray === 'remuneracionesMaternidad' || index !== 0}
                         name={`${fieldArray}.${index}.periodoRenta`}
+                        minDate={rangoPeriodo?.desde}
+                        maxDate={rangoPeriodo?.hasta}
                         unirConFieldArray={{
                           index,
                           campo: 'periodoRenta',
