@@ -12,7 +12,7 @@ export const buscarRangoLmeAnterioresSugeridos = (
 
   const toRangoLmeSugerido = async () => {
     const rentasSugeridasAPI = await requestPeriodos();
-    const [desde, hasta] = rentasSugeridasAPI.PeriodoLMEAnteriores.split('|');
+    const [desde, hasta] = rentasSugeridasAPI.PeriodoLMEAnteriores.split('|').sort();
     const rentasSugeridas: RangoLmeAnterioresSugerido = { desde, hasta };
     return rentasSugeridas;
   };
