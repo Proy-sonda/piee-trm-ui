@@ -13,7 +13,7 @@ export const buscarPeriodosSugeridos = (
   const toModeloRentasSugeridas = async () => {
     const rentasSugeridasAPI = await requestRentas();
 
-    const [desdeNormal, hastaNormal] = rentasSugeridasAPI.PeriodoRentasNormales.split('|');
+    const [hastaNormal, desdeNormal] = rentasSugeridasAPI.PeriodoRentasNormales.split('|');
     const rangoMaternal =
       rentasSugeridasAPI.PeriodoRentasMaternales === ''
         ? undefined

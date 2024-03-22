@@ -3,8 +3,9 @@ import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar'
 import { InputFecha } from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
-import { useFetch, useRefrescarPagina } from '@/hooks';
+import { emptyFetch, useEstaCargando, useFetch, useHayError, useRefrescarPagina } from '@/hooks';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
+import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -13,6 +14,7 @@ import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { InputDias } from '../(componentes)/input-dias';
+import { buscarZona2 } from '../c2/(servicios)';
 import { DatosModalConfirmarTramitacion, ModalConfirmarTramitacion } from './(componentes)';
 import {
   FormularioC4,
@@ -20,7 +22,12 @@ import {
   estaLicenciaAnteriorCompleta,
   licenciaAnteriorTieneCamposValidos,
 } from './(modelos)';
-import { buscarZona4, crearLicenciaZ4, tramitarLicenciaMedica } from './(servicios)';
+import {
+  buscarRangoLmeAnterioresSugeridos,
+  buscarZona4,
+  crearLicenciaZ4,
+  tramitarLicenciaMedica,
+} from './(servicios)';
 
 const IfContainer = dynamic(() => import('@/components/if-container'), { ssr: false });
 const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'), { ssr: false });
@@ -93,10 +100,26 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   const [refresh, refrescarZona4] = useRefrescarPagina();
 
+  const [errZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
+
+  const [errRango, rangoSugerido, cargandoRango] = useFetch(
+    licencia && zona2
+      ? buscarRangoLmeAnterioresSugeridos({
+          fechaInicio: format(new Date(licencia.fechainicioreposo), 'yyyy-MM-dd'),
+          idCalidadTrabajador: zona2.calidadtrabajador.idcalidadtrabajador,
+          idTipoLicencia: licencia.tipolicencia.idtipolicencia,
+        })
+      : emptyFetch(),
+    [licencia, zona2],
+  );
+
   const [errorZona4, zona4, cargandoZona4] = useFetch(
     buscarZona4(foliolicencia, idOperadorNumber),
     [refresh],
   );
+
+  const hayError = useHayError(errZona2, errRango, errorZona4);
+  const cargando = useEstaCargando(cargandoZona2, cargandoRango, cargandoZona4);
 
   // Limpiar errores al no informar licencias
   useEffect(() => {
@@ -361,11 +384,11 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         }}
       />
 
-      <IfContainer show={cargandoZona4}>
+      <IfContainer show={cargando}>
         <LoadingSpinner titulo="Cargando información..." />
       </IfContainer>
 
-      <IfContainer show={!cargandoZona4 && errorZona4}>
+      <IfContainer show={!cargando && hayError}>
         <Row className="pt-5 pb-1">
           <Col xs={12}>
             <h1 className="fs-3 text-center">Error</h1>
@@ -376,7 +399,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         </Row>
       </IfContainer>
 
-      <IfContainer show={!cargandoZona4 && !errorZona4}>
+      <IfContainer show={!cargando && !hayError}>
         <Row className="mt-2 mb-3">
           <Col xs={12}>
             <FormGroup controlId="informarLicencias" className="ps-0">
@@ -468,7 +491,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         </IfContainer>
 
         <FormProvider {...formulario}>
-          <form id="tramitacionC4" onSubmit={formulario.handleSubmit(onSubmitForm)}>
+          <form id="tramitacionC4" onSubmit={formulario.handleSubmit(onSubmitForm)} noValidate>
             <Row>
               <Col xs={12}>
                 <Table className="table table-bordered">
@@ -597,6 +620,8 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                             deshabilitado={!informarLicencias}
                             name={`licenciasAnteriores.${index}.desde`}
                             noPosteriorA={`licenciasAnteriores.${index}.hasta`}
+                            minDate={rangoSugerido?.desde}
+                            maxDate={rangoSugerido?.hasta}
                             unirConFieldArray={{
                               index,
                               campo: 'desde',
@@ -610,6 +635,8 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                             deshabilitado={!informarLicencias}
                             name={`licenciasAnteriores.${index}.hasta`}
                             noAnteriorA={`licenciasAnteriores.${index}.desde`}
+                            minDate={rangoSugerido?.desde}
+                            maxDate={rangoSugerido?.hasta}
                             unirConFieldArray={{
                               index,
                               campo: 'hasta',
