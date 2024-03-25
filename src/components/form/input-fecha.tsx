@@ -117,8 +117,6 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 if (esFechaInvalida(fecha) && !esFechaInvalida(hasta)) {
                   return 'Debe incluir la fecha desde';
                 }
-
-                clearErrors(noPosteriorA);
               },
               noPosteriorAHasta: (fecha: Date) => {
                 // Este input es de "tipo desde". Se asume que la fecha de este input es valida
@@ -154,8 +152,6 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 if (esFechaInvalida(fecha) && !esFechaInvalida(desde)) {
                   return 'Debe incluir la fecha hasta';
                 }
-
-                clearErrors(noAnteriorA);
               },
               noAnteriorADesde: (fecha: Date) => {
                 // Este input es de tipo "hasta". Se asume que la fecha de este input es valida
@@ -175,20 +171,6 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                 if (!esFechaInvalida(desde) && isAfter(fecha, desde)) {
                   clearErrors(noPosteriorA);
                 }
-
-                if (!esFechaInvalida(desde) && isAfter(fecha, desde)) {
-                  clearErrors(noPosteriorA);
-                }
-
-                if (!esFechaInvalida(desde) && isAfter(fecha, desde)) {
-                  clearErrors(noPosteriorA);
-                }
-
-                if (!esFechaInvalida(desde) && isAfter(fecha, desde)) {
-                  clearErrors(noPosteriorA);
-                }
-
-                clearErrors(noAnteriorA);
               },
             },
           })}

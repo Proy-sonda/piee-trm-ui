@@ -1,3 +1,5 @@
+import Position from '@/components/stage/position';
+
 export const metadata = {
   title: 'Bandeja de Tramitación',
   description:
@@ -5,5 +7,10 @@ export const metadata = {
 };
 
 export default function TramitacionLayout({ children }: { children: React.ReactNode }) {
-  return <div className="mx-3 mx-lg-5 py-4">{children}</div>;
+  return (
+    <>
+      <Position />
+      <div className="mx-3 mx-lg-5 py-4">{children}</div>;
+    </>
+  );
 }

@@ -1,3 +1,4 @@
+import { BotonVerPdfLicencia } from '@/components';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
@@ -247,16 +248,14 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     </button>
                   </IfContainer>
 
-                  <button
-                    className="btn btn-sm btn-primary"
-                    onClick={() => {
-                      AlertaInformacion.fire(
-                        'Funcionalidad en desarrollo',
-                        'Esta funcionalidad se encuentra en desarrollo, por favor intente más tarde.',
-                      );
-                    }}>
+                  <BotonVerPdfLicencia
+                    folioLicencia={licencia.foliolicencia}
+                    idOperador={licencia.operador.idoperador}
+                    size="sm"
+                    onGenerarPdf={() => setMostrarSpinner(true)}
+                    onPdfGenerado={() => setMostrarSpinner(false)}>
                     <small className="text-nowrap">VER PDF</small>
-                  </button>
+                  </BotonVerPdfLicencia>
                 </Stack>
               </td>
             </tr>

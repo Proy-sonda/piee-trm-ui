@@ -1,7 +1,7 @@
 'use client';
 import { ComboSimple, InputFecha, InputRadioButtons } from '@/components/form';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
-import { AlertaError, AlertaExito } from '@/utilidades/alertas';
+import { useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,6 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
-import { LicenciaC1 } from '../c1/(modelos)';
 import { buscarZona0, buscarZona1 } from '../c1/(servicios)';
 
 import { buscarCajasDeCompensacion } from '@/app/empleadores/(servicios)';
@@ -19,7 +18,9 @@ import { AuthContext } from '@/contexts';
 import { useRefrescarPagina } from '@/hooks';
 import dynamic from 'next/dynamic';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
+import { LicenciasAnteriores } from '../(modelo)/licencias-anteriores';
 import { buscarCalidadTrabajador } from '../(servicios)';
+import { BuscarLicenciasAnteriores } from '../(servicios)/buscar-licencias-anteriores';
 import { EntidadPagadora, EntidadPrevisional, Licenciac2 } from './(modelos)';
 import {
   ErrorCrearLicenciaC2,
@@ -59,12 +60,16 @@ interface formularioApp {
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
   const [esAFC, setesAFC] = useState(false);
   const [entePagador, setentePagador] = useState<EntidadPagadora[]>([]);
-  const [LMECABECERA, setLMECABECERA] = useState<LicenciaC1>();
   const [fadeinOut, setfadeinOut] = useState('');
   const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
+  const [LicenciasAnteriores, setLicenciasAnteriores] = useState<LicenciasAnteriores[]>([]);
   const router = useRouter();
   const [refresh, setrefresh] = useRefrescarPagina();
+  const [, LMECABECERA] = useFetch(buscarZona1(foliolicencia, Number(idoperador)), [
+    foliolicencia,
+    idoperador,
+  ]);
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject(
     {
       REGIMEN: buscarRegimen(),
@@ -95,13 +100,68 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   }, []);
 
   useEffect(() => {
-    const BuscarZonaC1 = async () => {
-      const data = await buscarZona1(foliolicencia, Number(idoperador));
-      if (data !== undefined) setLMECABECERA(data);
-    };
+    if (combos?.LMETRM) {
+      const BuscarLicenciaAnterior = async () => {
+        const [data] = await BuscarLicenciasAnteriores(
+          combos?.LMETRM.find((l) => l.foliolicencia === foliolicencia)!.runtrabajador,
+        );
 
-    BuscarZonaC1();
-  }, [foliolicencia, idoperador]);
+        setLicenciasAnteriores(await data());
+      };
+
+      BuscarLicenciaAnterior();
+    }
+  }, [combos]);
+
+  useEffect(() => {
+    if (LicenciasAnteriores.length > 0) {
+      const resp = AlertaConfirmacion.fire({
+        html: `Existen datos de licencias anteriores <br/>
+      ¿Desea auto completar?`,
+      });
+
+      console.log(
+        LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString(),
+      );
+
+      resp.then((result) => {
+        if (result.isConfirmed) {
+          formulario.setValue(
+            'regimen',
+            LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoregimenprevisional,
+          );
+          formulario.setValue(
+            'calidad',
+            LicenciasAnteriores[0].licenciazc2[0].calidadtrabajador.idcalidadtrabajador.toString(),
+          );
+          formulario.setValue(
+            'contratoIndefinido',
+            LicenciasAnteriores[0].licenciazc2[0].codigocontratoindef == 1 ? '1' : '0',
+          );
+          formulario.setValue(
+            'fechaafilacionprevisional',
+            format(new Date(LicenciasAnteriores[0].licenciazc2[0].fechaafiliacion), 'yyyy-MM-dd'),
+          );
+
+          formulario.setValue(
+            'previsional',
+            LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString() +
+              LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.letraentidadprevisional,
+          );
+
+          formulario.setValue(
+            'fechacontratotrabajo',
+            format(new Date(LicenciasAnteriores[0].licenciazc2[0].fechacontrato), 'yyyy-MM-dd'),
+          );
+
+          formulario.setValue(
+            'entidadremuneradora',
+            LicenciasAnteriores[0].licenciazc2[0].entidadpagadora.identidadpagadora,
+          );
+        }
+      });
+    }
+  }, [LicenciasAnteriores]);
 
   const step = [
     {

@@ -5,7 +5,9 @@ import { LicenciaC0 } from '../(modelos)/';
 
 export class ErrorCrearLicencia extends Error {}
 
-export const crearLicenciaZ0 = async (licencia: LicenciaC0) => {
+export type CrearLicenciaC0Request = Omit<LicenciaC0, 'ruttramitacion'>;
+
+export const crearLicenciaZ0 = async (licencia: CrearLicenciaC0Request) => {
   try {
     await runFetchConThrow<void>(`${urlBackendTramitacion()}/licencia/zona0/create`, {
       method: 'POST',

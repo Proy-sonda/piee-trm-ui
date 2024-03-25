@@ -11,9 +11,9 @@ import {
   InputRut,
   InputTelefono,
 } from '@/components/form';
-import { useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
 import { useRefrescarPagina } from '@/hooks/use-refrescar-pagina';
-import { AlertaError, AlertaExito } from '@/utilidades/alertas';
+import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
 import format from 'date-fns/format';
 import dynamic from 'next/dynamic';
@@ -35,11 +35,13 @@ import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licenci
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { LicenciaC1 } from './(modelos)';
 import { formularioApp } from './(modelos)/formulario-type';
-import { LicenciaC0 } from './(modelos)/licencia-c0';
 
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
+import { LicenciasAnteriores } from '../(modelo)/licencias-anteriores';
+import { BuscarLicenciasAnteriores } from '../(servicios)/buscar-licencias-anteriores';
 import {
+  CrearLicenciaC0Request,
   ErrorCrearLicencia,
   ErrorCrearLicenciaC1,
   buscarZona1,
@@ -91,7 +93,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   const [fadeinOut, setfadeinOut] = useState('');
   const [runEmpleador, setrunEmpleador] = useState<string>('');
   const [licenciaTramite, setlicenciaTramite] = useState<LicenciaTramitar>();
-  const [LMEEXIS, setLMEEXIS] = useState<LicenciaC1>();
   const [refrescar, refrescarPagina] = useRefrescarPagina();
   const [errorEmpleador, seterrorEmpleador] = useState(false);
   const [Cargando, setCargando] = useState(false);
@@ -103,6 +104,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     OCUPACION: buscarOcupacion(),
   });
 
+  const [licenciasAnteriores, setlicenciasAnteriores] = useState<LicenciasAnteriores[]>([]);
+
+  const [, LMEEXIS] = useFetch(buscarZona1(folio, Number(idoperador)), [folio, idoperador]);
   const [, licencia, cargandoData] = useMergeFetchObject(
     {
       LMETRM: buscarLicenciasParaTramitar(),
@@ -111,20 +115,64 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     [refrescar],
   );
 
+  useEffect(() => {
+    if (licencia?.LMETRM) {
+      const BuscarLicenciaAnterior = async () => {
+        const [data] = await BuscarLicenciasAnteriores(
+          licencia.LMETRM.find((l) => l.foliolicencia === folio)!.runtrabajador,
+        );
+
+        setlicenciasAnteriores(await data());
+      };
+
+      BuscarLicenciaAnterior();
+    }
+  }, [licencia]);
+
+  useEffect(() => {
+    if (licenciasAnteriores.length > 0) {
+      const resp = AlertaConfirmacion.fire({
+        html: `Existen datos de licencias anteriores <br/>
+      ¿Desea auto completar?`,
+      });
+
+      resp.then((result) => {
+        if (result.isConfirmed) {
+          formulario.setValue('numero', licenciasAnteriores[0].licenciazc1[0].numero);
+          formulario.setValue('telefono', licenciasAnteriores[0].licenciazc1[0].telefono);
+          formulario.setValue('departamento', licenciasAnteriores[0].licenciazc1[0].depto);
+          formulario.setValue(
+            'tipo',
+            licenciasAnteriores[0].licenciazc1[0].tipocalle.idtipocalle.toString(),
+          );
+          formulario.setValue(
+            'region',
+            licenciasAnteriores[0].licenciazc1[0].comuna.idcomuna.substring(0, 2),
+          );
+          formulario.setValue('comuna', licenciasAnteriores[0].licenciazc1[0].comuna.idcomuna);
+
+          formulario.setValue(
+            'actividadlaboral',
+            licenciasAnteriores[0].licenciazc1[0].actividadlaboral.idactividadlaboral.toString(),
+          );
+
+          formulario.setValue(
+            'ocupacion',
+            licenciasAnteriores[0].licenciazc1[0].ocupacion.idocupacion.toString(),
+          );
+
+          formulario.setValue('calle', licenciasAnteriores[0].licenciazc1[0].direccion);
+        }
+      });
+    }
+  }, [licenciasAnteriores]);
+
   const fechaRecepLME = useRef(null);
   const tipoCalle = useRef(null);
   const comboOcupacion = useRef(null);
   const {
     datosGuia: { guia, AgregarGuia, listaguia },
   } = useContext(AuthContext);
-
-  useEffect(() => {
-    const BuscarLMExistente = async () => {
-      const data = await buscarZona1(folio, Number(idoperador));
-      if (data !== undefined) setLMEEXIS(data);
-    };
-    BuscarLMExistente();
-  }, [folio, idoperador]);
 
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
@@ -257,7 +305,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       });
       return false;
     }
-    let licenciaC0: LicenciaC0 = {
+    let licenciaC0: CrearLicenciaC0Request = {
       estadolicencia: licenciaTramite!?.estadolicencia,
       fechaemision: format(new Date(licenciaTramite!?.fechaemision), 'yyyy-MM-dd'),
       fechainicioreposo: format(new Date(licenciaTramite!?.fechainicioreposo), 'yyy-MM-dd'),

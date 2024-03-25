@@ -1,25 +1,20 @@
 'use client';
 
 import { Titulo } from '@/components';
+import IfContainer from '@/components/if-container';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores } from '@/servicios';
 import { existe, strIncluye } from '@/utilidades';
 import { isWithinInterval } from 'date-fns';
-import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { FiltroLicenciasTramitadas, TablaLicenciasTramitadas } from './(componentes)';
 import {
   FiltroBusquedaLicenciasTramitadas,
   LicenciaTramitada,
   hayFiltrosLicenciasTramitadas,
 } from './(modelos)';
 import { buscarEstadosLicencias, buscarLicenciasTramitadas } from './(servicios)';
-
-const IfContainer = dynamic(() => import('@/components/if-container'));
-const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
-// prettier-ignore
-const TablaLicenciasTramitadas = dynamic(() => import('./(componentes)').then((x) => x.TablaLicenciasTramitadas));
-// prettier-ignore
-const FiltroLicenciasTramitadas = dynamic(() => import('./(componentes)').then((x) => x.FiltroLicenciasTramitadas));
 
 const LicenciasTramitadasPage = () => {
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({

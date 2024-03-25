@@ -1,38 +1,44 @@
 'use client';
 
 import { LicenciaTramitar, esLicenciaFONASA } from '@/app/tramitacion/(modelos)';
-import { ComboSimple, InputArchivo, InputFecha, InputRadioButtons, Titulo } from '@/components';
-
+import {
+  ComboSimple,
+  InputArchivo,
+  InputFecha,
+  InputRadioButtons,
+  Titulo,
+  valorPorDefectoCombo,
+} from '@/components';
+import { GuiaUsuario } from '@/components/guia-usuario';
+import IfContainer from '@/components/if-container';
+import LoadingSpinner from '@/components/loading-spinner';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
+import { useMergeFetchArray } from '@/hooks';
+import { AlertaError, AlertaExito } from '@/utilidades';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import Swal from 'sweetalert2';
-import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
-
-import { GuiaUsuario } from '@/components/guia-usuario';
-import { AuthContext } from '@/contexts';
-import { useMergeFetchArray } from '@/hooks';
-import dynamic from 'next/dynamic';
 import { InformacionLicencia } from '../(componentes)';
 import { buscarCajasDeCompensacion } from '../(servicios)';
+import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import {
   FormularioNoTramitarLicencia,
   NoRecepcionarLicenciaPageProps,
   esOtroMotivoDeRechazo,
   esRelacionLaboralTerminada,
+  motivoRechazoSolicitaAdjunto,
 } from './(modelos)';
 import {
   NoPuedeCrearZona0Error,
+  NoPuedeSubirAdjuntoNoTramitarError,
   NoTramitarError,
   buscarMotivosDeRechazo,
   noTamitarLicenciaMedica,
+  subirAdjuntoNoTramitar,
 } from './(servicios)';
-
-const IfContainer = dynamic(() => import('@/components/if-container'));
-const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
-const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
 
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliolicencia, idoperador },
@@ -65,14 +71,20 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   const adjuntodoc = useRef(null);
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
-
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   const formulario = useForm<FormularioNoTramitarLicencia>({
     mode: 'onBlur',
+    defaultValues: {
+      otroMotivoDeRechazo: '',
+      entidadPagadoraId: valorPorDefectoCombo('number'),
+    },
   });
 
   const motivoRechazo = formulario.watch('motivoRechazo');
+  const motivoRechazoSeleccionado = (motivosDeRechazo ?? []).find(
+    (m) => m.idmotivonorecepcion === parseInt(motivoRechazo, 10),
+  );
 
   const noTramitarLicencia: SubmitHandler<FormularioNoTramitarLicencia> = async (datos) => {
     if (!licencia) {
@@ -82,22 +94,31 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     try {
       setMostrarSpinner(true);
 
+      if (datos.documentoAdjunto && datos.documentoAdjunto.length > 0) {
+        await subirAdjuntoNoTramitar({
+          folioLicencia: foliolicencia,
+          idOperador: idOperadorNumber,
+          archivo: datos.documentoAdjunto.item(0)!,
+        });
+      }
+
       await noTamitarLicenciaMedica(licencia, {
         ...datos,
         folioLicencia: foliolicencia,
         idOperador: idOperadorNumber,
       });
 
-      Swal.fire({
-        icon: 'success',
-        html: 'Licencia no será tramitada',
-        showConfirmButton: false,
-        timer: 2000,
-      });
+      AlertaExito.fire({ html: 'Licencia no será tramitada' });
 
       router.push('/tramitacion');
     } catch (error) {
+      console.error(error);
+
       let mensajeError = 'Hubo un error inesperado. Por favor intente más tarde.';
+
+      if (error instanceof NoPuedeSubirAdjuntoNoTramitarError) {
+        mensajeError = 'Error al subir archivo adjunto';
+      }
 
       if (error instanceof NoPuedeCrearZona0Error) {
         mensajeError = 'Error al guardar licencia';
@@ -107,11 +128,9 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
         mensajeError = 'Error al no tramitar la licencia';
       }
 
-      Swal.fire({
-        icon: 'error',
+      AlertaError.fire({
         title: 'Error',
         text: mensajeError,
-        confirmButtonColor: 'var(--color-blue)',
       });
     } finally {
       setMostrarSpinner(false);
@@ -370,17 +389,25 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                         </button>
                       </div>
                     </GuiaUsuario>
-                    <div
-                      className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
-                      ref={adjuntodoc}>
-                      <InputArchivo
-                        // opcional={esRelacionLaboralTerminada(motivoRechazo)} // TODO: Descomentar cuando subir archivos sea obligatorio
-                        opcional
-                        name="documentoAdjunto"
-                        label="Adjuntar Documento"
-                        className="mt-3"
-                      />
-                    </div>
+                    <IfContainer
+                      show={
+                        motivoRechazoSeleccionado &&
+                        motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
+                      }>
+                      <div
+                        className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                        ref={adjuntodoc}>
+                        <InputArchivo
+                          opcional={
+                            !motivoRechazoSeleccionado ||
+                            !motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
+                          }
+                          name="documentoAdjunto"
+                          label="Adjuntar Documento"
+                          className="mt-3"
+                        />
+                      </div>
+                    </IfContainer>
                   </div>
                 </Col>
 
@@ -389,7 +416,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                     <ComboSimple
                       opcional={!licencia || !esLicenciaFONASA(licencia)}
                       name="entidadPagadoraId"
-                      label="Entidad que debe pagar subsidio o Mantener remuneración"
+                      label="Entidad que debe pagar subsidio o mantener remuneración"
                       datos={cajasDeCompensacion}
                       idElemento="idccaf"
                       descripcion="nombre"

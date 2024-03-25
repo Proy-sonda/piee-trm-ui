@@ -1,16 +1,6 @@
-'use client';
-
-import { AuthContext } from '@/contexts';
+import { cookies, headers } from 'next/headers';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './position.module.css';
-
-import { useUrl } from '@/hooks';
-import dynamic from 'next/dynamic';
-import IfContainer from '../if-container';
-
-const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
 
 type PositionProps = {
   /**
@@ -26,63 +16,34 @@ type Tab = {
 };
 
 const Position: React.FC<PositionProps> = ({}) => {
-  const [tabs, setTabs] = useState<Tab[]>([]);
-  const [Cargando, setCargando] = useState(false);
-  const { fullPath } = useUrl();
+  const tabs: Tab[] = [
+    { href: '/tramitacion', titulo: 'Bandeja de Tramitación' },
+    { href: '/licencias-tramitadas', titulo: 'Licencias Tramitadas' },
+    { href: '/consultas', titulo: 'Consultas' },
+    { href: '/empleadores', titulo: 'Entidades Empleadoras' },
+  ];
 
-  const {
-    usuario,
-    datosGuia: { guia, listaguia },
-  } = useContext(AuthContext);
-  const target = useRef(null);
-
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const tabsUsuario: Tab[] = [
-      { href: '/tramitacion', titulo: 'Bandeja de Tramitación' },
-      { href: '/licencias-tramitadas', titulo: 'Licencias Tramitadas' },
-      { href: '/consultas', titulo: 'Consultas' },
-      { href: '/empleadores', titulo: 'Entidades Empleadoras' },
-    ];
-
-    setTabs(tabsUsuario);
-  }, [usuario]);
-
-  useEffect(() => {}, [listaguia]);
+  const headersList = headers();
+  const pathname = headersList.get('x-invoke-path') ?? '';
+  const usuario = cookies().get('token')?.value;
 
   const esTabActiva = (tab: Tab) => {
     return pathname.startsWith(tab.href);
   };
 
-  if (!usuario) {
-    return null;
-  }
-
-  if (fullPath === '/superusuario') {
+  if (!usuario || pathname === '/superusuario') {
     return null;
   }
 
   return (
     <>
-      <IfContainer show={Cargando}>
-        <SpinnerPantallaCompleta />
-      </IfContainer>
-
       <div className={`container-fluid px-0`}>
         <div className="bg-white border-bottom border-1 text-center d-flex flex-column flex-md-row justify-content-center">
           {tabs.map((tab, index) => (
             <div
               key={index}
               className={`py-1 flex-grow-1 ${esTabActiva(tab) && styles['tab-activa']}`}>
-              <Link
-                href={tab.href}
-                onClick={() => {
-                  setCargando(true);
-                  setTimeout(() => {
-                    setCargando(false);
-                  }, 2000);
-                }}>
+              <Link href={tab.href}>
                 <label
                   className={`mt-2 form-label cursor-pointer ${styles['texto-inactivo']} ${
                     esTabActiva(tab) && styles['tab-activa-texto']

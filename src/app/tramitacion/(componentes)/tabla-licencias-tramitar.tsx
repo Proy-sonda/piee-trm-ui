@@ -1,9 +1,9 @@
+import { BotonVerPdfLicencia } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
-import { AlertaInformacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
@@ -11,7 +11,6 @@ import Link from 'next/link';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { LicenciaTramitar } from '../(modelos)';
-import { agregarEstadoDeTramitacion } from '../(servicios)/agregar-estado-de-tramitacion';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -29,7 +28,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: licencias,
     tamanoPagina: 5,
-    porCadaElemento: agregarEstadoDeTramitacion,
   });
 
   const [loading, setloading] = useState(false);
@@ -209,25 +207,21 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <Stack gap={2}>
                     <Link
                       className="btn btn-sm btn-success"
-                      onClick={() => setloading(true)}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
                       <small className="text-nowrap">TRAMITAR</small>
                     </Link>
 
-                    <button
-                      className="btn btn-sm btn-primary"
-                      onClick={() => {
-                        AlertaInformacion.fire(
-                          'Funcionalidad en desarrollo',
-                          'Esta funcionalidad se encuentra en desarrollo, por favor intente más tarde.',
-                        );
-                      }}>
+                    <BotonVerPdfLicencia
+                      folioLicencia={licencia.foliolicencia}
+                      idOperador={licencia.operador.idoperador}
+                      size="sm"
+                      onGenerarPdf={() => setloading(true)}
+                      onPdfGenerado={() => setloading(false)}>
                       <small className="text-nowrap">VER PDF</small>
-                    </button>
+                    </BotonVerPdfLicencia>
 
                     <Link
                       className="btn btn-sm btn-danger"
-                      onClick={() => setloading(true)}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
                       <small className="text-nowrap"> NO RECEPCIONAR</small>
                     </Link>

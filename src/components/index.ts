@@ -1,3 +1,4 @@
+export * from './boton-ver-pdf-licencia';
 export * from './form/index';
 export * from './if-container';
 export * from './loading-spinner';

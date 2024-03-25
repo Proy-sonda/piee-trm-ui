@@ -19,6 +19,8 @@ export interface LicenciaC0 {
   entidadsalud: Entidadsalud;
   ccaf?: ccaf;
   tiporeposo: Tiporeposo;
+  /** Es un string vacio para las licencias en las que no se alcanzo a guardar el RUT */
+  ruttramitacion: string;
 }
 
 interface Entidadsalud {
@@ -49,7 +51,6 @@ interface Tipolicencia {
   idtipolicencia: number;
   tipolicencia: string;
 }
-
 
 interface ccaf {
   idccaf: number;
