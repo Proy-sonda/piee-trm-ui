@@ -91,7 +91,7 @@ export const TablaTrabajadores: React.FC<props> = ({
                   {trabajador.runtrabajador}
                   {/* </Link> */}
                 </Td>
-                <Td>{format(new Date(trabajador.fecharegistro), 'dd-MM-yyyy hh:mm:ss')}</Td>
+                <Td>{format(new Date(trabajador.fecharegistro), 'dd-MM-yyyy HH:mm:ss')}</Td>
 
                 {rolEnEmpleadorActual === 'administrador' && (
                   <Td>
