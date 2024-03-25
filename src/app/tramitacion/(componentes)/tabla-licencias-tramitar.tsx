@@ -31,6 +31,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     tamanoPagina: 5,
     porCadaElemento: agregarEstadoDeTramitacion,
   });
+
   const [loading, setloading] = useState(false);
   const target = useRef(null);
 

@@ -27,6 +27,10 @@ export class UsuarioToken {
     return this.tokenAuth.user.ultimaconexion;
   }
 
+  get rutsuper() {
+    return this.tokenAuth.user.rutsuper;
+  }
+
   /**
    * @returns
    * Por cuantos segundos es valido el token, desde la emisión de este;

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useContext, useEffect, useRef, useState } from 'react';
 import styles from './position.module.css';
 
+import { useUrl } from '@/hooks';
 import dynamic from 'next/dynamic';
 import IfContainer from '../if-container';
 
@@ -27,6 +28,7 @@ type Tab = {
 const Position: React.FC<PositionProps> = ({}) => {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [Cargando, setCargando] = useState(false);
+  const { fullPath } = useUrl();
 
   const {
     usuario,
@@ -54,6 +56,10 @@ const Position: React.FC<PositionProps> = ({}) => {
   };
 
   if (!usuario) {
+    return null;
+  }
+
+  if (fullPath === '/superusuario') {
     return null;
   }
 

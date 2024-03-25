@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 const Marquesina = () => {
   const [error, mensajes, pendiente] = useFetch(obtenerMensajes());
   const [mensajemarquesina, setmensajemarquesina] = useState<string>('');
+
   useEffect(() => {
     if (mensajes) {
       const marquesina = mensajes.find((m) => m.idmensajegeneral === 1)!?.mensaje || '';
@@ -25,12 +26,17 @@ const Marquesina = () => {
 
   return (
     <div
-      className="alert alert-warning"
+      className="alert alert-warning alert-dismissible fade show"
       role="alert"
       style={{
         display: mensajemarquesina ? 'block' : 'none',
       }}>
       <b dangerouslySetInnerHTML={{ __html: mensajemarquesina }} />
+      <button
+        type="button"
+        className="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"></button>
     </div>
   );
 };
