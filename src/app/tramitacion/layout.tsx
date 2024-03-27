@@ -9,7 +9,7 @@ export const metadata = {
 export default function TramitacionLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Position />
+      <Position tabActiva="tramitacion" />
       <div className="mx-3 mx-lg-5 py-4">{children}</div>;
     </>
   );
