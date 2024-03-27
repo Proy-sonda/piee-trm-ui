@@ -19,6 +19,7 @@ export interface LicenciasAnteriores {
   estadotramitacion: Estadotramitacion;
   licenciazc1: Licenciazc1[];
   licenciazc2: Licenciazc2[];
+  licenciazc4: LicenciaAnteriorZC4[];
 }
 
 interface Licenciazc2 {
@@ -108,4 +109,23 @@ interface Tipolicencia {
 interface Operador {
   idoperador: number;
   operador: string;
+}
+
+export interface LicenciaAnteriorZC4 {
+  foliolicencia: string;
+  operador: number;
+  correlativo: number;
+  lmandias: number;
+
+  /**
+   * En formato ISO 8601
+   * @example 2023-03-03T03:00:00.000Z
+   */
+  lmafechadesde: string;
+
+  /**
+   * En formato ISO 8601
+   * @example 2023-03-04T03:00:00.000Z
+   */
+  lmafechahasta: string;
 }

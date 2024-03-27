@@ -9,7 +9,7 @@ import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Alert, Col, Form, FormGroup, Row } from 'react-bootstrap';
+import { Alert, Col, Form, FormGroup, Row, Stack } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
@@ -23,6 +23,7 @@ import {
   licenciaAnteriorTieneCamposValidos,
 } from './(modelos)';
 import {
+  buscarFechasDeLicenciasAnteriores,
   buscarRangoLmeAnterioresSugeridos,
   buscarZona4,
   crearLicenciaZ4,
@@ -36,6 +37,8 @@ const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-panta
 });
 
 const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }) => {
+  const TOTAL_DE_LICENCIAS_ANTERIORES = 6;
+
   const idOperadorNumber = parseInt(idoperador);
 
   const step = [
@@ -69,6 +72,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   } = useContext(AuthContext);
 
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const [mostrarMensajeLA, setMostrarMensajeLA] = useState(true);
 
   const formulario = useForm<FormularioC4>({
     mode: 'onBlur',
@@ -118,6 +122,13 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     [refresh],
   );
 
+  const [, fechasLicenciasAnteriores] = useFetch(
+    licencia && rangoSugerido
+      ? buscarFechasDeLicenciasAnteriores(licencia.runtrabajador, rangoSugerido)
+      : emptyFetch(),
+    [licencia, rangoSugerido],
+  );
+
   const hayError = useHayError(errZona2, errRango, errorZona4);
   const cargando = useEstaCargando(cargandoZona2, cargandoRango, cargandoZona4);
 
@@ -136,11 +147,9 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   // Parchar cambios o crear filas de ser necesario
   useEffect(() => {
-    const numeroLicenciasAnteriores = 6;
-
     // Crear si no existen
     if (!zona4 && licenciasAnteriores.fields.length === 0) {
-      for (let index = 0; index < numeroLicenciasAnteriores; index++) {
+      for (let index = 0; index < TOTAL_DE_LICENCIAS_ANTERIORES; index++) {
         licenciasAnteriores.append({
           dias: undefined,
           desde: undefined,
@@ -159,7 +168,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         } as any);
       }
 
-      let filasRestantes = numeroLicenciasAnteriores - zona4.length;
+      let filasRestantes = TOTAL_DE_LICENCIAS_ANTERIORES - zona4.length;
       while (filasRestantes-- > 0) {
         licenciasAnteriores.append({
           dias: undefined,
@@ -176,22 +185,25 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       let index = 0;
       for (index = 0; index < zona4.length; index++) {
         const licenciaZ4 = zona4[index];
-
-        formulario.setValue(`licenciasAnteriores.${index}.dias`, licenciaZ4.lmandias);
-        formulario.setValue(`licenciasAnteriores.${index}.desde`, licenciaZ4.lmafechadesde as any);
-        formulario.setValue(`licenciasAnteriores.${index}.hasta`, licenciaZ4.lmafechahasta as any);
+        licenciasAnteriores.update(index, {
+          dias: licenciaZ4.lmandias,
+          desde: licenciaZ4.lmafechadesde as any,
+          hasta: licenciaZ4.lmafechahasta as any,
+        });
       }
 
       // Borrar el resto de filas
-      while (index++ < numeroLicenciasAnteriores) {
-        formulario.setValue(`licenciasAnteriores.${index}.dias`, undefined as any);
-        formulario.setValue(`licenciasAnteriores.${index}.desde`, undefined as any);
-        formulario.setValue(`licenciasAnteriores.${index}.hasta`, undefined as any);
+      while (index++ < TOTAL_DE_LICENCIAS_ANTERIORES) {
+        licenciasAnteriores.update(index, {
+          dias: undefined as any,
+          desde: undefined as any,
+          hasta: undefined as any,
+        });
       }
 
       formulario.setValue('informarLicencia', zona4.length !== 0);
     }
-  }, [zona4]);
+  }, [zona4, rangoSugerido]);
 
   const onSubmitForm: SubmitHandler<FormularioC4> = async (datos) => {
     /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
@@ -354,6 +366,35 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     });
   };
 
+  const autocompletarLicenciasAnteriores = () => {
+    if (!fechasLicenciasAnteriores) {
+      return;
+    }
+
+    let index = 0;
+    for (index = 0; index < fechasLicenciasAnteriores.length; index++) {
+      const licenciaZ4 = fechasLicenciasAnteriores[index];
+      licenciasAnteriores.update(index, {
+        dias: licenciaZ4.lmandias,
+        desde: format(new Date(licenciaZ4.lmafechadesde), 'yyyy-MM-dd') as any,
+        hasta: format(new Date(licenciaZ4.lmafechahasta), 'yyyy-MM-dd') as any,
+      });
+    }
+
+    // Borrar el resto de filas
+    while (index++ < TOTAL_DE_LICENCIAS_ANTERIORES) {
+      licenciasAnteriores.update(index, {
+        dias: undefined as any,
+        desde: undefined as any,
+        hasta: undefined as any,
+      });
+    }
+
+    formulario.setValue('informarLicencia', true);
+
+    setMostrarMensajeLA(false);
+  };
+
   return (
     <>
       <ModalConfirmarTramitacion
@@ -400,6 +441,36 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       </IfContainer>
 
       <IfContainer show={!cargando && !hayError}>
+        <IfContainer
+          show={
+            fechasLicenciasAnteriores && fechasLicenciasAnteriores.length > 0 && mostrarMensajeLA
+          }>
+          <Row className="my-2">
+            <Col xs={12}>
+              <Alert variant="info">
+                <h2 className="fs-6">Licencias Anteriores Encontradas</h2>
+                <p>
+                  Este trabajador cuenta con licencias anteriores tramitadas en portal PIEE.{' '}
+                  <span className="fw-semibold">¿Desea autocompletar los datos?</span>
+                </p>
+
+                <Stack direction="horizontal" gap={2}>
+                  <button
+                    className="btn btn-sm btn-danger"
+                    onClick={() => setMostrarMensajeLA(false)}>
+                    Cancelar
+                  </button>
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={() => autocompletarLicenciasAnteriores()}>
+                    Autocompletar
+                  </button>
+                </Stack>
+              </Alert>
+            </Col>
+          </Row>
+        </IfContainer>
+
         <Row className="mt-2 mb-3">
           <Col xs={12}>
             <FormGroup controlId="informarLicencias" className="ps-0">
@@ -635,8 +706,6 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                             deshabilitado={!informarLicencias}
                             name={`licenciasAnteriores.${index}.hasta`}
                             noAnteriorA={`licenciasAnteriores.${index}.desde`}
-                            minDate={rangoSugerido?.desde}
-                            maxDate={rangoSugerido?.hasta}
                             unirConFieldArray={{
                               index,
                               campo: 'hasta',
