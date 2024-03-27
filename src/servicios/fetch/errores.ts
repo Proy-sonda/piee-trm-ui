@@ -20,3 +20,9 @@ export class ErrorFetchDesconocido extends Error {
 }
 
 export type FetchError = HttpError | ErrorFetchDesconocido;
+
+export const esFetchError = (x: any): x is FetchError => {
+  return (
+    x !== null && x !== undefined && (x instanceof HttpError || x instanceof ErrorFetchDesconocido)
+  );
+};
