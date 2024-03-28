@@ -134,8 +134,10 @@ export const LoginComponent: React.FC<{}> = () => {
       </IfContainer>
 
       <FormProvider {...formulario}>
-        <form onSubmit={formulario.handleSubmit(handleLoginUsuario)} className={styles.formlogin}>
-          <label style={{ fontWeight: 'bold' }}>
+        <form
+          onSubmit={formulario.handleSubmit(handleLoginUsuario)}
+          className={`mx-auto p-3 p-sm-4 w-100 rounded ${styles.formlogin}`}>
+          <label className="fw-bold">
             Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
           </label>
           <br />
@@ -155,20 +157,15 @@ export const LoginComponent: React.FC<{}> = () => {
             className="mb-3"
           />
 
-          <div className={'mt-2 ' + styles.btnlogin}>
+          <div className="mt-3 pt-2 w-100 d-flex flex-column-reverse flex-sm-row align-items-sm-center justify-content-sm-between">
             <label
-              style={{
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                color: 'blue',
-                marginRight: '50px',
-              }}
+              className="cursor-pointer mt-3 mt-sm-0 text-center text-decoration-underline"
+              style={{ color: 'blue' }}
               onClick={() => setShowModalRecuperarClave(true)}>
               Recuperar clave de acceso
-            </label>{' '}
-            &nbsp;
-            <button type="submit" className="btn btn-primary">
-              Ingresar
+            </label>
+            <button type="submit" className="btn btn-primary text-nowrap">
+              Ingresar al Portal
             </button>
           </div>
         </form>
