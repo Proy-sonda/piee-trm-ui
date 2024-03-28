@@ -35,9 +35,10 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
     datosGuia: { AgregarGuia, listaguia, guia },
   } = useContext(AuthContext);
 
-  const { empleadorActual, cambiarEmpleador } = useEmpleadorActual();
+  const { empleadorActual, cambiarEmpleador, actualizarRol } = useEmpleadorActual();
   useEffect(() => {
     cambiarEmpleador(rutempleador);
+    actualizarRol();
   }, [rutempleador]);
 
   const pathname = usePathname();
