@@ -103,12 +103,12 @@ export const LoginComponent: React.FC<{}> = () => {
       let messageError = '';
 
       if (error instanceof RutInvalidoError) {
-        messageError = `<br/> Rut Invalido`;
+        messageError = `<br/> Rut Inválido`;
       } else if (
         error instanceof LoginPasswordInvalidoError ||
         error instanceof UsuarioNoExisteError
       ) {
-        messageError = 'Contraseña invalida';
+        messageError = 'Contraseña inválida';
       } else if (error instanceof AutenticacionTransitoriaError) {
         setShowModalCambiarClave(true);
       } else {

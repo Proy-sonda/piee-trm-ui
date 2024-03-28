@@ -274,7 +274,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         if (msgError.includes('trabajador ya existe en el empleador'))
           msgError = '<p>Persona trabajadora ya existe</p>';
         if (msgError.includes('verificador invalido'))
-          msgError = '<p>Código verificador invalido</p>';
+          msgError = '<p>Código verificador inválido</p>';
 
         AlertaError.fire({
           html: 'Existe un problema al momento de grabar ' + (msgError ? msgError : data.text()),
@@ -513,7 +513,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                         })}
                       />
                       <IfContainer show={error.run}>
-                        <div className="invalid-tooltip">Debe ingresar un RUN valido</div>
+                        <div className="invalid-tooltip">Debe ingresar un RUN válido</div>
                       </IfContainer>
                     </div>
                     <div className="d-block d-sm-none d-md-none d-xs-block">
