@@ -19,6 +19,9 @@ const AppFooter: React.FC<AppFooterProps> = ({ children }) => {
         <div className="row mb-4">
           <div className="col-12">
             <div className={styles['footer-content']}>
+              <div className="mb-2 text-center" style={{ fontSize: '16px' }}>
+                Para soporte comunicarse a:
+              </div>
               <div className={styles['contact']}>
                 {ultimaConexion && (
                   <>
