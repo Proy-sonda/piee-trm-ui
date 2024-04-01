@@ -250,14 +250,22 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const router = useRouter();
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
-    if (!getValues('run')) return;
+    const runTrabajadorNuevo = getValues('run');
+    if (!runTrabajadorNuevo) return;
     if (error.run) return;
+
+    if (trabajadores.some((t) => t.runtrabajador === runTrabajadorNuevo)) {
+      return AlertaError.fire({
+        title: 'Error',
+        html: `Ya existe un trabajador con RUN <b>${runTrabajadorNuevo}</b> en esta unidad.`,
+      });
+    }
 
     const crearTrabajadorAux = async () => {
       const trabajador: Trabajadoresxrrhh = {
         acciontraxrrhh: 1,
         codigounidadrrhh: idunidad,
-        runtrabajador: getValues('run'),
+        runtrabajador: runTrabajadorNuevo,
       };
 
       if (empleadorActual == undefined || usuario == undefined) return;
