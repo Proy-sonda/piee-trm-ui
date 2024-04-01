@@ -19,9 +19,6 @@ const AppFooter: React.FC<AppFooterProps> = ({ children }) => {
         <div className="row mb-4">
           <div className="col-12">
             <div className={styles['footer-content']}>
-              <div className="mb-2 text-center" style={{ fontSize: '16px' }}>
-                Para soporte comunicarse a:
-              </div>
               <div className={styles['contact']}>
                 {ultimaConexion && (
                   <>
@@ -29,6 +26,9 @@ const AppFooter: React.FC<AppFooterProps> = ({ children }) => {
                     {format(new Date(ultimaConexion), 'dd/MM/yyyy HH:mm:ss')} <br />
                   </>
                 )}
+                <div className="mt-2 text-center" style={{ fontSize: '16px' }}>
+                  Para soporte comunicarse a:
+                </div>
                 <span>Teléfono:</span>&nbsp;<a href="tel:+56227149554">+56227149554</a> -{' '}
                 <span>Email:</span>{' '}
                 <a href="mailto:soportempleador@fonasa.gov.cl">soportempleador@fonasa.gov.cl</a>
