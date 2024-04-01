@@ -38,8 +38,8 @@ export const InputCalle: React.FC<InputCalleProps> = ({ name, label, className }
               message: 'No puede tener más de 80 caracteres',
             },
             pattern: {
-              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s#&]+$/,
-              message: 'Solo puede contener letras, # y/o &',
+              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s#&\d]+$/,
+              message: 'Solo puede contener letras, números, # y/o &',
             },
             onBlur: (event: any) => {
               const value = event.target.value;
