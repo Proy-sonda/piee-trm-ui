@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { InputReciclableBase } from './base-props';
@@ -31,7 +31,9 @@ export const ComboComuna: React.FC<ComboComunaProps> = ({
   regionSeleccionada,
   textoOpcionPorDefecto,
 }) => {
-  const { register } = useFormContext();
+  const COMUNA_POR_DEFECTO = '';
+
+  const { register, setValue, getValues } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'comuna',
@@ -40,6 +42,17 @@ export const ComboComuna: React.FC<ComboComunaProps> = ({
       texto: label,
     },
   });
+
+  const comunasRegionSeleccionada = (comunas ?? []).filter(
+    ({ region: { idregion } }) => idregion === regionSeleccionada,
+  );
+
+  useEffect(() => {
+    const comunaSeleccionada = getValues(name);
+    if (!comunasRegionSeleccionada.some((c) => c.idcomuna === comunaSeleccionada)) {
+      setValue(name, COMUNA_POR_DEFECTO);
+    }
+  }, [regionSeleccionada]);
 
   return (
     <>
@@ -52,20 +65,18 @@ export const ComboComuna: React.FC<ComboComunaProps> = ({
           {...register(name, {
             validate: {
               comboObligatorio: (valor: string) => {
-                if (typeof valor === 'string' && valor === '') {
+                if (typeof valor === 'string' && valor === COMUNA_POR_DEFECTO) {
                   return 'Este campo es obligatorio';
                 }
               },
             },
           })}>
-          <option value={''}>{textoOpcionPorDefecto ?? 'Seleccionar'}</option>
-          {(comunas ?? [])
-            .filter(({ region: { idregion } }) => idregion == regionSeleccionada)
-            .map(({ idcomuna, nombre }) => (
-              <option key={idcomuna} value={idcomuna}>
-                {nombre}
-              </option>
-            ))}
+          <option value={COMUNA_POR_DEFECTO}>{textoOpcionPorDefecto ?? 'Seleccionar'}</option>
+          {comunasRegionSeleccionada.map(({ idcomuna, nombre }) => (
+            <option key={idcomuna} value={idcomuna}>
+              {nombre}
+            </option>
+          ))}
         </Form.Select>
 
         <Form.Control.Feedback type="invalid" tooltip>
