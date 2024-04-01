@@ -254,7 +254,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     if (!runTrabajadorNuevo) return;
     if (error.run) return;
 
-    if (trabajadores.some((t) => t.runtrabajador === runTrabajadorNuevo)) {
+    if (trabajadorExisteEnGrilla(runTrabajadorNuevo)) {
       return AlertaError.fire({
         title: 'Error',
         html: `Ya existe un trabajador con RUN <b>${runTrabajadorNuevo}</b> en esta unidad.`,
@@ -293,6 +293,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     crearTrabajadorAux();
   };
 
+  const trabajadorExisteEnGrilla = (rut: string) => {
+    return trabajadores.some((t) => t.runtrabajador === rut);
+  };
+
   const handleClickNomina = async (event: FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
@@ -328,27 +332,34 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     setspinnerCargar(true);
     let recuento = 0;
     let recuentoError = 0;
+    let recuentoNuevos = 0;
+    let recuentoExistentes = 0;
     settextProgress('Cargando Personas Trabajadoras...');
     let rutagregados: any[] = [];
 
     for (let index = 0; index < csvData.length; index++) {
-      const element = csvData[index];
+      const rutTrabjadorCSV =
+        csvData[index] && csvData[index].trim() !== ''
+          ? formatRut(csvData[index], false)
+          : csvData[index];
+
       recuento = ++recuento;
-      if (element.trim() != '') {
+      if (rutTrabjadorCSV.trim() != '') {
         const trabajador: Trabajadoresxrrhh = {
           acciontraxrrhh: 1,
           codigounidadrrhh: idunidad,
-          runtrabajador: formatRut(element, false),
+          runtrabajador: rutTrabjadorCSV,
         };
 
         if (empleadorActual == undefined || usuario == undefined) return;
         const data = await crearTrabajador(trabajador, usuario.rut, empleadorActual.rutempleador);
         if (data.ok) {
           setcuentagrabados((recuento / csvData.length) * 100);
+          trabajadorExisteEnGrilla(rutTrabjadorCSV) ? recuentoExistentes++ : recuentoNuevos++;
         } else {
           setcuentagrabados((recuento / csvData.length) * 100);
           recuentoError = ++recuentoError;
-          rutagregados = [...rutagregados, element];
+          rutagregados = [...rutagregados, rutTrabjadorCSV];
         }
       }
     }
@@ -356,9 +367,25 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     if (recuento - recuentoError > 0) {
       setspinnerCargar(false);
       AlertaExito.fire({
-        html: `Se ha grabado <b>${
-          recuento - recuentoError
-        } persona(s) trabajadora(s)</b> con éxito`,
+        html:
+          `<p>Se han grabado <b>${
+            recuento - recuentoError
+          } persona(s) trabajadora(s)</b> con éxito.</p>` +
+          `
+          <table class="table">
+            <tbody>
+              <tr>
+                <td class="fw-semibold">Nuevos</td>
+                <td>${recuentoNuevos}</td>
+              </tr>
+              <tr>
+                <td class="fw-semibold">Existentes</td>
+                <td>${recuentoExistentes}</td>
+              </tr>
+            </tbody>
+          </table>
+        `,
+        timer: 4500,
         didClose: async () => {
           refrescarComponente();
           setcuentagrabados(0);
