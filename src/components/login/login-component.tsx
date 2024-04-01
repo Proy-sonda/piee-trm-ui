@@ -157,9 +157,9 @@ export const LoginComponent: React.FC<{}> = () => {
             className="mb-3"
           />
 
-          <div className="mt-3 pt-2 w-100 d-flex flex-column-reverse flex-sm-row align-items-sm-center justify-content-sm-between">
+          <div className="mt-3 pt-2 w-100 d-flex flex-column-reverse flex-lg-row align-items-lg-center justify-content-lg-between">
             <label
-              className="cursor-pointer mt-3 mt-sm-0 text-center text-decoration-underline"
+              className="cursor-pointer mt-3 mt-lg-0 text-center text-decoration-underline"
               style={{ color: 'blue' }}
               onClick={() => setShowModalRecuperarClave(true)}>
               Recuperar clave de acceso
