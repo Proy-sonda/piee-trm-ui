@@ -8,8 +8,8 @@ import { adsUrl } from '@/servicios/environment';
 import { Metadata } from 'next';
 import React from 'react';
 
-export const metadada: Metadata = {
-  title: 'Portal Tramitación LME 234',
+export const metadata: Metadata = {
+  title: 'Portal Tramitación LME',
 };
 
 interface HomePageProps {
