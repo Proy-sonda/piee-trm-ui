@@ -21,7 +21,14 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
   estadosLicencias,
   onFiltrarLicencias,
 }) => {
-  const formulario = useForm<FormularioFiltrarLicenciasHistoricas>({ mode: 'onBlur' });
+  const formulario = useForm<FormularioFiltrarLicenciasHistoricas>({
+    mode: 'onBlur',
+    defaultValues: {
+      folio: '',
+      fechaDesde: '2023-10-01' as any,
+      fechaHasta: '2023-11-30' as any,
+    },
+  });
 
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
 
@@ -45,7 +52,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
       folio: folio.trim() === '' ? undefined : folio,
       runPersonaTrabajadora: runPersonaTrabajadora === '' ? undefined : runPersonaTrabajadora,
       idEstado: esElValorPorDefecto(idEstado) ? undefined : idEstado,
-      tipoPeriodo: esElValorPorDefecto(tipoPeriodo) ? undefined : tipoPeriodo,
+      tipoPeriodo: esElValorPorDefecto(tipoPeriodo) ? 0 : tipoPeriodo,
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora) ? undefined : rutEntidadEmpleadora,
@@ -88,12 +95,12 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
               label="Consultar por fecha de"
               className="col-12 col-md-6 col-lg-3"
               datos={[
-                { label: 'Emisión', value: 'fecha-emision' },
-                { label: 'Tramitación', value: 'fecha-tramitacion' },
+                { label: 'Emisión', value: 1 },
+                { label: 'Tramitación', value: 2 },
               ]}
               idElemento={'value'}
               descripcion={'label'}
-              tipoValor="string"
+              textoOpcionPorDefecto="No Aplica"
             />
 
             <InputFecha
@@ -138,7 +145,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
           <div className="mt-4 row">
             <div className="d-flex">
               <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-sm-grow-0">
-                Filtrar
+                Buscar
               </button>
             </div>
           </div>

@@ -2,7 +2,8 @@ export interface FiltroBusquedaLicenciasHistoricas {
   folio?: string;
   runPersonaTrabajadora?: string;
   idEstado?: number;
-  tipoPeriodo?: 'fecha-emision' | 'fecha-tramitacion';
+  /** 0: No Aplica; 1: Fecha Emisión 2: Fecha Tramitación */
+  tipoPeriodo: 0 | 1 | 2;
   fechaDesde?: Date;
   fechaHasta?: Date;
   rutEntidadEmpleadora?: string;

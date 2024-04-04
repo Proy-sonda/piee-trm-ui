@@ -1,52 +1,25 @@
 export interface LicenciaHistorica {
-  foliolicencia: string;
   operador: Operador;
-  ruttrabajador: string;
+  foliolicencia: string;
+  rutempleador: string;
+  codigounidadRRHH: string;
+  runtrabajador: string;
   apellidopaterno: string;
   apellidomaterno: string;
   nombres: string;
+  tiporeposo: Tiporeposo;
+  jornadareposoparcial: string;
   fechaemision: string;
   fechainicioreposo: string;
-  ndias: number;
-  fechaestado: string;
-  fechaterminorelacion: null;
-  otromotivonorecepcion: string;
-  licenciasanteriores: number;
-  fechatramitacion: string;
-  estadolicencia: Estadolicencia;
-  entidadsalud: Entidadsalud;
+  diasreposo: number;
   tipolicencia: Tipolicencia;
-  tiporeposo: Tiporeposo;
-  estadotramitacion: Estadotramitacion;
-  licenciazc1: Licenciazc1;
-}
-
-interface Entidadsalud {
-  identidadsalud: number;
-  rut: string;
-  nombre: string;
+  estadolicencia: Estadolicencia;
+  fechaestadolicencia: string;
 }
 
 interface Estadolicencia {
   idestadolicencia: number;
   estadolicencia: string;
-}
-
-interface Estadotramitacion {
-  idestadotramitacion: number;
-  estadotramitacion: string;
-}
-
-interface Licenciazc1 {
-  foliolicencia: string;
-  operador: number;
-  rutempleador: string;
-  direccion: string;
-  numero: string;
-  depto: string;
-  telefono: string;
-  fecharecepcion: string;
-  glosaotraocupacion: string;
 }
 
 interface Operador {
@@ -63,19 +36,3 @@ interface Tiporeposo {
   idtiporeposo: number;
   tiporeposo: string;
 }
-
-export const licenciaFueTramitadaPorEmpleador = ({ estadotramitacion }: LicenciaHistorica) => {
-  return estadotramitacion.idestadotramitacion === 2;
-};
-
-export const licenciaFueEnviadaAlOperador = ({ estadotramitacion }: LicenciaHistorica) => {
-  return estadotramitacion.idestadotramitacion === 3;
-};
-
-export const licenciaFueTramitadaPorOperador = ({ estadotramitacion }: LicenciaHistorica) => {
-  return estadotramitacion.idestadotramitacion === 4;
-};
-
-export const licenciaConErrorDeEnvio = ({ estadotramitacion }: LicenciaHistorica) => {
-  return estadotramitacion.idestadotramitacion === 30;
-};
