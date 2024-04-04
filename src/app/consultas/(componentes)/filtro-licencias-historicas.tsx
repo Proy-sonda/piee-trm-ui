@@ -55,7 +55,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
       folio: folio.trim() === '' ? undefined : folio,
       runPersonaTrabajadora: runPersonaTrabajadora === '' ? undefined : runPersonaTrabajadora,
       idEstado: esElValorPorDefecto(idEstado) ? undefined : idEstado,
-      tipoPeriodo: esElValorPorDefecto(tipoPeriodo) ? undefined : tipoPeriodo,
+      tipoPeriodo: esElValorPorDefecto(tipoPeriodo) ? 0 : tipoPeriodo,
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora) ? undefined : rutEntidadEmpleadora,
@@ -75,6 +75,9 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
               className="col-12 col-md-6 col-lg-3"
               errores={{
                 rutInvalido: 'El folio de licencia es inválido',
+              }}
+              onBlur={() => {
+                formulario.trigger();
               }}
             />
 
@@ -102,12 +105,15 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
               label="Consultar por fecha de"
               className="col-12 col-md-6 col-lg-3"
               datos={[
-                { label: 'No Aplica', value: 0 },
                 { label: 'Emisión', value: 1 },
                 { label: 'Tramitación', value: 2 },
               ]}
               idElemento={'value'}
               descripcion={'label'}
+              textoOpcionPorDefecto="No Aplica"
+              errores={{
+                obligatorio: 'No puede ser la opción "No Aplica"',
+              }}
             />
 
             <InputFecha

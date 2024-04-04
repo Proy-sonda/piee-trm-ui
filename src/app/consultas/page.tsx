@@ -35,7 +35,7 @@ const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
       </IfContainer>
 
       <IfContainer show={hayError}>
-        <h4 className="pb-5 text-center">Error al cargar licencias historicas</h4>
+        <h4 className="py-5 text-center">Error al cargar licencias historicas</h4>
       </IfContainer>
 
       <IfContainer show={!hayError}>
