@@ -61,3 +61,7 @@ interface Tiporeposo {
   idtiporeposo: number;
   tiporeposo: string;
 }
+
+export const licenciaCompletoTramitacion = (zona0: LicenciaC0) => {
+  return zona0.estadotramitacion.idestadotramitacion !== 1;
+};

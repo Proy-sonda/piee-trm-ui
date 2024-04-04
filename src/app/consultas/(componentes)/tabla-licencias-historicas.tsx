@@ -1,11 +1,14 @@
+import { licenciaCompletoTramitacion } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c1/(modelos)';
+import { buscarZona0 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c1/(servicios)';
 import { BotonVerPdfLicencia } from '@/components';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { AlertaConfirmacion, AlertaInformacion } from '@/utilidades';
+import { AlertaConfirmacion, AlertaError } from '@/utilidades';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
+import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { ModalHistoricoEstadoLicencia } from '.';
@@ -13,14 +16,18 @@ import { LicenciaHistorica } from '../(modelos)';
 import { BuscarHistorialEstadosLmeRequest } from '../(servicios)';
 import styles from './tabla-licencias-historicas.module.css';
 
+const ModalComprobanteTramitacion = dynamic(() =>
+  import('@/components/modal-comprobante-tramitacion').then((x) => x.ModalComprobanteTramitacion),
+);
+
 interface TablaLicenciasHistoricasProps {
   licencias: LicenciaHistorica[];
 }
 
-// interface DatosComprobanteTramitacion {
-//   folioLicencia: string;
-//   idOperador: number;
-// }
+interface DatosComprobanteTramitacion {
+  folioLicencia: string;
+  idOperador: number;
+}
 
 export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> = ({
   licencias,
@@ -36,20 +43,36 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     useState<BuscarHistorialEstadosLmeRequest>();
 
   // prettier-ignore
-  // const [datosComprobanteTramitacion, setDatosComprobanteTramitacion] = useState<DatosComprobanteTramitacion>();
+  const [datosComprobanteTramitacion, setDatosComprobanteTramitacion] = useState<DatosComprobanteTramitacion>();
 
   const nombreTrabajador = (licencia: LicenciaHistorica) => {
     return `${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`;
   };
 
-  const imprimirComprobanteTramitacion = async (licencia: LicenciaHistorica) => {
-    const { isConfirmed } = await AlertaInformacion.fire({
-      html: 'Funcionalidad en construcción',
-    });
+  const generarComprobanteTramitacion = async (licencia: LicenciaHistorica) => {
+    const [request] = buscarZona0(licencia.foliolicencia, licencia.operador.idoperador);
+    const zona0 = await request();
 
-    if (!isConfirmed) {
+    let mensaje: string | undefined;
+    if (!zona0) {
+      mensaje = 'no ha sido tramitada en portal PIEE';
+    } else if (zona0 && !licenciaCompletoTramitacion(zona0)) {
+      mensaje = 'no se ha completado el proceso de tramitación';
+    }
+
+    if (mensaje) {
+      AlertaError.fire({
+        titleText: 'Error',
+        html: `No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}.`,
+      });
       return;
     }
+
+    setMostrarSpinner(true);
+    setDatosComprobanteTramitacion({
+      folioLicencia: zona0.foliolicencia,
+      idOperador: zona0.operador.idoperador,
+    });
   };
 
   const verHistoricosEstadoLicencia = async (licencia: LicenciaHistorica) => {
@@ -100,6 +123,17 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
       <IfContainer show={mostrarSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
+
+      {datosComprobanteTramitacion && (
+        <ModalComprobanteTramitacion
+          foliolicencia={datosComprobanteTramitacion.folioLicencia}
+          idOperadorNumber={datosComprobanteTramitacion.idOperador}
+          onComprobanteGenerado={() => {
+            setDatosComprobanteTramitacion(undefined);
+            setMostrarSpinner(false);
+          }}
+        />
+      )}
 
       <ModalHistoricoEstadoLicencia
         show={mostrarModalHistorico}
@@ -167,7 +201,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
                     <button className="btn btn-sm btn-primary">
                       <small
                         className="text-nowrap"
-                        onClick={() => imprimirComprobanteTramitacion(licencia)}>
+                        onClick={() => generarComprobanteTramitacion(licencia)}>
                         COMPROBANTE TRAMITACIÓN
                       </small>
                     </button>
