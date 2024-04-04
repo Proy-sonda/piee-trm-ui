@@ -4,10 +4,12 @@ import React from 'react';
 import { Form } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import { InputReciclableBase } from './base-props';
+import { ErroresEditables, InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
-interface InputRutProps extends InputReciclableBase {
+interface InputRutProps
+  extends InputReciclableBase,
+    ErroresEditables<'obligatorio' | 'rutInvalido'> {
   /** Define si usar RUT o RUN en los mensajes de error (defecto: `rut`) */
   tipo?: 'rut' | 'run';
 
@@ -26,6 +28,7 @@ export const InputRut: React.FC<InputRutProps> = ({
   opcional,
   omitirSignoObligatorio,
   onBlur: onBlurInterno,
+  errores,
 }) => {
   const MAXIMO_CARACTERES_EN_RUT = 12;
 
@@ -56,7 +59,7 @@ export const InputRut: React.FC<InputRutProps> = ({
           {...register(name, {
             required: {
               value: !opcional,
-              message: `El ${tipoInput()} es obligatorio`,
+              message: errores?.obligatorio ?? `El ${tipoInput()} es obligatorio`,
             },
             validate: {
               esRut: (rut) => {
@@ -65,7 +68,7 @@ export const InputRut: React.FC<InputRutProps> = ({
                 }
 
                 if (!validateRut(rut)) {
-                  return `El ${tipoInput()} es inválido`;
+                  return errores?.rutInvalido ?? `El ${tipoInput()} es inválido`;
                 }
               },
             },

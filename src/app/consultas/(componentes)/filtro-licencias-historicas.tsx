@@ -33,6 +33,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
   });
 
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
+  const folioLicencia = formulario.watch('folio');
 
   const [, unidadesRRHH] = useFetch(
     rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),
@@ -67,13 +68,22 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
           <div className="row g-3 align-items-baseline">
-            <InputRut opcional name="folio" label="Folio" className="col-12 col-md-6 col-lg-3" />
+            <InputRut
+              opcional
+              name="folio"
+              label="Folio Licencia"
+              className="col-12 col-md-6 col-lg-3"
+              errores={{
+                rutInvalido: 'El folio de licencia es inválido',
+              }}
+            />
 
             <InputRut
               opcional
               name="runPersonaTrabajadora"
               label="RUN Persona Trabajadora"
               className="col-12 col-md-6 col-lg-3"
+              tipo="run"
             />
 
             <ComboSimple
@@ -87,7 +97,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
             />
 
             <ComboSimple
-              opcional
+              opcional={folioLicencia !== ''}
               name="tipoPeriodo"
               label="Consultar por fecha de"
               className="col-12 col-md-6 col-lg-3"
@@ -101,7 +111,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
             />
 
             <InputFecha
-              opcional
+              opcional={folioLicencia !== ''}
               name="fechaDesde"
               noPosteriorA="fechaHasta"
               label="Fecha Desde"
@@ -109,7 +119,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
             />
 
             <InputFecha
-              opcional
+              opcional={folioLicencia !== ''}
               name="fechaHasta"
               noAnteriorA="fechaDesde"
               label="Fecha Hasta"

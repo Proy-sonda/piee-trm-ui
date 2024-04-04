@@ -10,7 +10,7 @@ export const buscarLicenciasHistoricas = (request: FiltroBusquedaLicenciasHistor
     runtrabajador: request.runPersonaTrabajadora ?? '',
     estadolicencia: request.idEstado ?? 0,
     rutempleador: request.rutEntidadEmpleadora ?? '',
-    codigounidadRRHH: request.idUnidadRRHH ?? 0,
+    codigounidadRRHH: request.idUnidadRRHH ?? '',
     indicadortipofecha: request.tipoPeriodo,
     fechadesde: request.fechaDesde ? format(request.fechaDesde, 'yyyy-MM-dd HH:mm:ss') : '',
     fechahasta: request.fechaHasta ? format(request.fechaHasta, 'yyyy-MM-dd HH:mm:ss') : '',
