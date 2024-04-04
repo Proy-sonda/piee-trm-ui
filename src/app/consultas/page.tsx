@@ -1,36 +1,70 @@
-import Link from 'next/link';
-import React from 'react';
+'use client';
 
-interface ConsultasPageProps {}
+import { Titulo } from '@/components';
+import IfContainer from '@/components/if-container';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { useEstaCargando, useFetch, useHayError, useMergeFetchObject } from '@/hooks';
+import { buscarEmpleadores, emptyFetch } from '@/servicios';
+import React, { useState } from 'react';
+import { FiltroLicenciasHistoricas, TablaLicenciasHistoricas } from './(componentes)';
+import { FiltroBusquedaLicenciasHistoricas } from './(modelos)';
+import { buscarEstadosLicencias, buscarLicenciasHistoricas } from './(servicios)';
 
-const ConsultasPage: React.FC<ConsultasPageProps> = ({}) => {
+interface ConsultaHistoricosPageProps {}
+
+const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
+  const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltroBusquedaLicenciasHistoricas>();
+
+  const [erroresCombos, datosBandeja, cargandoCombos] = useMergeFetchObject({
+    empleadores: buscarEmpleadores(''),
+    estadosLicencias: buscarEstadosLicencias(),
+  });
+
+  const [errorCargaLicencias, licenciasHistoricas, cargandoLicencias] = useFetch(
+    filtrosBusqueda ? buscarLicenciasHistoricas(filtrosBusqueda) : emptyFetch(),
+    [filtrosBusqueda],
+  );
+
+  const estaCargando = useEstaCargando(cargandoCombos, cargandoLicencias);
+  const hayError = useHayError(erroresCombos, errorCargaLicencias);
+
   return (
     <>
-      <div
-        className="my-5 row"
-        style={{
-          alignItems: 'center',
-        }}>
-        <div className="col-md-6 text-center">
-          <Link href="/consultas/historicos" className="btn btn-primary">
-            Históricos Licencias
-          </Link>
-          <p>
-            <sub>Buscador de todas las licencias de un trabajador</sub>
-          </p>
+      <IfContainer show={estaCargando}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
+
+      <IfContainer show={hayError}>
+        <h4 className="pb-5 text-center">Error al cargar licencias historicas</h4>
+      </IfContainer>
+
+      <IfContainer show={!hayError}>
+        <div className="row">
+          <Titulo url="">
+            <h5>Filtro para Licencias Históricas</h5>
+          </Titulo>
         </div>
 
-        <div className="col-md-6 text-center">
-          <Link href="/consultas/estados" className="btn btn-primary">
-            Estados por Licencias
-          </Link>
-          <p>
-            <sub>Búsqueda de estados por la cual ha pasado una licencia</sub>
-          </p>
+        <div className="pt-3 pb-4 border-bottom border-1">
+          <FiltroLicenciasHistoricas
+            empleadores={datosBandeja?.empleadores ?? []}
+            estadosLicencias={datosBandeja?.estadosLicencias ?? []}
+            onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
+          />
         </div>
-      </div>
+
+        <div className="pt-4 row text-center">
+          <h5>LICENCIAS HISTÓRICAS</h5>
+        </div>
+
+        <div className="row mt-3">
+          <div className="col-md-12">
+            <TablaLicenciasHistoricas licencias={licenciasHistoricas ?? []} />
+          </div>
+        </div>
+      </IfContainer>
     </>
   );
 };
 
-export default ConsultasPage;
+export default ConsultaHistoricosPage;

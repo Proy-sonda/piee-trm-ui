@@ -1,4 +1,4 @@
-export interface EstadoLME {
+export interface HistorialEstadoLME {
   foliolicencia: string;
   operador: Operador;
   listaestados: ListaEstado[];

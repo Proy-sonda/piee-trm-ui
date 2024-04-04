@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { ModalHistoricoEstadoLicencia } from '.';
 import { LicenciaHistorica } from '../(modelos)';
-import { BuscarEstadosLmeRequest } from '../../(servicios)';
+import { BuscarHistorialEstadosLmeRequest } from '../(servicios)';
 import styles from './tabla-licencias-historicas.module.css';
 
 interface TablaLicenciasHistoricasProps {
@@ -32,7 +32,8 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
 
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
   const [mostrarModalHistorico, setMostrarModalHistorico] = useState(false);
-  const [datosLicenciaHistorico, setDatosLicenciaHistorico] = useState<BuscarEstadosLmeRequest>();
+  const [datosLicenciaHistorico, setDatosLicenciaHistorico] =
+    useState<BuscarHistorialEstadosLmeRequest>();
 
   // prettier-ignore
   // const [datosComprobanteTramitacion, setDatosComprobanteTramitacion] = useState<DatosComprobanteTramitacion>();

@@ -5,11 +5,11 @@ import { HttpError } from '@/servicios';
 import { format } from 'date-fns';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
-import { BuscarEstadosLmeRequest, buscarEstadosLME } from '../../(servicios)';
+import { BuscarHistorialEstadosLmeRequest, buscarHistorialEstadosLicencia } from '../(servicios)';
 
 interface ModalHistoricoEstadoLicenciaProps {
   show: boolean;
-  datosLicencia?: BuscarEstadosLmeRequest;
+  datosLicencia?: BuscarHistorialEstadosLmeRequest;
   onCerrar: () => void;
 }
 
@@ -19,7 +19,7 @@ export const ModalHistoricoEstadoLicencia: React.FC<ModalHistoricoEstadoLicencia
   onCerrar,
 }) => {
   const [erroresInfoLicencia, estadoLME, cargandoInfoLicencia] = useFetch(
-    datosLicencia ? buscarEstadosLME(datosLicencia) : emptyFetch(),
+    datosLicencia ? buscarHistorialEstadosLicencia(datosLicencia) : emptyFetch(),
     [datosLicencia],
   );
 
