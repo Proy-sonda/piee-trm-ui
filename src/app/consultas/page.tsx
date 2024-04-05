@@ -34,29 +34,29 @@ const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
         <SpinnerPantallaCompleta />
       </IfContainer>
 
+      <div className="row">
+        <Titulo url="">
+          <h5>Filtro para Licencias Históricas</h5>
+        </Titulo>
+      </div>
+
+      <div className="pt-3 pb-4 border-bottom border-1">
+        <FiltroLicenciasHistoricas
+          empleadores={datosBandeja?.empleadores ?? []}
+          estadosLicencias={datosBandeja?.estadosLicencias ?? []}
+          onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
+        />
+      </div>
+
+      <div className="pt-4 row text-center">
+        <h5>LICENCIAS HISTÓRICAS</h5>
+      </div>
+
       <IfContainer show={hayError}>
-        <h4 className="py-5 text-center">Error al cargar licencias historicas</h4>
+        <h2 className="fs-5 py-5 text-center">Error al cargar licencias históricas</h2>
       </IfContainer>
 
       <IfContainer show={!hayError}>
-        <div className="row">
-          <Titulo url="">
-            <h5>Filtro para Licencias Históricas</h5>
-          </Titulo>
-        </div>
-
-        <div className="pt-3 pb-4 border-bottom border-1">
-          <FiltroLicenciasHistoricas
-            empleadores={datosBandeja?.empleadores ?? []}
-            estadosLicencias={datosBandeja?.estadosLicencias ?? []}
-            onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
-          />
-        </div>
-
-        <div className="pt-4 row text-center">
-          <h5>LICENCIAS HISTÓRICAS</h5>
-        </div>
-
         <div className="row mt-3">
           <div className="col-md-12">
             <TablaLicenciasHistoricas licencias={licenciasHistoricas ?? []} />
