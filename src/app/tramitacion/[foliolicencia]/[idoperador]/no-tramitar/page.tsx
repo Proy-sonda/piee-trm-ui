@@ -31,6 +31,7 @@ import {
   esRelacionLaboralTerminada,
   motivoRechazoSolicitaAdjunto,
 } from './(modelos)';
+import { SolicitudEntidadEmpleadora } from './(modelos)/solicitud-entidad-empleadora';
 import {
   NoPuedeCrearZona0Error,
   NoPuedeSubirAdjuntoNoTramitarError,
@@ -39,6 +40,7 @@ import {
   noTamitarLicenciaMedica,
   subirAdjuntoNoTramitar,
 } from './(servicios)';
+import { ObtenerSolicitudEntidadEmpleadora } from './(servicios)/obtener-solicitud-entidad-empleadora';
 
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliolicencia, idoperador },
@@ -50,9 +52,14 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     datosGuia: { AgregarGuia, guia, listaguia },
   } = useContext(AuthContext);
 
-  const [erroresCarga, [cajasDeCompensacion, motivosDeRechazo], cargando] = useMergeFetchArray([
+  const [
+    erroresCarga,
+    [cajasDeCompensacion, motivosDeRechazo, SolicitudEntidadEmpleadora],
+    cargando,
+  ] = useMergeFetchArray([
     buscarCajasDeCompensacion(),
     buscarMotivosDeRechazo(),
+    ObtenerSolicitudEntidadEmpleadora(),
   ]);
 
   useEffect(() => {
@@ -137,8 +144,23 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     }
   };
 
+  const [solicitadEntidadPagadora, setsolicitadEntidadPagadora] = useState<boolean>(false);
+  const [solicitudAdjunto, setsolicitudAdjunto] = useState<boolean>(false);
+
   // Elimina errores cuando el motivo de rechazo cambia
   useEffect(() => {
+    let SolicitudEntidadEmpleadoraSel: SolicitudEntidadEmpleadora | undefined;
+    if (SolicitudEntidadEmpleadora) {
+      SolicitudEntidadEmpleadoraSel = SolicitudEntidadEmpleadora.find(
+        (s) => s.idmotivonorecepcion == Number(motivoRechazo),
+      );
+
+      setsolicitadEntidadPagadora(
+        SolicitudEntidadEmpleadoraSel!?.solicitaentidadpag ? true : false,
+      );
+      setsolicitudAdjunto(SolicitudEntidadEmpleadoraSel!?.solicitaadjunto ? true : false);
+    }
+
     if (esRelacionLaboralTerminada(motivoRechazo)) {
       formulario.clearErrors('documentoAdjunto');
       formulario.clearErrors('fechaTerminoRelacion');
@@ -226,7 +248,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
             <p className="mb-3 small">
               Aquí deberá marcar la opción por la que rechaza la tramitación de la licencia medica
             </p>
-            <IfContainer show={esRelacionLaboralTerminada(motivoRechazo)}>
+            <IfContainer show={solicitadEntidadPagadora || solicitudAdjunto}>
               <p>
                 <sub className="float-end">
                   <b>Obligatorio (*)</b>
@@ -391,8 +413,9 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                     </GuiaUsuario>
                     <IfContainer
                       show={
-                        motivoRechazoSeleccionado &&
-                        motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
+                        (motivoRechazoSeleccionado &&
+                          motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)) ||
+                        solicitudAdjunto
                       }>
                       <div
                         className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
@@ -412,7 +435,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 </Col>
 
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
-                  <IfContainer show={licencia && esLicenciaFONASA(licencia)}>
+                  <IfContainer
+                    show={licencia && esLicenciaFONASA(licencia) && solicitadEntidadPagadora}>
                     <ComboSimple
                       opcional={!licencia || !esLicenciaFONASA(licencia)}
                       name="entidadPagadoraId"
