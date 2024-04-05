@@ -436,9 +436,9 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
                   <IfContainer
-                    show={(licencia && esLicenciaFONASA(licencia)) || solicitadEntidadPagadora}>
+                    show={licencia && esLicenciaFONASA(licencia) && solicitadEntidadPagadora}>
                     <ComboSimple
-                      opcional={!licencia || !esLicenciaFONASA(licencia) || !solicitudAdjunto}
+                      opcional={!licencia || (!esLicenciaFONASA(licencia) && !solicitudAdjunto)}
                       name="entidadPagadoraId"
                       label="Entidad que debe pagar subsidio o mantener remuneración"
                       datos={cajasDeCompensacion}
