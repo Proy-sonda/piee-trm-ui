@@ -88,6 +88,12 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     },
   });
 
+  useEffect(() => {
+    if (licencia) {
+      formulario.setValue('entidadPagadoraId', licencia.ccaf.idccaf);
+    }
+  }, [licencia]);
+
   const motivoRechazo = formulario.watch('motivoRechazo');
   const motivoRechazoSeleccionado = (motivosDeRechazo ?? []).find(
     (m) => m.idmotivonorecepcion === parseInt(motivoRechazo, 10),
