@@ -23,6 +23,8 @@ import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { InformacionLicencia } from '../(componentes)';
 import { buscarCajasDeCompensacion } from '../(servicios)';
+import { EntidadPagadora } from '../c2/(modelos)';
+import { buscarEntidadPagadora } from '../c2/(servicios)';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import {
   FormularioNoTramitarLicencia,
@@ -54,13 +56,22 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   const [
     erroresCarga,
-    [cajasDeCompensacion, motivosDeRechazo, SolicitudEntidadEmpleadora],
+    [cajasDeCompensacion, motivosDeRechazo, SolicitudEntidadEmpleadora, EntidadPagadora],
     cargando,
   ] = useMergeFetchArray([
     buscarCajasDeCompensacion(),
     buscarMotivosDeRechazo(),
     ObtenerSolicitudEntidadEmpleadora(),
+    buscarEntidadPagadora(),
   ]);
+
+  const [ComboEntidadPagadora, setComboEntidadPagadora] = useState<EntidadPagadora[]>([]);
+
+  useEffect(() => {
+    if (EntidadPagadora) {
+      setComboEntidadPagadora(EntidadPagadora);
+    }
+  }, [EntidadPagadora]);
 
   useEffect(() => {
     AgregarGuia([
@@ -155,16 +166,20 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   // Elimina errores cuando el motivo de rechazo cambia
   useEffect(() => {
+    if (motivoRechazo) {
+    }
     let SolicitudEntidadEmpleadoraSel: SolicitudEntidadEmpleadora | undefined;
     if (SolicitudEntidadEmpleadora) {
       SolicitudEntidadEmpleadoraSel = SolicitudEntidadEmpleadora.find(
         (s) => s.idmotivonorecepcion == Number(motivoRechazo),
       );
 
-      setsolicitadEntidadPagadora(
-        SolicitudEntidadEmpleadoraSel!?.solicitaentidadpag ? true : false,
-      );
-      setsolicitudAdjunto(SolicitudEntidadEmpleadoraSel!?.solicitaadjunto ? true : false);
+      if (SolicitudEntidadEmpleadora) {
+        setsolicitadEntidadPagadora(
+          SolicitudEntidadEmpleadoraSel!?.solicitaentidadpag ? true : false,
+        );
+        setsolicitudAdjunto(SolicitudEntidadEmpleadoraSel!?.solicitaadjunto ? true : false);
+      }
     }
 
     if (esRelacionLaboralTerminada(motivoRechazo)) {
@@ -429,7 +444,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                         <InputArchivo
                           opcional={
                             !motivoRechazoSeleccionado ||
-                            !motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
+                            (!motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado) &&
+                              !adjuntodoc)
                           }
                           name="documentoAdjunto"
                           label="Adjuntar Documento"
@@ -442,9 +458,11 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
                   <IfContainer
-                    show={(licencia && esLicenciaFONASA(licencia)) || solicitadEntidadPagadora}>
+                    show={licencia && esLicenciaFONASA(licencia) && solicitadEntidadPagadora}>
                     <ComboSimple
-                      opcional={!licencia || !esLicenciaFONASA(licencia) || !solicitudAdjunto}
+                      opcional={
+                        !licencia || (!esLicenciaFONASA(licencia) && !solicitadEntidadPagadora)
+                      }
                       name="entidadPagadoraId"
                       label="Entidad que debe pagar subsidio o mantener remuneración"
                       datos={cajasDeCompensacion}
