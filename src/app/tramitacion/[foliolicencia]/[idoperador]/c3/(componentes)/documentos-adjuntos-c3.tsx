@@ -352,7 +352,8 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
                   name="idTipoDocumento"
                   descripcion="tipoadjunto"
                   idElemento="idtipoadjunto"
-                  datos={tiposDocumentosFiltrados}
+                  // datos={tiposDocumentosFiltrados}
+                  datos={tiposDocumentos}
                 />
               </div>
 

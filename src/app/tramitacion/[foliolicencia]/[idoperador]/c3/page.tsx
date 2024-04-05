@@ -24,7 +24,9 @@ import { useContext, useEffect, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
+import { TipoDocumento } from '../(modelo)';
 import { buscarTiposDocumento } from '../(servicios)';
+import { buscarZona0 } from '../c1/(servicios)';
 import {
   crearIdEntidadPrevisional,
   entidadPrevisionalEsAFP,
@@ -46,6 +48,7 @@ import {
   remuneracionTieneAlgunCampoValido,
 } from './(modelos)';
 import { buscarPeriodosSugeridos, buscarZona3, crearLicenciaZ3 } from './(servicios)';
+import { ObtenerRelacionCalidadAdjunto } from './(servicios)/obtener-relacion-calidad-documento-adjunto';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
@@ -93,6 +96,40 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   const [errZona3, zona3, cargandoZona3] = useFetch(buscarZona3(foliolicencia, idOperadorNumber), [
     refreshZona3,
   ]);
+
+  const [errZona0, zona0, cargandoZona0] = useFetch(buscarZona0(foliolicencia, idOperadorNumber), [
+    refreshZona3,
+  ]);
+
+  const [tipoDocAdjunto, settipoDocAdjunto] = useState<TipoDocumento[]>([]);
+  useEffect(() => {
+    if (zona0 && !errZona0 && !cargandoZona0 && zona2 && !errZona2 && !cargandoZona2) {
+      const BuscarRelacionCalidadAdj = async () => {
+        const [relacionCalidad] = await ObtenerRelacionCalidadAdjunto(
+          zona2?.calidadtrabajador.idcalidadtrabajador,
+        );
+        console.log(
+          (await relacionCalidad()).filter(
+            (c) =>
+              c.calidadtrabajador.idcalidadtrabajador ===
+                zona2.calidadtrabajador.idcalidadtrabajador &&
+              c.tipolicencia.idtipolicencia === zona0.tipolicencia.idtipolicencia,
+          ),
+        );
+        settipoDocAdjunto(
+          (await relacionCalidad())
+            .filter(
+              (t) =>
+                t.tipolicencia.idtipolicencia === zona0.tipolicencia.idtipolicencia &&
+                t.calidadtrabajador.idcalidadtrabajador ===
+                  zona2.calidadtrabajador.idcalidadtrabajador,
+            )
+            .map((t) => t.tipoadjunto),
+        );
+      };
+      BuscarRelacionCalidadAdj();
+    }
+  }, [zona0]);
 
   const [errPeriodos, periodosSugeridos, cargandoPeriodos] = useFetch(
     licencia && zona2
@@ -680,7 +717,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
         <DocumentosAdjuntosC3
           licencia={licencia}
-          tiposDocumentos={tiposDeDocumentos}
+          tiposDocumentos={tipoDocAdjunto}
           documentosAdjuntos={documentosAdjuntos}
           errorDocumentosAdjuntos={formulario.formState.errors.documentosAdjuntos?.root}
           onDocumentoEliminado={() => refrescarZona3()}
