@@ -1,6 +1,6 @@
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
-import { InputReciclableBase, UnibleConFormArray } from './base-props';
+import { ErroresEditables, InputReciclableBase, UnibleConFormArray } from './base-props';
 import { useInputReciclable } from './hooks';
 
 const VALOR_POR_DEFECTO_EN_TIPO_NUMBER = -99999999;
@@ -27,7 +27,10 @@ export const esElValorPorDefecto = (value: number | string) => {
   }
 };
 
-interface ComboSimpleProps<T> extends InputReciclableBase, UnibleConFormArray {
+interface ComboSimpleProps<T>
+  extends InputReciclableBase,
+    UnibleConFormArray,
+    ErroresEditables<'obligatorio'> {
   /** Datos para rellenar el combo */
   datos?: T[];
 
@@ -80,6 +83,7 @@ export const ComboSimple = <T extends Record<string, any>>({
   opcional,
   unirConFieldArray,
   onBlur: onBlurHandler,
+  errores,
 }: ComboSimpleProps<T>) => {
   const { register } = useFormContext();
 
@@ -126,7 +130,7 @@ export const ComboSimple = <T extends Record<string, any>>({
                 }
 
                 if (esElValorPorDefecto(valor)) {
-                  return 'Este campo es obligatorio';
+                  return errores?.obligatorio ?? 'Este campo es obligatorio';
                 }
               },
             },

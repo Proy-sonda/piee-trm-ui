@@ -23,6 +23,8 @@ import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { InformacionLicencia } from '../(componentes)';
 import { buscarCajasDeCompensacion } from '../(servicios)';
+import { EntidadPagadora } from '../c2/(modelos)';
+import { buscarEntidadPagadora } from '../c2/(servicios)';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import {
   FormularioNoTramitarLicencia,
@@ -31,6 +33,7 @@ import {
   esRelacionLaboralTerminada,
   motivoRechazoSolicitaAdjunto,
 } from './(modelos)';
+import { SolicitudEntidadEmpleadora } from './(modelos)/solicitud-entidad-empleadora';
 import {
   NoPuedeCrearZona0Error,
   NoPuedeSubirAdjuntoNoTramitarError,
@@ -39,6 +42,7 @@ import {
   noTamitarLicenciaMedica,
   subirAdjuntoNoTramitar,
 } from './(servicios)';
+import { ObtenerSolicitudEntidadEmpleadora } from './(servicios)/obtener-solicitud-entidad-empleadora';
 
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliolicencia, idoperador },
@@ -50,10 +54,24 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     datosGuia: { AgregarGuia, guia, listaguia },
   } = useContext(AuthContext);
 
-  const [erroresCarga, [cajasDeCompensacion, motivosDeRechazo], cargando] = useMergeFetchArray([
+  const [
+    erroresCarga,
+    [cajasDeCompensacion, motivosDeRechazo, SolicitudEntidadEmpleadora, EntidadPagadora],
+    cargando,
+  ] = useMergeFetchArray([
     buscarCajasDeCompensacion(),
     buscarMotivosDeRechazo(),
+    ObtenerSolicitudEntidadEmpleadora(),
+    buscarEntidadPagadora(),
   ]);
+
+  const [ComboEntidadPagadora, setComboEntidadPagadora] = useState<EntidadPagadora[]>([]);
+
+  useEffect(() => {
+    if (EntidadPagadora) {
+      setComboEntidadPagadora(EntidadPagadora);
+    }
+  }, [EntidadPagadora]);
 
   useEffect(() => {
     AgregarGuia([
@@ -80,6 +98,12 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
       entidadPagadoraId: valorPorDefectoCombo('number'),
     },
   });
+
+  useEffect(() => {
+    if (licencia) {
+      formulario.setValue('entidadPagadoraId', licencia.ccaf.idccaf);
+    }
+  }, [licencia]);
 
   const motivoRechazo = formulario.watch('motivoRechazo');
   const motivoRechazoSeleccionado = (motivosDeRechazo ?? []).find(
@@ -137,8 +161,27 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     }
   };
 
+  const [solicitadEntidadPagadora, setsolicitadEntidadPagadora] = useState<boolean>(false);
+  const [solicitudAdjunto, setsolicitudAdjunto] = useState<boolean>(false);
+
   // Elimina errores cuando el motivo de rechazo cambia
   useEffect(() => {
+    if (motivoRechazo) {
+    }
+    let SolicitudEntidadEmpleadoraSel: SolicitudEntidadEmpleadora | undefined;
+    if (SolicitudEntidadEmpleadora) {
+      SolicitudEntidadEmpleadoraSel = SolicitudEntidadEmpleadora.find(
+        (s) => s.idmotivonorecepcion == Number(motivoRechazo),
+      );
+
+      if (SolicitudEntidadEmpleadora) {
+        setsolicitadEntidadPagadora(
+          SolicitudEntidadEmpleadoraSel!?.solicitaentidadpag ? true : false,
+        );
+        setsolicitudAdjunto(SolicitudEntidadEmpleadoraSel!?.solicitaadjunto ? true : false);
+      }
+    }
+
     if (esRelacionLaboralTerminada(motivoRechazo)) {
       formulario.clearErrors('documentoAdjunto');
       formulario.clearErrors('fechaTerminoRelacion');
@@ -226,7 +269,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
             <p className="mb-3 small">
               Aquí deberá marcar la opción por la que rechaza la tramitación de la licencia medica
             </p>
-            <IfContainer show={esRelacionLaboralTerminada(motivoRechazo)}>
+            <IfContainer show={solicitadEntidadPagadora || solicitudAdjunto}>
               <p>
                 <sub className="float-end">
                   <b>Obligatorio (*)</b>
@@ -391,8 +434,9 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                     </GuiaUsuario>
                     <IfContainer
                       show={
-                        motivoRechazoSeleccionado &&
-                        motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
+                        (motivoRechazoSeleccionado &&
+                          motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)) ||
+                        solicitudAdjunto
                       }>
                       <div
                         className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
@@ -400,7 +444,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                         <InputArchivo
                           opcional={
                             !motivoRechazoSeleccionado ||
-                            !motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado)
+                            (!motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado) &&
+                              !adjuntodoc)
                           }
                           name="documentoAdjunto"
                           label="Adjuntar Documento"
@@ -412,9 +457,15 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 </Col>
 
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
-                  <IfContainer show={licencia && esLicenciaFONASA(licencia)}>
+                  <IfContainer
+                    show={
+                      (licencia && esLicenciaFONASA(licencia)) ||
+                      (solicitadEntidadPagadora && esLicenciaFONASA(licencia!))
+                    }>
                     <ComboSimple
-                      opcional={!licencia || !esLicenciaFONASA(licencia)}
+                      opcional={
+                        !licencia || !esLicenciaFONASA(licencia) || !solicitadEntidadPagadora
+                      }
                       name="entidadPagadoraId"
                       label="Entidad que debe pagar subsidio o mantener remuneración"
                       datos={cajasDeCompensacion}

@@ -8,13 +8,15 @@ import { AuthContext } from '@/contexts';
 import {
   BootstrapBreakpoint,
   emptyFetch,
+  useEstaCargando,
   useFetch,
+  useHayError,
   useRefrescarPagina,
   useWindowSize,
 } from '@/hooks';
 import { capitalizar } from '@/utilidades';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
-import { format, subMonths } from 'date-fns';
+import { format, parse, startOfMonth } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
@@ -22,7 +24,9 @@ import { useContext, useEffect, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
+import { TipoDocumento } from '../(modelo)';
 import { buscarTiposDocumento } from '../(servicios)';
+import { buscarZona0 } from '../c1/(servicios)';
 import {
   crearIdEntidadPrevisional,
   entidadPrevisionalEsAFP,
@@ -43,7 +47,8 @@ import {
   remuneracionEstaCompleta,
   remuneracionTieneAlgunCampoValido,
 } from './(modelos)';
-import { buscarZona3, crearLicenciaZ3 } from './(servicios)';
+import { buscarPeriodosSugeridos, buscarZona3, crearLicenciaZ3 } from './(servicios)';
+import { ObtenerRelacionCalidadAdjunto } from './(servicios)/obtener-relacion-calidad-documento-adjunto';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
@@ -82,6 +87,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     },
   ];
 
+  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
+
   const [refreshZona3, refrescarZona3] = useRefrescarPagina();
 
   const [errZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
@@ -89,6 +96,51 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   const [errZona3, zona3, cargandoZona3] = useFetch(buscarZona3(foliolicencia, idOperadorNumber), [
     refreshZona3,
   ]);
+
+  const [errZona0, zona0, cargandoZona0] = useFetch(buscarZona0(foliolicencia, idOperadorNumber), [
+    refreshZona3,
+  ]);
+
+  const [tipoDocAdjunto, settipoDocAdjunto] = useState<TipoDocumento[]>([]);
+  useEffect(() => {
+    if (zona0 && !errZona0 && !cargandoZona0 && zona2 && !errZona2 && !cargandoZona2) {
+      const BuscarRelacionCalidadAdj = async () => {
+        const [relacionCalidad] = await ObtenerRelacionCalidadAdjunto(
+          zona2?.calidadtrabajador.idcalidadtrabajador,
+        );
+        console.log(
+          (await relacionCalidad()).filter(
+            (c) =>
+              c.calidadtrabajador.idcalidadtrabajador ===
+                zona2.calidadtrabajador.idcalidadtrabajador &&
+              c.tipolicencia.idtipolicencia === zona0.tipolicencia.idtipolicencia,
+          ),
+        );
+        settipoDocAdjunto(
+          (await relacionCalidad())
+            .filter(
+              (t) =>
+                t.tipolicencia.idtipolicencia === zona0.tipolicencia.idtipolicencia &&
+                t.calidadtrabajador.idcalidadtrabajador ===
+                  zona2.calidadtrabajador.idcalidadtrabajador,
+            )
+            .map((t) => t.tipoadjunto),
+        );
+      };
+      BuscarRelacionCalidadAdj();
+    }
+  }, [zona0]);
+
+  const [errPeriodos, periodosSugeridos, cargandoPeriodos] = useFetch(
+    licencia && zona2
+      ? buscarPeriodosSugeridos({
+          fechaInicio: format(new Date(licencia.fechainicioreposo), 'yyyy-MM-dd'),
+          idCalidadTrabajador: zona2.calidadtrabajador.idcalidadtrabajador,
+          idTipoLicencia: licencia.tipolicencia.idtipolicencia,
+        })
+      : emptyFetch(),
+    [licencia, zona2],
+  );
 
   const [errTipoDocumentos, tiposDeDocumentos, cargandoTipoDocumentos] = useFetch(
     buscarTiposDocumento(),
@@ -101,9 +153,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     [zona2],
   );
 
-  const [hayErrores, setHayErrores] = useState(false);
+  const hayErrores = useHayError(errZona2, errZona3, errPrevision, errTipoDocumentos, errPeriodos);
 
-  const [cargando, setCargando] = useState(true);
+  const cargando = useEstaCargando(
+    cargandoZona2,
+    cargandoZona3,
+    cargandoPrevision,
+    cargandoTipoDocumentos,
+    cargandoPeriodos,
+  );
 
   const router = useRouter();
 
@@ -111,8 +169,6 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     normales: [] as number[],
     maternidad: [] as number[],
   });
-
-  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
 
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
@@ -157,6 +213,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     datosGuia: { guia, AgregarGuia, listaguia },
   } = useContext(AuthContext);
 
+  // Define guias de usuario
   useEffect(() => {
     AgregarGuia([
       {
@@ -172,33 +229,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     ]);
   }, []);
 
-  // Determina si hay algún error en la pagina
-  useEffect(() => {
-    const errores = [errZona2, errZona3, errPrevision, errTipoDocumentos];
-    if (errores.some((err) => err !== undefined)) {
-      setHayErrores(true);
-      return;
-    }
-
-    if (!cargandoZona2 && !zona2) {
-      setHayErrores(true);
-      return;
-    }
-
-    setHayErrores(false);
-  }, [errZona2, errZona3, errPrevision, errTipoDocumentos, zona2, cargandoZona2]);
-
-  // Unifica todas las posibles cargas de datos
-  useEffect(() => {
-    setCargando(cargandoZona2 || cargandoZona3 || cargandoTipoDocumentos || cargandoPrevision);
-  }, [cargandoZona2, cargandoZona3, cargandoPrevision, cargandoTipoDocumentos]);
-
   // Agregar las filas de remuneraciones (parchar o crear)
   useEffect(() => {
     if (!licencia || !zona2) {
       return;
     }
-    // Existe zona C3 en la base de datos
+    // Existe zona C3 en la base de datos (parchar)
     if (zona2 && zona3) {
       // prettier-ignore
       formulario.setValue('remuneracionImponiblePrevisional', zona3.remuneracionImponiblePrevisional);
@@ -264,31 +300,29 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       }
     }
 
-    // No existe zona C3 en la base de datos, colocar filas por defecto
-    if (zona2 && !zona3) {
+    // No existe zona C3 en la base de datos (crear filas)
+    if (zona2 && !zona3 && periodosSugeridos) {
       if (remuneraciones.fields.length === 0) {
-        const fechaReferencia = new Date(licencia.fechaemision);
-
-        const totalPeriodos = esTrabajadorIndependiente(zona2) ? 12 : 3;
-        for (let index = 0; index < totalPeriodos; index++) {
-          const mesRenta = subMonths(fechaReferencia, index + 1);
-
+        for (const periodo of periodosSugeridos.periodosSugeridosNormales) {
           remuneraciones.append({
             prevision: crearIdEntidadPrevisional(zona2.entidadprevisional),
-            periodoRenta: mesRenta,
+            periodoRenta: parse(periodo, 'yyyy-MM', startOfMonth(new Date())),
             desgloseHaberes: {},
           } as any);
         }
       }
 
       if (esLicenciaMaternidad(licencia) && remuneracionesMaternidad.fields.length === 0) {
-        const periodosMaternidad = 3;
-        for (let index = 0; index < periodosMaternidad; index++) {
-          remuneracionesMaternidad.append({ desgloseHaberes: {} } as any);
+        for (const periodo of periodosSugeridos.periodosSugeridosMaternales ?? []) {
+          remuneracionesMaternidad.append({
+            prevision: crearIdEntidadPrevisional(zona2.entidadprevisional),
+            periodoRenta: parse(periodo, 'yyyy-MM', startOfMonth(new Date())),
+            desgloseHaberes: {},
+          } as any);
         }
       }
     }
-  }, [zona2, zona3, licencia]);
+  }, [zona2, zona3, licencia, periodosSugeridos]);
 
   // Refresca los valores de la zona 3
   useEffect(() => {
@@ -612,6 +646,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                 titulo="RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD"
                 fieldArray="remuneraciones"
                 zona2={zona2}
+                rangoPeriodo={periodosSugeridos?.rangoRentasNormales}
                 remuneraciones={remuneraciones as any}
                 filasIncompletas={completitudRemuneraciones.normales}
                 tiposPrevisiones={tiposPrevisiones ?? []}
@@ -669,6 +704,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                   titulo="EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE"
                   fieldArray="remuneracionesMaternidad"
                   zona2={zona2}
+                  rangoPeriodo={periodosSugeridos?.rangoRentasMaternales}
                   remuneraciones={remuneracionesMaternidad as any}
                   filasIncompletas={completitudRemuneraciones.maternidad}
                   tiposPrevisiones={tiposPrevisiones ?? []}
@@ -681,7 +717,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
         <DocumentosAdjuntosC3
           licencia={licencia}
-          tiposDocumentos={tiposDeDocumentos}
+          tiposDocumentos={tipoDocAdjunto}
           documentosAdjuntos={documentosAdjuntos}
           errorDocumentosAdjuntos={formulario.formState.errors.documentosAdjuntos?.root}
           onDocumentoEliminado={() => refrescarZona3()}

@@ -456,6 +456,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 idElemento="idregion"
                 descripcion="nombre"
                 className="col-12 col-md-6 col-lg-4"
+                tipoValor="string"
               />
 
               <ComboComuna

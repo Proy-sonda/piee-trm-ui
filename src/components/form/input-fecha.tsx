@@ -1,6 +1,16 @@
 import { ErroresEditables, InputReciclableBase, UnibleConFormArray } from '@/components/form';
+import { existe } from '@/utilidades';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
-import { endOfDay, isAfter, isBefore, parse, startOfDay } from 'date-fns';
+import {
+  endOfDay,
+  endOfMonth,
+  format,
+  isAfter,
+  isBefore,
+  parse,
+  startOfDay,
+  startOfMonth,
+} from 'date-fns';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
@@ -41,6 +51,24 @@ interface InputFechaProps
    *  ```
    */
   noPosteriorA?: string;
+
+  /**
+   * String en formato `yyyy-MM-dd` que indica la minima fecha posible (inclusivo).
+   *
+   * No puede ser anterior a `1920-11-31`.
+   *
+   * @default 1920-11-31
+   */
+  minDate?: string;
+
+  /**
+   * String en formato `yyyy-MM-dd` que indica la fecha maxima  (inclusivo).
+   *
+   * No puede ser anterior a `1920-11-31`.
+   *
+   * @default Hoy
+   */
+  maxDate?: string;
 }
 
 /**
@@ -58,8 +86,27 @@ export const InputFecha: React.FC<InputFechaProps> = ({
   deshabilitado,
   unirConFieldArray,
   errores,
+  minDate,
+  maxDate,
 }) => {
-  const { register, getValues, clearErrors, trigger, setError } = useFormContext();
+  const FECHA_MINIMA_POR_DEFECTO = new Date(1920, 11, 31);
+
+  const fechaMinima = existe(minDate)
+    ? parse(minDate, 'yyyy-MM-dd', startOfMonth(new Date()))
+    : undefined;
+  const fechaMaxima = existe(maxDate)
+    ? parse(maxDate, 'yyyy-MM-dd', endOfMonth(new Date()))
+    : undefined;
+
+  if (fechaMinima && fechaMinima < FECHA_MINIMA_POR_DEFECTO) {
+    throw new Error('InputFecha: La fecha minima no puede ser inferior a 1920');
+  }
+
+  if (fechaMaxima && fechaMaxima < FECHA_MINIMA_POR_DEFECTO) {
+    throw new Error('InputFecha: La fecha maxima no puede ser inferior a 1920');
+  }
+
+  const { register, getValues, clearErrors } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
     prefijoId: 'fecha',
@@ -78,6 +125,8 @@ export const InputFecha: React.FC<InputFechaProps> = ({
           autoComplete="new-custom-value"
           disabled={deshabilitado === true}
           isInvalid={tieneError}
+          min={minDate}
+          max={maxDate}
           {...register(name, {
             setValueAs: (date: string) => {
               /** Situa la fecha con respecto al inicio de hoy */
@@ -93,14 +142,22 @@ export const InputFecha: React.FC<InputFechaProps> = ({
                   return 'La fecha es inválida';
                 }
               },
-              despuesDe1920: (fecha: Date) => {
-                if (isBefore(fecha, new Date(1920, 11, 31))) {
+              posteriorAFechaMinima: (fecha: Date) => {
+                if (!fechaMinima && isBefore(fecha, FECHA_MINIMA_POR_DEFECTO)) {
                   return 'Debe ser mayor o igual al 31/12/1920';
                 }
+
+                if (fechaMinima && isBefore(fecha, fechaMinima)) {
+                  return `Debe ser mayor o igual a ${format(fechaMinima, 'dd/MM/yyyy')}`;
+                }
               },
-              noMayorQueHoy: (fecha: Date) => {
-                if (isAfter(fecha, endOfDay(Date.now()))) {
+              anteriorAFechaMaxima: (fecha: Date) => {
+                if (!fechaMaxima && isAfter(fecha, endOfDay(Date.now()))) {
                   return 'No puede ser posterior a hoy';
+                }
+
+                if (fechaMaxima && isAfter(fecha, fechaMaxima)) {
+                  return `Debe ser menor o igual a ${format(fechaMaxima, 'dd/MM/yyyy')}`;
                 }
               },
               obligatorioSiHayFechaHasta: (fecha: Date) => {

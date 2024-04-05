@@ -12,11 +12,23 @@ import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { ModalImprimirPdfProps } from '../(modelos)';
-import { numeroALetras } from '../(util)/numero-a-letra';
-import styles from './modal-imprimir-pdf.module.css';
+import styles from './modal-comprobante-tramitacion.module.css';
+import { numeroALetras } from './numero-a-letra';
 
-export const ModalImprimirPdf: React.FC<ModalImprimirPdfProps> = ({
+interface ModalComprobanteTramitacionProps {
+  foliolicencia: string;
+  idOperadorNumber: number;
+  onComprobanteGenerado: () => void | Promise<void>;
+
+  modalimprimir?: boolean;
+  setmodalimprimir?: (modal: boolean) => void;
+  refrescarZona4?: () => void;
+  refresh?: boolean;
+  setCargaPDF?: (carga: boolean) => void;
+  actualizaTramitacion?: boolean;
+}
+
+export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionProps> = ({
   foliolicencia,
   idOperadorNumber,
   onComprobanteGenerado,

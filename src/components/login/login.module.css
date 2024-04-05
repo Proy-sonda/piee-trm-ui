@@ -1,27 +1,5 @@
 .formlogin {
-  margin-top: 25px;
-  align-items: center;
-  margin-bottom: 25px;
   background-color: #ebf5ff;
   color: black;
-  border-radius: 2%;
-  margin-right: 2%;
-  margin-left: 2%;
-  padding: 2%;
-  width: auto;
-  text-align: 'justify';
-  text-justify: 'inter-word';
-  font-size: '15px';
-}
-
-.btnlogin {
-  text-align: justify;
-  text-justify: inter-word;
-  margin-top: 20%;
-}
-
-@media only screen and (min-width: 950px) {
-  .formlogin {
-    width: 450px;
-  }
+  max-width: 450px;
 }

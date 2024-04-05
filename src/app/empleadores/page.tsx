@@ -27,6 +27,7 @@ const EmpleadoresPage = () => {
 
   const [, permisos] = useFetch(usuario ? buscarPermisosPorEmpleador(usuario.rut) : emptyFetch(), [
     usuario,
+    refresh,
   ]);
 
   const [empleadoresFiltrados, setEmpleadoresFiltrados] = useState<Empleador[]>([]);

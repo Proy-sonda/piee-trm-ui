@@ -1,5 +1,7 @@
 import { BotonVerPdfLicencia } from '@/components';
+import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import { AlertaConfirmacion, AlertaInformacion } from '@/utilidades';
@@ -19,9 +21,7 @@ import {
 import styles from './tabla-licencias-tramitadas.module.css';
 
 // prettier-ignore
-const ModalImprimirPdf = dynamic(() => import('./modal-imprimir-pdf').then((x) => x.ModalImprimirPdf));
-const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
-const IfContainer = dynamic(() => import('@/components/if-container'));
+const ModalImprimirPdf = dynamic(() => import('@/components/modal-comprobante-tramitacion').then((x) => x.ModalComprobanteTramitacion));
 
 interface TablaLicenciasTramitadasProps {
   empleadores: Empleador[];

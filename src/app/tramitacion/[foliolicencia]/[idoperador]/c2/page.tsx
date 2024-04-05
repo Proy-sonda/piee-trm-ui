@@ -11,13 +11,14 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { buscarZona0, buscarZona1 } from '../c1/(servicios)';
 
-import { buscarCajasDeCompensacion } from '@/app/empleadores/(servicios)';
+import { buscarCajasDeCompensacion, buscarEmpleadorRut } from '@/app/empleadores/(servicios)';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { useRefrescarPagina } from '@/hooks';
 import dynamic from 'next/dynamic';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
+import { calidadTrabajador } from '../(modelo)';
 import { LicenciasAnteriores } from '../(modelo)/licencias-anteriores';
 import { buscarCalidadTrabajador } from '../(servicios)';
 import { BuscarLicenciasAnteriores } from '../(servicios)/buscar-licencias-anteriores';
@@ -31,6 +32,8 @@ import {
 } from './(servicios)/';
 import { ErrorGuardarCCAF, GuardarCCAF } from './(servicios)/actualiza-ccaf';
 import { BuscarIDCCAFPropuesto } from './(servicios)/obtener-idccaf-propuesta';
+import { ObtenerConfiguracionCalidadPersona } from './(servicios)/obtener-relacion-calidad-trabajador';
+import { ObtenerRelacionLicenciaEntidad } from './(servicios)/obtener-relacion-entidad-pagadora';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -65,7 +68,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
   const [LicenciasAnteriores, setLicenciasAnteriores] = useState<LicenciasAnteriores[]>([]);
   const router = useRouter();
-  const [refresh, setrefresh] = useRefrescarPagina();
+  const [refresh, refrescar] = useRefrescarPagina();
   const [, LMECABECERA] = useFetch(buscarZona1(foliolicencia, Number(idoperador)), [
     foliolicencia,
     idoperador,
@@ -76,12 +79,17 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       CALIDADTRABAJADOR: buscarCalidadTrabajador(),
       ENTIDADPAGADORA: buscarEntidadPagadora(),
       ZONA0: buscarZona0(foliolicencia, Number(idoperador)),
+      ZONA1: buscarZona1(foliolicencia, Number(idoperador)),
+      ZONA2: buscarZona2(foliolicencia, Number(idoperador)),
       LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
       LMETRM: buscarLicenciasParaTramitar(),
       CCAF: buscarCajasDeCompensacion(),
+      Configuracion: ObtenerConfiguracionCalidadPersona(),
     },
     [refresh],
   );
+
+  const [comboCalidadTrabajador, setcomboCalidadTrabajador] = useState<calidadTrabajador[]>([]);
 
   const regimenPrev = useRef(null);
   const institucionPrev = useRef(null);
@@ -111,7 +119,33 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
       BuscarLicenciaAnterior();
     }
+
+    if (combos?.Configuracion && combos.ZONA1) {
+      const buscarEmpleador = async () => {
+        const [data] = await buscarEmpleadorRut(combos?.ZONA1!?.rutempleador);
+        let configuracionTipoEmpleador = await data();
+
+        // realizar un filtro de los datos del combo calidad del trabajador dependiendo de la configuración
+        let tipoEmpleador = combos?.Configuracion.filter(
+          (c) =>
+            c.tipoempleador.idtipoempleador ===
+            configuracionTipoEmpleador.tipoempleador.idtipoempleador,
+        );
+
+        setcomboCalidadTrabajador(tipoEmpleador.map((c) => c.calidadtrabajador));
+      };
+      buscarEmpleador();
+    }
   }, [combos]);
+
+  useEffect(() => {
+    if (comboCalidadTrabajador.length > 0 && LicenciasAnteriores.length > 0) {
+      formulario.setValue(
+        'calidad',
+        combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
+      );
+    }
+  }, [comboCalidadTrabajador]);
 
   useEffect(() => {
     if (LicenciasAnteriores.length > 0) {
@@ -119,10 +153,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         html: `Existen datos de licencias anteriores <br/>
       ¿Desea auto completar?`,
       });
-
-      console.log(
-        LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString(),
-      );
 
       resp.then((result) => {
         if (result.isConfirmed) {
@@ -279,6 +309,25 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     }
   };
 
+  const idcalidad = formulario.watch('calidad');
+
+  useEffect(() => {
+    if (idcalidad && idcalidad !== '-99999999') {
+      const buscarRelacionEntidadPagadora = async () => {
+        const [data] = await ObtenerRelacionLicenciaEntidad(Number(idcalidad));
+        setentePagador(
+          (await data())
+            .filter(
+              (value) =>
+                value.tipolicencia?.idtipolicencia == combos?.ZONA0.tipolicencia.idtipolicencia,
+            )
+            .map((value) => value.entidadpagadora),
+        );
+      };
+      buscarRelacionEntidadPagadora();
+    }
+  }, [idcalidad]);
+
   const GuardarZ2 = async () => {
     let licenciac2: Licenciac2 = {
       codigocontratoindef: Number(formulario.getValues('contratoIndefinido')),
@@ -324,6 +373,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
     try {
       await crearLicenciaZ2(licenciac2);
+      refrescar();
       switch (formulario.getValues('accion')) {
         case 'siguiente':
           setspinner(true);
@@ -395,66 +445,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora == 'B'),
       );
     }
-
-    setentePagador(
-      combos!?.ENTIDADPAGADORA.filter((value) => {
-        switch (Number(calidadtrabajador)) {
-          case 1:
-            if (
-              value.identidadpagadora == 'A' ||
-              value.identidadpagadora == 'B' ||
-              value.identidadpagadora == 'C' ||
-              value.identidadpagadora == 'E' ||
-              value.identidadpagadora == 'F' ||
-              value.identidadpagadora == 'G' ||
-              value.identidadpagadora == 'H'
-            ) {
-            } else {
-              return value;
-            }
-
-            break;
-          case 2:
-            if (
-              value.identidadpagadora !== 'B' &&
-              value.identidadpagadora !== 'E' &&
-              value.identidadpagadora !== 'F' &&
-              value.identidadpagadora !== 'G' &&
-              value.identidadpagadora !== 'H'
-            ) {
-              return value;
-            }
-            break;
-          case 3:
-            if (
-              value.identidadpagadora === 'B' ||
-              value.identidadpagadora === 'D' ||
-              value.identidadpagadora == 'E' ||
-              value.identidadpagadora == 'F' ||
-              value.identidadpagadora == 'G' ||
-              value.identidadpagadora == 'H'
-            ) {
-            } else {
-              return value;
-            }
-            break;
-          case 4:
-            if (
-              value.identidadpagadora == 'B' ||
-              value.identidadpagadora == 'C' ||
-              value.identidadpagadora == 'D' ||
-              value.identidadpagadora == 'E' ||
-              value.identidadpagadora == 'F' ||
-              value.identidadpagadora == 'G' ||
-              value.identidadpagadora == 'H'
-            ) {
-            } else {
-              return value;
-            }
-            break;
-        }
-      }),
-    );
   }, [calidadtrabajador, combos, foliolicencia, formulario]);
 
   useEffect(() => {
@@ -861,7 +851,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   descripcion="calidadtrabajador"
                   idElemento="idcalidadtrabajador"
                   name="calidad"
-                  datos={combos?.CALIDADTRABAJADOR}
+                  datos={comboCalidadTrabajador}
                 />
               </div>
 

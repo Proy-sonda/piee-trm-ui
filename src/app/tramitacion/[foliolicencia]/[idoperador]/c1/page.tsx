@@ -562,6 +562,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   descripcion="nombre"
                   label="Región"
                   className="col-12 col-sm-6 col-lg-4 col-xl-3"
+                  tipoValor="string"
                 />
 
                 <ComboComuna
