@@ -495,9 +495,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                       idElemento='identidadpagadora'
                       descripcion='entidadpagadora'
                       tipoValor='string'
-                      >
-
-                      </ComboSimple>
+                      />
                       <IfContainer show={mostrarCCAF}>
                         <ComboSimple
                         opcional={
