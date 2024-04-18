@@ -23,6 +23,7 @@ import { Col, Container, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { InformacionLicencia } from '../(componentes)';
 import { buscarCajasDeCompensacion } from '../(servicios)';
+import { buscarZona0 } from '../c1/(servicios)';
 import { EntidadPagadora } from '../c2/(modelos)';
 import { buscarEntidadPagadora } from '../c2/(servicios)';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
@@ -48,6 +49,9 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliolicencia, idoperador },
 }) => {
   const idOperadorNumber = parseInt(idoperador, 10);
+  const [mostrarCCAF, setmostrarCCAF] = useState(false)
+  
+  
 
   const router = useRouter();
   const {
@@ -56,16 +60,29 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   const [
     erroresCarga,
-    [cajasDeCompensacion, motivosDeRechazo, SolicitudEntidadEmpleadora, EntidadPagadora],
+    [cajasDeCompensacion, motivosDeRechazo, SolicitudEntidadEmpleadora, EntidadPagadora, licenciaZona0],
     cargando,
   ] = useMergeFetchArray([
     buscarCajasDeCompensacion(),
     buscarMotivosDeRechazo(),
     ObtenerSolicitudEntidadEmpleadora(),
     buscarEntidadPagadora(),
+    buscarZona0(foliolicencia, idOperadorNumber)
   ]);
 
   const [ComboEntidadPagadora, setComboEntidadPagadora] = useState<EntidadPagadora[]>([]);
+
+
+  useEffect(() => {
+    if(licenciaZona0) {
+      if(licenciaZona0.motivonorecepcion){ 
+        formulario.setValue('motivoRechazo', licenciaZona0.motivonorecepcion.idmotivonorecepcion.toString());
+      }
+      formulario.setValue('entidadPagadoraId', licenciaZona0!?.ccaf!?.idccaf);
+      formulario.setValue('entidadPagadoraLetra',licenciaZona0!?.entidadpagadora!?.identidadpagadora);
+    }
+  }, [licenciaZona0])
+  
 
   useEffect(() => {
     if (EntidadPagadora) {
@@ -99,11 +116,6 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     },
   });
 
-  useEffect(() => {
-    if (licencia) {
-      formulario.setValue('entidadPagadoraId', licencia.ccaf.idccaf);
-    }
-  }, [licencia]);
 
   const motivoRechazo = formulario.watch('motivoRechazo');
   const motivoRechazoSeleccionado = (motivosDeRechazo ?? []).find(
@@ -163,6 +175,17 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   const [solicitadEntidadPagadora, setsolicitadEntidadPagadora] = useState<boolean>(false);
   const [solicitudAdjunto, setsolicitudAdjunto] = useState<boolean>(false);
+
+  const EntidadPagadoraLetra = formulario.watch('entidadPagadoraLetra');
+
+  useEffect(() => {
+    
+    if(EntidadPagadoraLetra == 'C'){
+      setmostrarCCAF(true);
+    }else{
+      setmostrarCCAF(false);
+    }
+  }, [EntidadPagadoraLetra])
 
   // Elimina errores cuando el motivo de rechazo cambia
   useEffect(() => {
@@ -459,19 +482,36 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
                   <IfContainer
                     show={
-                      (licencia && esLicenciaFONASA(licencia)) ||
+                      (licencia && esLicenciaFONASA(licencia)) &&
                       (solicitadEntidadPagadora && esLicenciaFONASA(licencia!))
                     }>
-                    <ComboSimple
+                      <ComboSimple
                       opcional={
                         !licencia || !esLicenciaFONASA(licencia) || !solicitadEntidadPagadora
                       }
-                      name="entidadPagadoraId"
-                      label="Entidad que debe pagar subsidio o mantener remuneración"
-                      datos={cajasDeCompensacion}
-                      idElemento="idccaf"
-                      descripcion="nombre"
-                    />
+                      name='entidadPagadoraLetra'
+                      label='Entidad que debe pagar subsidio o mantener remuneración'
+                      datos={ComboEntidadPagadora}
+                      idElemento='identidadpagadora'
+                      descripcion='entidadpagadora'
+                      tipoValor='string'
+                      >
+
+                      </ComboSimple>
+                      <IfContainer show={mostrarCCAF}>
+                        <ComboSimple
+                        opcional={
+                          (!licencia || !esLicenciaFONASA(licencia) || !mostrarCCAF)  
+                        }
+                        name="entidadPagadoraId"
+                        label="Entidad que debe pagar subsidio o mantener remuneración"
+                        datos={cajasDeCompensacion}
+                        idElemento="idccaf"
+                        descripcion="nombre"
+                        />
+
+                      </IfContainer>
+                    
                   </IfContainer>
                 </Col>
               </Row>

@@ -1,3 +1,4 @@
+
 export interface LicenciaTramitar {
   foliolicencia: string;
   runtrabajador: string;

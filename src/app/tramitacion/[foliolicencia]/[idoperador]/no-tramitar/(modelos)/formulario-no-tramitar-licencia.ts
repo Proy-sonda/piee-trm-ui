@@ -5,4 +5,11 @@ export interface FormularioNoTramitarLicencia {
   fechaTerminoRelacion: Date;
   documentoAdjunto: FileList;
   entidadPagadoraId: number;
+  entidadPagadoraLetra:string;
+  entidadpagadora?: EntidadPagadora
+}
+
+interface EntidadPagadora {
+  identidadpagadora: string;
+  entidadpagadora:string;
 }
