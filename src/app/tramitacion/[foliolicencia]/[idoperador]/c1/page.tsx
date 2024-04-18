@@ -328,6 +328,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         nombre: licenciaTramite!?.entidadsalud.nombre,
       },
       tiporeposo: licenciaTramite!.tiporesposo,
+      fechaUltimoDiaTramite:  format(new Date(licenciaTramite!?.fechaultimodiatramite),'yyyy-MM-dd'),
     };
 
     let licenciaC1: LicenciaC1 = {
