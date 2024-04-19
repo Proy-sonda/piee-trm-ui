@@ -44,7 +44,7 @@ export const noTamitarLicenciaMedica = async (
         identidadsalud: licencia.entidadsalud.identidadsalud,
         nombre: licencia.entidadsalud.nombre,
       },
-      tiporeposo: licencia.tiporesposo,
+      tiporeposo: licencia.tiporeposo,
       
      
     });
