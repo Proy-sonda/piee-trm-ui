@@ -423,28 +423,28 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       setesAFC(false);
       formulario.setValue('perteneceAFC', '0');
     }
-    if (
-      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
-        .idtipolicencia == 5 ||
-      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
-        .idtipolicencia == 6
-    ) {
-      setentePagador(
-        combos!?.ENTIDADPAGADORA.filter(
-          (value) => value.identidadpagadora == 'F' || value.identidadpagadora == 'H',
-        ),
-      );
-      return;
-    }
+    // if (
+    //   combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
+    //     .idtipolicencia == 5 ||
+    //   combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
+    //     .idtipolicencia == 6
+    // ) {
+    //   setentePagador(
+    //     combos!?.ENTIDADPAGADORA.filter(
+    //       (value) => value.identidadpagadora == 'F' || value.identidadpagadora == 'H',
+    //     ),
+    //   );
+    //   return;
+    // }
 
-    if (
-      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
-        .identidadsalud !== 1
-    ) {
-      return setentePagador(
-        combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora == 'B'),
-      );
-    }
+    // if (
+    //   combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
+    //     .identidadsalud !== 1
+    // ) {
+    //   return setentePagador(
+    //     combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora == 'B'),
+    //   );
+    // }
   }, [calidadtrabajador, combos, foliolicencia, formulario]);
 
   useEffect(() => {
@@ -478,6 +478,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       );
 
       setTimeout(() => {
+        console.log( combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora)
         formulario.setValue(
           'entidadremuneradora',
           combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora,
@@ -852,6 +853,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   idElemento="idcalidadtrabajador"
                   name="calidad"
                   datos={comboCalidadTrabajador}
+                  tipoValor='number'
                 />
               </div>
 
