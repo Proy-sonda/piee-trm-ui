@@ -28,7 +28,6 @@ export const Cabecera: React.FC<interfaceCabecera> = ({
 
   useEffect(() => {
     const licencia = data?.LMETRM.find(({ foliolicencia }) => foliotramitacion == foliolicencia);
-    console.log(licencia);
     if (licencia && onLicenciaCargada) {
       onLicenciaCargada(licencia);
     }

@@ -16,10 +16,10 @@ export interface LicenciaTramitar {
   operador: Operador;
   tipolicencia: Tipolicencia;
   jornadareposo: Jornadareposo;
-  tiporesposo: Tiporesposo;
+  tiporeposo: Tiporeposo;
   entidadsalud: Entidadsalud;
   estadoTramitacion?: Estadotramitacion;
-  fechaultimodiatramite: Date;
+  fechaultdiatramita: Date;
 }
 
 interface Entidadsalud {
@@ -28,7 +28,7 @@ interface Entidadsalud {
   nombre: string;
 }
 
-interface Tiporesposo {
+interface Tiporeposo {
   idtiporeposo: number;
   tiporeposo: string;
 }

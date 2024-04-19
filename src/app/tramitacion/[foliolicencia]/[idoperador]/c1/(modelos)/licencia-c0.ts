@@ -25,7 +25,7 @@ export interface LicenciaC0 {
   tiporeposo: Tiporeposo;
   /** Es un string vacio para las licencias en las que no se alcanzo a guardar el RUT */
   ruttramitacion: string;
-  fechaUltimoDiaTramite?:string;
+  fechaultdiatramita?:string;
 }
 
 interface motivonorecepcion {

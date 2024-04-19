@@ -311,6 +311,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       });
       return false;
     }
+
+    console.log(licenciaTramite)
     let licenciaC0: CrearLicenciaC0Request = {
       estadolicencia: licenciaTramite!?.estadolicencia,
       fechaemision: format(new Date(licenciaTramite!?.fechaemision), 'yyyy-MM-dd'),
@@ -333,8 +335,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         identidadsalud: licenciaTramite!?.entidadsalud.identidadsalud,
         nombre: licenciaTramite!?.entidadsalud.nombre,
       },
-      tiporeposo: licenciaTramite!.tiporesposo,
-      fechaUltimoDiaTramite:  format(new Date(licenciaTramite!?.fechaultimodiatramite),'yyyy-MM-dd'),
+      tiporeposo: licenciaTramite!?.tiporeposo,
+      fechaultdiatramita:  format(new Date(licenciaTramite!?.fechaultdiatramita),'yyyy-MM-dd'),
     };
 
     let licenciaC1: LicenciaC1 = {
