@@ -74,6 +74,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
 
   useEffect(() => {
+    
     if(licenciaZona0) {
       if(licenciaZona0.motivonorecepcion){ 
         formulario.setValue('motivoRechazo', licenciaZona0.motivonorecepcion.idmotivonorecepcion.toString());
@@ -82,6 +83,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
       formulario.setValue('entidadPagadoraLetra',licenciaZona0!?.entidadpagadora!?.identidadpagadora);
     }
   }, [licenciaZona0])
+  
+ 
   
 
   useEffect(() => {
@@ -107,6 +110,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const [comboFiltradoEntidadPagadora, setcomboFiltradoEntidadPagadora] = useState<EntidadPagadora[]>([])
 
   const formulario = useForm<FormularioNoTramitarLicencia>({
     mode: 'onBlur',
@@ -115,7 +119,17 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
       entidadPagadoraId: valorPorDefectoCombo('number'),
     },
   });
-
+  useEffect(() => {
+    if(licencia && ComboEntidadPagadora.length > 0){
+      if(licencia.tipolicencia.idtipolicencia == 1) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.tipolicencia.idtipolicencia == 2) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.tipolicencia.idtipolicencia == 3) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.tipolicencia.idtipolicencia == 4) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.tipolicencia.idtipolicencia == 5) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'E' || c.identidadpagadora === 'F' || c.identidadpagadora === 'G' || c.identidadpagadora === 'H'));
+      if(licencia.tipolicencia.idtipolicencia == 6) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'E' || c.identidadpagadora === 'F' || c.identidadpagadora === 'G' || c.identidadpagadora === 'H'));
+      if(licencia.tipolicencia.idtipolicencia == 7) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+    }
+  }, [licencia])
 
   const motivoRechazo = formulario.watch('motivoRechazo');
   const motivoRechazoSeleccionado = (motivosDeRechazo ?? []).find(
@@ -491,7 +505,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                       }
                       name='entidadPagadoraLetra'
                       label='Entidad que debe pagar subsidio o mantener remuneración'
-                      datos={ComboEntidadPagadora}
+                      datos={comboFiltradoEntidadPagadora}
                       idElemento='identidadpagadora'
                       descripcion='entidadpagadora'
                       tipoValor='string'

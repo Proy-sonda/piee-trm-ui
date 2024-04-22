@@ -69,11 +69,11 @@ interface Estadotramitacion {
 }
 
 export const esLicenciaMaternidad = (licencia: LicenciaTramitar) => {
-  return licencia.tipolicencia.idtipolicencia === 3;
+  return licencia.tipolicencia.idtipolicencia == 3;
 };
 
 export const esLicenciaFONASA = (licencia: LicenciaTramitar) => {
-  return licencia.entidadsalud.identidadsalud === 1;
+  return licencia.entidadsalud.identidadsalud == 1;
 };
 
 export const esLicenciaDiatDiep = (licencia: LicenciaTramitar) => {
@@ -81,9 +81,9 @@ export const esLicenciaDiatDiep = (licencia: LicenciaTramitar) => {
 };
 
 export const licenciaSePuedeTramitar = ({ estadoTramitacion }: LicenciaTramitar) => {
-  return estadoTramitacion === undefined || estadoTramitacion.idestadotramitacion === 1;
+  return estadoTramitacion === undefined || estadoTramitacion.idestadotramitacion == 1;
 };
 
 export const licenciaEnviadaHaciaOperadores = ({ estadoTramitacion }: LicenciaTramitar) => {
-  return estadoTramitacion !== undefined && estadoTramitacion.idestadotramitacion === 3;
+  return estadoTramitacion !== undefined && estadoTramitacion.idestadotramitacion == 3;
 };
