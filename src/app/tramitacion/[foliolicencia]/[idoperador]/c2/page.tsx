@@ -956,11 +956,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                     opcional={!esAFC}
                     opciones={[
                       {
-                        value: '1',
+                        value: "1",
                         label: 'Sí',
                       },
                       {
-                        value: '0',
+                        value: "2",
                         label: 'No',
                       },
                     ]}
@@ -992,11 +992,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   name="contratoIndefinido"
                   opciones={[
                     {
-                      value: '1',
+                      value: "1",
                       label: 'Sí',
                     },
                     {
-                      value: '0',
+                      value: "2",
                       label: 'No',
                     },
                   ]}

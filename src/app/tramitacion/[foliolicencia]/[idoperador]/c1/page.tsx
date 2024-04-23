@@ -311,8 +311,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       });
       return false;
     }
-
-    console.log(licenciaTramite)
     let licenciaC0: CrearLicenciaC0Request = {
       estadolicencia: licenciaTramite!?.estadolicencia,
       fechaemision: format(new Date(licenciaTramite!?.fechaemision), 'yyyy-MM-dd'),

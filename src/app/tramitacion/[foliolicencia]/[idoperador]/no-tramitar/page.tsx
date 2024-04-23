@@ -158,6 +158,9 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   );
 
   const noTramitarLicencia: SubmitHandler<FormularioNoTramitarLicencia> = async (datos) => {
+    if(datos.entidadPagadoraId < 0) {
+      datos.entidadPagadoraId = 10100;
+    }
     if (!licencia) {
       throw new Error('FALTA LICENCIA PARA TRAMITAR');
     }
