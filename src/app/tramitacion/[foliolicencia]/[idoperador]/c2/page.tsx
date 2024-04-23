@@ -51,8 +51,8 @@ interface formularioApp {
   regimen: number;
   previsional: string;
   calidad: string;
-  perteneceAFC: '1' | '0';
-  contratoIndefinido: '1' | '0';
+  perteneceAFC: '1' | '2';
+  contratoIndefinido: '1' | '2';
   fechaafilacionprevisional: string;
   fechacontratotrabajo: string;
   entidadremuneradora: string;
@@ -166,7 +166,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           );
           formulario.setValue(
             'contratoIndefinido',
-            LicenciasAnteriores[0].licenciazc2[0].codigocontratoindef == 1 ? '1' : '0',
+            LicenciasAnteriores[0].licenciazc2[0].codigocontratoindef == 1 ? '1' : '2',
           );
           formulario.setValue(
             'fechaafilacionprevisional',
@@ -421,7 +421,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     if (calidadtrabajador == '3') setesAFC(true);
     else {
       setesAFC(false);
-      formulario.setValue('perteneceAFC', '0');
+      formulario.setValue('perteneceAFC', '2');
     }
     // if (
     //   combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
@@ -462,10 +462,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
       formulario.setValue(
         'contratoIndefinido',
-        combos!?.LMEEXISTEZONA2.codigocontratoindef == 1 ? '1' : '0',
+        combos!?.LMEEXISTEZONA2.codigocontratoindef == 1 ? '1' : '2',
       );
 
-      formulario.setValue('perteneceAFC', combos!?.LMEEXISTEZONA2.codigoseguroafc == 1 ? '1' : '0');
+      formulario.setValue('perteneceAFC', combos!?.LMEEXISTEZONA2.codigoseguroafc == 1 ? '1' : '2');
 
       formulario.setValue(
         'fechaafilacionprevisional',
