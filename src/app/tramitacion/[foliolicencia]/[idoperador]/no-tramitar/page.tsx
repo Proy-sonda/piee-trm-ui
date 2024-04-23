@@ -26,6 +26,7 @@ import { buscarCajasDeCompensacion } from '../(servicios)';
 import { buscarZona0 } from '../c1/(servicios)';
 import { EntidadPagadora } from '../c2/(modelos)';
 import { buscarEntidadPagadora } from '../c2/(servicios)';
+import { BuscarIDCCAFPropuesto } from '../c2/(servicios)/obtener-idccaf-propuesta';
 import { InputOtroMotivoDeRechazo } from './(componentes)/input-otro-motivo-rechazo';
 import {
   FormularioNoTramitarLicencia,
@@ -60,14 +61,15 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   const [
     erroresCarga,
-    [cajasDeCompensacion, motivosDeRechazo, SolicitudEntidadEmpleadora, EntidadPagadora, licenciaZona0],
+    [cajasDeCompensacion, motivosDeRechazo, SolicitudEntidadEmpleadora, EntidadPagadora, licenciaZona0, ccafpropuesta],
     cargando,
   ] = useMergeFetchArray([
     buscarCajasDeCompensacion(),
     buscarMotivosDeRechazo(),
     ObtenerSolicitudEntidadEmpleadora(),
     buscarEntidadPagadora(),
-    buscarZona0(foliolicencia, idOperadorNumber)
+    buscarZona0(foliolicencia, idOperadorNumber),
+    BuscarIDCCAFPropuesto(idOperadorNumber, foliolicencia)
   ]);
 
   const [ComboEntidadPagadora, setComboEntidadPagadora] = useState<EntidadPagadora[]>([]);
@@ -121,13 +123,32 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   });
   useEffect(() => {
     if(licencia && ComboEntidadPagadora.length > 0){
-      if(licencia.tipolicencia.idtipolicencia == 1) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
-      if(licencia.tipolicencia.idtipolicencia == 2) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
-      if(licencia.tipolicencia.idtipolicencia == 3) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
-      if(licencia.tipolicencia.idtipolicencia == 4) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.entidadsalud.identidadsalud == 1){
+      if(licencia.tipolicencia.idtipolicencia == 1) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.tipolicencia.idtipolicencia == 2) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.tipolicencia.idtipolicencia == 3) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.tipolicencia.idtipolicencia == 4) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
       if(licencia.tipolicencia.idtipolicencia == 5) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'E' || c.identidadpagadora === 'F' || c.identidadpagadora === 'G' || c.identidadpagadora === 'H'));
       if(licencia.tipolicencia.idtipolicencia == 6) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'E' || c.identidadpagadora === 'F' || c.identidadpagadora === 'G' || c.identidadpagadora === 'H'));
-      if(licencia.tipolicencia.idtipolicencia == 7) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      if(licencia.tipolicencia.idtipolicencia == 7) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+        
+      }else{
+        if(licencia.tipolicencia.idtipolicencia != 1 && licencia.entidadsalud.identidadsalud != 1) {
+          
+          setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'B'))
+          formulario.setValue('entidadPagadoraLetra', 'B');
+          return;
+        } 
+        if(licencia.tipolicencia.idtipolicencia == 1) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+        if(licencia.tipolicencia.idtipolicencia == 2) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+        if(licencia.tipolicencia.idtipolicencia == 3) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+        if(licencia.tipolicencia.idtipolicencia == 4) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+        if(licencia.tipolicencia.idtipolicencia == 5) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'E' || c.identidadpagadora === 'F' || c.identidadpagadora === 'G' || c.identidadpagadora === 'H'));
+        if(licencia.tipolicencia.idtipolicencia == 6) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'E' || c.identidadpagadora === 'F' || c.identidadpagadora === 'G' || c.identidadpagadora === 'H'));
+        if(licencia.tipolicencia.idtipolicencia == 7) setcomboFiltradoEntidadPagadora(ComboEntidadPagadora.filter(c=> c.identidadpagadora === 'A' || c.identidadpagadora === 'B' || c.identidadpagadora === 'C' || c.identidadpagadora === 'D'));
+      }
+      
+      
     }
   }, [licencia])
 
@@ -196,6 +217,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     
     if(EntidadPagadoraLetra == 'C'){
       setmostrarCCAF(true);
+      formulario.setValue('entidadPagadoraId', ccafpropuesta!?.codigoccafpropuesta);
+      
     }else{
       setmostrarCCAF(false);
     }
@@ -496,8 +519,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 <Col xs={12} md={5} lg={4} className="mt-4 mt-md-0">
                   <IfContainer
                     show={
-                      (licencia && esLicenciaFONASA(licencia)) &&
-                      (solicitadEntidadPagadora && esLicenciaFONASA(licencia!))
+                      (licencia) &&
+                      (solicitadEntidadPagadora)
                     }>
                       <ComboSimple
                       opcional={
