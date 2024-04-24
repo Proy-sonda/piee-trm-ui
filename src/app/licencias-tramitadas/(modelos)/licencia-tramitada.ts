@@ -65,11 +65,11 @@ interface Tiporeposo {
 }
 
 export const licenciaFueTramitadaPorEmpleador = ({ estadotramitacion }: LicenciaTramitada) => {
-  return estadotramitacion.idestadotramitacion === 2;
+  return [24, 25].includes(estadotramitacion.idestadotramitacion);
 };
 
 export const licenciaFueEnviadaAlOperador = ({ estadotramitacion }: LicenciaTramitada) => {
-  return estadotramitacion.idestadotramitacion === 3;
+  return [34, 35].includes(estadotramitacion.idestadotramitacion);
 };
 
 export const licenciaFueTramitadaPorOperador = ({ estadotramitacion }: LicenciaTramitada) => {
@@ -77,5 +77,5 @@ export const licenciaFueTramitadaPorOperador = ({ estadotramitacion }: LicenciaT
 };
 
 export const licenciaConErrorDeEnvio = ({ estadotramitacion }: LicenciaTramitada) => {
-  return estadotramitacion.idestadotramitacion === 30;
+  return [241, 251].includes(estadotramitacion.idestadotramitacion);
 };
