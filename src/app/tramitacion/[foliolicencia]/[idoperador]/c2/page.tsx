@@ -437,14 +437,14 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     //   return;
     // }
 
-    // if (
-    //   combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
-    //     .identidadsalud !== 1
-    // ) {
-    //   return setentePagador(
-    //     combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora == 'B'),
-    //   );
-    // }
+    if (
+      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
+        .identidadsalud == 1 ) {
+          return setentePagador(
+            combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora != 'B'),
+          );
+      
+    }
   }, [calidadtrabajador, combos, foliolicencia, formulario]);
 
   useEffect(() => {
@@ -1032,7 +1032,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                     idElemento="idccaf"
                     descripcion="nombre"
                     label="Caja de Compensación"
-                    datos={combos!?.CCAF}
+                    datos={combos!?.CCAF.filter(c=> c.idccaf != 10100)}
                     opcional={!ccafvisible}
                     className="col-12 col-sm-6 col-lg-4 col-xl-3"
                     name="ccaflm"
