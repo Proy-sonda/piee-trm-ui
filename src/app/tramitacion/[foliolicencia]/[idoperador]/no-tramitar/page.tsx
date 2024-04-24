@@ -74,6 +74,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
 
   const [ComboEntidadPagadora, setComboEntidadPagadora] = useState<EntidadPagadora[]>([]);
 
+  
+
 
   useEffect(() => {
     
@@ -543,7 +545,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                         }
                         name="entidadPagadoraId"
                         label="Entidad que debe pagar subsidio o mantener remuneración"
-                        datos={cajasDeCompensacion}
+                        datos={cajasDeCompensacion ? cajasDeCompensacion.filter(c=> c.idccaf != 10100 ) : []}
                         idElemento="idccaf"
                         descripcion="nombre"
                         />
