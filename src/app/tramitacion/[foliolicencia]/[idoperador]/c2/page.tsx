@@ -136,16 +136,19 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       };
       buscarEmpleador();
     }
+   
+      formulario.setValue('calidad', combos?.ZONA2?.calidadtrabajador.idcalidadtrabajador.toString() || '-99999999')
+   
   }, [combos]);
 
-  useEffect(() => {
-    if (comboCalidadTrabajador.length > 0 && LicenciasAnteriores.length > 0) {
-      formulario.setValue(
-        'calidad',
-        combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
-      );
-    }
-  }, [comboCalidadTrabajador]);
+  // useEffect(() => {
+  //   if (comboCalidadTrabajador.length > 0 && LicenciasAnteriores.length > 0) {
+  //     formulario.setValue(
+  //       'calidad',
+  //       combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
+  //     );
+  //   }
+  // }, [comboCalidadTrabajador]);
 
   useEffect(() => {
     if (LicenciasAnteriores.length > 0) {
@@ -264,7 +267,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
   useEffect(() => {
     if (EntidadPagadora) {
-      if (EntidadPagadora === 'C' && combos?.ZONA0.entidadsalud.identidadsalud === 1) {
+      if (EntidadPagadora === 'C' || combos?.ZONA0.entidadsalud.identidadsalud === 1) {
         setccafvisible(true);
         setidccaf(undefined);
       } else {
@@ -476,6 +479,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         'fechacontratotrabajo',
         format(new Date(combos!?.LMEEXISTEZONA2.fechacontrato), 'yyyy-MM-dd'),
       );
+      
 
       setTimeout(() => {
         console.log( combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora)
