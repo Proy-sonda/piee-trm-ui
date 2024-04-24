@@ -153,9 +153,9 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 className="text-center align-middle">
                 <td className="px-4 py-3">
                   {/* Validamos si la fecha de hoy es menor a la fechaultimodiatramite y si es el mismo día debe mostrar el circulo amarillo */}
-                  {new Date(licencia.fechaultimodiatramite) > new Date() ? (
+                  {new Date(licencia.fechaultdiatramita) > new Date() ? (
                     <div className={`mb-2 ${styles.circlegreen}`}></div>
-                  ) : new Date(licencia.fechaultimodiatramite).getDate() ===
+                  ) : new Date(licencia.fechaultdiatramita).getDate() ===
                     new Date().getDate() ? ( // Si es el mismo día
                     <div className={`mb-2 ${styles.circleyellow}`}></div>
                   ) : (
@@ -191,7 +191,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 </td>
                 <td>
                   <div className="mb-1 small text-start text-nowrap">
-                    {licencia.tiporesposo.tiporeposo}: {licencia.diasreposo} día(s)
+                    {licencia.tiporeposo.tiporeposo}: {licencia.diasreposo} día(s)
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
                     INICIO REPOSO: {format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy')}

@@ -44,32 +44,65 @@ export const noTamitarLicenciaMedica = async (
         identidadsalud: licencia.entidadsalud.identidadsalud,
         nombre: licencia.entidadsalud.nombre,
       },
-      tiporeposo: licencia.tiporesposo,
+      tiporeposo: licencia.tiporeposo,
+      
+     
     });
   } catch (error) {
     throw new NoPuedeCrearZona0Error();
   }
 
   try {
-    const payloadNoRecepcion = {
-      foliolicencia: request.folioLicencia,
-      operador: {
-        idoperador: request.idOperador,
-        operador: ' ',
-      },
-      fechaterminorelacion: esFechaInvalida(request.fechaTerminoRelacion)
-        ? null
-        : format(request.fechaTerminoRelacion, 'yyyy-MM-dd'),
-      motivonorecepcion: {
-        idmotivonorecepcion: parseInt(request.motivoRechazo, 10),
-        motivonorecepcion: ' ',
-      },
-      ccaf: {
-        idccaf: esElValorPorDefecto(request.entidadPagadoraId) ? 10100 : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
-        nombre: ' ',
-      },
-      otromotivonorecepcion: request.otroMotivoDeRechazo,
-    };
+    let payloadNoRecepcion ={};
+    if(
+      request.entidadPagadoraId && request.entidadPagadoraLetra
+    )
+    {
+      payloadNoRecepcion = {
+        foliolicencia: request.folioLicencia,
+        operador: {
+          idoperador: request.idOperador,
+          operador: ' ',
+        },
+        fechaterminorelacion: esFechaInvalida(request.fechaTerminoRelacion)
+          ? null
+          : format(request.fechaTerminoRelacion, 'yyyy-MM-dd'),
+        motivonorecepcion: {
+          idmotivonorecepcion: parseInt(request.motivoRechazo, 10),
+          motivonorecepcion: ' ',
+        },
+        entidadpagadora:{
+          identidadpagadora: request.entidadPagadoraLetra,
+          entidadpagadora: ' ',
+        },
+        ccaf:{
+          idccaf: esElValorPorDefecto(request.entidadPagadoraId) ? 10100 : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
+          nombre: ' ',
+        },
+        otromotivonorecepcion: request.otroMotivoDeRechazo || ' ',
+      };
+
+    }else{
+      payloadNoRecepcion = {
+        foliolicencia: request.folioLicencia,
+        operador: {
+          idoperador: request.idOperador,
+          operador: ' ',
+        },
+        fechaterminorelacion: esFechaInvalida(request.fechaTerminoRelacion)
+          ? null
+          : format(request.fechaTerminoRelacion, 'yyyy-MM-dd'),
+        motivonorecepcion: {
+          idmotivonorecepcion: parseInt(request.motivoRechazo, 10),
+          motivonorecepcion: ' ',
+        },
+        ccaf:{
+          idccaf: !esElValorPorDefecto(request.entidadPagadoraId) ? 10100 : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
+          nombre: ' ',
+        },
+        otromotivonorecepcion: request.otroMotivoDeRechazo || ' ',
+      };
+    }
 
     await runFetchConThrow<void>(`${urlBackendTramitacion()}/licencia/norecepcion`, {
       method: 'POST',

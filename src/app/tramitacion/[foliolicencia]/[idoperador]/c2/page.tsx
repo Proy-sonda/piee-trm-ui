@@ -51,8 +51,8 @@ interface formularioApp {
   regimen: number;
   previsional: string;
   calidad: string;
-  perteneceAFC: '1' | '0';
-  contratoIndefinido: '1' | '0';
+  perteneceAFC: '1' | '2';
+  contratoIndefinido: '1' | '2';
   fechaafilacionprevisional: string;
   fechacontratotrabajo: string;
   entidadremuneradora: string;
@@ -136,16 +136,19 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       };
       buscarEmpleador();
     }
+   
+      formulario.setValue('calidad', combos?.ZONA2?.calidadtrabajador.idcalidadtrabajador.toString() || '-99999999')
+   
   }, [combos]);
 
-  useEffect(() => {
-    if (comboCalidadTrabajador.length > 0 && LicenciasAnteriores.length > 0) {
-      formulario.setValue(
-        'calidad',
-        combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
-      );
-    }
-  }, [comboCalidadTrabajador]);
+  // useEffect(() => {
+  //   if (comboCalidadTrabajador.length > 0 && LicenciasAnteriores.length > 0) {
+  //     formulario.setValue(
+  //       'calidad',
+  //       combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
+  //     );
+  //   }
+  // }, [comboCalidadTrabajador]);
 
   useEffect(() => {
     if (LicenciasAnteriores.length > 0) {
@@ -166,7 +169,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           );
           formulario.setValue(
             'contratoIndefinido',
-            LicenciasAnteriores[0].licenciazc2[0].codigocontratoindef == 1 ? '1' : '0',
+            LicenciasAnteriores[0].licenciazc2[0].codigocontratoindef == 1 ? '1' : '2',
           );
           formulario.setValue(
             'fechaafilacionprevisional',
@@ -264,7 +267,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
   useEffect(() => {
     if (EntidadPagadora) {
-      if (EntidadPagadora === 'C' && combos?.ZONA0.entidadsalud.identidadsalud === 1) {
+      if (EntidadPagadora === 'C' ) {
         setccafvisible(true);
         setidccaf(undefined);
       } else {
@@ -421,29 +424,29 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     if (calidadtrabajador == '3') setesAFC(true);
     else {
       setesAFC(false);
-      formulario.setValue('perteneceAFC', '0');
+      formulario.setValue('perteneceAFC', '2');
     }
-    if (
-      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
-        .idtipolicencia == 5 ||
-      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
-        .idtipolicencia == 6
-    ) {
-      setentePagador(
-        combos!?.ENTIDADPAGADORA.filter(
-          (value) => value.identidadpagadora == 'F' || value.identidadpagadora == 'H',
-        ),
-      );
-      return;
-    }
+    // if (
+    //   combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
+    //     .idtipolicencia == 5 ||
+    //   combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.tipolicencia
+    //     .idtipolicencia == 6
+    // ) {
+    //   setentePagador(
+    //     combos!?.ENTIDADPAGADORA.filter(
+    //       (value) => value.identidadpagadora == 'F' || value.identidadpagadora == 'H',
+    //     ),
+    //   );
+    //   return;
+    // }
 
     if (
       combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
-        .identidadsalud !== 1
-    ) {
-      return setentePagador(
-        combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora == 'B'),
-      );
+        .identidadsalud == 1 ) {
+          return setentePagador(
+            combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora != 'B'),
+          );
+      
     }
   }, [calidadtrabajador, combos, foliolicencia, formulario]);
 
@@ -462,10 +465,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
       formulario.setValue(
         'contratoIndefinido',
-        combos!?.LMEEXISTEZONA2.codigocontratoindef == 1 ? '1' : '0',
+        combos!?.LMEEXISTEZONA2.codigocontratoindef == 1 ? '1' : '2',
       );
 
-      formulario.setValue('perteneceAFC', combos!?.LMEEXISTEZONA2.codigoseguroafc == 1 ? '1' : '0');
+      formulario.setValue('perteneceAFC', combos!?.LMEEXISTEZONA2.codigoseguroafc == 1 ? '1' : '2');
 
       formulario.setValue(
         'fechaafilacionprevisional',
@@ -476,8 +479,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         'fechacontratotrabajo',
         format(new Date(combos!?.LMEEXISTEZONA2.fechacontrato), 'yyyy-MM-dd'),
       );
+      
 
       setTimeout(() => {
+        console.log( combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora)
         formulario.setValue(
           'entidadremuneradora',
           combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora,
@@ -852,6 +857,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   idElemento="idcalidadtrabajador"
                   name="calidad"
                   datos={comboCalidadTrabajador}
+                  tipoValor='number'
                 />
               </div>
 
@@ -954,11 +960,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                     opcional={!esAFC}
                     opciones={[
                       {
-                        value: '1',
+                        value: "1",
                         label: 'Sí',
                       },
                       {
-                        value: '0',
+                        value: "2",
                         label: 'No',
                       },
                     ]}
@@ -990,11 +996,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   name="contratoIndefinido"
                   opciones={[
                     {
-                      value: '1',
+                      value: "1",
                       label: 'Sí',
                     },
                     {
-                      value: '0',
+                      value: "2",
                       label: 'No',
                     },
                   ]}
@@ -1004,7 +1010,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
               <InputFecha
                 name="fechaafilacionprevisional"
                 label="Fecha Afiliación Entidad Previsional"
-                opcional
                 className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
 
@@ -1030,7 +1035,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                     idElemento="idccaf"
                     descripcion="nombre"
                     label="Caja de Compensación"
-                    datos={combos!?.CCAF}
+                    datos={combos!?.CCAF.filter(c=> c.idccaf != 10100)}
                     opcional={!ccafvisible}
                     className="col-12 col-sm-6 col-lg-4 col-xl-3"
                     name="ccaflm"

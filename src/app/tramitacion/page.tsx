@@ -53,11 +53,11 @@ const TramitacionPage = () => {
         filtroEstado === 'todos'
           ? true
           : filtroEstado === 'por-tramitar'
-          ? new Date(licencia.fechaultimodiatramite) > new Date()
+          ? new Date(licencia.fechaultdiatramita) > new Date()
           : filtroEstado === 'por-vencer'
-          ? new Date(licencia.fechaultimodiatramite).getDate() === new Date().getDate()
+          ? new Date(licencia.fechaultdiatramita).getDate() === new Date().getDate()
           : filtroEstado === 'vencido'
-          ? new Date(licencia.fechaultimodiatramite).getDate() < new Date().getDate()
+          ? new Date(licencia.fechaultdiatramita).getDate() < new Date().getDate()
           : true;
 
       if (!hayFiltros(filtros)) {

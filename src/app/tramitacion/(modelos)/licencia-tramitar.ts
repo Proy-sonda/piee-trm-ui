@@ -1,3 +1,4 @@
+
 export interface LicenciaTramitar {
   foliolicencia: string;
   runtrabajador: string;
@@ -15,10 +16,10 @@ export interface LicenciaTramitar {
   operador: Operador;
   tipolicencia: Tipolicencia;
   jornadareposo: Jornadareposo;
-  tiporesposo: Tiporesposo;
+  tiporeposo: Tiporeposo;
   entidadsalud: Entidadsalud;
   estadoTramitacion?: Estadotramitacion;
-  fechaultimodiatramite: Date;
+  fechaultdiatramita: Date;
 }
 
 interface Entidadsalud {
@@ -27,7 +28,7 @@ interface Entidadsalud {
   nombre: string;
 }
 
-interface Tiporesposo {
+interface Tiporeposo {
   idtiporeposo: number;
   tiporeposo: string;
 }
@@ -68,11 +69,11 @@ interface Estadotramitacion {
 }
 
 export const esLicenciaMaternidad = (licencia: LicenciaTramitar) => {
-  return licencia.tipolicencia.idtipolicencia === 3;
+  return licencia.tipolicencia.idtipolicencia == 3;
 };
 
 export const esLicenciaFONASA = (licencia: LicenciaTramitar) => {
-  return licencia.entidadsalud.identidadsalud === 1;
+  return licencia.entidadsalud.identidadsalud == 1;
 };
 
 export const esLicenciaDiatDiep = (licencia: LicenciaTramitar) => {
@@ -80,9 +81,9 @@ export const esLicenciaDiatDiep = (licencia: LicenciaTramitar) => {
 };
 
 export const licenciaSePuedeTramitar = ({ estadoTramitacion }: LicenciaTramitar) => {
-  return estadoTramitacion === undefined || estadoTramitacion.idestadotramitacion === 1;
+  return estadoTramitacion === undefined || estadoTramitacion.idestadotramitacion == 1;
 };
 
 export const licenciaEnviadaHaciaOperadores = ({ estadoTramitacion }: LicenciaTramitar) => {
-  return estadoTramitacion !== undefined && estadoTramitacion.idestadotramitacion === 3;
+  return estadoTramitacion !== undefined && estadoTramitacion.idestadotramitacion == 3;
 };

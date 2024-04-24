@@ -270,7 +270,7 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
               </div>
 
               <div className="col-12 col-md-6">
-                <b>{datos.licencia?.tiporesposo.tiporeposo}</b> por{' '}
+                <b>{datos.licencia?.tiporeposo.tiporeposo}</b> por{' '}
                 <b>{datos.licencia?.diasreposo} días(s)</b> desde el{' '}
                 <b>{formatearFecha(datos.licencia?.fechainicioreposo)} </b>
                 al <b>{calcularFechaFin(datos.licencia)}</b>

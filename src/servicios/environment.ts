@@ -25,3 +25,7 @@ export const urlBackendWorkers = () => {
 export const urlBackendSuperUsuario = () => {
   return process.env.NEXT_PUBLIC_URL_BACKEND_SUPER_USUARIO!;
 };
+
+export const versionApp = () => {
+  return process.env.NEXT_PUBLIC_APP_VERSION!;
+};

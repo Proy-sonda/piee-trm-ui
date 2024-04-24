@@ -149,7 +149,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
             'region',
             licenciasAnteriores[0].licenciazc1[0].comuna.idcomuna.substring(0, 2),
           );
-          formulario.setValue('comuna', licenciasAnteriores[0].licenciazc1[0].comuna.idcomuna);
+          setTimeout(() => {
+            formulario.setValue('comuna', licenciasAnteriores[0].licenciazc1[0].comuna.idcomuna);
+          }, 1000);
 
           formulario.setValue(
             'actividadlaboral',
@@ -222,6 +224,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       formulario.setValue('razon', empleador.razonsocial);
       if (LMEEXIS != undefined) {
         formulario.setValue('region', LMEEXIS.comuna.idcomuna.substring(0, 2));
+        console.log( LMEEXIS.comuna.idcomuna)
+        formulario.setValue('comuna', LMEEXIS.comuna.idcomuna);
         formulario.setValue('calle', LMEEXIS.direccion);
         formulario.setValue('numero', LMEEXIS.numero);
         formulario.setValue('departamento', LMEEXIS.depto);
@@ -242,7 +246,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       }
 
       formulario.setValue('region', empleador.direccionempleador.comuna.region.idregion);
-      formulario.setValue('comuna', empleador.direccionempleador.comuna.idcomuna);
+      setTimeout(() => {
+        formulario.setValue('comuna', empleador.direccionempleador.comuna.idcomuna);
+      }, 1000);
       formulario.setValue('calle', empleador.direccionempleador.calle);
       formulario.setValue('numero', empleador.direccionempleador.numero);
       formulario.setValue('departamento', empleador.direccionempleador.depto);
@@ -327,7 +333,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         identidadsalud: licenciaTramite!?.entidadsalud.identidadsalud,
         nombre: licenciaTramite!?.entidadsalud.nombre,
       },
-      tiporeposo: licenciaTramite!.tiporesposo,
+      tiporeposo: licenciaTramite!?.tiporeposo,
+      fechaultdiatramita:  format(new Date(licenciaTramite!?.fechaultdiatramita),'yyyy-MM-dd'),
     };
 
     let licenciaC1: LicenciaC1 = {
