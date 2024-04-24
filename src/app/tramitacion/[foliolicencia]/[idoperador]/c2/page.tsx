@@ -1006,7 +1006,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
               <InputFecha
                 name="fechaafilacionprevisional"
                 label="Fecha Afiliación Entidad Previsional"
-                opcional
                 className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
 
