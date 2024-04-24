@@ -201,12 +201,12 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                       className="btn btn-sm btn-warning"
                       onClick={() => {
                         AlertaInformacion.fire(
-                          'Recibido por operador...',
+                          'Recibido por operador',
                           `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en el operador.`,
                         );
                       }}
                       title="Recibido por operador">
-                      Recibido...
+                      <small className="text-nowrap">RECIBIDO</small>
                     </button>
                   </IfContainer>
 
@@ -215,12 +215,12 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                       className="btn btn-sm btn-warning"
                       onClick={() => {
                         AlertaInformacion.fire(
-                          'En Proceso...',
+                          'En Proceso',
                           `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en proceso de tramitación.`,
                         );
                       }}
                       title="En proceso de tramitación">
-                      En Proceso...
+                      <small className="text-nowrap">EN PROCESO</small>
                     </button>
                   </IfContainer>
 
@@ -234,7 +234,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                         );
                       }}
                       title="En proceso de tramitación">
-                      En reproceso...
+                      <small className="text-nowrap">EN REPROCESO</small>
                     </button>
                   </IfContainer>
 
