@@ -141,14 +141,14 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
    
   }, [combos]);
 
-  // useEffect(() => {
-  //   if (comboCalidadTrabajador.length > 0 && LicenciasAnteriores.length > 0) {
-  //     formulario.setValue(
-  //       'calidad',
-  //       combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
-  //     );
-  //   }
-  // }, [comboCalidadTrabajador]);
+  useEffect(() => {
+    if (comboCalidadTrabajador.length > 0) {
+      formulario.setValue(
+        'calidad',
+        combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
+      );
+    }
+  }, [comboCalidadTrabajador]);
 
   useEffect(() => {
     if (LicenciasAnteriores.length > 0) {
