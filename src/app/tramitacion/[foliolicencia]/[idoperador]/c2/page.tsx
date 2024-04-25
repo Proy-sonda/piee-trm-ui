@@ -142,11 +142,15 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   }, [combos]);
 
   useEffect(() => {
-    if (comboCalidadTrabajador.length > 0) {
-      formulario.setValue(
-        'calidad',
-        combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
-      );
+    if (combos?.ZONA2) {
+
+
+      if (comboCalidadTrabajador.length > 0) {
+        formulario.setValue(
+          'calidad',
+          combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
+        );
+      }
     }
   }, [comboCalidadTrabajador]);
 
