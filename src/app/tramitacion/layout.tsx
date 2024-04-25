@@ -10,7 +10,7 @@ export default function TramitacionLayout({ children }: { children: React.ReactN
   return (
     <>
       <Position tabActiva="tramitacion" />
-      <div className="mx-3 mx-lg-5 py-4">{children}</div>;
+      <div className="mx-3 mx-lg-5 py-4">{children}</div>
     </>
   );
 }

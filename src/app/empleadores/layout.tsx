@@ -7,7 +7,7 @@ export default function EmpleadoresLayout({ children }: { children: React.ReactN
   return (
     <>
       <Position tabActiva="mantencion-empleadores" />
-      <EmpleadorActualProvider>{children}</EmpleadorActualProvider>;
+      <EmpleadorActualProvider>{children}</EmpleadorActualProvider>
     </>
   );
 }
