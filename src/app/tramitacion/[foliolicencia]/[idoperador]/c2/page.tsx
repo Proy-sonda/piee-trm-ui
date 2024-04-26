@@ -275,9 +275,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         setidccaf(undefined);
       } else {
         setccafvisible(false);
-        if (EntidadPagadora === 'A' && combos?.ZONA0.entidadsalud.identidadsalud === 1) {
-          setidccaf(10100);
-        }
+        setidccaf(10100);
+        // !TODO: Revisar si es necesario el if
+        // if (EntidadPagadora === 'A' && combos?.ZONA0.entidadsalud.identidadsalud === 1) {
+        //   setidccaf(10100);
+        // }
       }
     }
   }, [EntidadPagadora]);
