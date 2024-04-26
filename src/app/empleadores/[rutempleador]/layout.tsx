@@ -8,6 +8,7 @@ import { useContext, useEffect, useRef, useState } from 'react';
 import { Collapse, Container, Offcanvas, Row, Stack } from 'react-bootstrap';
 import { useEmpleadorActual } from '../(contexts)/empleador-actual-context';
 import styles from './layout.module.css';
+import IfContainer from '@/components/if-container';
 
 interface LinkNavegacion {
   href: string;
@@ -47,6 +48,7 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
 
   const [abrirMenuMovil, setAbrirMenuMovil] = useState(false);
   const menu = useRef(null);
+  const menuMovil = useRef(null);
 
   const claseLinkActivo = (link: LinkNavegacion) => {
     const [linkPathname] = link.href.split('?');
@@ -133,11 +135,14 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
 
       {/* MENU VERSION MOVIL */}
       <Container fluid className="d-lg-none px-3 mt-3 pb-4">
+      
+        
         <button
           className="btn m-0 p-0"
           onClick={() => setAbrirMenuMovil(true)}
           aria-controls="example-collapse-text"
-          aria-expanded={abrirMenuMovil}>
+          aria-expanded={abrirMenuMovil}
+         >
           <i className="bi bi-list" style={{ fontSize: '20px' }}></i>
         </button>
 
@@ -153,10 +158,40 @@ export default function LayoutProps({ children, params: { rutempleador } }: Layo
           </Offcanvas.Header>
 
           <Offcanvas.Body>
-            <Stack gap={1}>
+            <IfContainer show={abrirMenuMovil}>
+            <GuiaUsuario guia={listaguia[0]!?.activo && guia} target={menuMovil} placement="bottom-end" classname='d-lg-none px-3 mt-3 pb-4'>
+            Menú lateral para navegación entre secciones <br />
+            <div className="mt-2 text-end">
+              <button
+                className="btn btn-sm"
+                style={{ border: '1px solid white', color: 'white' }}
+                onClick={() =>
+                  AgregarGuia([
+                    {
+                      indice: 0,
+                      nombre: 'Menu lateral',
+                      activo: false,
+                    },
+                    {
+                      indice: 1,
+                      nombre: 'Datos página',
+                      activo: true,
+                    },
+                  ])
+                }>
+                Continuar &nbsp;
+                <i className="bi bi-arrow-right"></i>
+              </button>
+            </div>
+          </GuiaUsuario>
+
+            </IfContainer>
+          
+            <Stack gap={1} ref={menuMovil}>
               {links.map((link, index) => (
                 <Link
                   key={index}
+                 
                   href={link.href}
                   onClick={() => setAbrirMenuMovil(false)}
                   className={`btn text-nowrap text-start ${claseLinkActivo(link)}`}>

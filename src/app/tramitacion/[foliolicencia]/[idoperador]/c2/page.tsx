@@ -63,7 +63,6 @@ interface formularioApp {
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
   const [esAFC, setesAFC] = useState(false);
   const [entePagador, setentePagador] = useState<EntidadPagadora[]>([]);
-  const [fadeinOut, setfadeinOut] = useState('');
   const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
   const [LicenciasAnteriores, setLicenciasAnteriores] = useState<LicenciasAnteriores[]>([]);
@@ -326,10 +325,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           (await data())
             .filter(
               (value) =>
-                value.tipolicencia?.idtipolicencia == combos?.ZONA0.tipolicencia.idtipolicencia,
+                value.tipolicencia?.idtipolicencia == combos?.ZONA0.tipolicencia.idtipolicencia
             )
-            .map((value) => value.entidadpagadora),
+            .map((value) =>   value.entidadpagadora).filter((value) => combos?.ZONA0.entidadsalud.identidadsalud == 1 ? value.identidadpagadora != 'B' : value.identidadpagadora),
         );
+        
       };
       buscarRelacionEntidadPagadora();
     }
@@ -528,9 +528,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       />
 
       <IfContainer show={cargandoCombos}>
-        <div className={fadeinOut}>
           <LoadingSpinner titulo="Cargando datos..." />
-        </div>
       </IfContainer>
 
       <div

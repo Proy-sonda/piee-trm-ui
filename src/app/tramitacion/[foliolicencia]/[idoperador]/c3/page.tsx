@@ -103,7 +103,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   const [tipoDocAdjunto, settipoDocAdjunto] = useState<TipoDocumento[]>([]);
   useEffect(() => {
-    if (zona0 && !errZona0 && !cargandoZona0 && zona2 && !errZona2 && !cargandoZona2) {
+    if (zona0 && zona2) {
       const BuscarRelacionCalidadAdj = async () => {
         const [relacionCalidad] = await ObtenerRelacionCalidadAdjunto(
           zona2?.calidadtrabajador.idcalidadtrabajador,
@@ -129,7 +129,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       };
       BuscarRelacionCalidadAdj();
     }
-  }, [zona0]);
+  }, [zona0, zona2]);
 
   const [errPeriodos, periodosSugeridos, cargandoPeriodos] = useFetch(
     licencia && zona2

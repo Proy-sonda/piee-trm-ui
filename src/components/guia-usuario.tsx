@@ -8,9 +8,10 @@ interface Props {
   children: ReactNode;
   target: React.MutableRefObject<null>;
   placement?: Placement;
+  classname?: string;
 }
 
-export const GuiaUsuario: React.FC<Props> = ({ guia, target, children, placement }) => {
+export const GuiaUsuario: React.FC<Props> = ({ guia, target, children, placement, classname }) => {
   const {
     datosGuia: { activarDesactivarGuia },
   } = useContext(AuthContext);
@@ -34,7 +35,7 @@ export const GuiaUsuario: React.FC<Props> = ({ guia, target, children, placement
       }) => (
         <div
           {...props}
-          className="overlay-guia"
+          className={`overlay-guia ${classname}`}
           style={{
             ...props.style,
           }}>
