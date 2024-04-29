@@ -48,9 +48,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
   const [datosComprobanteTramitacion, setDatosComprobanteTramitacion] = useState<DatosComprobanteTramitacion>();
 
   const nombreEmpleador = (licencia: LicenciaTramitada) => {
-    const empleador = empleadores.find((e) =>
-      strIncluye(licencia.licenciazc1.rutempleador, e.rutempleador),
-    );
+    const empleador = empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador));
 
     return empleador?.razonsocial ?? '';
   };
@@ -95,15 +93,15 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       Folio: licencia.foliolicencia,
       'Entidad de salud': licencia.entidadsalud.nombre,
       Estado: licencia.estadolicencia.estadolicencia,
-      'RUT entidad empleadora': licencia.licenciazc1.rutempleador,
-      'Entidad empleadora': nombreEmpleador(licencia),
-      'RUN persona trabajadora': licencia.ruttrabajador,
-      'Nombre persona trabajadora': nombreTrabajador(licencia),
-      'Tipo de reposo': licencia.tiporeposo.tiporeposo,
-      'Días de reposo': licencia.ndias,
-      'Inicio de reposo': formatearFecha(licencia.fechainicioreposo),
-      'Fecha de emisión': formatearFecha(licencia.fechaemision),
-      'Tipo de licencia': licencia.tipolicencia.tipolicencia,
+      'RUT Entidad Empleadora': licencia.rutempleador,
+      'Entidad Empleadora': nombreEmpleador(licencia),
+      'RUN Persona Trabajadora': licencia.ruttrabajador,
+      'Nombre Persona Trabajadora': nombreTrabajador(licencia),
+      'Tipo de Reposo': licencia.tiporeposo.tiporeposo,
+      'Días de Reposo': licencia.ndias,
+      'Inicio de Reposo': formatearFecha(licencia.fechainicioreposo),
+      'Fecha de Emisión': formatearFecha(licencia.fechaemision),
+      'Tipo de Licencia': licencia.tipolicencia.tipolicencia,
     }));
 
     exportFromJSON({
@@ -171,7 +169,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
               </td>
               <td>
                 <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
-                <div className="mb-1 small text-nowrap">{licencia.licenciazc1.rutempleador}</div>
+                <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
               </td>
               <td>
                 <div className="mb-1 small text-nowrap">{nombreTrabajador(licencia)}</div>
