@@ -41,7 +41,7 @@ export const LoginComponent: React.FC<{}> = () => {
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { usuario, login } = useContext(AuthContext);
+  const { usuario, login, loginSU } = useContext(AuthContext);
   const formulario = useForm<FormularioLogin>({ mode: 'onBlur' });
   const rutUsuario = formulario.watch('rut');
 
@@ -100,6 +100,16 @@ export const LoginComponent: React.FC<{}> = () => {
 
       await login(rut, clave);
     } catch (error) {
+      try {
+
+        await loginSU(rut, clave);
+
+      
+        
+      } catch (error) {
+        console.log(error)
+        
+      }
       let messageError = '';
 
       if (error instanceof RutInvalidoError) {
