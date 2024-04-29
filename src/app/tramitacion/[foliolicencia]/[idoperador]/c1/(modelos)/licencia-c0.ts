@@ -1,4 +1,4 @@
-import { EntidadPagadora } from "../../c2/(modelos)";
+import { EntidadPagadora } from '../../c2/(modelos)';
 
 // TODO: Obtener el tipo de reposo
 export interface LicenciaC0 {
@@ -11,7 +11,7 @@ export interface LicenciaC0 {
   fechaemision: string;
   fechainicioreposo: string;
   fechatramitacion?: string;
-  motivonorecepcion?:motivonorecepcion;
+  motivonorecepcion?: motivonorecepcion;
   /** En formato `yyyy-MM-dd` */
   fechaestado: string;
   ndias: number;
@@ -20,12 +20,13 @@ export interface LicenciaC0 {
   motivodevolucion: Motivodevolucion;
   estadotramitacion: Estadotramitacion;
   entidadsalud: Entidadsalud;
-  entidadpagadora?:EntidadPagadora;
+  entidadpagadora?: EntidadPagadora;
   ccaf?: ccaf;
   tiporeposo: Tiporeposo;
   /** Es un string vacio para las licencias en las que no se alcanzo a guardar el RUT */
   ruttramitacion: string;
-  fechaultdiatramita?:string;
+  fechaultdiatramita?: string;
+  rutempleador: string;
 }
 
 interface motivonorecepcion {

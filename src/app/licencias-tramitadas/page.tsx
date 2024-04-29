@@ -78,7 +78,7 @@ const LicenciasTramitadasPage = () => {
       }
 
       const coincideEntidadEmpleadora = strIncluye(
-        licencia.licenciazc1.rutempleador,
+        licencia.rutempleador,
         filtros.rutEntidadEmpleadora,
       );
 
