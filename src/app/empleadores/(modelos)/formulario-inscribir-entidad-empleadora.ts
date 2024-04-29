@@ -15,4 +15,6 @@ export interface FormularioInscribirEntidadEmpleadora {
   emailConfirma: string;
   tamanoEmpresaId: number;
   sistemaRemuneracionId: number;
+  emailUsuario: string;
+  emailUsuarioConfirma: string;
 }
