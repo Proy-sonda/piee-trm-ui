@@ -15,4 +15,6 @@ export interface InscribirEmpleadorRequest {
   emailConfirma: string;
   tamanoEmpresaId: number;
   sistemaRemuneracionId: number;
+  emailUsuario: string;
+  emailUsuarioConfirma: string;
 }

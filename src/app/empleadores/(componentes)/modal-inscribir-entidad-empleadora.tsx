@@ -227,7 +227,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                       />
 
                       <InputEmail
-                        label="Repetir correo electrónico"
+                        label="Repetir correo electrónico empleador"
                         name="emailConfirma"
                         className="col-12 col-lg-6 col-xl-3"
                         debeCoincidirCon="email"
@@ -249,6 +249,20 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                         label="Sistema de Remuneración"
                         descripcion={'descripcion'}
                         idElemento={'idsistemaremuneracion'}
+                      />
+
+                      <InputEmail
+                        label="Correo electrónico persona usuaria"
+                        name="emailUsuario"
+                        debeCoincidirCon="emailUsuarioConfirma"
+                        className="col-12 col-lg-6 col-xl-3"
+                      />
+
+                      <InputEmail
+                        label="Repetir correo electrónico persona usuaria"
+                        name="emailUsuarioConfirma"
+                        debeCoincidirCon="emailUsuario"
+                        className="col-12 col-lg-6 col-xl-3"
                       />
                     </div>
                   </div>
