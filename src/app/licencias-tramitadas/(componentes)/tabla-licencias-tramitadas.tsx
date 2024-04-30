@@ -4,16 +4,19 @@ import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
-import { AlertaConfirmacion, AlertaInformacion } from '@/utilidades';
+import { AlertaConfirmacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
-import { Stack, Table } from 'react-bootstrap';
+import { Badge, Stack, Table } from 'react-bootstrap';
 import {
   LicenciaTramitada,
+  esLicenciaNoTramitada,
   licenciaConErrorDeEnvio,
+  licenciaEnProcesoDeConciliacion,
+  licenciaEnProcesoDeEnvio,
   licenciaFueEnviadaAlOperador,
   licenciaFueTramitadaPorEmpleador,
   licenciaFueTramitadaPorOperador,
@@ -48,9 +51,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
   const [datosComprobanteTramitacion, setDatosComprobanteTramitacion] = useState<DatosComprobanteTramitacion>();
 
   const nombreEmpleador = (licencia: LicenciaTramitada) => {
-    const empleador = empleadores.find((e) =>
-      strIncluye(licencia.licenciazc1.rutempleador, e.rutempleador),
-    );
+    const empleador = empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador));
 
     return empleador?.razonsocial ?? '';
   };
@@ -95,15 +96,15 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       Folio: licencia.foliolicencia,
       'Entidad de salud': licencia.entidadsalud.nombre,
       Estado: licencia.estadolicencia.estadolicencia,
-      'RUT entidad empleadora': licencia.licenciazc1.rutempleador,
-      'Entidad empleadora': nombreEmpleador(licencia),
-      'RUN persona trabajadora': licencia.ruttrabajador,
-      'Nombre persona trabajadora': nombreTrabajador(licencia),
-      'Tipo de reposo': licencia.tiporeposo.tiporeposo,
-      'Días de reposo': licencia.ndias,
-      'Inicio de reposo': formatearFecha(licencia.fechainicioreposo),
-      'Fecha de emisión': formatearFecha(licencia.fechaemision),
-      'Tipo de licencia': licencia.tipolicencia.tipolicencia,
+      'RUT Entidad Empleadora': licencia.rutempleador,
+      'Entidad Empleadora': nombreEmpleador(licencia),
+      'RUN Persona Trabajadora': licencia.ruttrabajador,
+      'Nombre Persona Trabajadora': nombreTrabajador(licencia),
+      'Tipo de Reposo': licencia.tiporeposo.tiporeposo,
+      'Días de Reposo': licencia.ndias,
+      'Inicio de Reposo': formatearFecha(licencia.fechainicioreposo),
+      'Fecha de Emisión': formatearFecha(licencia.fechaemision),
+      'Tipo de Licencia': licencia.tipolicencia.tipolicencia,
     }));
 
     exportFromJSON({
@@ -143,6 +144,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       <Table striped hover responsive>
         <thead>
           <tr className={`text-center ${styles['text-tr']}`}>
+            <th></th>
             <th>FOLIO</th>
             <th>ESTADO</th>
             <th className="text-nowrap">ENTIDAD EMPLEADORA</th>
@@ -156,6 +158,51 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
             <tr
               key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
               className="text-center align-middle">
+              <td>
+                <Stack direction="vertical" gap={2}>
+                  <span
+                    className="badge rounded-pill"
+                    style={{ background: 'var(--color-blue)', fontWeight: 'normal' }}>
+                    {esLicenciaNoTramitada(licencia) ? 'No Recepcionada' : 'Tramitada'}
+                  </span>
+
+                  <IfContainer show={licenciaFueTramitadaPorEmpleador(licencia)}>
+                    <Badge pill bg="warning" text="dark" style={{ fontWeight: 'normal' }}>
+                      Envío Pendiente
+                    </Badge>
+                  </IfContainer>
+
+                  <IfContainer show={licenciaEnProcesoDeEnvio(licencia)}>
+                    <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
+                      Enviando
+                    </Badge>
+                  </IfContainer>
+
+                  <IfContainer show={licenciaEnProcesoDeConciliacion(licencia)}>
+                    <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
+                      Conciliando
+                    </Badge>
+                  </IfContainer>
+
+                  <IfContainer show={licenciaFueEnviadaAlOperador(licencia)}>
+                    <Badge pill bg="primary" style={{ fontWeight: 'normal' }}>
+                      Enviada
+                    </Badge>
+                  </IfContainer>
+
+                  <IfContainer show={licenciaConErrorDeEnvio(licencia)}>
+                    <Badge pill bg="danger" style={{ fontWeight: 'normal' }}>
+                      Error de envío
+                    </Badge>
+                  </IfContainer>
+
+                  <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
+                    <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
+                      Conciliada
+                    </Badge>
+                  </IfContainer>
+                </Stack>
+              </td>
               <td className="px-4 py-3">
                 <div className="small mb-1 text-nowrap">{licencia.operador.operador}</div>
                 <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
@@ -171,7 +218,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
               </td>
               <td>
                 <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
-                <div className="mb-1 small text-nowrap">{licencia.licenciazc1.rutempleador}</div>
+                <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
               </td>
               <td>
                 <div className="mb-1 small text-nowrap">{nombreTrabajador(licencia)}</div>
@@ -196,48 +243,6 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
               </td>
               <td>
                 <Stack gap={2}>
-                  <IfContainer show={licenciaFueEnviadaAlOperador(licencia)}>
-                    <button
-                      className="btn btn-sm btn-warning"
-                      onClick={() => {
-                        AlertaInformacion.fire(
-                          'Recibido por operador',
-                          `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en el operador.`,
-                        );
-                      }}
-                      title="Recibido por operador">
-                      <small className="text-nowrap">RECIBIDO</small>
-                    </button>
-                  </IfContainer>
-
-                  <IfContainer show={licenciaFueTramitadaPorEmpleador(licencia)}>
-                    <button
-                      className="btn btn-sm btn-warning"
-                      onClick={() => {
-                        AlertaInformacion.fire(
-                          'En Proceso',
-                          `La licencia con folio <b>${licencia.foliolicencia}</b>, ya se encuentra en proceso de tramitación.`,
-                        );
-                      }}
-                      title="En proceso de tramitación">
-                      <small className="text-nowrap">EN PROCESO</small>
-                    </button>
-                  </IfContainer>
-
-                  <IfContainer show={licenciaConErrorDeEnvio(licencia)}>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => {
-                        AlertaInformacion.fire(
-                          'En reproceso',
-                          `Hubo en error en el envio de la licencia con folio <b>${licencia.foliolicencia}</b> y se encuentra a la espera de ser enviada nuevamente al operador.`,
-                        );
-                      }}
-                      title="En proceso de tramitación">
-                      <small className="text-nowrap">EN REPROCESO</small>
-                    </button>
-                  </IfContainer>
-
                   <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
                     <button className="btn btn-sm btn-primary">
                       <small

@@ -46,6 +46,8 @@ export const inscribirEmpleador = async (
       depto: request.departamento,
       numero: request.numero,
     },
+    emailusuario: request.emailUsuario,
+    emailusuarioconfirma: request.emailUsuarioConfirma,
   };
 
   const payloadOperador = {

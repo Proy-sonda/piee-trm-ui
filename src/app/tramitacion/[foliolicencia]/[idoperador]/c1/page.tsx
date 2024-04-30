@@ -335,6 +335,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       },
       tiporeposo: licenciaTramite!?.tiporeposo,
       fechaultdiatramita:  format(new Date(licenciaTramite!?.fechaultdiatramita),'yyyy-MM-dd'),
+      rutempleador: licenciaTramite?.rutempleador!,
     };
 
     let licenciaC1: LicenciaC1 = {

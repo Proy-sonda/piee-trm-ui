@@ -18,7 +18,15 @@ export interface LicenciaTramitada {
   tipolicencia: Tipolicencia;
   tiporeposo: Tiporeposo;
   estadotramitacion: Estadotramitacion;
-  licenciazc1: Licenciazc1;
+  rutempleador: string;
+  motivonorecepcion: MotivoNoRecepcion | null;
+}
+
+interface MotivoNoRecepcion {
+  idmotivonorecepcion: number;
+  motivonorecepcion: string;
+  solicitaentidadpag: number;
+  solicitaadjunto: number;
 }
 
 interface Entidadsalud {
@@ -37,18 +45,6 @@ interface Estadotramitacion {
   estadotramitacion: string;
 }
 
-interface Licenciazc1 {
-  foliolicencia: string;
-  operador: number;
-  rutempleador: string;
-  direccion: string;
-  numero: string;
-  depto: string;
-  telefono: string;
-  fecharecepcion: string;
-  glosaotraocupacion: string;
-}
-
 interface Operador {
   idoperador: number;
   operador: string;
@@ -64,6 +60,10 @@ interface Tiporeposo {
   tiporeposo: string;
 }
 
+export const esLicenciaNoTramitada = (licencia: LicenciaTramitada) => {
+  return licencia.motivonorecepcion !== null;
+};
+
 export const licenciaFueTramitadaPorEmpleador = ({ estadotramitacion }: LicenciaTramitada) => {
   return [24, 25].includes(estadotramitacion.idestadotramitacion);
 };
@@ -78,4 +78,12 @@ export const licenciaFueTramitadaPorOperador = ({ estadotramitacion }: LicenciaT
 
 export const licenciaConErrorDeEnvio = ({ estadotramitacion }: LicenciaTramitada) => {
   return [241, 251].includes(estadotramitacion.idestadotramitacion);
+};
+
+export const licenciaEnProcesoDeEnvio = ({ estadotramitacion }: LicenciaTramitada) => {
+  return [21].includes(estadotramitacion.idestadotramitacion);
+};
+
+export const licenciaEnProcesoDeConciliacion = ({ estadotramitacion }: LicenciaTramitada) => {
+  return [31].includes(estadotramitacion.idestadotramitacion);
 };

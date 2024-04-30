@@ -45,19 +45,15 @@ export const noTamitarLicenciaMedica = async (
         nombre: licencia.entidadsalud.nombre,
       },
       tiporeposo: licencia.tiporeposo,
-      
-     
+      rutempleador: licencia.rutempleador,
     });
   } catch (error) {
     throw new NoPuedeCrearZona0Error();
   }
 
   try {
-    let payloadNoRecepcion ={};
-    if(
-      request.entidadPagadoraId && request.entidadPagadoraLetra
-    )
-    {
+    let payloadNoRecepcion = {};
+    if (request.entidadPagadoraId && request.entidadPagadoraLetra) {
       payloadNoRecepcion = {
         foliolicencia: request.folioLicencia,
         operador: {
@@ -71,18 +67,19 @@ export const noTamitarLicenciaMedica = async (
           idmotivonorecepcion: parseInt(request.motivoRechazo, 10),
           motivonorecepcion: ' ',
         },
-        entidadpagadora:{
+        entidadpagadora: {
           identidadpagadora: request.entidadPagadoraLetra,
           entidadpagadora: ' ',
         },
-        ccaf:{
-          idccaf: esElValorPorDefecto(request.entidadPagadoraId) ? 10100 : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
+        ccaf: {
+          idccaf: esElValorPorDefecto(request.entidadPagadoraId)
+            ? 10100
+            : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
           nombre: ' ',
         },
         otromotivonorecepcion: request.otroMotivoDeRechazo || ' ',
       };
-
-    }else{
+    } else {
       payloadNoRecepcion = {
         foliolicencia: request.folioLicencia,
         operador: {
@@ -96,8 +93,10 @@ export const noTamitarLicenciaMedica = async (
           idmotivonorecepcion: parseInt(request.motivoRechazo, 10),
           motivonorecepcion: ' ',
         },
-        ccaf:{
-          idccaf: !esElValorPorDefecto(request.entidadPagadoraId) ? 10100 : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
+        ccaf: {
+          idccaf: !esElValorPorDefecto(request.entidadPagadoraId)
+            ? 10100
+            : request.entidadPagadoraId, // 10100 = "NO SE TRAMITA EN CCAF"
           nombre: ' ',
         },
         otromotivonorecepcion: request.otroMotivoDeRechazo || ' ',
