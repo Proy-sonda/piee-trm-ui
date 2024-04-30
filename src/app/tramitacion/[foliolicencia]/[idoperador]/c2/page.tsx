@@ -302,6 +302,16 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       }
     } else {
       try {
+        if (formulario.getValues('entidadremuneradora') == 'F'
+          && combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)?.tipolicencia.idtipolicencia == 5
+          && combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)?.tipolicencia.idtipolicencia == 6) {
+          return await GuardarCCAF(
+            Number(idoperador),
+            combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)!?.entidadsalud.identidadsalud.toString(),
+            foliolicencia,
+          );
+
+        }
         await GuardarCCAF(
           Number(idoperador),
           formulario.getValues('ccaflm').toString(),
