@@ -44,8 +44,9 @@ export const InputRazonSocial: React.FC<InputRazonSocialProps> = ({
               message: 'No puede tener más de 120 caracteres',
             },
             pattern: {
-              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s#&]+$/,
-              message: 'Solo puede contener letras, # y/o &',
+              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\d\s#&,\.]+$/,
+              message:
+                'Solo puede contener los siguientes caracteres: letras, números, punto, coma, # y &',
             },
             onBlur: (event: any) => {
               const value = event.target.value;
