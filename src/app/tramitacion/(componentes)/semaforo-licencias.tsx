@@ -29,7 +29,7 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
 
   return (
     <>
-      <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={target} placement="top-end">
+      <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={target} placement="top-end">
         Semaforo para filtrar la bandeja de tramitación <br />
         dependiendo del color seleccionado
         <br />
@@ -40,28 +40,17 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
               AgregarGuia([
                 {
                   indice: 0,
-                  nombre: 'Folio Licencia',
-                  activo: false,
+                  nombre: 'Filtros',
+                  activo: true,
                 },
                 {
                   indice: 1,
-                  nombre: 'Rango de fecha',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Botón filtrar',
-                  activo: true,
-                },
-
-                {
-                  indice: 3,
                   nombre: 'semaforo',
                   activo: false,
                 },
 
                 {
-                  indice: 4,
+                  indice: 2,
                   nombre: 'Tabla de tramitacion',
                   activo: false,
                 },
@@ -80,26 +69,16 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
               AgregarGuia([
                 {
                   indice: 0,
-                  nombre: 'Folio Licencia',
+                  nombre: 'Filtro de licencias',
                   activo: false,
                 },
                 {
                   indice: 1,
-                  nombre: 'Rango de fecha',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Botón filtrar',
-                  activo: false,
-                },
-                {
-                  indice: 3,
                   nombre: 'semaforo',
                   activo: false,
                 },
                 {
-                  indice: 4,
+                  indice: 2,
                   nombre: 'Tabla de tramitacion',
                   activo: true,
                 },
@@ -119,7 +98,7 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
           <div
             key={index}
             className={`text-start cursor-pointer ${styles.filtrocolor} ${
-              listaguia[3]!?.activo && guia ? 'overlay-marco' : ''
+              listaguia[1]!?.activo && guia ? 'overlay-marco' : ''
             }${activo === semaforo.value ? `${styles['active-color']}` : ''}`}
             onClick={() => {
               onEstadoSeleccionado(semaforo.value);

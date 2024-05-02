@@ -1,4 +1,3 @@
-
 import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
@@ -32,18 +31,8 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
     AgregarGuia([
       {
         indice: 0,
-        nombre: 'Folio Licencia',
+        nombre: 'Filtros',
         activo: true,
-      },
-      {
-        indice: 1,
-        nombre: 'Rango de fecha',
-        activo: false,
-      },
-      {
-        indice: 2,
-        nombre: 'Botón filtrar',
-        activo: false,
       },
       {
         indice: 3,
@@ -57,10 +46,6 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
       },
     ]);
   }, []);
-
-  const foliolm = useRef(null);
-  const rangofecha = useRef(null);
-  const botonfiltro = useRef(null);
 
   const [, unidadesRRHH] = useFetch(
     rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),
@@ -90,52 +75,47 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   return (
     <>
       <FormProvider {...formulario}>
-        <form onSubmit={formulario.handleSubmit(filtrarLicencias)} ref={target}>
+        <GuiaUsuario guia={listaguia[0]!?.activo && guia} target={target} placement="top-start">
+          Puede usar estos filtros para facilitar <br />
+          la búsqueda de las licencias a tramitar
+          <br />
+          <div className="text-end mt-3">
+            <button
+              className="btn btn-sm text-white"
+              onClick={() => {
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Folio Licencia',
+                    activo: false,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'semaforo',
+                    activo: true,
+                  },
+                  {
+                    indice: 2,
+                    nombre: 'Tabla de tramitacion',
+                    activo: false,
+                  },
+                ]);
+                window.scrollTo(0, 0);
+              }}
+              style={{
+                border: '1px solid white',
+              }}>
+              Continuar &nbsp;
+              <i className="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </GuiaUsuario>
+        <form
+          onSubmit={formulario.handleSubmit(filtrarLicencias)}
+          ref={target}
+          className={`${listaguia[0]!?.activo && guia ? 'overlay-marco' : ''}`}>
           <div className={`row g-3 align-items-baseline`}>
-            <GuiaUsuario guia={listaguia[0]!?.activo && guia} target={foliolm}>
-              Folio de la Licencia Médica
-              <br />
-              <div className="text-end mt-3">
-                <button
-                  className="btn btn-sm text-white"
-                  onClick={() => {
-                    AgregarGuia([
-                      {
-                        indice: 0,
-                        nombre: 'Folio Licencia',
-                        activo: false,
-                      },
-                      {
-                        indice: 1,
-                        nombre: 'Rango de fecha',
-                        activo: true,
-                      },
-                      {
-                        indice: 2,
-                        nombre: 'Botón filtrar',
-                        activo: false,
-                      },
-
-                      {
-                        indice: 3,
-                        nombre: 'semaforo',
-                        activo: false,
-                      },
-                    ]);
-                  }}
-                  style={{
-                    border: '1px solid white',
-                  }}>
-                  Continuar &nbsp;
-                  <i className="bi bi-arrow-right"></i>
-                </button>
-              </div>
-            </GuiaUsuario>
-            <div
-              className={`col-12 col-md-6 col-lg-3 ${
-                listaguia[0]!?.activo && guia ? 'overlay-marco' : ''
-              }`}
-              ref={foliolm}>
+            <div className={`col-12 col-md-6 col-lg-3`}>
               <InputRutBusqueda opcional name="folio" label="Folio" />
             </div>
 
@@ -145,79 +125,8 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               label="RUN Persona Trabajadora"
               className="col-12 col-md-6 col-lg-3"
             />
-            <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={rangofecha}>
-              Rango de fecha de emisión de la Licencia Médica
-              <br />
-              <div className="text-end mt-3">
-                <button
-                  className="btn btn-sm text-white"
-                  onClick={() => {
-                    AgregarGuia([
-                      {
-                        indice: 0,
-                        nombre: 'Folio Licencia',
-                        activo: true,
-                      },
-                      {
-                        indice: 1,
-                        nombre: 'Rango de fecha',
-                        activo: false,
-                      },
 
-                      {
-                        indice: 3,
-                        nombre: 'semaforo',
-                        activo: false,
-                      },
-                    ]);
-                  }}
-                  style={{
-                    border: '1px solid white',
-                  }}>
-                  <i className="bi bi-arrow-left"></i>
-                  &nbsp; Anterior
-                </button>
-                &nbsp;
-                <button
-                  className="btn btn-sm text-white"
-                  onClick={() => {
-                    AgregarGuia([
-                      {
-                        indice: 0,
-                        nombre: 'Folio Licencia',
-                        activo: false,
-                      },
-                      {
-                        indice: 1,
-                        nombre: 'Rango de fecha',
-                        activo: false,
-                      },
-                      {
-                        indice: 2,
-                        nombre: 'Botón filtrar',
-                        activo: true,
-                      },
-
-                      {
-                        indice: 3,
-                        nombre: 'semaforo',
-                        activo: false,
-                      },
-                    ]);
-                  }}
-                  style={{
-                    border: '1px solid white',
-                  }}>
-                  Continuar &nbsp;
-                  <i className="bi bi-arrow-right"></i>
-                </button>
-              </div>
-            </GuiaUsuario>
-            <div
-              className={`col-12 col-md-12 col-lg-6 ${
-                listaguia[1]!?.activo && guia ? 'overlay-marco' : ''
-              }`}
-              ref={rangofecha}>
+            <div className={`col-12 col-md-12 col-lg-6`}>
               <div className="row">
                 <InputFecha
                   opcional
@@ -262,84 +171,7 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
 
           <div className="mt-4 row">
             <div className="d-flex">
-              <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={botonfiltro}>
-                Botón para filtrar la bandeja de tramitación
-                <br />
-                <div className="text-end mt-3">
-                  <button
-                    className="btn btn-sm text-white"
-                    onClick={() => {
-                      AgregarGuia([
-                        {
-                          indice: 0,
-                          nombre: 'Folio Licencia',
-                          activo: false,
-                        },
-                        {
-                          indice: 1,
-                          nombre: 'Rango de fecha',
-                          activo: true,
-                        },
-                        {
-                          indice: 2,
-                          nombre: 'Botón filtrar',
-                          activo: false,
-                        },
-
-                        {
-                          indice: 3,
-                          nombre: 'semaforo',
-                          activo: false,
-                        },
-                      ]);
-                    }}
-                    style={{
-                      border: '1px solid white',
-                    }}>
-                    <i className="bi bi-arrow-left"></i>
-                    &nbsp; Anterior
-                  </button>
-                  &nbsp;
-                  <button
-                    className="btn btn-sm text-white"
-                    onClick={() => {
-                      AgregarGuia([
-                        {
-                          indice: 0,
-                          nombre: 'Folio Licencia',
-                          activo: false,
-                        },
-                        {
-                          indice: 1,
-                          nombre: 'Rango de fecha',
-                          activo: false,
-                        },
-                        {
-                          indice: 2,
-                          nombre: 'Botón filtrar',
-                          activo: false,
-                        },
-                        {
-                          indice: 3,
-                          nombre: 'semaforo',
-                          activo: true,
-                        },
-                      ]);
-                    }}
-                    style={{
-                      border: '1px solid white',
-                    }}>
-                    Continuar &nbsp;
-                    <i className="bi bi-arrow-right"></i>
-                  </button>
-                </div>
-              </GuiaUsuario>
-              <button
-                type="submit"
-                className={`btn btn-primary px-4 flex-grow-1 flex-sm-grow-0 ${
-                  listaguia[2]!?.activo && guia ? 'overlay-marco' : ''
-                }`}
-                ref={botonfiltro}>
+              <button type="submit" className={`btn btn-primary px-4 flex-grow-1 flex-sm-grow-0`}>
                 Filtrar
               </button>
             </div>
