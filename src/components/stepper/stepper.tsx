@@ -40,30 +40,6 @@ export const Stepper: FC<Myprops> = ({ Options, onLinkClickeado }) => {
       <GuiaUsuario guia={listaguia[0]!?.activo && guia} target={stepper} placement="top-end">
         Pasos para completar la tramitación
         <br />
-        <div className="text-end mt-3">
-          <button
-            className="btn btn-sm text-white"
-            onClick={() => {
-              AgregarGuia([
-                {
-                  indice: 0,
-                  nombre: 'Stepper',
-                  activo: false,
-                },
-                {
-                  indice: 1,
-                  nombre: 'Recepción LME',
-                  activo: true,
-                },
-              ]);
-            }}
-            style={{
-              border: '1px solid white',
-            }}>
-            Continuar &nbsp;
-            <i className="bi bi-arrow-right"></i>
-          </button>
-        </div>
       </GuiaUsuario>
       <div
         className={`d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-center ${
