@@ -224,7 +224,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       formulario.setValue('razon', empleador.razonsocial);
       if (LMEEXIS != undefined) {
         formulario.setValue('region', LMEEXIS.comuna.idcomuna.substring(0, 2));
-        console.log( LMEEXIS.comuna.idcomuna)
+        console.log(LMEEXIS.comuna.idcomuna);
         formulario.setValue('comuna', LMEEXIS.comuna.idcomuna);
         formulario.setValue('calle', LMEEXIS.direccion);
         formulario.setValue('numero', LMEEXIS.numero);
@@ -334,7 +334,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         nombre: licenciaTramite!?.entidadsalud.nombre,
       },
       tiporeposo: licenciaTramite!?.tiporeposo,
-      fechaultdiatramita:  format(new Date(licenciaTramite!?.fechaultdiatramita),'yyyy-MM-dd'),
+      fechaultdiatramita: format(new Date(licenciaTramite!?.fechaultdiatramita), 'yyyy-MM-dd'),
       rutempleador: licenciaTramite?.rutempleador!,
     };
 
@@ -658,7 +658,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   ref={tipoCalle}>
                   <ComboSimple
                     name="tipo"
-                    label="Tipo"
+                    label="Tipo de calle"
                     descripcion="tipocalle"
                     idElemento="idtipocalle"
                     datos={combos?.CALLE}
@@ -666,7 +666,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 </div>
 
                 <InputCalle
-                  label="Calle"
+                  label="Nombre de calle"
                   name="calle"
                   className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
