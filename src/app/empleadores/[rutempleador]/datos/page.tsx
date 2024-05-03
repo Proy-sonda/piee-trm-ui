@@ -23,6 +23,7 @@ import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import { Titulo } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import dynamic from 'next/dynamic';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
   buscarActividadesLaborales,
   buscarCajasDeCompensacion,
@@ -210,17 +211,12 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                   {
                     indice: 0,
                     nombre: 'Menu lateral',
-                    activo: false,
+                    activo: true,
                   },
                   {
                     indice: 1,
                     nombre: 'Datos página',
                     activo: false,
-                  },
-                  {
-                    indice: 2,
-                    nombre: 'CCAFF',
-                    activo: true,
                   },
                 ])
               }
@@ -261,83 +257,23 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <GuiaUsuario
-                guia={guia && listaguia[2]!?.activo}
-                placement="top-start"
-                target={guiaCCAFF}>
-                Cajas de Compensación de Asignación Familiar (CCAF) <br />
-                <div className="text-end mt-2">
-                  <button
-                    className="btn btn-sm text-white"
-                    onClick={() =>
-                      AgregarGuia([
-                        {
-                          indice: 0,
-                          nombre: 'Menu lateral',
-                          activo: false,
-                        },
-                        {
-                          indice: 1,
-                          nombre: 'Datos página',
-                          activo: true,
-                        },
-                        {
-                          indice: 2,
-                          nombre: 'CCAFF',
-                          activo: false,
-                        },
-                      ])
-                    }
-                    style={{
-                      border: '1px solid white',
-                    }}>
-                    <i className="bi bi-arrow-left"></i>
-                    &nbsp; Anterior
-                  </button>
-                  &nbsp;
-                  <button
-                    className="btn btn-sm text-white"
-                    onClick={() =>
-                      AgregarGuia([
-                        {
-                          indice: 0,
-                          nombre: 'Menu lateral',
-                          activo: false,
-                        },
-                        {
-                          indice: 1,
-                          nombre: 'Datos página',
-                          activo: false,
-                        },
-                        {
-                          indice: 2,
-                          nombre: 'CCAFF',
-                          activo: false,
-                        },
-                        {
-                          indice: 3,
-                          nombre: 'Tamano Empresa',
-                          activo: true,
-                        },
-                      ])
-                    }
-                    style={{
-                      border: '1px solid white',
-                    }}>
-                    Continuar &nbsp;
-                    <i className="bi bi-arrow-right"></i>
-                  </button>
-                </div>
-              </GuiaUsuario>
+              <div className={`col-12 col-md-6 col-lg-4`}>
+                <label>Seleccione CCAF a la cual está afiliada (*)</label>
+                <OverlayTrigger
+                  placement="top"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={(props) => (
+                    <Tooltip id="button-tooltip" {...props}>
+                      {'Caja de Compensación de Asignación Familiar (CCAF)'}
+                    </Tooltip>
+                  )}>
+                  <i
+                    className="ms-2 text-primary bi bi-info-circle"
+                    style={{ fontSize: '16px' }}></i>
+                </OverlayTrigger>
 
-              <div
-                ref={guiaCCAFF}
-                className={`col-12 col-md-6 col-lg-4 ${
-                  listaguia[2]!?.activo && guia && 'overlay-marco'
-                }`}>
                 <ComboSimple
                   name="cajaCompensacionId"
-                  label="Seleccione CCAF a la cual está afiliada"
                   datos={CCAF}
                   idElemento="idccaf"
                   descripcion="nombre"
@@ -353,87 +289,22 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
-              <GuiaUsuario
-                guia={guia && listaguia[3]!?.activo}
-                placement="top-start"
-                target={tamanoempresa}>
-                Cantidad de personas trabajadoras en la entidad empleadora <br />
-                <div className="text-end mt-2">
-                  <button
-                    className="btn btn-sm text-white"
-                    onClick={() =>
-                      AgregarGuia([
-                        {
-                          indice: 0,
-                          nombre: 'Menu lateral',
-                          activo: false,
-                        },
-                        {
-                          indice: 1,
-                          nombre: 'Datos página',
-                          activo: false,
-                        },
-                        {
-                          indice: 2,
-                          nombre: 'CCAFF',
-                          activo: true,
-                        },
-                        {
-                          indice: 3,
-                          nombre: 'Tamano Empresa',
-                          activo: false,
-                        },
-                      ])
-                    }
-                    style={{
-                      border: '1px solid white',
-                    }}>
-                    <i className="bi bi-arrow-left"></i>
-                    &nbsp; Anterior
-                  </button>
-                  &nbsp;
-                  <button
-                    className="btn btn-sm text-white"
-                    onClick={() =>
-                      AgregarGuia([
-                        {
-                          indice: 0,
-                          nombre: 'Menu lateral',
-                          activo: true,
-                        },
-                        {
-                          indice: 1,
-                          nombre: 'Datos página',
-                          activo: false,
-                        },
-                        {
-                          indice: 2,
-                          nombre: 'CCAFF',
-                          activo: false,
-                        },
-                        {
-                          indice: 3,
-                          nombre: 'Tamano Empresa',
-                          activo: false,
-                        },
-                      ])
-                    }
-                    style={{
-                      border: '1px solid white',
-                    }}>
-                    Continuar &nbsp;
-                    <i className="bi bi-arrow-right"></i>
-                  </button>
-                </div>
-              </GuiaUsuario>
-              <div
-                ref={tamanoempresa}
-                className={`col-12 col-md-6 col-lg-4 ${
-                  listaguia[3]!?.activo && guia && 'overlay-marco'
-                }`}>
+              <div className={`col-12 col-md-6 col-lg-4`}>
+                <label>N° de trabajadores (*)</label>
+                <OverlayTrigger
+                  placement="top"
+                  delay={{ show: 250, hide: 400 }}
+                  overlay={(props) => (
+                    <Tooltip id="button-tooltip" {...props}>
+                      {'Cantidad de personas trabajadoras en la entidad empleadora'}
+                    </Tooltip>
+                  )}>
+                  <i
+                    className="ms-2 text-primary bi bi-info-circle"
+                    style={{ fontSize: '16px' }}></i>
+                </OverlayTrigger>
                 <ComboSimple
                   name="tamanoEmpresaId"
-                  label="N° de trabajadores"
                   datos={comboTamanoEmpresa}
                   idElemento="idtamanoempresa"
                   descripcion="descripcion"

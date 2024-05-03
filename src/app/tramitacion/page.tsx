@@ -107,7 +107,8 @@ const TramitacionPage = () => {
           </Titulo>
           <p className="mt-3">
             En esta pantalla se muestran todas las licencias médicas que usted tiene pendiente de
-            tramitación.
+            tramitación. <br/>
+            Puede utilizar los siguientes campos para facilitar su búsqueda.
           </p>
         </div>
 

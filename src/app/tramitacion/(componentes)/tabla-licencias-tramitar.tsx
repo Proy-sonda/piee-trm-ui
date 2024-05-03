@@ -32,6 +32,8 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
 
   const [loading, setloading] = useState(false);
   const target = useRef(null);
+  const btnTramitar = useRef(null);
+  const btnNoRecepcion = useRef(null);
 
   const {
     datosGuia: { listaguia, guia, AgregarGuia },
@@ -47,8 +49,8 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
       <IfContainer show={loading}>
         <SpinnerPantallaCompleta />
       </IfContainer>
-      <GuiaUsuario guia={listaguia[4]!?.activo && guia} target={target} placement="top-start">
-        Tabla de licencias para tramitar
+      <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={target} placement="top-start">
+        Aquí aparecen las licencias que coinciden con su búsqueda
         <br />
         <div className="text-end mt-3">
           <button
@@ -62,24 +64,169 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 },
                 {
                   indice: 1,
-                  nombre: 'Rango de fecha',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Botón filtrar',
-                  activo: false,
-                },
-
-                {
-                  indice: 3,
                   nombre: 'semaforo',
                   activo: true,
                 },
 
                 {
-                  indice: 4,
+                  indice: 2,
                   nombre: 'Tabla de tramitacion',
+                  activo: false,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+          &nbsp;
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Folio Licencia',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'semaforo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Tabla de tramitación',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Botón de tramitación',
+                  activo: true,
+                },
+              ]);
+              window.scrollTo(0, 0);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            Continuar &nbsp;
+            <i className="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </GuiaUsuario>
+      <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={btnTramitar} placement="top-start">
+        Presione {'"Tramitar"'} para iniciar la tramitación de esta licencia, <br />
+        o continuar con la tramitación si es que previamente ya ha <br />
+        comenzado a trabajar con esta
+        <br />
+        <div className="text-end mt-3">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Folio Licencia',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'semaforo',
+                  activo: false,
+                },
+
+                {
+                  indice: 2,
+                  nombre: 'Tabla de tramitacion',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+          &nbsp;
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Folio Licencia',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'semaforo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Tabla de tramitación',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Botón de tramitación',
+                  activo: false,
+                },
+                {
+                  indice: 4,
+                  nombre: 'Botón no recepción',
+                  activo: true,
+                },
+              ]);
+              window.scrollTo(0, 0);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            Continuar &nbsp;
+            <i className="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </GuiaUsuario>
+      <GuiaUsuario
+        guia={listaguia[4]!?.activo && guia}
+        target={btnNoRecepcion}
+        placement="top-start">
+        Presione {'"No Recepcionar"'}, para indicar que esta licencia no corresponde <br />
+        a su Entidad Empleadora (por ejemplo, cuando no hay vinculo laboral)
+        <br />
+        <div className="text-end mt-3">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Folio Licencia',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'semaforo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Tabla de tramitación',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Botón de tramitación',
+                  activo: true,
+                },
+                {
+                  indice: 4,
+                  nombre: 'Botón no recepción',
                   activo: false,
                 },
               ]);
@@ -102,22 +249,22 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 },
                 {
                   indice: 1,
-                  nombre: 'Rango de fecha',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Botón filtrar',
-                  activo: false,
-                },
-                {
-                  indice: 3,
                   nombre: 'semaforo',
                   activo: false,
                 },
                 {
+                  indice: 2,
+                  nombre: 'Tabla de tramitación',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Botón de tramitación',
+                  activo: false,
+                },
+                {
                   indice: 4,
-                  nombre: 'Tabla de tramitacion',
+                  nombre: 'Botón no recepción',
                   activo: false,
                 },
               ]);
@@ -132,7 +279,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
         </div>
       </GuiaUsuario>
       <div
-        className={`table-responsive  ${listaguia[4]!?.activo && guia ? 'overlay-marco' : ''}`}
+        className={`table-responsive  ${listaguia[2]!?.activo && guia ? 'overlay-marco' : ''}`}
         ref={target}>
         <Table striped hover responsive ref={target}>
           {/* <Table striped hover  className="table table-hover table-striped"> */}
@@ -147,7 +294,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
             </tr>
           </thead>
           <tbody>
-            {licenciasPaginadas.map((licencia) => (
+            {licenciasPaginadas.map((licencia, index) => (
               <tr
                 key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
                 className="text-center align-middle">
@@ -155,8 +302,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   {/* Validamos si la fecha de hoy es menor a la fechaultimodiatramite y si es el mismo día debe mostrar el circulo amarillo */}
                   {new Date(licencia.fechaultdiatramita) > new Date() ? (
                     <div className={`mb-2 ${styles.circlegreen}`}></div>
-                  ) : new Date(licencia.fechaultdiatramita).getDate() ===
-                    new Date().getDate() ? ( // Si es el mismo día
+                  ) : new Date(licencia.fechaultdiatramita).getDate() === new Date().getDate() ? ( // Si es el mismo día
                     <div className={`mb-2 ${styles.circleyellow}`}></div>
                   ) : (
                     <div className={`mb-2 ${styles.circlered}`}></div>
@@ -206,7 +352,10 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 <td>
                   <Stack gap={2}>
                     <Link
-                      className="btn btn-sm btn-success"
+                      className={`btn btn-sm btn-success ${
+                        index == 0 && listaguia[3]!?.activo && guia ? 'overlay-marco' : ''
+                      }`}
+                      ref={index == 0 ? btnTramitar : null}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
                       <small className="text-nowrap">TRAMITAR</small>
                     </Link>
@@ -221,7 +370,10 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     </BotonVerPdfLicencia>
 
                     <Link
-                      className="btn btn-sm btn-danger"
+                      className={`btn btn-sm btn-danger ${
+                        index == 0 && listaguia[4]!?.activo && guia ? 'overlay-marco' : ''
+                      }`}
+                      ref={index == 0 ? btnNoRecepcion : null}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
                       <small className="text-nowrap"> NO RECEPCIONAR</small>
                     </Link>

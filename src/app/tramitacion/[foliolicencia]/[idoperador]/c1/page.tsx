@@ -18,7 +18,7 @@ import 'animate.css';
 import format from 'date-fns/format';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import {
@@ -36,8 +36,6 @@ import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { LicenciaC1 } from './(modelos)';
 import { formularioApp } from './(modelos)/formulario-type';
 
-import { GuiaUsuario } from '@/components/guia-usuario';
-import { AuthContext } from '@/contexts';
 import { LicenciasAnteriores } from '../(modelo)/licencias-anteriores';
 import { BuscarLicenciasAnteriores } from '../(servicios)/buscar-licencias-anteriores';
 import {
@@ -169,13 +167,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     }
   }, [licenciasAnteriores]);
 
-  const fechaRecepLME = useRef(null);
-  const tipoCalle = useRef(null);
-  const comboOcupacion = useRef(null);
-  const {
-    datosGuia: { guia, AgregarGuia, listaguia },
-  } = useContext(AuthContext);
-
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
 
@@ -224,7 +215,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       formulario.setValue('razon', empleador.razonsocial);
       if (LMEEXIS != undefined) {
         formulario.setValue('region', LMEEXIS.comuna.idcomuna.substring(0, 2));
-        console.log( LMEEXIS.comuna.idcomuna)
+        console.log(LMEEXIS.comuna.idcomuna);
         formulario.setValue('comuna', LMEEXIS.comuna.idcomuna);
         formulario.setValue('calle', LMEEXIS.direccion);
         formulario.setValue('numero', LMEEXIS.numero);
@@ -334,7 +325,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         nombre: licenciaTramite!?.entidadsalud.nombre,
       },
       tiporeposo: licenciaTramite!?.tiporeposo,
-      fechaultdiatramita:  format(new Date(licenciaTramite!?.fechaultdiatramita),'yyyy-MM-dd'),
+      fechaultdiatramita: format(new Date(licenciaTramite!?.fechaultdiatramita), 'yyyy-MM-dd'),
       rutempleador: licenciaTramite?.rutempleador!,
     };
 
@@ -490,78 +481,16 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   <InputFecha label="Fecha Emisión" name="fechaemision" />
                 </div>
 
-                <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={fechaRecepLME}>
-                  Fecha en la que se recibe la licencia médica <br />
-                  de la persona trabajadora
-                  <br />
-                  <div className="text-end mt-3">
-                    <button
-                      className="btn btn-sm text-white"
-                      onClick={() => {
-                        AgregarGuia([
-                          {
-                            indice: 0,
-                            nombre: 'Entidad Empleadora/Independiente',
-                            activo: true,
-                          },
-                          {
-                            indice: 1,
-                            nombre: 'Fecha Recepción LME',
-                            activo: false,
-                          },
-                        ]);
-                      }}
-                      style={{
-                        border: '1px solid white',
-                      }}>
-                      <i className="bi bi-arrow-left"></i>
-                      &nbsp; Anterior
-                    </button>
-                    &nbsp;
-                    <button
-                      className="btn btn-sm text-white"
-                      onClick={() => {
-                        AgregarGuia([
-                          {
-                            indice: 0,
-                            nombre: 'Entidad Empleadora/Independiente',
-                            activo: false,
-                          },
-                          {
-                            indice: 1,
-                            nombre: 'Fecha Recepción LME',
-                            activo: false,
-                          },
-                          {
-                            indice: 2,
-                            nombre: 'tipo de calle',
-                            activo: true,
-                          },
-                        ]);
-                      }}
-                      style={{
-                        border: '1px solid white',
-                      }}>
-                      Continuar &nbsp;
-                      <i className="bi bi-arrow-right"></i>
-                    </button>
-                  </div>
-                </GuiaUsuario>
-                <div
-                  className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
-                    listaguia[1]!?.activo && guia && 'overlay-marco'
-                  }`}
-                  ref={fechaRecepLME}>
-                  <InputFecha
-                    label="Fecha Recepción LME"
-                    name="fecharecepcionlme"
-                    opcional
-                    noAnteriorA="fechaemision"
-                    errores={{
-                      anteriorADesde: 'La fecha no puede ser menor a la emisión',
-                    }}
-                  />
-                </div>
+                <InputFecha
+                  label="Fecha Recepción LME"
+                  name="fecharecepcionlme"
+                  className={`col-12 col-sm-6 col-lg-4 col-xl-3`}
+                  opcional
+                  noAnteriorA="fechaemision"
+                  errores={{
+                    anteriorADesde: 'La fecha no puede ser menor a la emisión',
+                  }}
+                />
 
                 <ComboSimple
                   name="region"
@@ -581,92 +510,17 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
-                <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={tipoCalle}>
-                  Tipo de calle de la Entidad Empleadora <br />
-                  EJ: Avenida, Calle, Pasaje
-                  <br />
-                  <div className="text-end mt-3">
-                    <button
-                      className="btn btn-sm text-white"
-                      onClick={() => {
-                        AgregarGuia([
-                          {
-                            indice: 0,
-                            nombre: 'Entidad Empleadora/Independiente',
-                            activo: false,
-                          },
-
-                          {
-                            indice: 1,
-                            nombre: 'Fecha Recepción LME',
-                            activo: true,
-                          },
-                          {
-                            indice: 2,
-                            nombre: 'tipo de calle',
-                            activo: false,
-                          },
-                        ]);
-                      }}
-                      style={{
-                        border: '1px solid white',
-                      }}>
-                      <i className="bi bi-arrow-left"></i>
-                      &nbsp; Anterior
-                    </button>
-                    &nbsp;
-                    <button
-                      className="btn btn-sm text-white"
-                      onClick={() => {
-                        AgregarGuia([
-                          {
-                            indice: 0,
-                            nombre: 'Entidad Empleadora/Independiente',
-                            activo: false,
-                          },
-
-                          {
-                            indice: 1,
-                            nombre: 'Fecha Recepción LME',
-                            activo: false,
-                          },
-                          {
-                            indice: 2,
-                            nombre: 'tipo de calle',
-                            activo: false,
-                          },
-                          {
-                            indice: 3,
-                            nombre: 'Ocupacion',
-                            activo: true,
-                          },
-                        ]);
-                      }}
-                      style={{
-                        border: '1px solid white',
-                      }}>
-                      Continuar &nbsp;
-                      <i className="bi bi-arrow-right"></i>
-                    </button>
-                  </div>
-                </GuiaUsuario>
-
-                <div
-                  className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
-                    listaguia[2]!?.activo && guia && 'overlay-marco'
-                  }`}
-                  ref={tipoCalle}>
-                  <ComboSimple
-                    name="tipo"
-                    label="Tipo"
-                    descripcion="tipocalle"
-                    idElemento="idtipocalle"
-                    datos={combos?.CALLE}
-                  />
-                </div>
+                <ComboSimple
+                  name="tipo"
+                  label="Tipo de calle"
+                  descripcion="tipocalle"
+                  idElemento="idtipocalle"
+                  datos={combos?.CALLE}
+                  className={`col-12 col-sm-6 col-lg-4 col-xl-3`}
+                />
 
                 <InputCalle
-                  label="Calle"
+                  label="Nombre de calle"
                   name="calle"
                   className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
@@ -693,92 +547,14 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 
-                <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={comboOcupacion}>
-                  Ocupación de la persona trabajadora <br /> en la Entidad Empleadora
-                  <br />
-                  <div className="text-end mt-3">
-                    <button
-                      className="btn btn-sm text-white"
-                      onClick={() => {
-                        AgregarGuia([
-                          {
-                            indice: 0,
-                            nombre: 'Entidad Empleadora/Independiente',
-                            activo: false,
-                          },
-
-                          {
-                            indice: 1,
-                            nombre: 'Fecha Recepción LME',
-                            activo: false,
-                          },
-                          {
-                            indice: 2,
-                            nombre: 'tipo de calle',
-                            activo: true,
-                          },
-                          {
-                            indice: 3,
-                            nombre: 'Ocupacion',
-                            activo: false,
-                          },
-                        ]);
-                      }}
-                      style={{
-                        border: '1px solid white',
-                      }}>
-                      <i className="bi bi-arrow-left"></i>
-                      &nbsp; Anterior
-                    </button>
-                    &nbsp;
-                    <button
-                      className="btn btn-sm text-white"
-                      onClick={() => {
-                        AgregarGuia([
-                          {
-                            indice: 0,
-                            nombre: 'Entidad Empleadora/Independiente',
-                            activo: true,
-                          },
-
-                          {
-                            indice: 1,
-                            nombre: 'Fecha Recepción LME',
-                            activo: false,
-                          },
-                          {
-                            indice: 2,
-                            nombre: 'tipo de calle',
-                            activo: false,
-                          },
-                          {
-                            indice: 3,
-                            nombre: 'Ocupacion',
-                            activo: false,
-                          },
-                        ]);
-                      }}
-                      style={{
-                        border: '1px solid white',
-                      }}>
-                      Continuar &nbsp;
-                      <i className="bi bi-arrow-right"></i>
-                    </button>
-                  </div>
-                </GuiaUsuario>
-                <div
-                  className={`col-12 col-sm-6 col-lg-4 col-xl-3 ${
-                    listaguia[3]!?.activo && guia && 'overlay-marco'
-                  }`}
-                  ref={comboOcupacion}>
-                  <ComboSimple
-                    name="ocupacion"
-                    label="Ocupación"
-                    datos={combos?.OCUPACION}
-                    idElemento="idocupacion"
-                    descripcion="ocupacion"
-                  />
-                </div>
+                <ComboSimple
+                  name="ocupacion"
+                  label="Ocupación"
+                  datos={combos?.OCUPACION}
+                  idElemento="idocupacion"
+                  descripcion="ocupacion"
+                  className={`col-12 col-sm-6 col-lg-4 col-xl-3`}
+                />
 
                 <IfContainer show={Number(ocupacionSeleccionada) == 19}>
                   <div className="col-12 col-sm-6 col-lg-4 col-xl-3 position-relative">
