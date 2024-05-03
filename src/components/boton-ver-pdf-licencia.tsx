@@ -1,7 +1,7 @@
 'use client';
 
 import { NoExistePdfLicenciaError, buscarPdfLicencia } from '@/servicios/buscar-pdf-licencia';
-import { AlertaError } from '@/utilidades';
+import { AlertaError, base64ToBlob } from '@/utilidades';
 import React, { ReactNode } from 'react';
 
 interface BotonVerPdfLicenciaProps {
@@ -33,29 +33,8 @@ export const BotonVerPdfLicencia: React.FC<BotonVerPdfLicenciaProps> = ({
 
     try {
       const { archivo } = await buscarPdfLicencia(folioLicencia, idOperador);
-      const dataUrl = `data:application/pdf;base64,${archivo}`;
-
-      const newWindow = window.open();
-      if (!newWindow) {
-        return AlertaError.fire({
-          title: 'Error',
-          html: 'No se pudo abrir el archivo',
-        });
-      }
-
-      newWindow.document.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>PDF Viewer</title>
-        </head>
-        <body style="margin: 0;">
-          <iframe src="${dataUrl}" style="width: 100%; height: 100vh; border: none;"></iframe>
-        </body>
-        </html>
-      `);
+      const blobPdfLicencia = base64ToBlob(archivo, { type: 'application/pdf' });
+      window.open(URL.createObjectURL(blobPdfLicencia), '_blank');
     } catch (error) {
       if (error instanceof NoExistePdfLicenciaError) {
         return AlertaError.fire({
