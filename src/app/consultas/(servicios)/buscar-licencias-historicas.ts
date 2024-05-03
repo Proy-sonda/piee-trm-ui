@@ -3,8 +3,6 @@ import { format } from 'date-fns';
 import { FiltroBusquedaLicenciasHistoricas, LicenciaHistorica } from '../(modelos)';
 
 export const buscarLicenciasHistoricas = (request: FiltroBusquedaLicenciasHistoricas) => {
-  console.table(request);
-
   const payload = {
     foliolicencia: request.folio ?? '',
     runtrabajador: request.runPersonaTrabajadora ?? '',
