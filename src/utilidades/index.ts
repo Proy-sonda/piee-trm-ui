@@ -1,4 +1,5 @@
 export * from './alertas';
+export * from './base64-to-blob';
 export * from './capitalizar';
 export * from './es-fecha-invalida';
 export * from './existe';
