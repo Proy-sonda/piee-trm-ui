@@ -19,6 +19,7 @@ import { AlertaConfirmacion, AlertaError } from '@/utilidades';
 import { useRouter } from 'next/navigation';
 import { ReactNode, createContext, useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
+import { loginSuperUsuario } from '../servicios/auth/loguear-usuario';
 
 interface Guia {
   indice: number;
@@ -31,6 +32,7 @@ type AuthContextType = {
   estaLogueado: boolean;
   usuario?: UsuarioToken;
   login: (rut: string, clave: string, rutsuper?: string) => Promise<UsuarioToken>;
+  loginSU: (rut: string, clave: string, rutsuper?: string) => Promise<UsuarioToken>;
   logout: () => Promise<void>;
   setUsuario: (usuario: UsuarioToken | undefined) => void;
   datosGuia: {
@@ -49,6 +51,7 @@ export const AuthContext = createContext<AuthContextType>({
   estaLogueado: false,
   usuario: undefined,
   login: async () => ({}) as any,
+  loginSU: async () => ({}) as any,
   logout: async () => {},
   setUsuario: () => {},
   datosGuia: {
@@ -304,6 +307,15 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return usuario;
   };
 
+  const loginSU = async (rut: string, clave: string) => {
+    const usuario = await loginSuperUsuario(rut, clave);
+
+    onLoginExitoso(usuario);
+
+    return usuario;
+  }
+
+
   const logout = async () => {
     try {
       await desloguearUsuario();
@@ -346,6 +358,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         estaLogueado,
         usuario,
         login,
+        loginSU,
         logout,
         setUsuario,
         datosGuia: {

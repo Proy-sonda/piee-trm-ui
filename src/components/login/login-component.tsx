@@ -38,10 +38,11 @@ export const LoginComponent: React.FC<{}> = () => {
   const [showSpinner, setShowSpinner] = useState(false);
   const [, mensajes] = useFetch(obtenerMensajes());
   const [inicioComoSuperusuario, setInicioComoSuperusuario] = useState(false);
+  const [sinUsuarioEnTRM, setsinUsuarioEnTRM] = useState(false);
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { usuario, login } = useContext(AuthContext);
+  const { usuario, login, loginSU } = useContext(AuthContext);
   const formulario = useForm<FormularioLogin>({ mode: 'onBlur' });
   const rutUsuario = formulario.watch('rut');
 
@@ -61,6 +62,16 @@ export const LoginComponent: React.FC<{}> = () => {
     });
 
     if (inicioComoSuperusuario) {
+      if (sinUsuarioEnTRM) {
+        AlertaExito.fire({
+          html: 'Iniciando como superusuario...',
+          timer: 3000,
+          didClose: () => router.push('/superusuario'),
+        });
+
+        return;
+      }
+
       AlertaConfirmacion.fire({
         title: 'RUN ingresado es de superusuario',
         html: '¿Desea ingresar como superusuario?',
@@ -100,6 +111,14 @@ export const LoginComponent: React.FC<{}> = () => {
 
       await login(rut, clave);
     } catch (error) {
+      try {
+        // si no cuenta con usuario en tramitación manda al catch
+
+        await loginSU(rut, clave);
+        setsinUsuarioEnTRM(true);
+      } catch (error) {
+        console.log(error);
+      }
       let messageError = '';
 
       if (error instanceof RutInvalidoError) {
