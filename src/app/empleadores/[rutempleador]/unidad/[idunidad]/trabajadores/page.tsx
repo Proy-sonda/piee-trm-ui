@@ -779,7 +779,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 <span
                   className="text-end animate animate__fadeIn"
                   style={{
-                    display: datosPagina!?.trabajadores.length > 1 ? 'block' : 'none',
+                    display: trabajadores.length > 1 ? 'block' : 'none',
                   }}>
                   <button className="btn btn-danger btn-sm" onClick={handleDeleteAll}>
                     Borrar todo
@@ -797,7 +797,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             <IfContainer show={!pendiente || !loading}>
               <div
                 className="row mb-2"
-                style={{ display: datosPagina?.trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
+                style={{ display: trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
                 <div className="col-md-3">
                   <input
                     type="text"
@@ -806,7 +806,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                     onInput={(e: ChangeEvent<HTMLInputElement>) => {
                       e.preventDefault();
                       settrabajadores(
-                        datosPagina?.trabajadores.filter((trabajador) =>
+                        trabajadores.filter((trabajador) =>
                           trabajador.RunTrabajador.includes(e.target.value.toUpperCase()),
                         ) || [],
                       );
