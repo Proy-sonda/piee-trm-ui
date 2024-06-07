@@ -11,7 +11,6 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 interface props {
   trabajadores: Trabajadoresunidadrrhh[];
   unidad: string;
-  handleEditTrabajador: (codigounidad: string, runtrabajador: string) => void;
   handleDeleteTrabajador: (trabajador: Trabajadoresunidadrrhh) => void;
   idunidad: number;
 }
@@ -19,7 +18,6 @@ interface props {
 export const TablaTrabajadores: React.FC<props> = ({
   trabajadores,
   unidad,
-  handleEditTrabajador,
   handleDeleteTrabajador,
   idunidad,
 }) => {
@@ -39,7 +37,7 @@ export const TablaTrabajadores: React.FC<props> = ({
     if (resp.isDenied) return;
     if (resp.isDismissed) return;
     let data = trabajadores.map((trabajador) => ({
-      ['']: trabajador.runtrabajador.replaceAll('-', ''),
+      ['']: trabajador.RunTrabajador.replaceAll('-', ''),
     }));
 
     function padZero(num: number): string {
@@ -81,35 +79,17 @@ export const TablaTrabajadores: React.FC<props> = ({
         <Tbody className="align-middle text-center">
           {trabajadoresPaginados.length > 0 ? (
             trabajadoresPaginados.map((trabajador) => (
-              <Tr key={trabajador.runtrabajador}>
-                <Td>
-                  {/* <Link
-                    href={''}
-                    onClick={() =>
-                      handleEditTrabajador(trabajador.codigounidadrrhh, trabajador.runtrabajador)
-                    }> */}
-                  {trabajador.runtrabajador}
-                  {/* </Link> */}
-                </Td>
-                <Td>{format(new Date(trabajador.fecharegistro), 'dd-MM-yyyy HH:mm:ss')}</Td>
+              <Tr key={trabajador.RunTrabajador}>
+                <Td>{trabajador.RunTrabajador}</Td>
+                <Td>{format(new Date(trabajador.FechaRegistro), 'dd-MM-yyyy HH:mm:ss')}</Td>
 
                 {rolEnEmpleadorActual === 'administrador' && (
                   <Td>
-                    {/* <button
-                      className="btn btn-sm btn-primary"
-                      onClick={() =>
-                        handleEditTrabajador(trabajador.codigounidadrrhh, trabajador.runtrabajador)
-                      }>
-                      <i
-                        title={`editar ${trabajador.runtrabajador}`}
-                        className={'bi bi-pencil-square'}></i>
-                    </button>
-                    &nbsp; */}
                     <button
                       className="btn btn-sm btn-danger"
                       onClick={() => handleDeleteTrabajador(trabajador)}>
                       <i
-                        title={`eliminar ${trabajador.runtrabajador}`}
+                        title={`eliminar ${trabajador.RunTrabajador}`}
                         className={'bi bi-trash btn-danger'}></i>
                     </button>
                   </Td>
@@ -118,7 +98,9 @@ export const TablaTrabajadores: React.FC<props> = ({
             ))
           ) : (
             <Tr>
-              <Td>-</Td>
+              <Td colspan={3}>
+                <div className="alert alert-info text-center">No hay trabajadores registrados</div>
+              </Td>
               <Td>-</Td>
               {rolEnEmpleadorActual === 'administrador' && <Td>-</Td>}
             </Tr>

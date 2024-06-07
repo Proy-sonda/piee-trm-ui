@@ -7,15 +7,16 @@ import { runFetchAbortable } from '@/servicios/fetch';
 export const buscarUsuariosAsociado = (
   idunidad: string,
   rutEmpleador: string,
+  operador: number,
 ): [() => Promise<Usuariosunidad[]>, () => void] => {
   const payLoad: PayloadTramitacion = {
     Accion: 5,
     CodigoUnidadRRHH: idunidad,
-    RunTrabajador: '',
     RutEmpleador: rutEmpleador,
     RunUsuario: '',
+    RunTrabajador :'',
+    Operador: operador,
   };
-
   const [resp, abort] = runFetchAbortable<DatoEmpleadorUnidad>(
     `${urlBackendTramitacion()}/operadores/all/obtieneempleadorrrhhusu`,
     {
@@ -27,7 +28,6 @@ export const buscarUsuariosAsociado = (
       body: JSON.stringify(payLoad),
     },
   );
-
   const BuscarUsuarioUnidad = async () => {
     const Usuarios: Usuariosunidad[] = (await resp()).usuariosunidad;
 

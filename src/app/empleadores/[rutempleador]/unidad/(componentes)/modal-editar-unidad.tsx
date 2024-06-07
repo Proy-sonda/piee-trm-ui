@@ -4,7 +4,6 @@ import {
   ComboComuna,
   ComboSimple,
   InputBlockDepartamento,
-  InputCalle,
   InputNumero,
   InputTelefono,
 } from '@/components/form';
@@ -12,13 +11,13 @@ import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { buscarUnidadesDeRRHH } from '@/servicios';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { useContext, useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { Unidadesrrhh } from '../(modelos)/payload-unidades';
 import { actualizarUnidad } from '../(servicios)/actualizar-unidad';
-import { buscarUnidadPorId } from '../(servicios)/buscar-unidad-por-id';
 import { buscarComunas } from '../../../(servicios)/buscar-comunas';
 import { buscarRegiones } from '../../../(servicios)/buscar-regiones';
 import { InputIdentificadorUnidadRRHH } from './input-identificador-unidad-rrhh';
@@ -28,6 +27,7 @@ interface ModalEditarUnidadProps {
   show: boolean;
   rutempleador: string;
   idUnidad?: string;
+  Operador: number;
   onUnidadRRHHEditada: () => void;
   onCerrarModal: () => void;
 }
@@ -36,6 +36,7 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
   show,
   rutempleador,
   idUnidad,
+  Operador,
   onUnidadRRHHEditada,
   onCerrarModal,
 }) => {
@@ -48,7 +49,7 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
   });
 
   const [errorCargarUnidad, unidadRRHH, cargandoUnidad] = useFetch(
-    idUnidad ? buscarUnidadPorId(idUnidad.toString()) : emptyFetch(),
+    idUnidad ? buscarUnidadesDeRRHH(rutempleador, Operador, idUnidad) : emptyFetch(),
     [idUnidad],
   );
 
@@ -58,7 +59,7 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
 
   const formulario = useForm<Unidadesrrhh>({ mode: 'onBlur' });
 
-  const regionSeleccionada = formulario.watch('codigoregion');
+  const regionSeleccionada = formulario.watch('CodigoRegion');
 
   // Parchar fomulario
   useEffect(() => {
@@ -71,23 +72,59 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
     ) {
       return;
     }
-
     setMostrarSpinner(true);
 
-    formulario.setValue('glosaunidadrrhh', unidadRRHH.glosaunidadrrhh);
-    formulario.setValue('codigoregion', unidadRRHH.codigoregion);
-    formulario.setValue('direccion', unidadRRHH.direccion);
-    formulario.setValue('numero', unidadRRHH.numero);
-    formulario.setValue('blockdepto', unidadRRHH.blockdepto);
-    formulario.setValue('codigounidadrrhh', idUnidad ?? unidadRRHH.codigounidadrrhh);
-    formulario.setValue('telefono', unidadRRHH.telefono);
-    formulario.setValue('codigotipocalle', unidadRRHH.codigotipocalle);
-    formulario.setValue('codigocomuna', unidadRRHH.codigocomuna);
+    formulario.setValue(
+      'GlosaUnidadRRHH',
+      unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.GlosaUnidadRRHH ?? '',
+    );
+    formulario.setValue(
+      'CodigoRegion',
+      (unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoRegion ?? '').length == 1
+        ? '0' + (unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoRegion ?? '')
+        : unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoRegion ?? '',
+    );
+    formulario.setValue(
+      'Direccion',
+      unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.Direccion ?? '',
+    );
+    formulario.setValue(
+      'CodigoUnidadRRHH',
+      idUnidad ?? unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoUnidadRRHH ?? '',
+    );
+    formulario.setValue(
+      'CodigoComuna',
+      unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoComuna ?? '',
+    );
 
+    formulario.setValue(
+      'Telefono',
+      unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.Telefono ?? '',
+    );
+
+    formulario.setValue(
+      'CodigoTipoCalle',
+      unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoTipoCalle ?? 0,
+    );
+
+    formulario.setValue(
+      'Numero',
+      unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.Numero ?? '',
+    );
+
+    formulario.setValue(
+      'BlockDepto',
+      unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.BlockDepto ?? '',
+    );
     /* NOTA: Hay que darle un timeout antes de parchar la comuna. Puede ser porque react necesita
      * un tiempo para actualizar el combo de comunas al parchar la region. */
     setTimeout(() => {
-      formulario.setValue('codigocomuna', unidadRRHH.codigocomuna);
+      formulario.setValue(
+        'CodigoComuna',
+        (unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoComuna ?? '').length == 4
+          ? +'0' + (unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoComuna ?? '')
+          : unidadRRHH.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoComuna ?? '',
+      );
       setMostrarSpinner(false);
     }, 100);
   }, [
@@ -115,7 +152,7 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
 
       if (empleadorActual == undefined || usuario == undefined) return;
 
-      await actualizarUnidad(data, empleadorActual.rutempleador, usuario.rut);
+      await actualizarUnidad(data, empleadorActual.rutempleador, usuario.rut, 2, Operador);
 
       AlertaExito.fire({ text: 'Unidad fue actualizada con éxito' });
 
@@ -138,8 +175,12 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
         <Modal.Header closeButton onClick={handleCerrarModal}>
           <Modal.Title className="fs-5">
             {rolEnEmpleadorActual === 'administrador'
-              ? `Modificar Unidad RRHH - ${unidadRRHH!?.glosaunidadrrhh ?? ''}`
-              : `Unidad RRHH - ${unidadRRHH!?.glosaunidadrrhh ?? ''}`}
+              ? `Modificar Unidad RRHH - ${
+                  unidadRRHH!?.find((v) => v.CodigoUnidadRRHH == idUnidad)?.CodigoUnidadRRHH ?? ''
+                }`
+              : `Unidad RRHH - ${
+                  unidadRRHH!?.find((v) => v.CodigoUnidadRRHH == idUnidad)?.GlosaUnidadRRHH ?? ''
+                }`}
           </Modal.Title>
         </Modal.Header>
 
@@ -179,20 +220,20 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                 }>
                 <div className="row mt-2 g-3 align-items-baseline">
                   <InputIdentificadorUnidadRRHH
-                    name="codigounidadrrhh"
+                    name="CodigoUnidadRRHH"
                     label="Código Unidad"
                     className="col-12 col-lg-6 col-xl-3"
                     deshabilitado
                   />
 
                   <InputNombreUnidadRRHH
-                    name="glosaunidadrrhh"
+                    name="GlosaUnidadRRHH"
                     label="Nombre"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
                   <ComboSimple
-                    name="codigoregion"
+                    name="CodigoRegion"
                     label="Región"
                     datos={combos?.CCREGION}
                     idElemento="idregion"
@@ -203,34 +244,51 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
 
                   <ComboComuna
                     label="Comuna"
-                    name="codigocomuna"
+                    name="CodigoComuna"
                     comunas={combos?.CCCOMUNA}
                     regionSeleccionada={regionSeleccionada}
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
                   <ComboSimple
-                    label="TIpo Calle"
-                    name="codigotipocalle"
+                    label="Tipo de calle"
+                    name="CodigoTipoCalle"
                     datos={combos?.TIPOCALLE}
-                    descripcion={'tipocalle'}
                     idElemento={'idtipocalle'}
+                    descripcion={'tipocalle'}
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  <InputCalle name="direccion" label="Calle" className="col-12 col-lg-6 col-xl-3" />
+                  <div className="col-12 col-lg-6 col-xl-3">
+                    <label>Dirección (*)</label>
+                    <input
+                      className="form-control"
+                      {...formulario.register('Direccion', {
+                        required: {
+                          value: true,
+                          message: 'Este campo es requerido',
+                        },
+                        maxLength: {
+                          value: 100,
+                          message: 'Este campo no puede tener más de 100 caracteres',
+                        },
+                        onChange(event) {
+                          formulario.setValue('Direccion', event.target.value.toUpperCase());
+                        },
+                      })}
+                    />
+                  </div>
 
-                  <InputNumero name="numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
+                  <InputNumero name="Numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
 
                   <InputBlockDepartamento
-                    opcional
-                    name="blockdepto"
+                    name="BlockDepto"
                     label="Departamento"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
                   <InputTelefono
-                    name="telefono"
+                    name="Telefono"
                     label="Teléfono"
                     className="col-12 col-lg-6 col-xl-3"
                   />

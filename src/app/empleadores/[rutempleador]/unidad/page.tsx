@@ -44,8 +44,12 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
 
   const [refrescar, refrescarUnidades] = useRefrescarPagina();
 
+  const { usuario } = useContext(AuthContext);
+
   const [errorCargarUnidad, unidades, cargandoUnidades] = useFetch(
-    empleadorActual ? buscarUnidadesDeRRHH(empleadorActual.rutempleador) : emptyFetch(),
+    empleadorActual
+      ? buscarUnidadesDeRRHH(empleadorActual.rutempleador, tabOperador == 'imed' ? 3 : 4)
+      : emptyFetch(),
     [refrescar, empleadorActual, tabOperador],
   );
 
@@ -175,10 +179,10 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
             onChange={(e) => {
               setunidadesFiltradas(
                 unidades?.filter(
-                  ({ glosaunidadrrhh, codigounidadrrhh, telefono }) =>
-                    glosaunidadrrhh.toUpperCase().includes(e.target.value.toUpperCase()) ||
-                    codigounidadrrhh.includes(e.target.value) ||
-                    telefono.includes(e.target.value),
+                  ({ GlosaUnidadRRHH, CodigoUnidadRRHH, Direccion }) =>
+                    GlosaUnidadRRHH.toUpperCase().includes(e.target.value.toUpperCase()) ||
+                    CodigoUnidadRRHH.includes(e.target.value) ||
+                    Direccion.toUpperCase().includes(e.target.value.toUpperCase()),
                 ),
               );
             }}
@@ -279,11 +283,12 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
             <TablaUnidades
               rutempleador={rutempleador}
               unidades={unidadesFiltradas ?? []}
-              onEditarUnidad={({ codigounidadrrhh }) => {
-                setIdUnidad(codigounidadrrhh);
+              onEditarUnidad={({ CodigoUnidadRRHH }) => {
+                setIdUnidad(CodigoUnidadRRHH);
                 setAbrirModalEditarUnidad(true);
               }}
               onUnidadEliminada={() => refrescarUnidades()}
+              operador={tabOperador == 'imed' ? 3 : 4}
             />
           </IfContainer>
         </div>
@@ -297,6 +302,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
           setAbrirModalCrearUnidad(false);
           refrescarUnidades();
         }}
+        operador={tabOperador == 'imed' ? 3 : 4}
       />
 
       {
@@ -304,6 +310,7 @@ const UnidadRRHHPage: React.FC<UnidadRRHHPageProps> = ({ params: { rutempleador 
           show={abrirModalEditarUnidad}
           rutempleador={rutempleador}
           idUnidad={idunidad}
+          Operador={tabOperador == 'imed' ? 3 : 4}
           onUnidadRRHHEditada={() => {
             setAbrirModalEditarUnidad(false);
             refrescarUnidades();

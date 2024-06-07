@@ -4,13 +4,14 @@ import { runFetchConThrow } from '@/servicios/fetch';
 
 import { EmpleadorUnidad, Unidadesrrhh } from '../(modelos)/payload-unidades';
 
-export const crearUnidad = (request: Unidadesrrhh, rutEmpleador: string, runUsuario: string) => {
+export const crearUnidad = (request: Unidadesrrhh, rutEmpleador: string, runUsuario: string, operador:number) => {
   request.accionrrhh = 1;
   const payload: EmpleadorUnidad = {
     RunUsuario: runUsuario,
     RutEmpleador: rutEmpleador,
     unidadesrrhh: request,
-  };
+    operador
+    };
 
   return runFetchConThrow<void>(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {
     method: 'PUT',

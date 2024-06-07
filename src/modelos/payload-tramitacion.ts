@@ -13,4 +13,5 @@ export interface PayloadTramitacion {
   CodigoUnidadRRHH?: string;
   RunUsuario?: string;
   RunTrabajador?: string;
+  Operador?: number;
 }

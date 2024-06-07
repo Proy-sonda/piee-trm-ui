@@ -13,10 +13,10 @@ import styles from './usuarios.module.css';
 import { Titulo } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { useMergeFetchObject } from '@/hooks';
+import { buscarUnidadesDeRRHH } from '@/servicios';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
-import { Usuarioxrrhh } from '../../(modelos)';
-import { buscarUnidadPorId } from '../../(servicios)';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { TIPOS_DE_OPERADORESID, TipoOperadorId, Usuarioxrrhh } from '../../(modelos)';
 import { UsuarioEntidadEmpleadora } from '../../../usuarios/(modelos)';
 import { buscarUsuarios } from '../../../usuarios/(servicios)';
 import { TableUsuariosAsociados } from './(componentes)/table-usuarios-asociados';
@@ -40,6 +40,13 @@ interface Formulario {
 }
 
 const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
+  const search = useSearchParams();
+
+  const tabOperadorQuery: TipoOperadorId =
+    TIPOS_DE_OPERADORESID.find((x) => x === Number(search.get('operador'))) ?? 3;
+
+  const [tabOperador] = useState<TipoOperadorId>(tabOperadorQuery);
+
   const { rutempleador, idunidad } = params;
   const [unidad, setunidad] = useState('');
   const [spinner, setspinner] = useState(false);
@@ -84,10 +91,9 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
   useEffect(() => {
     const busquedaUnidad = async () => {
-      const [resp] = await buscarUnidadPorId(idunidad);
-      setunidad((await resp())!?.glosaunidadrrhh);
+      const [resp] = await buscarUnidadesDeRRHH(rutempleador, tabOperador);
+      setunidad((await resp()).find((u) => u.CodigoUnidadRRHH == idunidad)?.GlosaUnidadRRHH ?? '');
     };
-
     busquedaUnidad();
 
     refrescarComponente();
@@ -104,15 +110,16 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      usuarioAso: buscarUsuariosAsociado(idunidad, rutempleador),
+      usuarioAso: buscarUsuariosAsociado(idunidad, rutempleador, tabOperador),
     },
     [refresh],
   );
+  const refrescarComponente = () => setRefresh(Math.random());
 
   useEffect(() => {
     if (datosPagina?.usuarioAso == undefined) return;
     setusuariosAsociados(datosPagina!?.usuarioAso);
-  }, [datosPagina]);
+  }, [datosPagina, refrescarComponente]);
 
   useEffect(() => {
     setusuarios(
@@ -120,13 +127,11 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         (usuario) =>
           usuario.rutusuario !==
           usuariosAsociados?.find(
-            (usuarioAsociado) => usuarioAsociado.runusuario == usuario.rutusuario,
-          )?.runusuario,
+            (usuarioAsociado) => usuarioAsociado.RunUsuario == usuario.rutusuario,
+          )?.RunUsuario,
       ),
     );
   }, [usuariosAsociados]);
-
-  const refrescarComponente = () => setRefresh(Math.random());
 
   const onHandleSubmit: SubmitHandler<Formulario> = async (data) => {
     const respuesta = await AlertaConfirmacion.fire({
@@ -149,7 +154,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     setspinner(true);
     try {
       if (usuario == undefined) return;
-      await asociarUnidad(usuarioaasociar, usuario?.rut, rutempleador);
+      await asociarUnidad(usuarioaasociar, usuario?.rut, rutempleador, tabOperador);
       setspinner(false);
       AlertaExito.fire({
         html: 'Asociación realizada con éxito',
@@ -179,12 +184,12 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         acccionusuxrrhh: 3,
         codigounidadrrhh: idunidad,
         rolusuario: Number(
-          usuariosAsociados?.find(({ runusuario }) => runusuario == runusuarioeliminar)?.rolusuario,
+          usuariosAsociados?.find(({ RunUsuario }) => RunUsuario == runusuarioeliminar)?.RolUsuario,
         ),
         runusuario: runusuarioeliminar,
       };
       if (usuario == undefined) return;
-      await eliminarUsuarioAsociado(usuarioEliminar, usuario?.rut, rutempleador);
+      await eliminarUsuarioAsociado(usuarioEliminar, usuario?.rut, rutempleador, tabOperador);
       setspinner(false);
       refrescarComponente();
       AlertaExito.fire({
@@ -196,9 +201,6 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       AlertaError.fire({
         html: 'Error en eliminación, verifique los datos correctamente',
       });
-    } finally {
-      refrescarComponente();
-      window.location.href = window.location.href;
     }
   };
 
@@ -292,7 +294,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                           usuarios.map(({ rutusuario, nombres }) => (
                             <Fragment key={rutusuario}>
                               {datosPagina?.usuarioAso.find(
-                                (useraso) => useraso.runusuario === rutusuario,
+                                (useraso) => useraso.RunUsuario === rutusuario,
                               ) ? (
                                 <Fragment key={Math.random()}></Fragment>
                               ) : (
@@ -343,8 +345,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                   placeholder="Búsqueda por RUN..."
                   onChange={(e: ChangeEvent<HTMLInputElement>) => {
                     setusuariosAsociados(
-                      datosPagina?.usuarioAso.filter(({ runusuario }) =>
-                        runusuario.includes(e.target.value),
+                      datosPagina?.usuarioAso.filter(({ RunUsuario }) =>
+                        RunUsuario.includes(e.target.value),
                       ),
                     );
                   }}
@@ -364,7 +366,11 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
           <button
             className="btn btn-danger"
             onClick={() => {
-              router.push(`/empleadores/${rutempleador}/unidad`);
+              router.push(
+                `/empleadores/${rutempleador}/unidad?operador=${
+                  tabOperador == 3 ? 'imed' : 'medipass'
+                }`,
+              );
             }}>
             Volver
           </button>

@@ -7,11 +7,13 @@ export const asociarUnidad = (
   usuarioxrrhh: Usuarioxrrhh,
   RunUsuario: string,
   RutEmpleador: string,
+  operador:number
 ) => {
   const payload: EmpleadorUnidad = {
     RunUsuario,
     RutEmpleador,
     usuarioxrrhh,
+    operador
   };
   return runFetchConThrow<void>(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {
     method: 'PUT',

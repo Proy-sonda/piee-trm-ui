@@ -6,13 +6,17 @@ import { runFetchAbortable } from './fetch';
 
 export const buscarUnidadesDeRRHH = (
   rutEmpleador: string,
+  operador?:number,
+  CodigoUnidadRRHH?: string,
 ): [() => Promise<Unidadesrrhh[]>, () => void] => {
-  const payload: PayloadTramitacion = {
+  
+  let payload: PayloadTramitacion = {
     Accion: 2,
     RutEmpleador: rutEmpleador,
-    CodigoUnidadRRHH: '',
+    CodigoUnidadRRHH: CodigoUnidadRRHH || '',
     RunUsuario: '',
     RunTrabajador: '',
+    Operador: operador || 0,
   };
 
   const [resp, abort] = runFetchAbortable<DatoEmpleadorUnidad>(

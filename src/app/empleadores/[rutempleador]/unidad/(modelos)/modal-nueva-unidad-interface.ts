@@ -3,4 +3,5 @@ export interface ModalNuevaUnidadProps {
   rutempleador: string;
   onCerrarModal: () => void;
   onNuevaUnidadCreada: () => void;
+  operador:number;
 }
