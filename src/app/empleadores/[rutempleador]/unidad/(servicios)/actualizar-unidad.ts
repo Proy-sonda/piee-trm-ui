@@ -7,13 +7,25 @@ export const actualizarUnidad = (
   request: Unidadesrrhh,
   rutEmpleador: string,
   runUsuario: string,
+  accion:number,
+  operador?: number,
 ) => {
-  request.accionrrhh = 2;
-  const payload: EmpleadorUnidad = {
-    RunUsuario: runUsuario,
-    RutEmpleador: rutEmpleador,
-    unidadesrrhh: request,
-  };
+  let payload: EmpleadorUnidad;
+  request.accionrrhh = accion;
+  if(operador){
+    payload = {
+      RunUsuario: runUsuario,
+      RutEmpleador: rutEmpleador,
+      unidadesrrhh: request,
+      operador: operador,
+    }
+  }else{
+    payload = {
+      RunUsuario: runUsuario,
+      RutEmpleador: rutEmpleador,
+      unidadesrrhh: request,
+    }
+  }
 
   return runFetchConThrow<void>(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {
     method: 'PUT',

@@ -18,6 +18,7 @@ interface TablaUnidadesProps {
   rutempleador: string;
   onEditarUnidad: (unidad: Unidadesrrhh) => void;
   onUnidadEliminada: (unidad: Unidadesrrhh) => void;
+  operador: number;
 }
 
 const TablaUnidades = ({
@@ -25,6 +26,7 @@ const TablaUnidades = ({
   onEditarUnidad,
   onUnidadEliminada,
   rutempleador,
+  operador,
 }: TablaUnidadesProps) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
@@ -38,7 +40,7 @@ const TablaUnidades = ({
 
   const eliminarUnidadDeRRHH = async (unidad: UnidadAccion) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Desea eliminar la unidad: <b>${unidad.glosaunidadrrhh}</b>?`,
+      html: `¿Desea eliminar la unidad: <b>${unidad.GlosaUnidadRRHH}</b>?`,
     });
 
     if (!isConfirmed) {
@@ -50,7 +52,7 @@ const TablaUnidades = ({
 
       if (empleadorActual == undefined || usuario == undefined) return;
 
-      await eliminarUnidad(unidad, empleadorActual?.rutempleador, usuario?.rut);
+      await eliminarUnidad(unidad, empleadorActual?.rutempleador, usuario?.rut, operador);
 
       AlertaExito.fire({
         html: 'Unidad fue eliminada con éxito',
@@ -68,11 +70,11 @@ const TablaUnidades = ({
   };
 
   const linkTrabajadores = (unidad: Unidadesrrhh) => {
-    return `/empleadores/${rutempleador}/unidad/${unidad.codigounidadrrhh}/trabajadores/`;
+    return `/empleadores/${rutempleador}/unidad/${unidad.CodigoUnidadRRHH}/trabajadores?operador=${operador}`;
   };
 
   const linkUsuarios = (unidad: Unidadesrrhh) => {
-    return `/empleadores/${rutempleador}/unidad/${unidad.codigounidadrrhh}/usuarios`;
+    return `/empleadores/${rutempleador}/unidad/${unidad.CodigoUnidadRRHH}/usuarios?operador=${operador}`;
   };
 
   const editarUnidadInterno = (unidad: Unidadesrrhh) => {
@@ -105,37 +107,35 @@ const TablaUnidades = ({
             <Tr>
               <Th>Código</Th>
               <Th>Nombre</Th>
-              <Th>Teléfono</Th>
-
+              <Th>Dirección</Th>
               <Th></Th>
             </Tr>
           </Thead>
           <Tbody className="text-center align-middle">
             {unidadesPaginadas.map((unidad) => (
-              <Tr key={unidad?.codigounidadrrhh}>
-                <Td>{unidad?.codigounidadrrhh}</Td>
+              <Tr key={unidad?.CodigoUnidadRRHH}>
+                <Td>{unidad?.CodigoUnidadRRHH}</Td>
                 <Td>
                   <span
                     className="text-primary cursor-pointer"
                     onClick={editarUnidadInterno(unidad)}>
-                    {unidad?.glosaunidadrrhh}
+                    {unidad?.GlosaUnidadRRHH}
                   </span>
                 </Td>
-                <Td>{unidad?.telefono}</Td>
-
+                <Td>{unidad?.Direccion}</Td>
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
                     {rolEnEmpleadorActual === 'administrador' && (
                       <>
                         <button
                           className="btn text-primary"
-                          title={`Editar Unidad: ${unidad?.glosaunidadrrhh}`}
+                          title={`Editar Unidad: ${unidad?.GlosaUnidadRRHH}`}
                           onClick={editarUnidadInterno(unidad)}>
                           <i className="bi bi-pencil-square"></i>
                         </button>
                         <button
                           className="btn text-danger"
-                          title={`Eliminar Unidad: ${unidad?.glosaunidadrrhh}`}
+                          title={`Eliminar Unidad: ${unidad?.GlosaUnidadRRHH}`}
                           onClick={eliminarUnidadInterno(unidad)}>
                           <i className="bi bi-trash3"></i>
                         </button>

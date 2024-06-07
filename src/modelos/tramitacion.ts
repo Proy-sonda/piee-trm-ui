@@ -7,8 +7,11 @@ export interface DatoEmpleadorUnidad {
 }
 
 export interface Usuariosunidad {
-  runusuario: string;
-  rolusuario: string;
+  RunUsuario:             string;
+  ApellidoPaternoUsuario: string;
+  ApellidoMaternoUsuario: string;
+  NombresUsuario:         string;
+  RolUsuario:             number;
 }
 
 export interface Usuario {
@@ -22,21 +25,20 @@ export interface Usuario {
 }
 
 export interface Unidadesrrhh {
-  codigounidadrrhh: string;
-  glosaunidadrrhh: string;
-  codigoregion: string;
-  codigocomuna: string;
-  codigotipocalle: number;
-  direccion: string;
-  numero: string;
-  blockdepto: string;
-  telefono: string;
+  CodigoUnidadRRHH: string;
+  GlosaUnidadRRHH: string;
+  CodigoRegion: string;
+  CodigoComuna: string;
+  CodigoTipoCalle: number;
+  Direccion: string;
+  Numero: string;
+  BlockDepto: string;
+  Telefono: string;
 }
 
 export interface Trabajadoresunidadrrhh {
-  codigounidadrrhh: string;
-  runtrabajador: string;
-  fecharegistro: string;
+  RunTrabajador: string;
+  FechaRegistro: string;
 }
 
 export interface Empleadore {

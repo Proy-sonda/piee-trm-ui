@@ -162,8 +162,8 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               name="idUnidadRRHH"
               label="Unidad RRHH"
               datos={unidadesRRHH}
-              idElemento="codigounidadrrhh"
-              descripcion="glosaunidadrrhh"
+              idElemento="CodigoUnidadRRHH"
+              descripcion="GlosaUnidadRRHH"
               tipoValor="string"
               className="col-12 col-md-6 col-lg-3"
             />

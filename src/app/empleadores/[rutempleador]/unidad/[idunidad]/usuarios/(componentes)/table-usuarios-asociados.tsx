@@ -22,30 +22,33 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
         <Thead>
           <Tr>
             <Th>RUN</Th>
+            <Th>Nombre</Th>
             <Th>{rolEnEmpleadorActual === 'administrador' && 'Acciones'}</Th>
           </Tr>
         </Thead>
         <Tbody>
           {usuariosPaginados.length || 0 > 0 ? (
-            usuariosPaginados.map(({ runusuario }) => (
-              <Tr key={runusuario}>
-                <Td>{runusuario}</Td>
-
-                <Td>
-                  {rolEnEmpleadorActual === 'administrador' && (
-                    <button
-                      title={`Eliminar ${runusuario}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleDelete(runusuario);
-                      }}
-                      className="btn btn-danger btn-sm">
-                      <i className="bi bi-trash3"></i>
-                    </button>
-                  )}
-                </Td>
-              </Tr>
-            ))
+            usuariosPaginados.map(
+              ({ RunUsuario, NombresUsuario, ApellidoMaternoUsuario, ApellidoPaternoUsuario }) => (
+                <Tr key={RunUsuario}>
+                  <Td>{RunUsuario}</Td>
+                  <Td>{`${NombresUsuario} ${ApellidoPaternoUsuario} ${ApellidoMaternoUsuario}`}</Td>
+                  <Td>
+                    {rolEnEmpleadorActual === 'administrador' && (
+                      <button
+                        title={`Eliminar ${RunUsuario}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleDelete(RunUsuario);
+                        }}
+                        className="btn btn-danger btn-sm">
+                        <i className="bi bi-trash3"></i>
+                      </button>
+                    )}
+                  </Td>
+                </Tr>
+              ),
+            )
           ) : (
             <Tr>
               <Td>-</Td>

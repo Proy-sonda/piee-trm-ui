@@ -6,12 +6,15 @@ export const eliminarTrabajador = async (
   trabajadoresxrrhh: Trabajadoresxrrhh,
   RunUsuario: string,
   RutEmpleador: string,
+  operador:number,
+  accion:number
 ) => {
-  trabajadoresxrrhh.acciontraxrrhh=3;
+  trabajadoresxrrhh.acciontraxrrhh=accion;
   const payload: EmpleadorUnidad = {
     RunUsuario,
     RutEmpleador,
     trabajadoresxrrhh,
+    operador
   };
 
   const data = await fetch(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {

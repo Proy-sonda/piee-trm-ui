@@ -28,6 +28,7 @@ export const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
   show,
   onCerrarModal,
   onNuevaUnidadCreada,
+  operador,
 }) => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
   const { empleadorActual } = useEmpleadorActual();
@@ -43,7 +44,7 @@ export const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
     mode: 'onBlur',
   });
 
-  const regionSeleccionada = formulario.watch('codigoregion');
+  const regionSeleccionada = formulario.watch('CodigoRegion');
 
   const resetearFormulario = () => {
     formulario.reset();
@@ -60,7 +61,7 @@ export const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
 
       if (empleadorActual == undefined || usuario == undefined) return;
 
-      await crearUnidad(data, empleadorActual?.rutempleador, usuario?.rut);
+      await crearUnidad(data, empleadorActual?.rutempleador, usuario?.rut, operador);
 
       AlertaExito.fire({
         text: 'Unidad fue creada con éxito',
@@ -104,17 +105,17 @@ export const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                   <InputNombreUnidadRRHH
                     label="Código Unidad"
                     className="col-12 col-lg-6 col-xl-3"
-                    name="codigounidadrrhh"
+                    name="CodigoUnidadRRHH"
                   />
 
                   <InputNombreUnidadRRHH
-                    name="glosaunidadrrhh"
+                    name="GlosaUnidadRRHH"
                     label="Nombre Unidad"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
                   <ComboSimple
-                    name="codigoregion"
+                    name="CodigoRegion"
                     label="Región"
                     datos={combos?.CCREGION}
                     idElemento="idregion"
@@ -125,33 +126,33 @@ export const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
 
                   <ComboComuna
                     label="Comuna"
-                    name="codigocomuna"
+                    name="CodigoComuna"
                     comunas={combos?.CCCOMUNA}
                     regionSeleccionada={regionSeleccionada}
                     className="col-12 col-lg-6 col-xl-3"
                   />
                   <ComboSimple
                     label="Tipo de Calle"
-                    name="codigotipocalle"
+                    name="CodigoTipoCalle"
                     datos={combos?.CCTIPOCALLE}
                     idElemento={'idtipocalle'}
                     descripcion={'tipocalle'}
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  <InputCalle label="Calle" name="direccion" className="col-12 col-lg-6 col-xl-3" />
+                  <InputCalle label="Calle" name="Direccion" className="col-12 col-lg-6 col-xl-3" />
 
-                  <InputNumero name="numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
+                  <InputNumero name="Numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
 
                   <InputBlockDepartamento
                     opcional
-                    name="blockdepto"
+                    name="BlockDepto"
                     label="Departamento"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
                   <InputTelefono
-                    name="telefono"
+                    name="Telefono"
                     label="Teléfono"
                     className="col-12 col-lg-6 col-xl-3"
                   />

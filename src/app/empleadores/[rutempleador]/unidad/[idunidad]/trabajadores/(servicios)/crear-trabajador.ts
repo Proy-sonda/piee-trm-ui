@@ -7,12 +7,14 @@ export const crearTrabajador = async (
   trabajadoresxrrhh: Trabajadoresxrrhh,
   RunUsuario: string,
   RutEmpleador: string,
+  operador:number,
 ) => {
   trabajadoresxrrhh.acciontraxrrhh = 1;
   const payload: EmpleadorUnidad = {
     RunUsuario,
     RutEmpleador,
     trabajadoresxrrhh,
+    operador
   };
   const data = await fetch(`${urlBackendTramitacion()}/operadores/actualizarrhhusu`, {
     method: 'PUT',

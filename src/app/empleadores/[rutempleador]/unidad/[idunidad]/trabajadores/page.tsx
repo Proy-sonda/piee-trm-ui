@@ -3,7 +3,6 @@
 import {
   actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
-  buscarUnidadesDeEmpleador,
   crearTrabajador,
   eliminarTrabajador,
 } from '@/app/empleadores/[rutempleador]/unidad/[idunidad]/trabajadores/(servicios)';
@@ -14,17 +13,17 @@ import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks';
 import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
+import { buscarUnidadesDeRRHH } from '@/servicios';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
 import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ChangeEvent, FormEvent, useContext, useEffect, useRef, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
-import { Trabajadoresxrrhh } from '../../(modelos)';
-import { buscarUnidadPorId } from '../../(servicios)';
+import { TIPOS_DE_OPERADORESID, TipoOperadorId, Trabajadoresxrrhh } from '../../(modelos)';
 import { ProgressBarCustom, TablaTrabajadores } from './(componentes)';
 import { Trabajador } from './(modelos)';
 import styles from './trabajadores.module.css';
@@ -38,6 +37,12 @@ interface TrabajadoresPageProps {
 }
 
 const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
+  const search = useSearchParams();
+
+  const tabOperadorQuery: TipoOperadorId =
+    TIPOS_DE_OPERADORESID.find((x) => x === Number(search.get('operador'))) ?? 3;
+
+  const [tabOperador] = useState<TipoOperadorId>(tabOperadorQuery);
   const [unidad, setunidad] = useState('');
   const [cuentagrabados, setcuentagrabados] = useState<number>(0);
   const [textProgress, settextProgress] = useState('');
@@ -72,20 +77,20 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
-      trabajadores: buscarTrabajadoresDeUnidad(idunidad, rutempleador),
+      trabajadores: buscarTrabajadoresDeUnidad(idunidad, rutempleador, tabOperador),
     },
     [refresh],
   );
 
   useEffect(() => {
-    const busquedaUnidadEmpleador = async () => {
-      const [resp] = await buscarUnidadesDeEmpleador(rutempleador, idunidad);
-      const [unidadNombre] = await buscarUnidadPorId(idunidad);
-      setunidad((await unidadNombre())!?.glosaunidadrrhh);
-      setunidadEmpleador(await resp());
+    const busquedaUnidad = async () => {
+      const [resp] = await buscarUnidadesDeRRHH(rutempleador, tabOperador);
+      setunidad((await resp()).find((u) => u.CodigoUnidadRRHH == idunidad)?.GlosaUnidadRRHH ?? '');
     };
-    busquedaUnidadEmpleador();
-  }, [trabajadores, idunidad, rutempleador]);
+    busquedaUnidad();
+
+    refrescarComponente();
+  }, [idunidad]);
 
   useEffect(() => {
     if (datosPagina?.trabajadores != undefined) {
@@ -95,45 +100,35 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const refrescarComponente = () => setRefresh(Math.random());
 
-  const handleEditTrabajador = (codigounidad: string, runtrabajador: string) => {
-    seteditar({
-      runtrabajador,
-      unidad: {
-        codigounidad,
-      },
-    });
-    setrutedit(runtrabajador);
-    refrescarComponente();
-    setshow(true);
-  };
-
   const handleClose = () => setshow(false);
 
   const handleDeleteTrabajador = (trabajadores: Trabajadoresunidadrrhh) => {
     const EliminarTrabajador = async () => {
       const TrabajadorAEliminar: Trabajadoresxrrhh = {
         acciontraxrrhh: 3,
-        codigounidadrrhh: trabajadores.codigounidadrrhh,
-        runtrabajador: trabajadores.runtrabajador,
+        codigounidadrrhh: idunidad,
+        runtrabajador: trabajadores.RunTrabajador,
       };
       if (empleadorActual == undefined || usuario == undefined) return;
       const data = await eliminarTrabajador(
         TrabajadorAEliminar,
         usuario?.rut,
         empleadorActual?.rutempleador,
+        tabOperador,
+        3,
       );
 
       if (data.ok) {
         refrescarComponente();
 
         return AlertaExito.fire({
-          html: `Persona trabajadora ${trabajadores.runtrabajador} fue eliminada con éxito`,
+          html: `Persona trabajadora ${trabajadores.RunTrabajador} fue eliminada con éxito`,
         });
       }
       AlertaError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
     };
     AlertaConfirmacion.fire({
-      html: `¿Desea eliminar a la persona trabajadora <b>${trabajadores.runtrabajador}</b>?`,
+      html: `¿Desea eliminar a la persona trabajadora <b>${trabajadores.RunTrabajador}</b>?`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
     });
@@ -187,8 +182,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       if (element == undefined) return;
       const TrabajadorAEliminar: Trabajadoresxrrhh = {
         acciontraxrrhh: 3,
-        codigounidadrrhh: element.codigounidadrrhh,
-        runtrabajador: element.runtrabajador,
+        codigounidadrrhh: idunidad,
+        runtrabajador: element.RunTrabajador,
       };
       if (empleadorActual == undefined || usuario == undefined) return;
 
@@ -196,6 +191,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         TrabajadorAEliminar,
         usuario?.rut,
         empleadorActual?.rutempleador,
+        tabOperador,
+        3,
       );
       if (resp.ok) {
         recuento = ++recuento;
@@ -269,7 +266,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       };
 
       if (empleadorActual == undefined || usuario == undefined) return;
-      const data = await crearTrabajador(trabajador, empleadorActual?.rutempleador, usuario?.rut);
+      const data = await crearTrabajador(
+        trabajador,
+        usuario?.rut,
+        empleadorActual?.rutempleador,
+        tabOperador,
+      );
 
       if (data.ok) {
         AlertaExito.fire({ html: 'Persona trabajadora agregada correctamente' });
@@ -294,7 +296,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   };
 
   const trabajadorExisteEnGrilla = (rut: string) => {
-    return trabajadores.some((t) => t.runtrabajador === rut);
+    return trabajadores.some((t) => t.RunTrabajador === rut);
   };
 
   const handleClickNomina = async (event: FormEvent<HTMLButtonElement>) => {
@@ -352,7 +354,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         };
 
         if (empleadorActual == undefined || usuario == undefined) return;
-        const data = await crearTrabajador(trabajador, usuario.rut, empleadorActual.rutempleador);
+        const data = await crearTrabajador(
+          trabajador,
+          usuario.rut,
+          empleadorActual.rutempleador,
+          tabOperador,
+        );
         if (data.ok) {
           setcuentagrabados((recuento / csvData.length) * 100);
           trabajadorExisteEnGrilla(rutTrabjadorCSV) ? recuentoExistentes++ : recuentoNuevos++;
@@ -800,28 +807,28 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       e.preventDefault();
                       settrabajadores(
                         datosPagina?.trabajadores.filter((trabajador) =>
-                          trabajador.runtrabajador.includes(e.target.value.toUpperCase()),
+                          trabajador.RunTrabajador.includes(e.target.value.toUpperCase()),
                         ) || [],
                       );
                     }}
                   />
                 </div>
               </div>
-              {trabajadores.length || 0 > 0 ? (
+              {trabajadores.length > 0 && !pendiente ? (
                 <>
                   <TablaTrabajadores
                     unidad={unidad}
                     handleDeleteTrabajador={handleDeleteTrabajador}
-                    handleEditTrabajador={handleEditTrabajador}
                     idunidad={Number(idunidad)}
-                    trabajadores={(trabajadores || []).filter(
-                      ({ codigounidadrrhh }) => codigounidadrrhh == idunidad,
-                    )}
+                    trabajadores={trabajadores}
                   />
                 </>
               ) : (
-                <div className="text-center">
-                  <b>No se han encontrado personas trabajadoras</b>
+                <div className="alert alert-warning text-center">
+                  <b>
+                    No se han encontrado personas trabajadoras en la unidad{' '}
+                    <strong>{unidad}</strong>
+                  </b>
                 </div>
               )}
             </IfContainer>
@@ -836,7 +843,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="col-md-6 text-end">
             <button
               className="btn btn-danger"
-              onClick={() => router.push(`/empleadores/${rutempleador}/unidad`)}>
+              onClick={() =>
+                router.push(
+                  `/empleadores/${rutempleador}/unidad?operador=${
+                    tabOperador == 3 ? 'imed' : 'medipass'
+                  }`,
+                )
+              }>
               Volver
             </button>
           </div>
@@ -869,9 +882,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 onChange={handleChangeUnidad}>
                 <option value={''}>Seleccionar</option>
                 {unidadEmpleador!?.length || 0 > 0 ? (
-                  unidadEmpleador!?.map(({ codigounidadrrhh, glosaunidadrrhh }) => (
-                    <option key={codigounidadrrhh} value={codigounidadrrhh}>
-                      {glosaunidadrrhh}
+                  unidadEmpleador!?.map(({ CodigoUnidadRRHH, GlosaUnidadRRHH }) => (
+                    <option key={CodigoUnidadRRHH} value={CodigoUnidadRRHH}>
+                      {GlosaUnidadRRHH}
                     </option>
                   ))
                 ) : (
