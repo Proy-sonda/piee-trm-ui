@@ -33,6 +33,12 @@ interface Direccionempleador {
   numero: string;
   depto: string;
   comuna: Comuna;
+  tipocalle: TipoCalle;
+}
+
+interface TipoCalle {
+  idtipocalle: number;
+  tipocalle: number;
 }
 
 interface Comuna {

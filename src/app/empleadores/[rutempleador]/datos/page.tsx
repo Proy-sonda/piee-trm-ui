@@ -31,6 +31,7 @@ import {
   buscarRegiones,
   buscarSistemasDeRemuneracion,
   buscarTamanosEmpresa,
+  buscarTiposCalle,
   buscarTiposDeEmpleadores,
 } from '../../(servicios)';
 import { CamposFormularioEmpleador } from './(modelos)';
@@ -54,7 +55,16 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
 
   const [
     errorCombos,
-    [CCTIPOEMP, CCAF, CCACTLAB, CCREGION, CCCOMUNA, comboRemuneracion, comboTamanoEmpresa],
+    [
+      CCTIPOEMP,
+      CCAF,
+      CCACTLAB,
+      CCREGION,
+      CCCOMUNA,
+      comboRemuneracion,
+      comboTamanoEmpresa,
+      tiposCalle,
+    ],
     cargandoCombos,
   ] = useMergeFetchArray([
     buscarTiposDeEmpleadores(),
@@ -64,6 +74,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
     buscarComunas(),
     buscarSistemasDeRemuneracion(),
     buscarTamanosEmpresa(),
+    buscarTiposCalle(),
   ]);
 
   const datos = useRef(null);
@@ -73,8 +84,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
   const regionSeleccionada = formulario.watch('regionId');
 
   const { rolEnEmpleadorActual } = useEmpleadorActual();
-  const guiaCCAFF = useRef(null);
-  const tamanoempresa = useRef(null);
 
   // Parchar fomulario
   useEffect(() => {
@@ -90,6 +99,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
     formulario.setValue('cajaCompensacionId', empleadorActual.ccaf.idccaf);
     formulario.setValue('actividadLaboralId', empleadorActual.actividadlaboral.idactividadlaboral);
     formulario.setValue('regionId', empleadorActual.direccionempleador.comuna.region.idregion);
+    formulario.setValue('tipoCalleId', empleadorActual.direccionempleador.tipocalle.idtipocalle);
     formulario.setValue('calle', empleadorActual.direccionempleador.calle);
     formulario.setValue('numero', empleadorActual.direccionempleador.numero);
     formulario.setValue('departamento', empleadorActual.direccionempleador.depto);
@@ -113,39 +123,23 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
     }, 1000);
   }, [cargandoCombos, cargandoEmpleador, empleadorActual, errorCombos, formulario]);
 
-  const onGuardarCambios: SubmitHandler<CamposFormularioEmpleador> = async (data) => {
-    if (!empleadorActual) {
-      throw new Error('No se ha cargado el empleador aun');
-    }
-
+  const onGuardarCambios: SubmitHandler<CamposFormularioEmpleador> = async (datos) => {
     try {
+      if (!empleadorActual) {
+        throw new Error('No se ha cargado el empleador aun');
+      }
+
+      if (!usuario) {
+        throw new Error('No existe el usuario');
+      }
+
       setSpinnerCargar(true);
 
-      if (usuario == undefined) return;
-
-      await actualizarEmpleador(
-        {
-          idEmpleador: empleadorActual.idempleador,
-          rutEmpleador: data.rut,
-          razonSocial: data.razonSocial,
-          nombreFantasia: '',
-          email: data.email,
-          emailconfirma: data.emailConfirma,
-          holding: '',
-          telefono1: data.telefono1,
-          telefono2: data.telefono2,
-          calle: data.calle,
-          depto: data.departamento,
-          numero: data.numero,
-          comunaId: data.comunaId,
-          sistemaRemuneracionId: data.sistemaRemuneracionId,
-          tamanoEmpresaId: data.tamanoEmpresaId,
-          tipoEmpleadorId: data.tipoEntidadEmpleadoraId,
-          actividadLaboralId: data.actividadLaboralId,
-          cajaCompensacionId: data.cajaCompensacionId,
-        },
-        usuario?.rut,
-      );
+      await actualizarEmpleador({
+        ...datos,
+        idEmpleador: empleadorActual.idempleador,
+        runUsuario: usuario.rut,
+      });
 
       setSpinnerCargar(false);
 
@@ -258,7 +252,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
               />
 
               <div className={`col-12 col-md-6 col-lg-4`}>
-                <label>Seleccione CCAF a la cual está afiliada (*)</label>
+                <label className="form-label">Seleccione CCAF a la cual está afiliada (*)</label>
                 <OverlayTrigger
                   placement="top"
                   delay={{ show: 250, hide: 400 }}
@@ -290,7 +284,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
               />
 
               <div className={`col-12 col-md-6 col-lg-4`}>
-                <label>N° de trabajadores (*)</label>
+                <label className="form-label">N° de trabajadores (*)</label>
                 <OverlayTrigger
                   placement="top"
                   delay={{ show: 250, hide: 400 }}
@@ -338,6 +332,15 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 className="col-12 col-md-6 col-lg-4"
               />
 
+              <ComboSimple
+                name="tipoCalleId"
+                label="Tipo de Calle"
+                datos={tiposCalle}
+                idElemento={'idtipocalle'}
+                descripcion={'tipocalle'}
+                className="col-12 col-md-6 col-lg-4"
+              />
+
               <InputCalle name="calle" label="Calle" className="col-12 col-md-6 col-lg-4" />
 
               <InputNumero name="numero" label="Número" className="col-12 col-md-6 col-lg-4" />
@@ -361,9 +364,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
                 label="Teléfono 2"
                 className="col-12 col-md-6 col-lg-4"
               />
-
-              {/* Para mover filas a la siguiente linea */}
-              <div className="d-none d-lg-block col-lg-4"></div>
 
               <InputEmail
                 name="email"

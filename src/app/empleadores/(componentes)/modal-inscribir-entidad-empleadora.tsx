@@ -17,14 +17,18 @@ import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import React, { useContext, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
-import { buscarActividadesLaborales } from '../(servicios)/buscar-actividades-laborales';
-import { buscarCajasDeCompensacion } from '../(servicios)/buscar-cajas-de-compensacion';
-import { buscarComunas } from '../(servicios)/buscar-comunas';
-import { buscarRegiones } from '../(servicios)/buscar-regiones';
-import { buscarSistemasDeRemuneracion } from '../(servicios)/buscar-sistemas-de-remuneracion';
-import { buscarTamanosEmpresa } from '../(servicios)/buscar-tamanos-empresa';
-import { buscarTiposDeEmpleadores } from '../(servicios)/buscar-tipo-de-empleadores';
-import { EmpleadorYaExisteError, inscribirEmpleador } from '../(servicios)/inscribir-empleador';
+import {
+  EmpleadorYaExisteError,
+  buscarActividadesLaborales,
+  buscarCajasDeCompensacion,
+  buscarComunas,
+  buscarRegiones,
+  buscarSistemasDeRemuneracion,
+  buscarTamanosEmpresa,
+  buscarTiposCalle,
+  buscarTiposDeEmpleadores,
+  inscribirEmpleador,
+} from '../(servicios)';
 
 interface ModalInscribirEntidadEmpleadoraProps {
   onEntidadEmpleadoraCreada: () => void;
@@ -44,6 +48,7 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
     actividadesLaborales: buscarActividadesLaborales(),
     sistemasDeRemuneracion: buscarSistemasDeRemuneracion(),
     tamanosEmpresas: buscarTamanosEmpresa(),
+    tiposCalle: buscarTiposCalle(),
   });
 
   const formulario = useForm<FormularioInscribirEntidadEmpleadora>({
@@ -76,11 +81,13 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
     } catch (error) {
       if (error instanceof EmpleadorYaExisteError) {
         return AlertaError.fire({
-          html: 'RUT del empleador ya existe',
+          title: 'Error',
+          html: 'El RUT de la entidad empleadora ya existe',
         });
       }
       return AlertaError.fire({
-        html: 'Error al inscribir empleador',
+        title: 'Error',
+        html: 'Error al inscribir la entidad empleadora',
       });
     } finally {
       setMostrarSpinner(false);
@@ -188,6 +195,15 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
                         label="Comuna"
                         comunas={combos!?.comunas}
                         regionSeleccionada={regionSeleccionada}
+                        className="col-12 col-lg-6 col-xl-3"
+                      />
+
+                      <ComboSimple
+                        name="tipoCalleId"
+                        label="Tipo de Calle"
+                        datos={combos?.tiposCalle}
+                        idElemento={'idtipocalle'}
+                        descripcion={'tipocalle'}
                         className="col-12 col-lg-6 col-xl-3"
                       />
 

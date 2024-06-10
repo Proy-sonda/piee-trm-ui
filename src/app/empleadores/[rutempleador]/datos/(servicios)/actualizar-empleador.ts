@@ -1,21 +1,26 @@
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl, urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
-import { ActualizarEmpleadorRequest } from '../(modelos)/actualizar-empleador-request';
+import { CamposFormularioEmpleador } from '../(modelos)';
 
-export const actualizarEmpleador = (request: ActualizarEmpleadorRequest, RunUsuario: string) => {
+interface ActualizarEmpleadorRequest extends CamposFormularioEmpleador {
+  idEmpleador: number;
+  runUsuario: string;
+}
+
+export const actualizarEmpleador = (request: ActualizarEmpleadorRequest) => {
   const payload = {
     idempleador: request.idEmpleador,
-    rutempleador: request.rutEmpleador,
+    rutempleador: request.rut,
     razonsocial: request.razonSocial,
     nombrefantasia: request.nombreFantasia,
     telefonohabitual: request.telefono1,
     telefonomovil: request.telefono2,
     email: request.email,
-    emailconfirma: request.emailconfirma,
+    emailconfirma: request.emailConfirma,
     holding: request.holding,
     tipoempleador: {
-      idtipoempleador: request.tipoEmpleadorId,
+      idtipoempleador: request.tipoEntidadEmpleadoraId,
       tipoempleador: ' ',
     },
     ccaf: {
@@ -36,8 +41,12 @@ export const actualizarEmpleador = (request: ActualizarEmpleadorRequest, RunUsua
       descripcion: ' ',
     },
     direccionempleador: {
+      tipocalle: {
+        idtipocalle: request.tipoCalleId,
+        tipocalle: ' ',
+      },
       calle: request.calle,
-      depto: request.depto,
+      depto: request.departamento,
       numero: request.numero,
       comuna: {
         idcomuna: request.comunaId,
@@ -47,24 +56,24 @@ export const actualizarEmpleador = (request: ActualizarEmpleadorRequest, RunUsua
   };
 
   const payloadOperador = {
-    RunUsuario,
+    RunUsuario: request.runUsuario,
     empleador: {
       accion: 2,
-      rutempleador: request.rutEmpleador,
+      rutempleador: request.runUsuario,
       nombrerazonsocial: request.razonSocial,
       nombrefantasia: request.nombreFantasia,
-      tipoempleador: request.tipoEmpleadorId,
+      tipoempleador: request.tipoEntidadEmpleadoraId,
       codigoccaf: request.cajaCompensacionId,
       codigoactividadlaboral: request.actividadLaboralId,
       codigoregion: request.comunaId.substring(0, 2),
       codigocomuna: request.comunaId,
-      codigotipocalle: 1,
+      codigotipocalle: request.tipoCalleId,
       direccion: request.calle,
       numero: request.numero,
-      blockdepto: request.depto,
+      blockdepto: request.departamento,
       telefono1: request.telefono1,
       telefono2: request.telefono2,
-      correoelectronico: request.emailconfirma,
+      correoelectronico: request.email,
       nombreholding: '',
       codigocantidadtrabajadores: request.tamanoEmpresaId,
       codigosistemaremuneraciones: request.sistemaRemuneracionId,
