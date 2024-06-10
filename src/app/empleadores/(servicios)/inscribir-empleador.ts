@@ -1,13 +1,15 @@
-import { InscribirEmpleadorRequest } from '@/app/empleadores/(modelos)/inscribir-empleador-request';
 import { obtenerToken } from '@/servicios/auth';
 import { apiUrl, urlBackendTramitacion } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
+import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
+
+interface InscribirEmpleadorRequest extends FormularioInscribirEntidadEmpleadora {}
 
 export class EmpleadorYaExisteError extends Error {}
 
 export const inscribirEmpleador = async (
   request: InscribirEmpleadorRequest,
-  RunUsuario: string,
+  runUsuario: string,
 ) => {
   const payload = {
     rutempleador: request.rut,
@@ -38,6 +40,10 @@ export const inscribirEmpleador = async (
       descripcion: ' ',
     },
     direccionempleador: {
+      tipocalle: {
+        idtipocalle: request.tipoCalleId,
+        tipocalle: ' ',
+      },
       comuna: {
         idcomuna: request.comunaId,
         nombre: ' ',
@@ -51,7 +57,7 @@ export const inscribirEmpleador = async (
   };
 
   const payloadOperador = {
-    RunUsuario,
+    RunUsuario: runUsuario,
     empleador: {
       accion: 1,
       rutempleador: request.rut,
@@ -62,7 +68,7 @@ export const inscribirEmpleador = async (
       codigoactividadlaboral: request.actividadLaboralId,
       codigoregion: request.regionId,
       codigocomuna: request.comunaId,
-      codigotipocalle: 1,
+      codigotipocalle: request.tipoCalleId,
       direccion: request.calle,
       numero: request.numero,
       blockdepto: request.departamento,
