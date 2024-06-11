@@ -1,5 +1,5 @@
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl, urlBackendTramitacion } from '@/servicios/environment';
+import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 import { CamposFormularioEmpleador } from '../(modelos)';
 
@@ -54,40 +54,6 @@ export const actualizarEmpleador = (request: ActualizarEmpleadorRequest) => {
       },
     },
   };
-
-  const payloadOperador = {
-    RunUsuario: request.runUsuario,
-    empleador: {
-      accion: 2,
-      rutempleador: request.runUsuario,
-      nombrerazonsocial: request.razonSocial,
-      nombrefantasia: request.nombreFantasia,
-      tipoempleador: request.tipoEntidadEmpleadoraId,
-      codigoccaf: request.cajaCompensacionId,
-      codigoactividadlaboral: request.actividadLaboralId,
-      codigoregion: request.comunaId.substring(0, 2),
-      codigocomuna: request.comunaId,
-      codigotipocalle: request.tipoCalleId,
-      direccion: request.calle,
-      numero: request.numero,
-      blockdepto: request.departamento,
-      telefono1: request.telefono1,
-      telefono2: request.telefono2,
-      correoelectronico: request.email,
-      nombreholding: '',
-      codigocantidadtrabajadores: request.tamanoEmpresaId,
-      codigosistemaremuneraciones: request.sistemaRemuneracionId,
-    },
-  };
-
-  runFetchConThrow<void>(`${urlBackendTramitacion()}/operadores/actualizaempleadorusuario`, {
-    method: 'PUT',
-    headers: {
-      Authorization: obtenerToken(),
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify(payloadOperador),
-  });
 
   return runFetchConThrow<void>(`${apiUrl()}/empleador/actualizar`, {
     method: 'POST',
