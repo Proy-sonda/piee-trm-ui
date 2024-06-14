@@ -131,7 +131,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
   };
 
   const formatearNombres = (usuario: UsuarioEntidadEmpleadora) => {
-    const nombreBase = `${usuario.nombres} ${usuario.apellidopaterno} ${usuario.apellidomaterno}`;
+    const nombreBase = `${usuario.nombres} ${usuario.apellidopaterno}`;
     return usuario.apellidomaterno ? `${nombreBase} ${usuario.apellidomaterno}` : nombreBase;
   };
 
