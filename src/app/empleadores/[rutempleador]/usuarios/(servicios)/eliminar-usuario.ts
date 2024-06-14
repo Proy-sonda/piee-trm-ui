@@ -51,7 +51,7 @@ async function eliminarUsuarioConWS(request: EliminarUsuarioRequest) {
       accion: 3,
       rutempleador: request.rutEmpleador,
       runusuario: request.rutusuario,
-      apellidosusuario: request.apellidos,
+      apellidosusuario: request.apellidopaterno,
       nombresusuario: request.nombres,
       rolusuario: request.usuarioempleadorActual.rol.idrol,
       telefono: request.usuarioempleadorActual.telefonouno,

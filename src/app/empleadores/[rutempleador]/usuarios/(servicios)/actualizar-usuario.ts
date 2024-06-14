@@ -37,7 +37,8 @@ async function actualizarUsuarioInterno({ usuarioOriginal, ...request }: EditarU
     idusuario: usuarioOriginal.idusuario,
     rutusuario: request.rut,
     nombres: request.nombres,
-    apellidos: request.apellidos,
+    apellidopaterno: request.apellidoPaterno,
+    apellidomaterno: request.apellidoMaterno,
     usuarioempleador: [
       {
         idusuarioempleador: usuarioOriginal.usuarioempleadorActual.idusuarioempleador,
@@ -80,7 +81,7 @@ async function actualizarUsuarioConWS(request: EditarUsuarioRequest) {
       accion: 2,
       rutempleador: request.empleador.rutempleador,
       runusuario: request.rut,
-      apellidosusuario: request.apellidos,
+      apellidosusuario: `${request.apellidoPaterno} ${request.apellidoMaterno}`,
       nombresusuario: request.nombres,
       rolusuario: request.rolId,
       telefono: request.telefono1,

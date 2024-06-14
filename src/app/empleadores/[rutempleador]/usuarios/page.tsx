@@ -93,7 +93,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
     const filtrados = usuarios.filter((usuario) => {
       return (
         strIncluye(usuario.rutusuario, textoBusqueda) ||
-        strIncluye(`${usuario.nombres} ${usuario.apellidos}`, textoBusqueda) ||
+        strIncluye(`${usuario.nombres} ${usuario.apellidopaterno}`, textoBusqueda) ||
         strIncluye(usuario.usuarioempleadorActual.email, textoBusqueda) ||
         strIncluye(usuario.usuarioempleadorActual.telefonouno, textoBusqueda) ||
         strIncluye(usuario.usuarioempleadorActual.rol.rol, textoBusqueda)

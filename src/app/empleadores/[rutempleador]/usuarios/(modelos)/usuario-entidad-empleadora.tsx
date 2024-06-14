@@ -5,7 +5,8 @@ export interface UsuarioEntidadEmpleadora {
   idusuario: number;
   rutusuario: string;
   nombres: string;
-  apellidos: string;
+  apellidopaterno: string;
+  apellidomaterno: string;
   /** Todos los empleadores a los que pertenece el usuario. */
   usuarioempleador: UsuarioEmpleador[];
 

@@ -1,7 +1,8 @@
 export interface FormularioCrearUsuario {
   rut: string;
   nombres: string;
-  apellidos: string;
+  apellidoPaterno: string;
+  apellidoMaterno: string;
   telefono1: string;
   telefono2: string;
   email: string;
