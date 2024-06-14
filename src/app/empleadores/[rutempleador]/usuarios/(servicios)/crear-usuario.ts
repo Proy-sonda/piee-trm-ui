@@ -36,7 +36,8 @@ async function crearUsuarioInterno(request: CrearUsuarioRequest) {
   const payload = {
     rutusuario: request.rut,
     nombres: request.nombres,
-    apellidos: request.apellidos,
+    apellidopaterno: request.apellidoPaterno,
+    apellidomaterno: request.apellidoMaterno,
     usuarioempleador: [
       {
         email: request.email,
@@ -74,7 +75,7 @@ async function crearUsuarioConWS(request: CrearUsuarioRequest) {
       accion: 1,
       rutempleador: request.rutEmpleador,
       runusuario: request.rut,
-      apellidosusuario: request.apellidos,
+      apellidosusuario: `${request.apellidoPaterno} ${request.apellidoMaterno}`,
       nombresusuario: request.nombres,
       rolusuario: request.rolId,
       telefono: request.telefono1,

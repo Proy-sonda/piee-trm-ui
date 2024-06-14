@@ -142,7 +142,8 @@ export const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
       formulario.clearErrors();
       formulario.setValue('rut', usuario.rutusuario);
       formulario.setValue('nombres', usuario.nombres);
-      formulario.setValue('apellidos', usuario.apellidos);
+      formulario.setValue('apellidoPaterno', usuario.apellidopaterno ?? '');
+      formulario.setValue('apellidoMaterno', usuario.apellidomaterno ?? '');
 
       const empleadorUsuario = usuario.usuarioempleador.find(
         (ue) => ue.empleador.rutempleador === empleador.rutempleador,
@@ -203,17 +204,27 @@ export const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                   />
 
                   <InputApellidos
-                    name="apellidos"
-                    label="Apellidos"
+                    name="apellidoPaterno"
+                    label="Apellido paterno"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  <ComboSimple
-                    name="rolId"
-                    label="Rol"
-                    datos={datosModal?.roles}
-                    idElemento={'idrol'}
-                    descripcion={'rol'}
+                  <InputApellidos
+                    name="apellidoMaterno"
+                    label="Apellido materno"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputEmail
+                    name="email"
+                    label="Correo electrónico"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputEmail
+                    name="confirmarEmail"
+                    debeCoincidirCon="email"
+                    label="Confirmar correo electrónico"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
@@ -231,16 +242,12 @@ export const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  <InputEmail
-                    name="email"
-                    label="Correo electrónico"
-                    className="col-12 col-lg-6 col-xl-3"
-                  />
-
-                  <InputEmail
-                    name="confirmarEmail"
-                    debeCoincidirCon="email"
-                    label="Confirmar correo electrónico"
+                  <ComboSimple
+                    name="rolId"
+                    label="Rol"
+                    datos={datosModal?.roles}
+                    idElemento={'idrol'}
+                    descripcion={'rol'}
                     className="col-12 col-lg-6 col-xl-3"
                   />
                 </div>
