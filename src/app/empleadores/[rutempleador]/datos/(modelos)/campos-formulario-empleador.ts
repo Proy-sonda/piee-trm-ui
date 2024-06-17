@@ -7,6 +7,7 @@ export interface CamposFormularioEmpleador {
   actividadLaboralId: number;
   regionId: string;
   comunaId: string;
+  tipoCalleId: number;
   calle: string;
   numero: string;
   departamento: string;

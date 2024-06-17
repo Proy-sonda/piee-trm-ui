@@ -4,6 +4,7 @@ export interface UsuarioEntidadEmpleadoraAPI {
   idusuario: number;
   rutusuario: string;
   nombres: string;
-  apellidos: string;
+  apellidopaterno: string;
+  apellidomaterno: string;
   usuarioempleador: UsuarioEmpleador[];
 }

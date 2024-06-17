@@ -87,7 +87,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
   const handleEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidos}</b>?`,
+      html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidopaterno}</b>?`,
     });
 
     if (!isConfirmed) {
@@ -130,6 +130,11 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
     return cantidadAdministradoresActivos > 0;
   };
 
+  const formatearNombres = (usuario: UsuarioEntidadEmpleadora) => {
+    const nombreBase = `${usuario.nombres} ${usuario.apellidopaterno}`;
+    return usuario.apellidomaterno ? `${nombreBase} ${usuario.apellidomaterno}` : nombreBase;
+  };
+
   return (
     <>
       <Table className="table table-hover">
@@ -161,7 +166,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
                     <span className="text-nowrap">{usuario.rutusuario}</span>
                   )}
                 </Td>
-                <Td>{`${usuario.nombres} ${usuario.apellidos}`}</Td>
+                <Td>{formatearNombres(usuario)}</Td>
                 <IfContainer show={noEsTablet()}>
                   <Td>{usuario.usuarioempleadorActual.telefonouno?.trim() ?? ' '}</Td>
                   <Td>

@@ -67,7 +67,8 @@ export const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
 
     formulario.setValue('rut', usuarioEditar.rutusuario);
     formulario.setValue('nombres', usuarioEditar.nombres);
-    formulario.setValue('apellidos', usuarioEditar.apellidos);
+    formulario.setValue('apellidoPaterno', usuarioEditar.apellidopaterno ?? '');
+    formulario.setValue('apellidoMaterno', usuarioEditar.apellidomaterno ?? '');
     formulario.setValue('telefono1', usuarioEditar.usuarioempleadorActual.telefonouno ?? '');
     formulario.setValue('telefono2', usuarioEditar.usuarioempleadorActual.telefonodos ?? '');
     formulario.setValue('email', usuarioEditar.usuarioempleadorActual.email ?? '');
@@ -173,8 +174,41 @@ export const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   />
 
                   <InputApellidos
-                    name="apellidos"
-                    label="Apellidos"
+                    name="apellidoPaterno"
+                    label="Apellido paterno"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputApellidos
+                    name="apellidoMaterno"
+                    label="Apellido materno"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputEmail
+                    name="email"
+                    label="Correo electrónico"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputEmail
+                    name="confirmarEmail"
+                    debeCoincidirCon="email"
+                    label="Confirmar correo electrónico"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputTelefono
+                    opcional
+                    name="telefono1"
+                    label="Teléfono 1"
+                    className="col-12 col-lg-6 col-xl-3"
+                  />
+
+                  <InputTelefono
+                    opcional
+                    name="telefono2"
+                    label="Teléfono 2"
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
@@ -199,33 +233,6 @@ export const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                       />
                     </div>
                   )}
-
-                  <InputTelefono
-                    opcional
-                    name="telefono1"
-                    label="Teléfono 1"
-                    className="col-12 col-lg-6 col-xl-3"
-                  />
-
-                  <InputTelefono
-                    opcional
-                    name="telefono2"
-                    label="Teléfono 2"
-                    className="col-12 col-lg-6 col-xl-3"
-                  />
-
-                  <InputEmail
-                    name="email"
-                    label="Correo electrónico"
-                    className="col-12 col-lg-6 col-xl-3"
-                  />
-
-                  <InputEmail
-                    name="confirmarEmail"
-                    debeCoincidirCon="email"
-                    label="Confirmar correo electrónico"
-                    className="col-12 col-lg-6 col-xl-3"
-                  />
                 </div>
               </IfContainer>
             </Modal.Body>
