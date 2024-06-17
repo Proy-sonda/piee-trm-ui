@@ -123,6 +123,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       const buscarEmpleador = async () => {
         const [data] = await buscarEmpleadorRut(combos?.ZONA1!?.rutempleador);
         let configuracionTipoEmpleador = await data();
+        console.log({ CONFIGURACION: combos?.Configuracion });
 
         // realizar un filtro de los datos del combo calidad del trabajador dependiendo de la configuración
         let tipoEmpleador = combos?.Configuracion.filter(
@@ -135,15 +136,15 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       };
       buscarEmpleador();
     }
-   
-      formulario.setValue('calidad', combos?.ZONA2?.calidadtrabajador.idcalidadtrabajador.toString() || '-99999999')
-   
+
+    formulario.setValue(
+      'calidad',
+      combos?.ZONA2?.calidadtrabajador.idcalidadtrabajador.toString() || '-99999999',
+    );
   }, [combos]);
 
   useEffect(() => {
     if (combos?.ZONA2) {
-
-
       if (comboCalidadTrabajador.length > 0) {
         formulario.setValue(
           'calidad',
@@ -270,7 +271,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
   useEffect(() => {
     if (EntidadPagadora) {
-      if (EntidadPagadora === 'C' ) {
+      if (EntidadPagadora === 'C') {
         setccafvisible(true);
         setidccaf(undefined);
       } else {
@@ -292,24 +293,25 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   const GuardarIDCCAF = async () => {
     if (idccaf) {
       try {
-        if (formulario.getValues('entidadremuneradora') == 'F'
-          && (combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)?.tipolicencia.idtipolicencia == 5
-          || combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)?.tipolicencia.idtipolicencia == 6)) {
+        if (
+          formulario.getValues('entidadremuneradora') == 'F' &&
+          (combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.tipolicencia
+            .idtipolicencia == 5 ||
+            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.tipolicencia
+              .idtipolicencia == 6)
+        ) {
           return await GuardarCCAF(
             Number(idoperador),
-            combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)!?.entidadsalud.identidadsalud.toString(),
+            combos?.LMETRM.find(
+              (v) => v.foliolicencia == foliolicencia,
+            )!?.entidadsalud.identidadsalud.toString(),
             foliolicencia,
           );
+        }
+        if (formulario.getValues('entidadremuneradora') != 'C') {
+          return await GuardarCCAF(Number(idoperador), '10100', foliolicencia);
+        }
 
-        }
-        if(formulario.getValues('entidadremuneradora') != 'C'){
-          return await GuardarCCAF(
-            Number(idoperador),
-            '10100',
-            foliolicencia,
-          );
-        }
-          
         await GuardarCCAF(
           Number(idoperador),
           formulario.getValues('ccaflm').toString(),
@@ -325,22 +327,23 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       }
     } else {
       try {
-        if (formulario.getValues('entidadremuneradora') == 'F'
-          && (combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)?.tipolicencia.idtipolicencia == 5
-          || combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)?.tipolicencia.idtipolicencia == 6)) {
+        if (
+          formulario.getValues('entidadremuneradora') == 'F' &&
+          (combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.tipolicencia
+            .idtipolicencia == 5 ||
+            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.tipolicencia
+              .idtipolicencia == 6)
+        ) {
           return await GuardarCCAF(
             Number(idoperador),
-            combos?.LMETRM.find(v => v.foliolicencia == foliolicencia)!?.entidadsalud.identidadsalud.toString(),
+            combos?.LMETRM.find(
+              (v) => v.foliolicencia == foliolicencia,
+            )!?.entidadsalud.identidadsalud.toString(),
             foliolicencia,
           );
-
         }
-        if(formulario.getValues('entidadremuneradora') != 'C'){
-          return await GuardarCCAF(
-            Number(idoperador),
-            '10100',
-            foliolicencia,
-          );
+        if (formulario.getValues('entidadremuneradora') != 'C') {
+          return await GuardarCCAF(Number(idoperador), '10100', foliolicencia);
         }
         await GuardarCCAF(
           Number(idoperador),
@@ -367,11 +370,15 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           (await data())
             .filter(
               (value) =>
-                value.tipolicencia?.idtipolicencia == combos?.ZONA0.tipolicencia.idtipolicencia
+                value.tipolicencia?.idtipolicencia == combos?.ZONA0.tipolicencia.idtipolicencia,
             )
-            .map((value) =>   value.entidadpagadora).filter((value) => combos?.ZONA0.entidadsalud.identidadsalud == 1 ? value.identidadpagadora != 'B' : value.identidadpagadora),
+            .map((value) => value.entidadpagadora)
+            .filter((value) =>
+              combos?.ZONA0.entidadsalud.identidadsalud == 1
+                ? value.identidadpagadora != 'B'
+                : value.identidadpagadora,
+            ),
         );
-        
       };
       buscarRelacionEntidadPagadora();
     }
@@ -488,11 +495,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
     if (
       combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
-        .identidadsalud == 1 ) {
-          return setentePagador(
-            combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora != 'B'),
-          );
-      
+        .identidadsalud == 1
+    ) {
+      return setentePagador(
+        combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora != 'B'),
+      );
     }
   }, [calidadtrabajador, combos, foliolicencia, formulario]);
 
@@ -525,10 +532,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         'fechacontratotrabajo',
         format(new Date(combos!?.LMEEXISTEZONA2.fechacontrato), 'yyyy-MM-dd'),
       );
-      
 
       setTimeout(() => {
-        console.log( combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora)
+        console.log(combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora);
         formulario.setValue(
           'entidadremuneradora',
           combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora,
@@ -570,7 +576,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       />
 
       <IfContainer show={cargandoCombos}>
-          <LoadingSpinner titulo="Cargando datos..." />
+        <LoadingSpinner titulo="Cargando datos..." />
       </IfContainer>
 
       <div
@@ -901,7 +907,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   idElemento="idcalidadtrabajador"
                   name="calidad"
                   datos={comboCalidadTrabajador}
-                  tipoValor='number'
+                  tipoValor="number"
                 />
               </div>
 
@@ -1004,11 +1010,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                     opcional={!esAFC}
                     opciones={[
                       {
-                        value: "1",
+                        value: '1',
                         label: 'Sí',
                       },
                       {
-                        value: "2",
+                        value: '2',
                         label: 'No',
                       },
                     ]}
@@ -1040,11 +1046,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                   name="contratoIndefinido"
                   opciones={[
                     {
-                      value: "1",
+                      value: '1',
                       label: 'Sí',
                     },
                     {
-                      value: "2",
+                      value: '2',
                       label: 'No',
                     },
                   ]}
@@ -1079,7 +1085,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                     idElemento="idccaf"
                     descripcion="nombre"
                     label="Caja de Compensación"
-                    datos={combos!?.CCAF.filter(c=> c.idccaf != 10100)}
+                    datos={combos!?.CCAF.filter((c) => c.idccaf != 10100)}
                     opcional={!ccafvisible}
                     className="col-12 col-sm-6 col-lg-4 col-xl-3"
                     name="ccaflm"
