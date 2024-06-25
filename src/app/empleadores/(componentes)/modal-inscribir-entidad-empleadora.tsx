@@ -68,8 +68,8 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
   const crearNuevaEntidad: SubmitHandler<FormularioInscribirEntidadEmpleadora> = async (data) => {
     try {
       setMostrarSpinner(true);
-      if (usuario == undefined) return;
-      await inscribirEmpleador(data, usuario?.rut);
+
+      await inscribirEmpleador(data);
 
       resetearFormulario();
 

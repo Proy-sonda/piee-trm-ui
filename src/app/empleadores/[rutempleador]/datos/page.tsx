@@ -252,7 +252,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
               />
 
               <div className={`col-12 col-md-6 col-lg-4`}>
-                <label className="form-label">Seleccione CCAF a la cual está afiliada (*)</label>
+                <label className="form-label">CCAF a la cual está afiliada (*)</label>
                 <OverlayTrigger
                   placement="top"
                   delay={{ show: 250, hide: 400 }}

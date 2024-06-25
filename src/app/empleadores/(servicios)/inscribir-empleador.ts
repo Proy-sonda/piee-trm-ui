@@ -1,5 +1,5 @@
 import { obtenerToken } from '@/servicios/auth';
-import { apiUrl, urlBackendTramitacion } from '@/servicios/environment';
+import { apiUrl } from '@/servicios/environment';
 import { runFetchConThrow } from '@/servicios/fetch';
 import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
 
@@ -7,10 +7,7 @@ interface InscribirEmpleadorRequest extends FormularioInscribirEntidadEmpleadora
 
 export class EmpleadorYaExisteError extends Error {}
 
-export const inscribirEmpleador = async (
-  request: InscribirEmpleadorRequest,
-  runUsuario: string,
-) => {
+export const inscribirEmpleador = async (request: InscribirEmpleadorRequest) => {
   const payload = {
     rutempleador: request.rut,
     razonsocial: request.razonSocial,
@@ -56,43 +53,7 @@ export const inscribirEmpleador = async (
     emailusuarioconfirma: request.emailUsuarioConfirma,
   };
 
-  const payloadOperador = {
-    RunUsuario: runUsuario,
-    empleador: {
-      accion: 1,
-      rutempleador: request.rut,
-      nombrerazonsocial: request.razonSocial,
-      nombrefantasia: '',
-      tipoempleador: request.tipoEntidadEmpleadoraId,
-      codigoccaf: request.cajaCompensacionId,
-      codigoactividadlaboral: request.actividadLaboralId,
-      codigoregion: request.regionId,
-      codigocomuna: request.comunaId,
-      codigotipocalle: request.tipoCalleId,
-      direccion: request.calle,
-      numero: request.numero,
-      blockdepto: request.departamento,
-      telefono1: request.telefono1,
-      telefono2: request.telefono2,
-      correoelectronico: request.emailConfirma,
-      nombreholding: '',
-      codigocantidadtrabajadores: request.tamanoEmpresaId,
-      codigosistemaremuneraciones: request.sistemaRemuneracionId,
-    },
-  };
-
   try {
-    await runFetchConThrow<void>(
-      `${urlBackendTramitacion()}/operadores/actualizaempleadorusuario`,
-      {
-        method: 'PUT',
-        headers: {
-          Authorization: obtenerToken(),
-          'Content-type': 'application/json',
-        },
-        body: JSON.stringify(payloadOperador),
-      },
-    );
     await runFetchConThrow<void>(`${apiUrl()}/empleador/inscribir`, {
       method: 'POST',
       headers: {
