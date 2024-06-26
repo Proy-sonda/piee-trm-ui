@@ -236,6 +236,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         return;
       }
 
+      formulario.setValue('tipo', empleador.direccionempleador.tipocalle.idtipocalle.toString());
+
       formulario.setValue('region', empleador.direccionempleador.comuna.region.idregion);
       setTimeout(() => {
         formulario.setValue('comuna', empleador.direccionempleador.comuna.idcomuna);

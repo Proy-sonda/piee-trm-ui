@@ -31,9 +31,9 @@ import {
   crearLicenciaZ2,
 } from './(servicios)/';
 import { ErrorGuardarCCAF, GuardarCCAF } from './(servicios)/actualiza-ccaf';
-import { BuscarIDCCAFPropuesto } from './(servicios)/obtener-idccaf-propuesta';
 import { ObtenerConfiguracionCalidadPersona } from './(servicios)/obtener-relacion-calidad-trabajador';
 import { ObtenerRelacionLicenciaEntidad } from './(servicios)/obtener-relacion-entidad-pagadora';
+import { buscarCCAFwebservices } from './(servicios)/obtenerccafws';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -72,6 +72,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     foliolicencia,
     idoperador,
   ]);
+  const [spinnerCombo, setspinnerCombo] = useState<boolean>(false);
   const [erroresCargarCombos, combos, cargandoCombos] = useMergeFetchObject(
     {
       REGIMEN: buscarRegimen(),
@@ -123,7 +124,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       const buscarEmpleador = async () => {
         const [data] = await buscarEmpleadorRut(combos?.ZONA1!?.rutempleador);
         let configuracionTipoEmpleador = await data();
-        console.log({ CONFIGURACION: combos?.Configuracion });
 
         // realizar un filtro de los datos del combo calidad del trabajador dependiendo de la configuración
         let tipoEmpleador = combos?.Configuracion.filter(
@@ -256,13 +256,13 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           return setidccaf(10100);
         }
 
-        // aqui cargamos el idccaf propuesto en caso de que el valor sea null
-        const busquedaPropuesta = async () => {
-          const [resp] = await BuscarIDCCAFPropuesto(Number(idoperador), foliolicencia);
-          await resp().then((data) => formulario.setValue('ccaflm', data.codigoccafpropuesta));
-        };
+        // // aqui cargamos el idccaf propuesto en caso de que el valor sea null
+        // const busquedaPropuesta = async () => {
+        //   const [resp] = await BuscarIDCCAFPropuesto(Number(idoperador), foliolicencia);
+        //   await resp().then((data) => formulario.setValue('ccaflm', data.codigoccafpropuesta));
+        // };
 
-        busquedaPropuesta();
+        // busquedaPropuesta();
       }
     }
   }, [combos?.ZONA0]);
@@ -272,6 +272,21 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   useEffect(() => {
     if (EntidadPagadora) {
       if (EntidadPagadora === 'C') {
+        setspinnerCombo(true);
+        if (combos?.ZONA0?.entidadsalud.identidadsalud == 1) {
+          try {
+            buscarCCAFwebservices(combos?.ZONA0?.ruttrabajador!)
+              .then((data) => {
+                formulario.setValue('ccaflm', data);
+              })
+              .finally(() => setspinnerCombo(false));
+          } catch (error: any) {
+            AlertaError.fire({
+              position: 'top-end',
+              html: `Ha ocurrido un problema: ${error.message}`,
+            });
+          }
+        }
         setccafvisible(true);
         setidccaf(undefined);
       } else {
@@ -1078,29 +1093,24 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                 tipoValor="string"
                 className="col-12 col-sm-6 col-lg-4 col-xl-3"
               />
+              {spinnerCombo && (
+                <div className="col-12 col-sm-6 col-lg-4 col-xl-3">
+                  <LoadingSpinner titulo="" size={14} tipoDot />
+                </div>
+              )}
 
-              {
-                ccafvisible && (
-                  <ComboSimple
-                    idElemento="idccaf"
-                    descripcion="nombre"
-                    label="Caja de Compensación"
-                    datos={combos!?.CCAF.filter((c) => c.idccaf != 10100)}
-                    opcional={!ccafvisible}
-                    className="col-12 col-sm-6 col-lg-4 col-xl-3"
-                    name="ccaflm"
-                    tipoValor="number"
-                  />
-                )
-                // : (
-                //   <InputOtroMotivoDeRechazo
-                //     name="nombreentidadpagadorasubsidio"
-                //     opcional
-                //     label="Nombre Entidad Pagadora Subsidio"
-                //     className="col-12 col-sm-6 col-lg-4 col-xl-3"
-                //   />
-                // )
-              }
+              {ccafvisible && !spinnerCombo && (
+                <ComboSimple
+                  idElemento="idccaf"
+                  descripcion="nombre"
+                  label="Caja de Compensación"
+                  datos={combos!?.CCAF.filter((c) => c.idccaf != 10100)}
+                  opcional={!ccafvisible}
+                  className="col-12 col-sm-6 col-lg-4 col-xl-3"
+                  name="ccaflm"
+                  tipoValor="number"
+                />
+              )}
             </div>
 
             <div className="mt-4">
