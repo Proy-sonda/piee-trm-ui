@@ -17,6 +17,7 @@ import { buscarTiposDocumento } from '../../(servicios)/buscar-tipos-documento';
 import { buscarZona0, buscarZona1 } from '../../c1/(servicios)';
 import {
   crearIdEntidadPrevisional,
+  entidadPrevisionalEsAFP,
   glosaCompletaEntidadPrevisional,
 } from '../../c2/(modelos)/entidad-previsional';
 import { buscarEntidadPrevisional } from '../../c2/(servicios)/buscar-entidad-previsional';
@@ -302,7 +303,12 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                       <Tr key={index}>
                         <Td>{obtenerEntidadPrevisional(renta.idPrevision)}</Td>
                         <Td>{obtenerPeriodoRenta(renta.periodo)}</Td>
-                        <Td>${renta.montoImponible.toLocaleString()}</Td>
+                        <Td>
+                          $
+                          {zona2 && entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                            ? renta.totalRemuneracion.toLocaleString()
+                            : renta.montoImponible.toLocaleString()}
+                        </Td>
                         <Td>{renta.dias}</Td>
                       </Tr>
                     ))}
@@ -334,7 +340,12 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
                         <Tr key={index}>
                           <Td>{obtenerEntidadPrevisional(renta.idPrevision)}</Td>
                           <Td>{obtenerPeriodoRenta(renta.periodo)}</Td>
-                          <Td>${renta.montoImponible.toLocaleString()}</Td>
+                          <Td>
+                            $
+                            {zona2 && entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                              ? renta.totalRemuneracion.toLocaleString()
+                              : renta.montoImponible.toLocaleString()}
+                          </Td>
                           <Td>{renta.dias}</Td>
                         </Tr>
                       ))}

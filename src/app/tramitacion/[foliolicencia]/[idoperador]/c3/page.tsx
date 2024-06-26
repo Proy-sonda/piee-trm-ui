@@ -4,6 +4,7 @@ import {
   LicenciaTramitar,
   esLicenciaMaternidad,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
+import { valorPorDefectoCombo } from '@/components';
 import { AuthContext } from '@/contexts';
 import {
   BootstrapBreakpoint,
@@ -231,7 +232,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   // Agregar las filas de remuneraciones (parchar o crear)
   useEffect(() => {
-    if (!licencia || !zona2) {
+    if (!licencia || !zona2 || !tiposPrevisiones) {
       return;
     }
     // Existe zona C3 en la base de datos (parchar)
@@ -240,14 +241,16 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       formulario.setValue('remuneracionImponiblePrevisional', zona3.remuneracionImponiblePrevisional);
       formulario.setValue('porcentajeDesahucio', zona3.porcentajeDesahucio);
 
+      const idsTiposPrevision = tiposPrevisiones.map(crearIdEntidadPrevisional);
       // REMUNERACIONES NORMALES
       if (remuneraciones.fields.length === 0) {
         // Parchar lo que venga desde la API
         for (let index = 0; index < zona3.rentas.length; index++) {
           const renta = zona3.rentas[index];
+          const idTipoPrevision = idsTiposPrevision.find((id) => id === renta.idPrevision);
 
           remuneraciones.append({
-            prevision: renta.idPrevision,
+            prevision: idTipoPrevision ?? valorPorDefectoCombo('string'),
             periodoRenta: renta.periodo,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
@@ -271,9 +274,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         // Parchar lo que venga desde la API
         for (let index = 0; index < zona3.rentasMaternidad.length; index++) {
           const renta = zona3.rentasMaternidad[index];
+          const idTipoPrevision = idsTiposPrevision.find((id) => id === renta.idPrevision);
 
           remuneracionesMaternidad.append({
-            prevision: renta.idPrevision,
+            prevision: idTipoPrevision ?? valorPorDefectoCombo('string'),
             periodoRenta: renta.periodo,
             dias: renta.dias,
             montoImponible: renta.montoImponible,
@@ -322,13 +326,15 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         }
       }
     }
-  }, [zona2, zona3, licencia, periodosSugeridos]);
+  }, [zona2, zona3, licencia, periodosSugeridos, tiposPrevisiones]);
 
   // Refresca los valores de la zona 3
   useEffect(() => {
-    if (!zona2 || !zona3 || !licencia) {
+    if (!zona2 || !zona3 || !licencia || !tiposPrevisiones) {
       return;
     }
+
+    const idsTiposPrevision = tiposPrevisiones.map(crearIdEntidadPrevisional);
 
     // REMUNERACIONES NORMALES
     if (remuneraciones.fields.length > 0) {
@@ -339,8 +345,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       for (let index = 0; index < periodosNormalesEsperados; index++) {
         if (index < zona3.rentas.length) {
           const renta = zona3.rentas[index];
+          const idTipoPrevision = idsTiposPrevision.find((id) => id === renta.idPrevision);
 
-          formulario.setValue(`remuneraciones.${index}.prevision`, renta.idPrevision);
+          formulario.setValue(
+            `remuneraciones.${index}.prevision`,
+            idTipoPrevision ?? valorPorDefectoCombo('string'),
+          );
           formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo);
           formulario.setValue(`remuneraciones.${index}.dias`, renta.dias);
           formulario.setValue(`remuneraciones.${index}.montoImponible`, renta.montoImponible);
@@ -361,8 +371,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       for (let index = 0; index < periodosMaternidadEsperados; index++) {
         if (index < zona3.rentasMaternidad.length) {
           const renta = zona3.rentasMaternidad[index];
+          const idTipoPrevision = idsTiposPrevision.find((id) => id === renta.idPrevision);
 
-          formulario.setValue(`remuneracionesMaternidad.${index}.prevision`, renta.idPrevision);
+          formulario.setValue(
+            `remuneracionesMaternidad.${index}.prevision`,
+            idTipoPrevision ?? valorPorDefectoCombo('string'),
+          );
           formulario.setValue(`remuneracionesMaternidad.${index}.periodoRenta`, renta.periodo);
           formulario.setValue(`remuneracionesMaternidad.${index}.dias`, renta.dias);
           formulario.setValue(
@@ -398,7 +412,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         documentosAdjuntos.update(index, zona3.licenciazc3adjuntos[index]);
       }
     }
-  }, [zona3, formulario, licencia, zona2]);
+  }, [zona3, formulario, licencia, zona2, tiposPrevisiones]);
 
   const datosFilaVacia = () => {
     return {
