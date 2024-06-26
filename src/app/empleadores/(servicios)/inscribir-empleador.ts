@@ -6,7 +6,16 @@ import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-in
 interface InscribirEmpleadorRequest extends FormularioInscribirEntidadEmpleadora {}
 
 export class EmpleadorYaExisteError extends Error {}
+export class RepresentateLegalInvalidoError extends Error {}
+export class EmpleadorBloqueadoError extends Error {}
 
+/**
+ * Inscribe un nuevo empleador
+ *
+ * @throws {EmpleadorYaExisteError} Cuando ya existe un empleador con el RUT indicado.
+ * @throws {RepresentateLegalInvalidoError} Cuando el usuario administrador no es representante legal del empleador indicado.
+ * @throws {EmpleadorBloqueadoError} Cuando el RUT del empleador ha sido bloqueado.
+ */
 export const inscribirEmpleador = async (request: InscribirEmpleadorRequest) => {
   const payload = {
     rutempleador: request.rut,
@@ -65,6 +74,14 @@ export const inscribirEmpleador = async (request: InscribirEmpleadorRequest) => 
   } catch (error: any) {
     if (error.body.message.includes('rutempleador|ya existe')) {
       throw new EmpleadorYaExisteError();
+    }
+
+    if (error.body.message === 'empleador bloqueado') {
+      throw new EmpleadorBloqueadoError();
+    }
+
+    if (error.body.message === 'usuario no es el repsentante legal') {
+      throw new RepresentateLegalInvalidoError();
     }
 
     throw error;

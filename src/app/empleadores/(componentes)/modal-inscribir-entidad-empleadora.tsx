@@ -18,7 +18,9 @@ import React, { useContext, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FormularioInscribirEntidadEmpleadora } from '../(modelos)/formulario-inscribir-entidad-empleadora';
 import {
+  EmpleadorBloqueadoError,
   EmpleadorYaExisteError,
+  RepresentateLegalInvalidoError,
   buscarActividadesLaborales,
   buscarCajasDeCompensacion,
   buscarComunas,
@@ -80,15 +82,26 @@ const ModalInscribirEntidadEmpleadora: React.FC<ModalInscribirEntidadEmpleadoraP
       onEntidadEmpleadoraCreada();
     } catch (error) {
       if (error instanceof EmpleadorYaExisteError) {
-        return AlertaError.fire({
+        AlertaError.fire({
           title: 'Error',
           html: 'El RUT de la entidad empleadora ya existe',
         });
+      } else if (error instanceof EmpleadorBloqueadoError) {
+        AlertaError.fire({
+          title: 'Error',
+          text: 'La entidad empleadora se encuentra bloqueada.',
+        });
+      } else if (error instanceof RepresentateLegalInvalidoError) {
+        AlertaError.fire({
+          title: 'Representante legal inválido',
+          html: `Usted no es un representante legal de la entidad empleadora con RUT <b>${data.rut}</b>.`,
+        });
+      } else {
+        AlertaError.fire({
+          title: 'Error',
+          html: 'Error al inscribir la entidad empleadora',
+        });
       }
-      return AlertaError.fire({
-        title: 'Error',
-        html: 'Error al inscribir la entidad empleadora',
-      });
     } finally {
       setMostrarSpinner(false);
     }
