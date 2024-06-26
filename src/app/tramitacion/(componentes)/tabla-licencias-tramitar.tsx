@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import { LicenciaTramitar, licenciaFueDevuelta } from '../(modelos)';
+import { LicenciaTramitar, calcularPlazoVencimiento, licenciaFueDevuelta } from '../(modelos)';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -42,28 +42,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
-  };
-
-  const calcularPlazoVencimiento = (licencia: LicenciaTramitar) => {
-    const fechaLicencia = new Date(licencia.fechaultdiatramita);
-    const ahora = new Date();
-
-    if (fechaLicencia > ahora) {
-      return 'en-plazo';
-      // } else if (isToday(fechaLicencia)) {
-    } else if (fechaLicencia.getDate() === ahora.getDate()) {
-      return 'por-vencer';
-    } else {
-      return 'vencida';
-    }
-
-    // {new Date(licencia.fechaultdiatramita) > new Date() ? (
-    //   <div className={`mb-2 ${styles.circlegreen}`}></div>
-    // ) : new Date(licencia.fechaultdiatramita).getDate() === new Date().getDate() ? ( // Si es el mismo día
-    //   <div className={`mb-2 ${styles.circleyellow}`}></div>
-    // ) : (
-    //   <div className={`mb-2 ${styles.circlered}`}></div>
-    // )}
   };
 
   return (
@@ -321,7 +299,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
                 className="text-center align-middle">
                 <td className="px-4 py-3">
-                  {/* Validamos si la fecha de hoy es menor a la fechaultimodiatramite y si es el mismo día debe mostrar el circulo amarillo */}
+                  {/* Circulo de color */}
                   {calcularPlazoVencimiento(licencia) === 'en-plazo' && (
                     <div className={`mb-2 ${styles.circlegreen}`}></div>
                   )}
@@ -332,22 +310,18 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     <div className={`mb-2 ${styles.circlered}`}></div>
                   )}
 
-                  {/* {new Date(licencia.fechaultdiatramita) > new Date() ? (
-                    <div className={`mb-2 ${styles.circlegreen}`}></div>
-                  ) : new Date(licencia.fechaultdiatramita).getDate() === new Date().getDate() ? ( // Si es el mismo día
-                    <div className={`mb-2 ${styles.circleyellow}`}></div>
-                  ) : (
-                    <div className={`mb-2 ${styles.circlered}`}></div>
-                  )} */}
+                  {/* Info operador y licencia */}
                   <div className="small mb-1 text-nowrap">{licencia.operador.operador}</div>
                   <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
                   <div className="small mb-1 text-nowrap">{licencia.entidadsalud.nombre}</div>
                 </td>
                 <td>
+                  {/* Estado de la licencia */}
                   <div className="mb-1 small text-nowrap">
                     {licencia.estadolicencia.idestadolicencia} -{' '}
                     {licencia.estadolicencia.estadolicencia}
                   </div>
+
                   {/* Texto asociado al circulo de color */}
                   {calcularPlazoVencimiento(licencia) === 'en-plazo' && (
                     <div className="mb-1 small text-nowrap">Por tramitar en plazo</div>
@@ -366,9 +340,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   {!licencia.tramitacioniniciada && !licenciaFueDevuelta(licencia) && (
                     <div className="mb-1 small text-nowrap">No se ha iniciado tramitación</div>
                   )}
-                  {/* <div className="mb-1 small text-nowrap">
-                    En proceso de Tramitación por Operador
-                  </div> */}
                 </td>
                 <td>
                   <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>

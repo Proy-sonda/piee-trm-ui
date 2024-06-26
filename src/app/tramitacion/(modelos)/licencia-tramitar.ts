@@ -1,3 +1,5 @@
+import { isToday } from 'date-fns';
+
 export interface LicenciaTramitar {
   foliolicencia: string;
   runtrabajador: string;
@@ -90,4 +92,18 @@ export const licenciaEnviadaHaciaOperadores = ({ estadoTramitacion }: LicenciaTr
 
 export const licenciaFueDevuelta = ({ estadoTramitacion }: LicenciaTramitar) => {
   return estadoTramitacion !== undefined && estadoTramitacion.idestadotramitacion !== 6;
+};
+
+export const calcularPlazoVencimiento = (licencia: LicenciaTramitar) => {
+  const fechaLicencia = new Date(licencia.fechaultdiatramita);
+  const ahora = new Date();
+
+  // Validamos si la fecha de hoy es menor a la fechaultimodiatramite y si es el mismo día debe mostrar el circulo amarillo
+  if (fechaLicencia > ahora) {
+    return 'en-plazo';
+  } else if (isToday(fechaLicencia)) {
+    return 'por-vencer';
+  } else {
+    return 'vencida';
+  }
 };
