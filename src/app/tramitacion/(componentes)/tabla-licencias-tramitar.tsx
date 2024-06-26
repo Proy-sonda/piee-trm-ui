@@ -340,6 +340,9 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   {!licencia.tramitacioniniciada && !licenciaFueDevuelta(licencia) && (
                     <div className="mb-1 small text-nowrap">No se ha iniciado tramitación</div>
                   )}
+                  <div className="mb-1 small text-nowrap">
+                    {new Date(licencia.fechaultdiatramita).toLocaleDateString()}
+                  </div>
                 </td>
                 <td>
                   <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>

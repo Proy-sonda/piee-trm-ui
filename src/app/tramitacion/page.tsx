@@ -14,7 +14,12 @@ import {
   SemaforoLicencias,
   TablaLicenciasTramitar,
 } from './(componentes)';
-import { FiltroBusquedaLicencias, LicenciaTramitar, hayFiltros } from './(modelos)';
+import {
+  FiltroBusquedaLicencias,
+  LicenciaTramitar,
+  calcularPlazoVencimiento,
+  hayFiltros,
+} from './(modelos)';
 import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para-tramitar';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
@@ -43,26 +48,33 @@ const TramitacionPage = () => {
     const licenciasParaFiltrar = datosBandeja?.licenciasParaTramitar ?? [];
 
     setLicenciasFiltradas(
-      licenciasParaFiltrar.filter(licenciaCumple(filtrosBusqueda, filtroEstado)),
+      licenciasParaFiltrar.filter(licenciaCumpleFiltros(filtrosBusqueda, filtroEstado)),
     );
   }, [filtrosBusqueda, filtroEstado, datosBandeja?.licenciasParaTramitar]);
 
-  const licenciaCumple = (filtros: FiltroBusquedaLicencias, filtroEstado: FiltroEstadoLicencia) => {
+  const licenciaCumpleFiltros = (
+    filtros: FiltroBusquedaLicencias,
+    filtroEstado: FiltroEstadoLicencia,
+  ) => {
     return (licencia: LicenciaTramitar) => {
-      const coincideColor =
-        filtroEstado === 'todos'
-          ? true
-          : filtroEstado === 'por-tramitar'
-          ? new Date(licencia.fechaultdiatramita) > new Date()
-          : filtroEstado === 'por-vencer'
-          ? new Date(licencia.fechaultdiatramita).getDate() === new Date().getDate()
-          : filtroEstado === 'vencido'
-          ? new Date(licencia.fechaultdiatramita).getDate() < new Date().getDate()
-          : true;
+      const plazoVencimientoLicencia = calcularPlazoVencimiento(licencia);
+      let coincideColor = false;
+      if (filtroEstado === 'todos') {
+        coincideColor = true;
+      } else if (plazoVencimientoLicencia === 'en-plazo' && filtroEstado === 'por-tramitar') {
+        coincideColor = true;
+      } else if (plazoVencimientoLicencia === 'por-vencer' && filtroEstado === 'por-vencer') {
+        coincideColor = true;
+      } else if (plazoVencimientoLicencia === 'vencida' && filtroEstado === 'vencido') {
+        coincideColor = true;
+      } else {
+        coincideColor = false;
+      }
 
       if (!hayFiltros(filtros)) {
         return coincideColor;
       }
+
       const coincideFolio = strIncluye(licencia.foliolicencia, filtros.folio);
       const coincideRun = strIncluye(licencia.runtrabajador, filtros.runPersonaTrabajadora);
 
@@ -107,7 +119,7 @@ const TramitacionPage = () => {
           </Titulo>
           <p className="mt-3">
             En esta pantalla se muestran todas las licencias médicas que usted tiene pendiente de
-            tramitación. <br/>
+            tramitación. <br />
             Puede utilizar los siguientes campos para facilitar su búsqueda.
           </p>
         </div>
