@@ -210,9 +210,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
               </td>
               <td>
                 <div className="mb-1 small text-nowrap">
-                  Estado {licencia.estadolicencia.idestadolicencia}
-                </div>
-                <div className="mb-1 small text-nowrap">
+                  {licencia.estadolicencia.idestadolicencia} -{' '}
                   {licencia.estadolicencia.estadolicencia}
                 </div>
               </td>
