@@ -10,7 +10,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
-import { LicenciaTramitar } from '../(modelos)';
+import { LicenciaTramitar, licenciaFueDevuelta } from '../(modelos)';
 import styles from './tabla-licencias-tramitar.module.css';
 
 const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
@@ -42,6 +42,28 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
+  };
+
+  const calcularPlazoVencimiento = (licencia: LicenciaTramitar) => {
+    const fechaLicencia = new Date(licencia.fechaultdiatramita);
+    const ahora = new Date();
+
+    if (fechaLicencia > ahora) {
+      return 'en-plazo';
+      // } else if (isToday(fechaLicencia)) {
+    } else if (fechaLicencia.getDate() === ahora.getDate()) {
+      return 'por-vencer';
+    } else {
+      return 'vencida';
+    }
+
+    // {new Date(licencia.fechaultdiatramita) > new Date() ? (
+    //   <div className={`mb-2 ${styles.circlegreen}`}></div>
+    // ) : new Date(licencia.fechaultdiatramita).getDate() === new Date().getDate() ? ( // Si es el mismo día
+    //   <div className={`mb-2 ${styles.circleyellow}`}></div>
+    // ) : (
+    //   <div className={`mb-2 ${styles.circlered}`}></div>
+    // )}
   };
 
   return (
@@ -300,30 +322,53 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 className="text-center align-middle">
                 <td className="px-4 py-3">
                   {/* Validamos si la fecha de hoy es menor a la fechaultimodiatramite y si es el mismo día debe mostrar el circulo amarillo */}
-                  {new Date(licencia.fechaultdiatramita) > new Date() ? (
+                  {calcularPlazoVencimiento(licencia) === 'en-plazo' && (
+                    <div className={`mb-2 ${styles.circlegreen}`}></div>
+                  )}
+                  {calcularPlazoVencimiento(licencia) === 'por-vencer' && (
+                    <div className={`mb-2 ${styles.circleyellow}`}></div>
+                  )}
+                  {calcularPlazoVencimiento(licencia) === 'vencida' && (
+                    <div className={`mb-2 ${styles.circlered}`}></div>
+                  )}
+
+                  {/* {new Date(licencia.fechaultdiatramita) > new Date() ? (
                     <div className={`mb-2 ${styles.circlegreen}`}></div>
                   ) : new Date(licencia.fechaultdiatramita).getDate() === new Date().getDate() ? ( // Si es el mismo día
                     <div className={`mb-2 ${styles.circleyellow}`}></div>
                   ) : (
                     <div className={`mb-2 ${styles.circlered}`}></div>
-                  )}
-
+                  )} */}
                   <div className="small mb-1 text-nowrap">{licencia.operador.operador}</div>
                   <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
                   <div className="small mb-1 text-nowrap">{licencia.entidadsalud.nombre}</div>
                 </td>
                 <td>
                   <div className="mb-1 small text-nowrap">
-                    Estado {licencia.estadolicencia.idestadolicencia}
-                  </div>
-                  <div className="mb-1 small text-nowrap">
+                    {licencia.estadolicencia.idestadolicencia} -{' '}
                     {licencia.estadolicencia.estadolicencia}
                   </div>
-                  {/* TODO: Falta hacer los calculos de esta parte */}
-                  <div className="mb-1 small text-nowrap">Plazo tramitación vencido</div>
-                  <div className="mb-1 small text-nowrap">
+                  {/* Texto asociado al circulo de color */}
+                  {calcularPlazoVencimiento(licencia) === 'en-plazo' && (
+                    <div className="mb-1 small text-nowrap">Por tramitar en plazo</div>
+                  )}
+                  {calcularPlazoVencimiento(licencia) === 'por-vencer' && (
+                    <div className="mb-1 small text-nowrap">Plazo de tramitación por vencer</div>
+                  )}
+                  {calcularPlazoVencimiento(licencia) === 'vencida' && (
+                    <div className="mb-1 small text-nowrap">Plazo de tramitación vencido</div>
+                  )}
+
+                  {/* Texto de si fue tramitada o no */}
+                  {licencia.tramitacioniniciada && !licenciaFueDevuelta(licencia) && (
+                    <div className="mb-1 small text-nowrap">Tramitación iniciada</div>
+                  )}
+                  {!licencia.tramitacioniniciada && !licenciaFueDevuelta(licencia) && (
+                    <div className="mb-1 small text-nowrap">No se ha iniciado tramitación</div>
+                  )}
+                  {/* <div className="mb-1 small text-nowrap">
                     En proceso de Tramitación por Operador
-                  </div>
+                  </div> */}
                 </td>
                 <td>
                   <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>

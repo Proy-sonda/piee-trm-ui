@@ -1,4 +1,3 @@
-
 export interface LicenciaTramitar {
   foliolicencia: string;
   runtrabajador: string;
@@ -20,6 +19,7 @@ export interface LicenciaTramitar {
   entidadsalud: Entidadsalud;
   estadoTramitacion?: Estadotramitacion;
   fechaultdiatramita: Date;
+  tramitacioniniciada?: boolean;
 }
 
 interface Entidadsalud {
@@ -86,4 +86,8 @@ export const licenciaSePuedeTramitar = ({ estadoTramitacion }: LicenciaTramitar)
 
 export const licenciaEnviadaHaciaOperadores = ({ estadoTramitacion }: LicenciaTramitar) => {
   return estadoTramitacion !== undefined && estadoTramitacion.idestadotramitacion == 3;
+};
+
+export const licenciaFueDevuelta = ({ estadoTramitacion }: LicenciaTramitar) => {
+  return estadoTramitacion !== undefined && estadoTramitacion.idestadotramitacion !== 6;
 };
