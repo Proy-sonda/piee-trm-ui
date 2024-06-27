@@ -128,7 +128,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   }, [licencia]);
 
   useEffect(() => {
-    if (licenciasAnteriores.length > 0) {
+    if (licenciasAnteriores.length > 0 && licenciasAnteriores[0].foliolicencia !== folio) {
       const resp = AlertaConfirmacion.fire({
         html: `Existen datos de licencias anteriores <br/>
       ¿Desea auto completar?`,
@@ -235,6 +235,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
         return;
       }
+
+      formulario.setValue('tipo', empleador.direccionempleador.tipocalle.idtipocalle.toString());
 
       formulario.setValue('region', empleador.direccionempleador.comuna.region.idregion);
       setTimeout(() => {

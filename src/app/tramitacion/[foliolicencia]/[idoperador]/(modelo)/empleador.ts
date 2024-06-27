@@ -13,6 +13,7 @@ export interface Empleador {
   ccaf: Ccaf;
   actividadlaboral: Actividadlaboral;
   direccionempleador: Direccionempleador;
+ 
 }
 
 interface Actividadlaboral {
@@ -30,6 +31,7 @@ interface Direccionempleador {
   numero: string;
   depto: string;
   comuna: Comuna;
+  tipocalle:TipoCalle
 }
 
 interface Comuna {
@@ -57,4 +59,9 @@ interface Tamanoempresa {
 interface Tipoempleador {
   idtipoempleador: number;
   tipoempleador: string;
+}
+
+interface TipoCalle {
+  idtipocalle: number;
+  tipocalle: string;
 }
