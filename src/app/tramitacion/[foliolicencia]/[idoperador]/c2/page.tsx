@@ -277,6 +277,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           try {
             buscarCCAFwebservices(combos?.ZONA0?.ruttrabajador!)
               .then((data) => {
+                if (data == 10100) {
+                  return;
+                }
                 formulario.setValue('ccaflm', data);
               })
               .finally(() => setspinnerCombo(false));

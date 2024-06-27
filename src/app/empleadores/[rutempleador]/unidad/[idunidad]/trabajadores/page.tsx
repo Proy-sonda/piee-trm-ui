@@ -436,8 +436,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       <div className="animate__animate animate__fadeIn">
         <div className="row">
           <Titulo url="">
-            Entidad Empleadora - <b>{empleadorActual!?.razonsocial}</b> / Unidades de RRHH -{' '}
-            <b> {unidad} </b>/ Personas Trabajadoras
+            {empleadorActual?.razonsocial} / {unidad} / {tabOperador == 3 ? 'I-MED' : 'MEDIPASS'} /{' '}
+            <b>Personas Trabajadoras</b>
           </Titulo>
         </div>
 

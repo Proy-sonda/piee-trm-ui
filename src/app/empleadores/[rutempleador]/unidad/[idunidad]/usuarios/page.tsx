@@ -212,8 +212,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
       <div className="row">
         <Titulo manual="Manual" url="">
-          Entidad Empleadora - <b>{empleadorActual?.razonsocial}</b> / Unidades de RRHH -{' '}
-          <b>{unidad}</b> / Personas Usuarias
+          {empleadorActual?.razonsocial} / {unidad} / {tabOperador == 3 ? 'I-MED' : 'MEDIPASS'} /{' '}
+          <b>Personas Usuarias</b>
         </Titulo>
       </div>
 
