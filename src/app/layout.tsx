@@ -1,3 +1,4 @@
+import '@/components/clave-unica/kit-clave-unica/css/cu.min.css';
 import AppFooter from '@/components/footer/footer';
 import Version from '@/components/footer/version';
 import AppHeader from '@/components/header/header';

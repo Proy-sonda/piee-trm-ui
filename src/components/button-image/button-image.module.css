@@ -3,9 +3,8 @@
 }
 
 .gobimg {
-  width: 45% !important;
-  border-radius: 50%;
-  margin: 4px;
+  width: 70% !important;
+  height: auto;
 }
 
 .pgobcl {
@@ -21,4 +20,44 @@
   border-radius: 15px;
   font-weight: bold;
   /* padding: 4px; */
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) {
+  .gobimg {
+    width: 60% !important;
+    height: auto;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .gobimg {
+    width: 70% !important;
+    height: auto;
+  }
+}
+
+/* Large devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+  .gobimg {
+    width: 60% !important;
+    height: auto;
+  }
+}
+
+/* X-Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+  .gobimg {
+    width: 45% !important;
+    height: auto;
+  }
+}
+
+/* XX-Large devices (larger desktops, 1400px and up) */
+@media (min-width: 1400px) {
+  .gobimg {
+    width: 30% !important;
+    height: auto;
+  }
 }
