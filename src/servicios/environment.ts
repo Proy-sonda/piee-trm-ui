@@ -29,3 +29,7 @@ export const urlBackendSuperUsuario = () => {
 export const versionApp = () => {
   return process.env.NEXT_PUBLIC_APP_VERSION!;
 };
+
+export const saltarseClaveUnica = () => {
+  return process.env.NEXT_PUBLIC_SALTARSE_CLAVE_UNICA === 'SI';
+};

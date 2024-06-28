@@ -1,12 +1,11 @@
-// 'use client';
+'use client';
 
 import { ButtonImage } from '@/components/button-image';
 import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
-import insemp from '@/img/Inscribeem.png';
-import { adsUrl } from '@/servicios/environment';
+import { useFetch } from '@/hooks';
+import { buscarConfiguracionClaveUnica } from '@/servicios/clave-unica';
 import { Metadata } from 'next';
-import React from 'react';
 
 export const metadata: Metadata = {
   title: 'Portal Tramitación LME',
@@ -18,13 +17,13 @@ interface HomePageProps {
   };
 }
 
-const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
-  const urlAdscripcion: string = adsUrl();
+export default function HomePage({ searchParams }: HomePageProps) {
+  const [, configuracionClaveUnica] = useFetch(buscarConfiguracionClaveUnica());
 
   return (
     <>
       <div className="py-3 py-md-4 container-fluid">
-        <div className="row">
+        <div className="row align-items-center">
           <IfContainer show={searchParams.redirectTo}>
             <div className="col-12">
               <div
@@ -42,11 +41,7 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
           </IfContainer>
 
           <div className="col-12 col-md-6">
-            <ButtonImage
-              url={`${urlAdscripcion}/adscripcion`}
-              text="Inscribe Entidad Empleadora"
-              img={insemp.src}
-            />
+            <ButtonImage configuracionClaveUnica={configuracionClaveUnica} />
           </div>
           <div className="col-12 col-md-6">
             <LoginComponent />
@@ -55,6 +50,4 @@ const HomePage: React.FC<HomePageProps> = ({ searchParams }) => {
       </div>
     </>
   );
-};
-
-export default HomePage;
+}
