@@ -5,11 +5,6 @@ import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
 import { useFetch } from '@/hooks';
 import { buscarConfiguracionClaveUnica } from '@/servicios/clave-unica';
-import { Metadata } from 'next';
-
-export const metadata: Metadata = {
-  title: 'Portal Tramitación LME',
-};
 
 interface HomePageProps {
   searchParams: {
