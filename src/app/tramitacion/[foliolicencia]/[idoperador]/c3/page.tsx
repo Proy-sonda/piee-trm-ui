@@ -253,8 +253,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
             prevision: idTipoPrevision ?? valorPorDefectoCombo('string'),
             periodoRenta: renta.periodo,
             dias: renta.dias,
-            montoImponible: renta.montoImponible,
-            totalRemuneracion: renta.totalRemuneracion,
+            montoImponible: !entidadPrevisionalEsAFP(zona2.entidadprevisional)
+              ? renta.montoImponible
+              : 0,
+            totalRemuneracion: entidadPrevisionalEsAFP(zona2.entidadprevisional)
+              ? renta.totalRemuneracion
+              : 0,
             montoIncapacidad: renta.montoIncapacidad,
             diasIncapacidad: renta.diasIncapacidad,
             desgloseHaberes: renta.desgloseHaberes,
@@ -280,8 +284,12 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
             prevision: idTipoPrevision ?? valorPorDefectoCombo('string'),
             periodoRenta: renta.periodo,
             dias: renta.dias,
-            montoImponible: renta.montoImponible,
-            totalRemuneracion: renta.totalRemuneracion,
+            montoImponible: !entidadPrevisionalEsAFP(zona2.entidadprevisional)
+              ? renta.montoImponible
+              : 0,
+            totalRemuneracion: entidadPrevisionalEsAFP(zona2.entidadprevisional)
+              ? renta.totalRemuneracion
+              : 0,
             montoIncapacidad: renta.montoIncapacidad,
             diasIncapacidad: renta.diasIncapacidad,
             desgloseHaberes: renta.desgloseHaberes,
@@ -353,8 +361,14 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           );
           formulario.setValue(`remuneraciones.${index}.periodoRenta`, renta.periodo);
           formulario.setValue(`remuneraciones.${index}.dias`, renta.dias);
-          formulario.setValue(`remuneraciones.${index}.montoImponible`, renta.montoImponible);
-          formulario.setValue(`remuneraciones.${index}.totalRemuneracion`, renta.totalRemuneracion);
+          formulario.setValue(
+            `remuneraciones.${index}.montoImponible`,
+            !entidadPrevisionalEsAFP(zona2.entidadprevisional) ? renta.montoImponible : 0,
+          );
+          formulario.setValue(
+            `remuneraciones.${index}.totalRemuneracion`,
+            entidadPrevisionalEsAFP(zona2.entidadprevisional) ? renta.totalRemuneracion : 0,
+          );
           formulario.setValue(`remuneraciones.${index}.montoIncapacidad`, renta.montoIncapacidad);
           formulario.setValue(`remuneraciones.${index}.diasIncapacidad`, renta.diasIncapacidad);
           formulario.setValue(`remuneraciones.${index}.desgloseHaberes`, renta.desgloseHaberes);
@@ -381,11 +395,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
           formulario.setValue(`remuneracionesMaternidad.${index}.dias`, renta.dias);
           formulario.setValue(
             `remuneracionesMaternidad.${index}.montoImponible`,
-            renta.montoImponible,
+            !entidadPrevisionalEsAFP(zona2.entidadprevisional) ? renta.montoImponible : 0,
           );
           formulario.setValue(
             `remuneracionesMaternidad.${index}.totalRemuneracion`,
-            renta.totalRemuneracion,
+            entidadPrevisionalEsAFP(zona2.entidadprevisional) ? renta.totalRemuneracion : 0,
           );
           formulario.setValue(
             `remuneracionesMaternidad.${index}.montoIncapacidad`,
