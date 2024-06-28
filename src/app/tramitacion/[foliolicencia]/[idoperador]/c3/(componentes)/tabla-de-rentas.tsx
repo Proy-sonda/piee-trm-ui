@@ -147,8 +147,12 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                   <Th>
                     <span className="text-nowrap">N° Días</span>
                   </Th>
-                  <Th>Imponible Desahucio</Th>
-                  <Th> Total Remuneración </Th>
+                  {!entidadPrevisionalEsAFP(zona2.entidadprevisional) && (
+                    <Th>Imponible Desahucio</Th>
+                  )}
+                  {entidadPrevisionalEsAFP(zona2.entidadprevisional) && (
+                    <Th> Total Remuneración </Th>
+                  )}
                   <Th>Monto Incapacidad</Th>
                   <Th>Días Incapacidad</Th>
                   <Th>Registrar Desglose de haberes</Th>
@@ -261,110 +265,114 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                         />
                       </div>
                     </Td>
-                    <Td>
-                      <div
-                        className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
-                        ref={index === 0 ? totalRemuneracion : undefined}>
-                        <InputMonto
-                          opcional={
-                            fieldArray === 'remuneracionesMaternidad' ||
-                            index !== 0 ||
-                            entidadPrevisionalEsAFP(zona2.entidadprevisional)
-                          }
-                          deshabilitado={entidadPrevisionalEsAFP(zona2.entidadprevisional)}
-                          name={`${fieldArray}.${index}.montoImponible`}
-                          unirConFieldArray={{
-                            index,
-                            campo: 'montoImponible',
-                            fieldArrayName: fieldArray,
-                          }}
-                          onBlur={autoCompletarColumna(index, 'montoImponible')}
-                        />
-                      </div>
-                    </Td>
-                    <Td>
-                      {index === 0 && (
-                        <GuiaUsuario
-                          guia={listaguia[2]!?.activo && guia}
-                          target={totalRemuneracion}>
-                          Total de la remuneración del periodo de renta
-                          <br />
-                          <div className="text-end mt-3">
-                            <button
-                              className="btn btn-sm text-white"
-                              onClick={() => {
-                                AgregarGuia([
-                                  { indice: 0, nombre: 'stepper', activo: false },
-                                  {
-                                    indice: 1,
-                                    nombre: 'nro dias',
-                                    activo: true,
-                                  },
-                                  {
-                                    indice: 2,
-                                    nombre: 'total remuneración',
-                                    activo: false,
-                                  },
-                                ]);
-                              }}
-                              style={{
-                                border: '1px solid white',
-                              }}>
-                              <i className="bi bi-arrow-left"></i>
-                              &nbsp; Anterior
-                            </button>
-                            &nbsp;
-                            <button
-                              className="btn btn-sm text-white"
-                              onClick={() => {
-                                AgregarGuia([
-                                  { indice: 0, nombre: 'stepper', activo: false },
-                                  {
-                                    indice: 1,
-                                    nombre: 'nro dias',
-                                    activo: false,
-                                  },
-                                  {
-                                    indice: 2,
-                                    nombre: 'total remuneración',
-                                    activo: false,
-                                  },
-                                  {
-                                    indice: 3,
-                                    nombre: 'desglose haberes',
-                                    activo: true,
-                                  },
-                                ]);
-                              }}
-                              style={{
-                                border: '1px solid white',
-                              }}>
-                              Continuar &nbsp;
-                              <i className="bi bi-arrow-right"></i>
-                            </button>
-                          </div>
-                        </GuiaUsuario>
-                      )}
-                      <div
-                        className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
-                        ref={index === 0 ? totalRemuneracion : undefined}>
-                        <InputMonto
-                          opcional={
-                            fieldArray === 'remuneracionesMaternidad' ||
-                            index !== 0 ||
-                            !entidadPrevisionalEsAFP(zona2.entidadprevisional)
-                          }
-                          deshabilitado={!entidadPrevisionalEsAFP(zona2.entidadprevisional)}
-                          name={`${fieldArray}.${index}.totalRemuneracion`}
-                          unirConFieldArray={{
-                            index,
-                            campo: 'totalRemuneracion',
-                            fieldArrayName: fieldArray,
-                          }}
-                          onBlur={autoCompletarColumna(index, 'totalRemuneracion')}
-                        />
-                      </div>
-                    </Td>
+                    {!entidadPrevisionalEsAFP(zona2.entidadprevisional) && (
+                      <Td>
+                        <div
+                          className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                          ref={index === 0 ? totalRemuneracion : undefined}>
+                          <InputMonto
+                            opcional={
+                              fieldArray === 'remuneracionesMaternidad' ||
+                              index !== 0 ||
+                              entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                            }
+                            deshabilitado={entidadPrevisionalEsAFP(zona2.entidadprevisional)}
+                            name={`${fieldArray}.${index}.montoImponible`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'montoImponible',
+                              fieldArrayName: fieldArray,
+                            }}
+                            onBlur={autoCompletarColumna(index, 'montoImponible')}
+                          />
+                        </div>
+                      </Td>
+                    )}
+                    {entidadPrevisionalEsAFP(zona2.entidadprevisional) && (
+                      <Td>
+                        {index === 0 && (
+                          <GuiaUsuario
+                            guia={listaguia[2]!?.activo && guia}
+                            target={totalRemuneracion}>
+                            Total de la remuneración del periodo de renta
+                            <br />
+                            <div className="text-end mt-3">
+                              <button
+                                className="btn btn-sm text-white"
+                                onClick={() => {
+                                  AgregarGuia([
+                                    { indice: 0, nombre: 'stepper', activo: false },
+                                    {
+                                      indice: 1,
+                                      nombre: 'nro dias',
+                                      activo: true,
+                                    },
+                                    {
+                                      indice: 2,
+                                      nombre: 'total remuneración',
+                                      activo: false,
+                                    },
+                                  ]);
+                                }}
+                                style={{
+                                  border: '1px solid white',
+                                }}>
+                                <i className="bi bi-arrow-left"></i>
+                                &nbsp; Anterior
+                              </button>
+                              &nbsp;
+                              <button
+                                className="btn btn-sm text-white"
+                                onClick={() => {
+                                  AgregarGuia([
+                                    { indice: 0, nombre: 'stepper', activo: false },
+                                    {
+                                      indice: 1,
+                                      nombre: 'nro dias',
+                                      activo: false,
+                                    },
+                                    {
+                                      indice: 2,
+                                      nombre: 'total remuneración',
+                                      activo: false,
+                                    },
+                                    {
+                                      indice: 3,
+                                      nombre: 'desglose haberes',
+                                      activo: true,
+                                    },
+                                  ]);
+                                }}
+                                style={{
+                                  border: '1px solid white',
+                                }}>
+                                Continuar &nbsp;
+                                <i className="bi bi-arrow-right"></i>
+                              </button>
+                            </div>
+                          </GuiaUsuario>
+                        )}
+                        <div
+                          className={`${listaguia[2]!?.activo && guia && 'overlay-marco'}`}
+                          ref={index === 0 ? totalRemuneracion : undefined}>
+                          <InputMonto
+                            opcional={
+                              fieldArray === 'remuneracionesMaternidad' ||
+                              index !== 0 ||
+                              !entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                            }
+                            deshabilitado={!entidadPrevisionalEsAFP(zona2.entidadprevisional)}
+                            name={`${fieldArray}.${index}.totalRemuneracion`}
+                            unirConFieldArray={{
+                              index,
+                              campo: 'totalRemuneracion',
+                              fieldArrayName: fieldArray,
+                            }}
+                            onBlur={autoCompletarColumna(index, 'totalRemuneracion')}
+                          />
+                        </div>
+                      </Td>
+                    )}
                     <Td>
                       <InputMonto
                         opcional
