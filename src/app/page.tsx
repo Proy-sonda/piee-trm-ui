@@ -3,6 +3,7 @@
 import { ButtonImage } from '@/components/button-image';
 import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
+import { useFetch } from '@/hooks';
 import { buscarConfiguracionClaveUnica } from '@/servicios/clave-unica';
 import { Metadata } from 'next';
 
@@ -16,9 +17,8 @@ interface HomePageProps {
   };
 }
 
-export default async function HomePage({ searchParams }: HomePageProps) {
-  const [request] = buscarConfiguracionClaveUnica();
-  const configuracionClaveUnica = await request();
+export default function HomePage({ searchParams }: HomePageProps) {
+  const [, configuracionClaveUnica] = useFetch(buscarConfiguracionClaveUnica());
 
   return (
     <>

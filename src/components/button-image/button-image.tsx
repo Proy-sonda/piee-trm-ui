@@ -8,7 +8,7 @@ import React from 'react';
 import styles from './button-image.module.css';
 
 interface ButtonImageProps {
-  configuracionClaveUnica: ConfiguracionClaveUnica;
+  configuracionClaveUnica?: ConfiguracionClaveUnica;
 }
 
 export const ButtonImage: React.FC<ButtonImageProps> = ({ configuracionClaveUnica }) => {

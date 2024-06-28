@@ -32,8 +32,6 @@ export const BotonClaveUnica: React.FC<BotonClaveUnicaProps> = ({ configuracionC
     });
   }, []);
 
-  console.log('RENDERIZANDO BOTON CU');
-
   return (
     <>
       {linkClaveUnica ? (
