@@ -255,14 +255,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         ) {
           return setidccaf(10100);
         }
-
-        // // aqui cargamos el idccaf propuesto en caso de que el valor sea null
-        // const busquedaPropuesta = async () => {
-        //   const [resp] = await BuscarIDCCAFPropuesto(Number(idoperador), foliolicencia);
-        //   await resp().then((data) => formulario.setValue('ccaflm', data.codigoccafpropuesta));
-        // };
-
-        // busquedaPropuesta();
       }
     }
   }, [combos?.ZONA0]);
@@ -274,20 +266,50 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       if (EntidadPagadora === 'C') {
         setspinnerCombo(true);
         if (combos?.ZONA0?.entidadsalud.identidadsalud == 1) {
-          try {
-            buscarCCAFwebservices(combos?.ZONA0?.ruttrabajador!)
-              .then((data) => {
-                if (data == 10100) {
-                  return;
-                }
-                formulario.setValue('ccaflm', data);
-              })
-              .finally(() => setspinnerCombo(false));
-          } catch (error: any) {
-            AlertaError.fire({
-              position: 'top-end',
-              html: `Ha ocurrido un problema: ${error.message}`,
-            });
+          if (!combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf) {
+            try {
+              buscarCCAFwebservices(combos?.ZONA0?.ruttrabajador!)
+                .then((data) => {
+                  if (data == 10100) {
+                    return;
+                  }
+                  formulario.setValue('ccaflm', data);
+                })
+                .finally(() => setspinnerCombo(false));
+            } catch (error: any) {
+              AlertaError.fire({
+                position: 'top-end',
+                html: `Ha ocurrido un problema: ${error.message}`,
+              });
+            }
+          } else if (
+            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10100 &&
+            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10101 &&
+            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10102 &&
+            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10105 &&
+            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10106
+          ) {
+            try {
+              buscarCCAFwebservices(combos?.ZONA0?.ruttrabajador!)
+                .then((data) => {
+                  if (data == 10100) {
+                    return;
+                  }
+                  formulario.setValue('ccaflm', data);
+                })
+                .finally(() => setspinnerCombo(false));
+            } catch (error: any) {
+              AlertaError.fire({
+                position: 'top-end',
+                html: `Ha ocurrido un problema: ${error.message}`,
+              });
+            }
+          } else {
+            setspinnerCombo(false);
+            formulario.setValue(
+              'ccaflm',
+              combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf!?.idccaf,
+            );
           }
         }
         setccafvisible(true);
