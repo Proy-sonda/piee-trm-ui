@@ -128,6 +128,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       AlertaError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
     };
     AlertaConfirmacion.fire({
+      iconColor: 'white',
+      iconHtml:
+        '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
+      title: 'Advertencia',
       html: `¿Desea eliminar a la persona trabajadora <b>${trabajadores.RunTrabajador}</b>?`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();

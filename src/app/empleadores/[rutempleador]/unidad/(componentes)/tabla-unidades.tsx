@@ -44,9 +44,11 @@ const TablaUnidades = ({
       iconHtml:
         '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
       title: 'Advertencia',
-      html: `Al eliminar una unidad, se eliminara también de <b>ambos operadores</b>
+      html: `Al eliminar esta unidad, solo se eliminara del operador <b>${
+        operador == 3 ? 'I-MED' : 'MEDIPASS'
+      }</b>
       </br>
-      ¿Desea continuar con la eliminación de la unidad: <b>${unidad.GlosaUnidadRRHH}</b>?`,
+      ¿Desea continuar con la eliminación de la unidad <b>${unidad.GlosaUnidadRRHH}</b>?`,
     });
 
     if (!isConfirmed) {
