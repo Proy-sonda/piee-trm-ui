@@ -172,8 +172,11 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
 
   const handleDelete = async (runusuarioeliminar: string) => {
     const respuesta = await AlertaConfirmacion.fire({
-      title: 'Eliminar Usuario/a',
-      html: `¿Desea eliminar al usuario de la unidad ${unidad}?`,
+      iconColor: 'white',
+      iconHtml:
+        '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
+      title: 'Advertencia',
+      html: `¿Desea eliminar a la persona usuaria de la unidad ${unidad}?`,
     });
 
     if (!respuesta.isConfirmed) return;

@@ -168,7 +168,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const handleDeleteAll = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const resp = await AlertaConfirmacion.fire({
-      html: `¿Desea eliminar todos los trabajadores de la unidad "<b>${unidad}</b>"?`,
+      iconColor: 'white',
+      iconHtml:
+        '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
+      title: 'Advertencia',
+      html: `Si continua con esta acción, se eliminarán <b>TODAS</b> las personas trabajadoras de la unidad <b>${unidad}</b>,
+      </br>
+      ¿Desea continuar con la eliminación?`,
     });
 
     if (resp.isDenied) return;
