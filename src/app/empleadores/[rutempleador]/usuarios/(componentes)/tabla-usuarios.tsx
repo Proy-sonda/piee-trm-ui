@@ -87,7 +87,12 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
 
   const handleEliminarUsuario = async (usuario: UsuarioEntidadEmpleadora) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Está seguro que desea eliminar a <b>${usuario.nombres} ${usuario.apellidopaterno}</b>?`,
+      iconColor: 'white',
+      iconHtml:
+        '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
+      title: 'Advertencia',
+
+      html: `¿Está seguro que desea eliminar al usuario <b>${usuario.nombres} ${usuario.apellidopaterno}</b>?`,
     });
 
     if (!isConfirmed) {
