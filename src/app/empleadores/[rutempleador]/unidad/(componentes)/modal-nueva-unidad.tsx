@@ -140,7 +140,7 @@ export const ModalNuevaUnidad: React.FC<ModalNuevaUnidadProps> = ({
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  <InputCalle label="Calle" name="Calle" className="col-12 col-lg-6 col-xl-3" />
+                  <InputCalle label="Calle" name="Direccion" className="col-12 col-lg-6 col-xl-3" />
 
                   <InputNumero name="Numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
 
