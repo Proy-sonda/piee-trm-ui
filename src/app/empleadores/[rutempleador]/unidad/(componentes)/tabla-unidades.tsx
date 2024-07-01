@@ -122,7 +122,13 @@ const TablaUnidades = ({
                     {unidad?.GlosaUnidadRRHH}
                   </span>
                 </Td>
-                <Td>{unidad?.Direccion}</Td>
+                <Td>{`${
+                  unidad?.CodigoTipoCalle == 1
+                    ? 'AVENIDA'
+                    : unidad?.CodigoTipoCalle == 2
+                    ? 'PASAJE'
+                    : 'CALLE'
+                } ${unidad?.Direccion}, ${unidad.Numero}`}</Td>
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
                     {rolEnEmpleadorActual === 'administrador' && (
