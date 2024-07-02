@@ -175,7 +175,6 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
   useEffect(() => {
     if (LicenciaSeleccionada.foliolicencia == '') {
-      console.log('pase por aquí 2');
       const buscarLicencia = async () => {
         try {
           const [resp] = await buscarLicenciasParaTramitar();
@@ -207,7 +206,10 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       buscarLicencia();
     }
     if (LicenciaSeleccionada.foliolicencia !== '') {
-      formulario.setValue('fechaemision', LicenciaSeleccionada.fechaemision);
+      formulario.setValue(
+        'fechaemision',
+        format(new Date(LicenciaSeleccionada.fechaemision), 'yyyy-MM-dd'),
+      );
     }
   }, [LicenciaSeleccionada, folio]);
 

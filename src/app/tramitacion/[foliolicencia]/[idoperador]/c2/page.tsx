@@ -13,6 +13,7 @@ import { buscarZona0, buscarZona1 } from '../c1/(servicios)';
 
 import { buscarCajasDeCompensacion, buscarEmpleadorRut } from '@/app/empleadores/(servicios)';
 import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { useRefrescarPagina } from '@/hooks';
@@ -62,7 +63,7 @@ interface formularioApp {
 
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
   const [esAFC, setesAFC] = useState(false);
-  const { licencia } = useContext(LicenciaContext);
+  const { licencia, setLicencia } = useContext(LicenciaContext);
   const [entePagador, setentePagador] = useState<EntidadPagadora[]>([]);
   const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
@@ -109,6 +110,17 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   }, []);
 
   useEffect(() => {
+    if (licencia.foliolicencia == '') {
+      const buscarLicencia = async () => {
+        try {
+          const [resp] = await buscarLicenciasParaTramitar();
+          const licencias = await resp();
+          const licencia = licencias.find(({ foliolicencia }) => foliolicencia == foliolicencia);
+          if (licencia !== undefined) setLicencia(licencia);
+        } catch (error) {}
+      };
+      buscarLicencia();
+    }
     if (licencia.foliolicencia !== '') {
       const BuscarLicenciaAnterior = async () => {
         const [data] = await BuscarLicenciasAnteriores(licencia.runtrabajador);
