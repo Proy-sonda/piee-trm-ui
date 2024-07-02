@@ -167,10 +167,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
   const regionSeleccionada = formulario.watch('region');
   const ocupacionSeleccionada = formulario.watch('ocupacion');
+  const [spinnerCompleta, setspinnerCompleta] = useState(false);
 
   useEffect(
     () => formulario.setValue('comuna', LMEEXIS!?.comuna.idcomuna),
-    [regionSeleccionada, LMEEXIS, formulario],
+    [regionSeleccionada, LMEEXIS],
   );
 
   useEffect(() => {
@@ -181,6 +182,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
           const licencias = await resp();
           const licencia = licencias.find(({ foliolicencia }) => foliolicencia == folio);
           if (licencia !== undefined) setLicencia(licencia);
+          refrescarPagina();
         } catch (error) {}
       };
       buscarLicencia();
@@ -214,11 +216,14 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   }, [LicenciaSeleccionada, folio]);
 
   useEffect(() => {
-    if (runEmpleador == '') return;
+    if (LicenciaSeleccionada.foliolicencia == '') {
+      return;
+    }
     const busquedaEmpleador = async () => {
-      const [requestEmpleador] = buscarEmpleador(runEmpleador);
+      const [requestEmpleador] = buscarEmpleador(LicenciaSeleccionada.rutempleador);
 
       const empleador = await requestEmpleador();
+      console.log({ empleador });
       if (empleador === undefined) {
         seterrorEmpleador(true);
         return;
@@ -247,26 +252,31 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
         return;
       }
-
-      formulario.setValue('tipo', empleador.direccionempleador.tipocalle.idtipocalle.toString());
-
-      formulario.setValue('region', empleador.direccionempleador.comuna.region.idregion);
+      setspinnerCompleta(true);
       setTimeout(() => {
-        formulario.setValue('comuna', empleador.direccionempleador.comuna.idcomuna);
-      }, 1000);
-      formulario.setValue('calle', empleador.direccionempleador.calle);
-      formulario.setValue('numero', empleador.direccionempleador.numero);
-      formulario.setValue('departamento', empleador.direccionempleador.depto);
-      formulario.setValue('telefono', empleador.telefonohabitual);
-      formulario.setValue('fecharecepcionlme', format(new Date(), 'yyyy-MM-dd'));
+        formulario.setValue('tipo', empleador.direccionempleador.tipocalle.idtipocalle.toString());
+        formulario.setValue(
+          'region',
+          empleador.direccionempleador.comuna.region.idregion.toString(),
+        );
 
-      formulario.setValue(
-        'actividadlaboral',
-        empleador.actividadlaboral.idactividadlaboral.toString(),
-      );
+        formulario.setValue('calle', empleador.direccionempleador.calle);
+        formulario.setValue('numero', empleador.direccionempleador.numero);
+        formulario.setValue('departamento', empleador.direccionempleador.depto);
+        formulario.setValue('telefono', empleador.telefonohabitual);
+        formulario.setValue('fecharecepcionlme', format(new Date(), 'yyyy-MM-dd'));
+        formulario.setValue(
+          'actividadlaboral',
+          empleador.actividadlaboral.idactividadlaboral.toString(),
+        );
+        setTimeout(() => {
+          formulario.setValue('comuna', empleador.direccionempleador.comuna.idcomuna);
+          setspinnerCompleta(false);
+        }, 50);
+      }, 1000);
     };
     busquedaEmpleador();
-  }, [runEmpleador, LMEEXIS, formulario]);
+  }, [LMEEXIS, LicenciaSeleccionada, refrescar]);
 
   useEffect(
     () => (!cargandoCombos ? setfadeinOut('animate__animated animate__fadeOut') : setfadeinOut('')),
@@ -412,7 +422,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
   return (
     <>
-      <IfContainer show={Cargando}>
+      <IfContainer show={Cargando || spinnerCompleta}>
         <SpinnerPantallaCompleta />
       </IfContainer>
       <IfContainer show={errorEmpleador}>
