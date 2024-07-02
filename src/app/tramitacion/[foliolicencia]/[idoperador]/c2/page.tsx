@@ -12,7 +12,7 @@ import { buscarRegimen } from '../(servicios)/buscar-regimen';
 import { buscarZona0, buscarZona1 } from '../c1/(servicios)';
 
 import { buscarCajasDeCompensacion, buscarEmpleadorRut } from '@/app/empleadores/(servicios)';
-import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
+import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { useRefrescarPagina } from '@/hooks';
@@ -62,6 +62,7 @@ interface formularioApp {
 
 const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) => {
   const [esAFC, setesAFC] = useState(false);
+  const { licencia } = useContext(LicenciaContext);
   const [entePagador, setentePagador] = useState<EntidadPagadora[]>([]);
   const [spinner, setspinner] = useState(false);
   const [entidadPrevisional, setentidadPrevisional] = useState<EntidadPrevisional[]>([]);
@@ -82,7 +83,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       ZONA1: buscarZona1(foliolicencia, Number(idoperador)),
       ZONA2: buscarZona2(foliolicencia, Number(idoperador)),
       LMEEXISTEZONA2: buscarZona2(foliolicencia, Number(idoperador)),
-      LMETRM: buscarLicenciasParaTramitar(),
+      // LMETRM: buscarLicenciasParaTramitar(),
       CCAF: buscarCajasDeCompensacion(),
       Configuracion: ObtenerConfiguracionCalidadPersona(),
     },
@@ -108,11 +109,9 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   }, []);
 
   useEffect(() => {
-    if (combos?.LMETRM) {
+    if (licencia.foliolicencia !== '') {
       const BuscarLicenciaAnterior = async () => {
-        const [data] = await BuscarLicenciasAnteriores(
-          combos?.LMETRM.find((l) => l.foliolicencia === foliolicencia)!.runtrabajador,
-        );
+        const [data] = await BuscarLicenciasAnteriores(licencia.runtrabajador);
 
         setLicenciasAnteriores(await data());
       };
@@ -141,7 +140,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       'calidad',
       combos?.ZONA2?.calidadtrabajador.idcalidadtrabajador.toString() || '-99999999',
     );
-  }, [combos]);
+  }, [combos, licencia]);
 
   useEffect(() => {
     if (combos?.ZONA2) {
@@ -266,7 +265,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       if (EntidadPagadora === 'C') {
         setspinnerCombo(true);
         if (combos?.ZONA0?.entidadsalud.identidadsalud == 1) {
-          if (!combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf) {
+          if (!licencia.ccaf.idccaf) {
             try {
               buscarCCAFwebservices(combos?.ZONA0?.ruttrabajador!)
                 .then((data) => {
@@ -283,11 +282,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
               });
             }
           } else if (
-            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10100 &&
-            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10101 &&
-            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10102 &&
-            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10105 &&
-            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf.idccaf != 10106
+            licencia?.ccaf.idccaf != 10100 &&
+            licencia?.ccaf.idccaf != 10101 &&
+            licencia?.ccaf.idccaf != 10102 &&
+            licencia?.ccaf.idccaf != 10105 &&
+            licencia?.ccaf.idccaf != 10106
           ) {
             try {
               buscarCCAFwebservices(combos?.ZONA0?.ruttrabajador!)
@@ -306,10 +305,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             }
           } else {
             setspinnerCombo(false);
-            formulario.setValue(
-              'ccaflm',
-              combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.ccaf!?.idccaf,
-            );
+            formulario.setValue('ccaflm', licencia?.ccaf!?.idccaf);
           }
         }
         setccafvisible(true);
@@ -335,16 +331,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       try {
         if (
           formulario.getValues('entidadremuneradora') == 'F' &&
-          (combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.tipolicencia
-            .idtipolicencia == 5 ||
-            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.tipolicencia
-              .idtipolicencia == 6)
+          (licencia?.tipolicencia.idtipolicencia == 5 || licencia?.tipolicencia.idtipolicencia == 6)
         ) {
           return await GuardarCCAF(
             Number(idoperador),
-            combos?.LMETRM.find(
-              (v) => v.foliolicencia == foliolicencia,
-            )!?.entidadsalud.identidadsalud.toString(),
+            licencia!?.entidadsalud.identidadsalud.toString(),
             foliolicencia,
           );
         }
@@ -369,16 +360,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       try {
         if (
           formulario.getValues('entidadremuneradora') == 'F' &&
-          (combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.tipolicencia
-            .idtipolicencia == 5 ||
-            combos?.LMETRM.find((v) => v.foliolicencia == foliolicencia)?.tipolicencia
-              .idtipolicencia == 6)
+          (licencia?.tipolicencia.idtipolicencia == 5 || licencia?.tipolicencia.idtipolicencia == 6)
         ) {
           return await GuardarCCAF(
             Number(idoperador),
-            combos?.LMETRM.find(
-              (v) => v.foliolicencia == foliolicencia,
-            )!?.entidadsalud.identidadsalud.toString(),
+            licencia!?.entidadsalud.identidadsalud.toString(),
             foliolicencia,
           );
         }
@@ -533,10 +519,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     //   return;
     // }
 
-    if (
-      combos?.LMETRM.find((value) => value.foliolicencia == foliolicencia)?.entidadsalud
-        .identidadsalud == 1
-    ) {
+    if (licencia?.entidadsalud.identidadsalud == 1) {
       return setentePagador(
         combos!?.ENTIDADPAGADORA.filter((value) => value.identidadpagadora != 'B'),
       );

@@ -65,7 +65,10 @@ export const BotonesNavegacion: React.FC<BotonesNavegacionProps> = ({
               form={formId}
               className="btn btn-success"
               {...formulario.register('accion')}
-              onClick={() => formulario.setValue('accion', 'guardar')}>
+              onClick={() => {
+                formulario.setValue('accion', 'guardar');
+                console.log('formulario', formulario);
+              }}>
               Guardar
             </button>
           </div>

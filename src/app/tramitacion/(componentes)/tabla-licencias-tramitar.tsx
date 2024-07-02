@@ -8,8 +8,10 @@ import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
+import { LicenciaContext } from '../(context)/licencia.context';
 import { LicenciaTramitar, calcularPlazoVencimiento, licenciaFueDevuelta } from '../(modelos)';
 import styles from './tabla-licencias-tramitar.module.css';
 
@@ -31,6 +33,8 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   });
 
   const [loading, setloading] = useState(false);
+  const router = useRouter();
+  const { setLicencia } = useContext(LicenciaContext);
   const target = useRef(null);
   const btnTramitar = useRef(null);
   const btnNoRecepcion = useRef(null);
@@ -42,6 +46,11 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
+  };
+
+  const RedireccionarTramitacion = (licencia: LicenciaTramitar) => {
+    setLicencia(licencia);
+    router.push(`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`);
   };
 
   return (
@@ -367,14 +376,22 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <Link
+                    <button
+                      ref={index == 0 ? btnTramitar : null}
+                      className={`btn btn-sm btn-success ${
+                        index == 0 && listaguia[3]!?.activo && guia ? 'overlay-marco' : ''
+                      }`}
+                      onClick={() => RedireccionarTramitacion(licencia)}>
+                      <small className="text-nowrap">TRAMITAR</small>
+                    </button>
+                    {/* <Link
                       className={`btn btn-sm btn-success ${
                         index == 0 && listaguia[3]!?.activo && guia ? 'overlay-marco' : ''
                       }`}
                       ref={index == 0 ? btnTramitar : null}
                       href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`}>
                       <small className="text-nowrap">TRAMITAR</small>
-                    </Link>
+                    </Link> */}
 
                     <BotonVerPdfLicencia
                       folioLicencia={licencia.foliolicencia}
