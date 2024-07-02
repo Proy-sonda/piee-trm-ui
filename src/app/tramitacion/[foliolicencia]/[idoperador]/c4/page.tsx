@@ -1,9 +1,11 @@
 'use client';
-import { LicenciaTramitar } from '@/app/tramitacion/(modelos)/licencia-tramitar';
+import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { InputFecha } from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { emptyFetch, useEstaCargando, useFetch, useHayError, useRefrescarPagina } from '@/hooks';
+import { FetchError, HttpError } from '@/servicios';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
@@ -19,6 +21,7 @@ import { DatosModalConfirmarTramitacion, ModalConfirmarTramitacion } from './(co
 import {
   FormularioC4,
   PasoC4Props,
+  RangoLmeAnterioresSugerido,
   estaLicenciaAnteriorCompleta,
   licenciaAnteriorTieneCamposValidos,
 } from './(modelos)';
@@ -98,24 +101,54 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     licenciasAnteriores: [],
   });
 
-  const [filasIncompletas, setFilasIncompletas] = useState<number[]>([]);
+  const { licencia: LicenciaSeleccionada, setLicencia: setLicenciaSeleccionada } =
+    useContext(LicenciaContext);
 
-  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
+  const [errRango, seterrRango] = useState<FetchError>();
+  const [cargandoRango, setcargandoRango] = useState(false);
+  const [rangoSugerido, setrangoSugerido] = useState<RangoLmeAnterioresSugerido>();
+
+  const [filasIncompletas, setFilasIncompletas] = useState<number[]>([]);
 
   const [refresh, refrescarZona4] = useRefrescarPagina();
 
   const [errZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
 
-  const [errRango, rangoSugerido, cargandoRango] = useFetch(
-    licencia && zona2
-      ? buscarRangoLmeAnterioresSugeridos({
-          fechaInicio: format(new Date(licencia.fechainicioreposo), 'yyyy-MM-dd'),
-          idCalidadTrabajador: zona2.calidadtrabajador.idcalidadtrabajador,
-          idTipoLicencia: licencia.tipolicencia.idtipolicencia,
-        })
-      : emptyFetch(),
-    [licencia, zona2],
-  );
+  useEffect(() => {
+    if (LicenciaSeleccionada.foliolicencia == '') {
+      const buscarLicencia = async () => {
+        try {
+          const [resp] = await buscarLicenciasParaTramitar();
+          const licencias = await resp();
+          const licencia = licencias.find(({ foliolicencia }) => foliolicencia == foliolicencia);
+          if (licencia !== undefined) setLicenciaSeleccionada(licencia);
+        } catch (error) {}
+      };
+      buscarLicencia();
+    }
+
+    if (LicenciaSeleccionada.foliolicencia !== '' && zona2) {
+      const BusquedaPeriodo = async () => {
+        try {
+          setcargandoRango(true);
+          const [resp] = await buscarRangoLmeAnterioresSugeridos({
+            fechaInicio: format(new Date(LicenciaSeleccionada.fechainicioreposo), 'yyyy-MM-dd'),
+            idCalidadTrabajador: zona2.calidadtrabajador.idcalidadtrabajador,
+            idTipoLicencia: LicenciaSeleccionada.tipolicencia.idtipolicencia,
+          });
+          const periodos = await resp();
+          setrangoSugerido(periodos);
+          setcargandoRango(false);
+        } catch (error) {
+          seterrRango(error as HttpError);
+          setcargandoRango(false);
+        } finally {
+          setcargandoRango(false);
+        }
+      };
+      BusquedaPeriodo();
+    }
+  }, [LicenciaSeleccionada, zona2]);
 
   const [errorZona4, zona4, cargandoZona4] = useFetch(
     buscarZona4(foliolicencia, idOperadorNumber),
@@ -123,10 +156,10 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   );
 
   const [, fechasLicenciasAnteriores] = useFetch(
-    licencia && rangoSugerido
-      ? buscarFechasDeLicenciasAnteriores(licencia.runtrabajador, rangoSugerido)
+    LicenciaSeleccionada && rangoSugerido
+      ? buscarFechasDeLicenciasAnteriores(LicenciaSeleccionada.runtrabajador, rangoSugerido)
       : emptyFetch(),
-    [licencia, rangoSugerido],
+    [LicenciaSeleccionada, rangoSugerido],
   );
 
   const hayError = useHayError(errZona2, errRango, errorZona4);
@@ -344,7 +377,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
       await tramitarLicenciaMedica(foliolicencia, idOperadorNumber);
 
       AlertaExito.fire({
-        html: `Su licencia <b>${foliolicencia}</b> ha sido enviada al operador <b>${licencia?.operador.operador}</b>, cuando el operador la reciba se generará el comprobante de tramitación, el cual podrá verificar en la pestaña <b>Licencias Tramitadas</b>`,
+        html: `Su licencia <b>${foliolicencia}</b> ha sido enviada al operador <b>${LicenciaSeleccionada?.operador.operador}</b>, cuando el operador la reciba se generará el comprobante de tramitación, el cual podrá verificar en la pestaña <b>Licencias Tramitadas</b>`,
         timer: 10000,
       });
 
@@ -397,16 +430,20 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   return (
     <>
-      <ModalConfirmarTramitacion
-        datos={{
-          ...datosModalConfirmarTramitacion,
-          licencia,
-          folioLicencia: foliolicencia,
-          idOperador: idOperadorNumber,
-        }}
-        onCerrar={cerrarModal}
-        onTramitacionConfirmada={tramitarLaLicencia}
-      />
+      {LicenciaSeleccionada.foliolicencia !== '' && (
+        <>
+          <ModalConfirmarTramitacion
+            datos={{
+              ...datosModalConfirmarTramitacion,
+              licencia: LicenciaSeleccionada,
+              folioLicencia: foliolicencia,
+              idOperador: idOperadorNumber,
+            }}
+            onCerrar={cerrarModal}
+            onTramitacionConfirmada={tramitarLaLicencia}
+          />
+        </>
+      )}
 
       <IfContainer show={mostrarSpinner}>
         <SpinnerPantallaCompleta />
@@ -417,7 +454,6 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         idoperador={idOperadorNumber}
         step={step}
         title="Licencias Anteriores en los Últimos 6 Meses"
-        onLicenciaCargada={setLicencia}
         onLinkClickeado={(link) => {
           formulario.setValue('linkNavegacion', link);
           formulario.setValue('accion', 'navegar');

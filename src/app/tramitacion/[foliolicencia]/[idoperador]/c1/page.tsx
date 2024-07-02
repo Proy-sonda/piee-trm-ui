@@ -18,7 +18,7 @@ import 'animate.css';
 import format from 'date-fns/format';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import {
@@ -31,11 +31,12 @@ import {
 
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
-import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 import { buscarZona2 } from '../c2/(servicios)/buscar-z2';
 import { LicenciaC1 } from './(modelos)';
 import { formularioApp } from './(modelos)/formulario-type';
 
+import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { LicenciasAnteriores } from '../(modelo)/licencias-anteriores';
 import { BuscarLicenciasAnteriores } from '../(servicios)/buscar-licencias-anteriores';
 import {
@@ -102,30 +103,27 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     OCUPACION: buscarOcupacion(),
   });
 
+  const { licencia: LicenciaSeleccionada, setLicencia } = useContext(LicenciaContext);
+
   const [licenciasAnteriores, setlicenciasAnteriores] = useState<LicenciasAnteriores[]>([]);
 
   const [, LMEEXIS] = useFetch(buscarZona1(folio, Number(idoperador)), [folio, idoperador]);
   const [, licencia, cargandoData] = useMergeFetchObject(
     {
-      LMETRM: buscarLicenciasParaTramitar(),
       LMEZONAC2: buscarZona2(folio, Number(idoperador)),
     },
     [refrescar],
   );
 
   useEffect(() => {
-    if (licencia?.LMETRM) {
+    if (LicenciaSeleccionada.foliolicencia !== '') {
       const BuscarLicenciaAnterior = async () => {
-        const [data] = await BuscarLicenciasAnteriores(
-          licencia.LMETRM.find((l) => l.foliolicencia === folio)!.runtrabajador,
-        );
-
+        const [data] = await BuscarLicenciasAnteriores(LicenciaSeleccionada.runtrabajador);
         setlicenciasAnteriores(await data());
       };
-
       BuscarLicenciaAnterior();
     }
-  }, [licencia]);
+  }, [LicenciaSeleccionada]);
 
   useEffect(() => {
     if (licenciasAnteriores.length > 0 && licenciasAnteriores[0].foliolicencia !== folio) {
@@ -176,30 +174,44 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   );
 
   useEffect(() => {
-    if (licencia == undefined) return;
-    setrunEmpleador(
-      licencia!?.LMETRM.find(({ foliolicencia }) => foliolicencia == folio)!?.rutempleador,
-    );
-    setlicenciaTramite(licencia.LMETRM.find(({ foliolicencia }) => foliolicencia == folio));
-    formulario.setValue(
-      'run',
-      licencia!?.LMETRM.find(({ foliolicencia }) => foliolicencia == folio)!?.rutempleador,
-    );
-  }, [licencia, folio, formulario]);
+    if (LicenciaSeleccionada.foliolicencia == '') {
+      const buscarLicencia = async () => {
+        try {
+          const [resp] = await buscarLicenciasParaTramitar();
+          const licencias = await resp();
+          const licencia = licencias.find(({ foliolicencia }) => foliolicencia == folio);
+          if (licencia !== undefined) setLicencia(licencia);
+        } catch (error) {}
+      };
+      buscarLicencia();
+    }
+    if (LicenciaSeleccionada.foliolicencia !== '') {
+      formulario.setValue('run', LicenciaSeleccionada.rutempleador);
+      setrunEmpleador(LicenciaSeleccionada.rutempleador);
+      setlicenciaTramite(LicenciaSeleccionada);
+      return;
+    }
+  }, [folio, formulario, LicenciaSeleccionada]);
 
   useEffect(() => {
-    if (licencia!?.LMETRM == undefined) return;
-
-    formulario.setValue(
-      'fechaemision',
-      format(
-        new Date(
-          licencia.LMETRM.find(({ foliolicencia }) => foliolicencia === folio)?.fechaemision || '',
-        ),
-        'yyyy-MM-dd',
-      ),
-    );
-  }, [licencia, folio, licencia]);
+    if (LicenciaSeleccionada.foliolicencia == '') {
+      const buscarLicencia = async () => {
+        try {
+          const [resp] = await buscarLicenciasParaTramitar();
+          const licencias = await resp();
+          const licencia = licencias.find(({ foliolicencia }) => foliolicencia == folio);
+          if (licencia !== undefined) setLicencia(licencia);
+        } catch (error) {}
+      };
+      buscarLicencia();
+    }
+    if (LicenciaSeleccionada.foliolicencia !== '') {
+      formulario.setValue(
+        'fechaemision',
+        format(new Date(LicenciaSeleccionada.fechaemision), 'yyyy-MM-dd'),
+      );
+    }
+  }, [LicenciaSeleccionada, folio]);
 
   useEffect(() => {
     if (runEmpleador == '') return;
@@ -262,6 +274,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   );
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
+    console.log({ data });
     if (!(await formulario.trigger()))
       return AlertaError.fire({
         title: 'Hay campos inválidos',

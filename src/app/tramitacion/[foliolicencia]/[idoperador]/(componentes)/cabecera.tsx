@@ -1,10 +1,9 @@
 'use client';
 
+import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
 import { LicenciaTramitar } from '@/app/tramitacion/(modelos)';
-import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { Stepper, Titulo } from '@/components';
-import { useMergeFetchObject, useRefrescarPagina } from '@/hooks';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { InformacionLicencia } from '.';
 import { interfaceCabecera } from '../(modelo)';
 
@@ -17,32 +16,16 @@ export const Cabecera: React.FC<interfaceCabecera> = ({
   onLicenciaCargada,
   onLinkClickeado,
 }) => {
-  const [refrescar] = useRefrescarPagina();
+  const { licencia } = useContext(LicenciaContext);
   const [datopaciente, setdatopaciente] = useState<LicenciaTramitar>();
-  const [, data, cargandoData] = useMergeFetchObject(
-    {
-      LMETRM: buscarLicenciasParaTramitar(),
-    },
-    [refrescar],
-  );
-
   useEffect(() => {
-    const licencia = data?.LMETRM.find(({ foliolicencia }) => foliotramitacion == foliolicencia);
     if (licencia && onLicenciaCargada) {
       onLicenciaCargada(licencia);
     }
-
     setdatopaciente(licencia);
     if (rutEmpleador == undefined) return;
     if (datopaciente?.rutempleador) rutEmpleador(datopaciente?.rutempleador);
-  }, [
-    cargandoData,
-    data?.LMETRM,
-    datopaciente?.rutempleador,
-    foliotramitacion,
-    onLicenciaCargada,
-    rutEmpleador,
-  ]);
+  }, [licencia, datopaciente?.rutempleador, foliotramitacion, onLicenciaCargada, rutEmpleador]);
 
   return (
     <>

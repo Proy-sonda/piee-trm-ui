@@ -1,9 +1,11 @@
 'use client';
 
+import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
 import {
   LicenciaTramitar,
   esLicenciaMaternidad,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import { valorPorDefectoCombo } from '@/components';
 import { AuthContext } from '@/contexts';
 import {
@@ -15,6 +17,7 @@ import {
   useRefrescarPagina,
   useWindowSize,
 } from '@/hooks';
+import { FetchError, HttpError } from '@/servicios';
 import { capitalizar } from '@/utilidades';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { format, parse, startOfMonth } from 'date-fns';
@@ -44,6 +47,7 @@ import {
 import { InputPorcentajeDesahucio } from './(componentes)/input-porcentaje-desahucio';
 import {
   FormularioC3,
+  PeriodosSugeridos,
   limpiarRemuneracion,
   remuneracionEstaCompleta,
   remuneracionTieneAlgunCampoValido,
@@ -132,16 +136,48 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     }
   }, [zona0, zona2]);
 
-  const [errPeriodos, periodosSugeridos, cargandoPeriodos] = useFetch(
-    licencia && zona2
-      ? buscarPeriodosSugeridos({
-          fechaInicio: format(new Date(licencia.fechainicioreposo), 'yyyy-MM-dd'),
-          idCalidadTrabajador: zona2.calidadtrabajador.idcalidadtrabajador,
-          idTipoLicencia: licencia.tipolicencia.idtipolicencia,
-        })
-      : emptyFetch(),
-    [licencia, zona2],
-  );
+  const { licencia: LicenciaSeleccionada, setLicencia: setLicenciaSeleccionada } =
+    useContext(LicenciaContext);
+
+  useEffect(() => {
+    if (LicenciaSeleccionada.foliolicencia == '') {
+      const buscarLicencia = async () => {
+        try {
+          const [resp] = await buscarLicenciasParaTramitar();
+          const licencias = await resp();
+          const licencia = licencias.find(({ foliolicencia }) => foliolicencia == foliolicencia);
+          if (licencia !== undefined) setLicenciaSeleccionada(licencia);
+        } catch (error) {}
+      };
+      buscarLicencia();
+    }
+
+    if (LicenciaSeleccionada.foliolicencia !== '' && zona2) {
+      const BusquedaPeriodo = async () => {
+        try {
+          setcargandoPeriodos(true);
+          const [resp] = await buscarPeriodosSugeridos({
+            fechaInicio: format(new Date(LicenciaSeleccionada.fechainicioreposo), 'yyyy-MM-dd'),
+            idCalidadTrabajador: zona2.calidadtrabajador.idcalidadtrabajador,
+            idTipoLicencia: LicenciaSeleccionada.tipolicencia.idtipolicencia,
+          });
+          const periodos = await resp();
+          setperiodosSugeridos(periodos);
+          setcargandoPeriodos(false);
+        } catch (error) {
+          seterrPeriodos(error as HttpError);
+          setcargandoPeriodos(false);
+        } finally {
+          setcargandoPeriodos(false);
+        }
+      };
+      BusquedaPeriodo();
+    }
+  }, [LicenciaSeleccionada, zona2]);
+
+  const [periodosSugeridos, setperiodosSugeridos] = useState<PeriodosSugeridos | undefined>();
+  const [errPeriodos, seterrPeriodos] = useState<FetchError>();
+  const [cargandoPeriodos, setcargandoPeriodos] = useState(false);
 
   const [errTipoDocumentos, tiposDeDocumentos, cargandoTipoDocumentos] = useFetch(
     buscarTiposDocumento(),

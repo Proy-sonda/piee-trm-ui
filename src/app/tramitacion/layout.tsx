@@ -1,4 +1,5 @@
 import Position from '@/components/stage/position';
+import { LicenciaProvider } from './(context)/licencia.context';
 
 export const metadata = {
   title: 'Bandeja de Tramitación',
@@ -8,9 +9,9 @@ export const metadata = {
 
 export default function TramitacionLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <LicenciaProvider>
       <Position tabActiva="tramitacion" />
       <div className="mx-3 mx-lg-5 py-4">{children}</div>
-    </>
+    </LicenciaProvider>
   );
 }
