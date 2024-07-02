@@ -1,4 +1,5 @@
 import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { addDays, format } from 'date-fns';
@@ -9,18 +10,32 @@ interface InformacionLicenciaProps {
   folioLicencia: string;
   idoperador: number;
   onLicenciaCargada?: (licencia: LicenciaTramitar) => void;
+  noTramitar?: boolean;
 }
 
 export const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
   folioLicencia,
   idoperador,
   onLicenciaCargada,
+  noTramitar,
 }) => {
-  const { licencia } = useContext(LicenciaContext);
+  const { licencia, setLicencia } = useContext(LicenciaContext);
 
   useEffect(() => {
     if (licencia && onLicenciaCargada) {
       onLicenciaCargada(licencia);
+    }
+
+    if (noTramitar && licencia.foliolicencia == '') {
+      const buscarLicencia = async () => {
+        try {
+          const [resp] = await buscarLicenciasParaTramitar();
+          const licencias = await resp();
+          const licencia = licencias.find(({ foliolicencia }) => foliolicencia == folioLicencia);
+          if (licencia !== undefined) setLicencia(licencia);
+        } catch (error) {}
+      };
+      buscarLicencia();
     }
   }, [licencia, onLicenciaCargada]);
 
