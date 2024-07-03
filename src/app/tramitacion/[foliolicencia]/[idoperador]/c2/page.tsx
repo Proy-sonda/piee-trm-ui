@@ -273,6 +273,11 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   const EntidadPagadora = formulario.watch('entidadremuneradora');
 
   useEffect(() => {
+    if (licencia.tipolicencia.idtipolicencia !== 1) {
+      setccafvisible(false);
+      setidccaf(10100);
+      return;
+    }
     if (EntidadPagadora) {
       if (EntidadPagadora === 'C') {
         setspinnerCombo(true);
@@ -414,7 +419,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             .filter((value) =>
               combos?.ZONA0.entidadsalud.identidadsalud == 1
                 ? value.identidadpagadora != 'B'
-                : value.identidadpagadora,
+                : value.identidadpagadora != 'C',
             ),
         );
       };
