@@ -6,7 +6,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 type props = {
   usuarioAsociado: Usuariosunidad[] | undefined;
-  handleDelete: (runusuario: string) => void;
+  handleDelete: (runusuario: string, nombre: string) => void;
 };
 
 export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handleDelete }) => {
@@ -39,7 +39,10 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
                         title={`Eliminar ${RunUsuario}`}
                         onClick={(e) => {
                           e.preventDefault();
-                          handleDelete(RunUsuario);
+                          handleDelete(
+                            RunUsuario,
+                            `${NombresUsuario} ${ApellidoPaternoUsuario} ${ApellidoMaternoUsuario}`,
+                          );
                         }}
                         className="btn btn-danger btn-sm">
                         <i className="bi bi-trash3"></i>

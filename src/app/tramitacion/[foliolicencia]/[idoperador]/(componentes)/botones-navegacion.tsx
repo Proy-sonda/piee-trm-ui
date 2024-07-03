@@ -43,6 +43,11 @@ export const BotonesNavegacion: React.FC<BotonesNavegacionProps> = ({
     <div className="row">
       {onAnteriorConfig ? (
         <>
+          <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
+            <a className="btn btn-danger" href="/tramitacion">
+              Bandeja de Tramitación
+            </a>
+          </div>
           <div className="d-none d-md-none col-lg-4 d-lg-inline"></div>
           <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
             <button
@@ -54,11 +59,7 @@ export const BotonesNavegacion: React.FC<BotonesNavegacionProps> = ({
               Anterior
             </button>
           </div>
-          <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
-            <a className="btn btn-danger" href="/tramitacion">
-              Tramitación
-            </a>
-          </div>
+
           <div className="col-sm-3 col-md-3 d-grid col-lg-2 p-2">
             <button
               type="submit"
@@ -82,12 +83,13 @@ export const BotonesNavegacion: React.FC<BotonesNavegacionProps> = ({
         </>
       ) : (
         <>
-          <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
           <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
             <a className="btn btn-danger" href="/tramitacion">
-              Tramitación
+              Bandeja de Tramitación
             </a>
           </div>
+          <div className="d-none d-md-none col-lg-6 d-lg-inline"></div>
+
           <div className="col-sm-4 col-md-4 d-grid col-lg-2 p-2">
             <button
               type="submit"

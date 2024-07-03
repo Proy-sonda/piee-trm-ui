@@ -128,6 +128,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       AlertaError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
     };
     AlertaConfirmacion.fire({
+      iconColor: 'white',
+      iconHtml:
+        '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
+      title: 'Advertencia',
       html: `¿Desea eliminar a la persona trabajadora <b>${trabajadores.RunTrabajador}</b>?`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
@@ -168,57 +172,65 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const handleDeleteAll = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const resp = await AlertaConfirmacion.fire({
-      html: `¿Desea eliminar todos los trabajadores de la unidad "<b>${unidad}</b>"?`,
+      iconColor: 'white',
+      iconHtml:
+        '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
+      title: 'Advertencia',
+      html: `Si continua con esta acción, se eliminarán <b>TODAS</b> las personas trabajadoras de la unidad <b>${unidad}</b>,
+      </br>
+      ¿Desea continuar con la eliminación?`,
     });
 
     if (resp.isDenied) return;
 
-    setspinnerCargar(true);
-    let recuento = 0;
-    settextProgress('Eliminando Personas Trabajadoras...');
+    if (resp.isConfirmed) {
+      setspinnerCargar(true);
+      let recuento = 0;
+      settextProgress('Eliminando Personas Trabajadoras...');
 
-    for (let index = 0; index < datosPagina!?.trabajadores.length; index++) {
-      const element = datosPagina?.trabajadores[index];
-      if (element == undefined) return;
-      const TrabajadorAEliminar: Trabajadoresxrrhh = {
-        acciontraxrrhh: 3,
-        codigounidadrrhh: idunidad,
-        runtrabajador: element.RunTrabajador,
-      };
-      if (empleadorActual == undefined || usuario == undefined) return;
+      for (let index = 0; index < datosPagina!?.trabajadores.length; index++) {
+        const element = datosPagina?.trabajadores[index];
+        if (element == undefined) return;
+        const TrabajadorAEliminar: Trabajadoresxrrhh = {
+          acciontraxrrhh: 3,
+          codigounidadrrhh: idunidad,
+          runtrabajador: element.RunTrabajador,
+        };
+        if (empleadorActual == undefined || usuario == undefined) return;
 
-      const resp = await eliminarTrabajador(
-        TrabajadorAEliminar,
-        usuario?.rut,
-        empleadorActual?.rutempleador,
-        tabOperador,
-        3,
-      );
-      if (resp.ok) {
-        recuento = ++recuento;
-        setcuentagrabados((recuento / datosPagina!?.trabajadores.length) * 100);
+        const resp = await eliminarTrabajador(
+          TrabajadorAEliminar,
+          usuario?.rut,
+          empleadorActual?.rutempleador,
+          tabOperador,
+          3,
+        );
+        if (resp.ok) {
+          recuento = ++recuento;
+          setcuentagrabados((recuento / datosPagina!?.trabajadores.length) * 100);
+        }
       }
-    }
 
-    setspinnerCargar(false);
-    if (recuento > 0) {
-      AlertaExito.fire({
-        html: `Se han eliminado un total de <b>${recuento}</b> personas trabajadoras`,
-        didClose: () => {
-          setcuentagrabados(0);
-          settextProgress('');
-          refrescarComponente();
-        },
-      });
-    } else {
-      AlertaError.fire({
-        html: `No se han eliminado las personas trabajadoras`,
-        didClose: () => {
-          setcuentagrabados(0);
-          settextProgress('');
-          refrescarComponente();
-        },
-      });
+      setspinnerCargar(false);
+      if (recuento > 0) {
+        AlertaExito.fire({
+          html: `Se han eliminado un total de <b>${recuento}</b> personas trabajadoras`,
+          didClose: () => {
+            setcuentagrabados(0);
+            settextProgress('');
+            refrescarComponente();
+          },
+        });
+      } else {
+        AlertaError.fire({
+          html: `No se han eliminado las personas trabajadoras`,
+          didClose: () => {
+            setcuentagrabados(0);
+            settextProgress('');
+            refrescarComponente();
+          },
+        });
+      }
     }
   };
 

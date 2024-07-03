@@ -1,34 +1,41 @@
+import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
+import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
-import { useFetch } from '@/hooks/use-merge-fetch';
 import { addDays, format } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { LicenciaTramitar } from '../../../(modelos)/licencia-tramitar';
-import { buscarLicenciasParaTramitar } from '../../../(servicios)/buscar-licencias-para-tramitar';
 
 interface InformacionLicenciaProps {
   folioLicencia: string;
   idoperador: number;
   onLicenciaCargada?: (licencia: LicenciaTramitar) => void;
+  noTramitar?: boolean;
 }
 
 export const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
   folioLicencia,
   idoperador,
   onLicenciaCargada,
+  noTramitar,
 }) => {
-  const [, licenciasTramitar, cargando] = useFetch(buscarLicenciasParaTramitar());
-
-  const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
-
-  useEffect(() => {
-    const x = (licenciasTramitar ?? []).find((lic) => lic.foliolicencia === folioLicencia);
-    setLicencia(x);
-  }, [licenciasTramitar, folioLicencia]);
+  const { licencia, setLicencia } = useContext(LicenciaContext);
 
   useEffect(() => {
     if (licencia && onLicenciaCargada) {
       onLicenciaCargada(licencia);
+    }
+
+    if (noTramitar && licencia.foliolicencia == '') {
+      const buscarLicencia = async () => {
+        try {
+          const [resp] = await buscarLicenciasParaTramitar();
+          const licencias = await resp();
+          const licencia = licencias.find(({ foliolicencia }) => foliolicencia == folioLicencia);
+          if (licencia !== undefined) setLicencia(licencia);
+        } catch (error) {}
+      };
+      buscarLicencia();
     }
   }, [licencia, onLicenciaCargada]);
 
@@ -38,10 +45,10 @@ export const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
 
   return (
     <div>
-      <IfContainer show={cargando}>
+      <IfContainer show={licencia.foliolicencia == ''}>
         <LoadingSpinner titulo="Cargando información" />
       </IfContainer>
-      <IfContainer show={!cargando && licencia !== undefined}>
+      <IfContainer show={licencia.foliolicencia != '' && licencia !== undefined}>
         {() => (
           <div className="small">
             <p>

@@ -4,6 +4,7 @@ import {
   ComboComuna,
   ComboSimple,
   InputBlockDepartamento,
+  InputCalle,
   InputNumero,
   InputTelefono,
 } from '@/components/form';
@@ -259,25 +260,7 @@ export const ModalEditarUnidad: React.FC<ModalEditarUnidadProps> = ({
                     className="col-12 col-lg-6 col-xl-3"
                   />
 
-                  <div className="col-12 col-lg-6 col-xl-3">
-                    <label>Dirección (*)</label>
-                    <input
-                      className="form-control"
-                      {...formulario.register('Direccion', {
-                        required: {
-                          value: true,
-                          message: 'Este campo es requerido',
-                        },
-                        maxLength: {
-                          value: 100,
-                          message: 'Este campo no puede tener más de 100 caracteres',
-                        },
-                        onChange(event) {
-                          formulario.setValue('Direccion', event.target.value.toUpperCase());
-                        },
-                      })}
-                    />
-                  </div>
+                  <InputCalle label="Calle" name="Direccion" className="col-12 col-lg-6 col-xl-3" />
 
                   <InputNumero name="Numero" label="Número" className="col-12 col-lg-6 col-xl-3" />
 

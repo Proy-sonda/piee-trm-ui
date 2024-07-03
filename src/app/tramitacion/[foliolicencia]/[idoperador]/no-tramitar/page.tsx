@@ -313,8 +313,11 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
         idOperador: idOperadorNumber,
       });
 
-      AlertaExito.fire({ html: 'Licencia no será tramitada <br/> redireccionando a bandeja de tramitación...', timer:4000, didClose: () => router.push('/tramitacion')});
-      
+      AlertaExito.fire({
+        html: 'Licencia no será tramitada <br/> redireccionando a bandeja de tramitación...',
+        timer: 4000,
+        didClose: () => router.push('/tramitacion'),
+      });
     } catch (error) {
       console.error(error);
 
@@ -433,6 +436,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
               folioLicencia={foliolicencia}
               idoperador={idOperadorNumber}
               onLicenciaCargada={setLicencia}
+              noTramitar={true}
             />
           </div>
         </Row>

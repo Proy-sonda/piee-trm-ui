@@ -40,7 +40,15 @@ const TablaUnidades = ({
 
   const eliminarUnidadDeRRHH = async (unidad: UnidadAccion) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Desea eliminar la unidad: <b>${unidad.GlosaUnidadRRHH}</b>?`,
+      iconColor: 'white',
+      iconHtml:
+        '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
+      title: 'Advertencia',
+      html: `Al eliminar esta unidad, solo se eliminara del operador <b>${
+        operador == 3 ? 'I-MED' : 'MEDIPASS'
+      }</b>
+      </br>
+      ¿Desea continuar con la eliminación de la unidad <b>${unidad.GlosaUnidadRRHH}</b>?`,
     });
 
     if (!isConfirmed) {
@@ -122,7 +130,13 @@ const TablaUnidades = ({
                     {unidad?.GlosaUnidadRRHH}
                   </span>
                 </Td>
-                <Td>{unidad?.Direccion}</Td>
+                <Td>{`${
+                  unidad?.CodigoTipoCalle == 1
+                    ? 'AVENIDA'
+                    : unidad?.CodigoTipoCalle == 2
+                    ? 'PASAJE'
+                    : 'CALLE'
+                } ${unidad?.Direccion}, ${unidad.Numero}`}</Td>
                 <Td>
                   <div className="d-none d-lg-flex align-items-center">
                     {rolEnEmpleadorActual === 'administrador' && (
