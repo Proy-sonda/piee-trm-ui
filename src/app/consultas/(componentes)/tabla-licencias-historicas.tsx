@@ -198,20 +198,16 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
                 </td>
                 <td>
                   <Stack gap={2} className="mx-auto" style={{ maxWidth: '220px' }}>
-                    <button className="btn btn-sm btn-primary">
-                      <small
-                        className="text-nowrap"
-                        onClick={() => generarComprobanteTramitacion(licencia)}>
-                        COMPROBANTE TRAMITACIÓN
-                      </small>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => generarComprobanteTramitacion(licencia)}>
+                      <small className="text-nowrap">COMPROBANTE TRAMITACIÓN</small>
                     </button>
 
-                    <button className="btn btn-sm btn-primary">
-                      <small
-                        className="text-nowrap"
-                        onClick={() => verHistoricosEstadoLicencia(licencia)}>
-                        HISTÓRICOS DE ESTADO
-                      </small>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => verHistoricosEstadoLicencia(licencia)}>
+                      <small className="text-nowrap">HISTÓRICOS DE ESTADO</small>
                     </button>
 
                     <BotonVerPdfLicencia
