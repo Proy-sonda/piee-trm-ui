@@ -1,5 +1,6 @@
 'use client';
 
+import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
 import { LicenciaTramitar, esLicenciaFONASA } from '@/app/tramitacion/(modelos)';
 import {
   ComboSimple,
@@ -118,6 +119,16 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   const comboEntidadEmpleadora = useRef(null);
 
   const [licencia, setLicencia] = useState<LicenciaTramitar | undefined>();
+
+  const { licencia: LicenciaSeleccionada, setLicencia: setLicenciaSeleccionada } =
+    useContext(LicenciaContext);
+
+  useEffect(() => {
+    if (licencia) {
+      setLicencia(LicenciaSeleccionada);
+    }
+  }, [LicenciaSeleccionada]);
+
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
   const [comboFiltradoEntidadPagadora, setcomboFiltradoEntidadPagadora] = useState<
     EntidadPagadora[]
@@ -142,6 +153,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                 c.identidadpagadora === 'D',
             ),
           );
+
         if (licencia.tipolicencia.idtipolicencia == 2)
           setcomboFiltradoEntidadPagadora(
             ComboEntidadPagadora.filter(
@@ -281,7 +293,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
           );
       }
     }
-  }, [licencia]);
+  }, [licencia, ComboEntidadPagadora]);
 
   const motivoRechazo = formulario.watch('motivoRechazo');
   const motivoRechazoSeleccionado = (motivosDeRechazo ?? []).find(
@@ -362,6 +374,11 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   useEffect(() => {
     if (motivoRechazo) {
     }
+
+    if (EntidadPagadora) {
+      setComboEntidadPagadora(EntidadPagadora);
+    }
+
     let SolicitudEntidadEmpleadoraSel: SolicitudEntidadEmpleadora | undefined;
     if (SolicitudEntidadEmpleadora) {
       SolicitudEntidadEmpleadoraSel = SolicitudEntidadEmpleadora.find(

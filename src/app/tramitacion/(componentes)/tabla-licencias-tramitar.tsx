@@ -7,7 +7,6 @@ import { Empleador } from '@/modelos/empleador';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
@@ -51,6 +50,13 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const RedireccionarTramitacion = (licencia: LicenciaTramitar) => {
     setLicencia(licencia);
     router.push(`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/c1`);
+  };
+
+  const RedireccionarNoTramitacion = (licencia: LicenciaTramitar) => {
+    setLicencia(licencia);
+    router.push(
+      `/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`,
+    );
   };
 
   return (
@@ -402,14 +408,14 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                       <small className="text-nowrap">VER PDF</small>
                     </BotonVerPdfLicencia>
 
-                    <Link
+                    <button
+                      ref={index == 0 ? btnNoRecepcion : null}
                       className={`btn btn-sm btn-danger ${
                         index == 0 && listaguia[4]!?.activo && guia ? 'overlay-marco' : ''
                       }`}
-                      ref={index == 0 ? btnNoRecepcion : null}
-                      href={`/tramitacion/${licencia.foliolicencia}/${licencia.operador.idoperador}/no-tramitar`}>
+                      onClick={() => RedireccionarNoTramitacion(licencia)}>
                       <small className="text-nowrap"> NO RECEPCIONAR</small>
-                    </Link>
+                    </button>
                   </Stack>
                 </td>
               </tr>
