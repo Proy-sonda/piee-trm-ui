@@ -4,6 +4,8 @@ import Version from '@/components/footer/version';
 import AppHeader from '@/components/header/header';
 import Marquesina from '@/components/marquesina';
 import { AuthProvider } from '@/contexts';
+
+import ProgressPage from '@/components/progress-bar';
 import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -29,7 +31,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
             <main className="bg-white shadow-sm">
               <Marquesina />
-              <div>{children}</div>
+              <ProgressPage>{children}</ProgressPage>
             </main>
 
             <AppFooter>
