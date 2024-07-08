@@ -16,7 +16,6 @@ import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
 import { buscarUnidadesDeRRHH } from '@/servicios';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import 'animate.css';
-import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChangeEvent, FormEvent, useContext, useEffect, useRef, useState } from 'react';
@@ -24,7 +23,7 @@ import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import { TIPOS_DE_OPERADORESID, TipoOperadorId, Trabajadoresxrrhh } from '../../(modelos)';
-import { ProgressBarCustom, TablaTrabajadores } from './(componentes)';
+import { TablaTrabajadores } from './(componentes)';
 import { Trabajador } from './(modelos)';
 import styles from './trabajadores.module.css';
 const IfContainer = dynamic(() => import('@/components/if-container'));
@@ -44,9 +43,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const [tabOperador] = useState<TipoOperadorId>(tabOperadorQuery);
   const [unidad, setunidad] = useState('');
-  const [cuentagrabados, setcuentagrabados] = useState<number>(0);
-  const [textProgress, settextProgress] = useState('');
-  const [spinnerCargar, setspinnerCargar] = useState(false);
   const [unidadEmpleador, setunidadEmpleador] = useState<Unidadesrrhh[] | undefined>();
   const [trabajadores, settrabajadores] = useState<Trabajadoresunidadrrhh[]>([]);
 
@@ -96,7 +92,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     if (datosPagina?.trabajadores != undefined) {
       settrabajadores(datosPagina!?.trabajadores);
     }
-  }, [datosPagina, refresh]);
+  }, [datosPagina]);
 
   const refrescarComponente = () => setRefresh(Math.random());
 
@@ -184,51 +180,33 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     if (resp.isDenied) return;
 
     if (resp.isConfirmed) {
-      setspinnerCargar(true);
-      let recuento = 0;
-      settextProgress('Eliminando Personas Trabajadoras...');
+      const Trabajadores: Trabajadoresxrrhh = {
+        acciontraxrrhh: 4,
+        codigounidadrrhh: idunidad,
+      };
+      if (empleadorActual == undefined || usuario == undefined) return;
 
-      for (let index = 0; index < datosPagina!?.trabajadores.length; index++) {
-        const element = datosPagina?.trabajadores[index];
-        if (element == undefined) return;
-        const TrabajadorAEliminar: Trabajadoresxrrhh = {
-          acciontraxrrhh: 3,
-          codigounidadrrhh: idunidad,
-          runtrabajador: element.RunTrabajador,
-        };
-        if (empleadorActual == undefined || usuario == undefined) return;
-
+      try {
         const resp = await eliminarTrabajador(
-          TrabajadorAEliminar,
+          Trabajadores,
           usuario?.rut,
           empleadorActual?.rutempleador,
           tabOperador,
-          3,
+          4,
         );
-        if (resp.ok) {
-          recuento = ++recuento;
-          setcuentagrabados((recuento / datosPagina!?.trabajadores.length) * 100);
-        }
-      }
 
-      setspinnerCargar(false);
-      if (recuento > 0) {
         AlertaExito.fire({
-          html: `Se han eliminado un total de <b>${recuento}</b> personas trabajadoras`,
+          title: 'Éxito',
+          html: 'Se han eliminado todas las personas trabajadoras de la unidad',
           didClose: () => {
-            setcuentagrabados(0);
-            settextProgress('');
             refrescarComponente();
+            settrabajadores([]);
           },
         });
-      } else {
+      } catch (error: any) {
         AlertaError.fire({
-          html: `No se han eliminado las personas trabajadoras`,
-          didClose: () => {
-            setcuentagrabados(0);
-            settextProgress('');
-            refrescarComponente();
-          },
+          html: 'Ha ocurrido un problema ' + error.message,
+          icon: 'error',
         });
       }
     }
@@ -320,7 +298,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     /* El regex verifica que el RUT tenga el formato "<correlativo>-<DV>" o "<correlativo>-<DV>"
      * para descartar los que tienen separadores de miles. Despues `validateRut` hace su magia
-     * y verrifica que el rut sea valido. */
+     * y verifica que el rut sea valido. */
     let errorEncontrado = csvData
       .map((x: any) => (typeof x === 'string' ? x.trim() : x))
       .find(
@@ -343,108 +321,48 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       });
     }
 
-    setspinnerCargar(true);
-    let recuento = 0;
-    let recuentoError = 0;
-    let recuentoNuevos = 0;
-    let recuentoExistentes = 0;
-    settextProgress('Cargando Personas Trabajadoras...');
-    let rutagregados: any[] = [];
-
+    let arregloRut: string[] = [];
     for (let index = 0; index < csvData.length; index++) {
       const rutTrabjadorCSV =
         csvData[index] && csvData[index].trim() !== ''
           ? formatRut(csvData[index], false)
           : csvData[index];
 
-      recuento = ++recuento;
       if (rutTrabjadorCSV.trim() != '') {
-        const trabajador: Trabajadoresxrrhh = {
-          acciontraxrrhh: 1,
-          codigounidadrrhh: idunidad,
-          runtrabajador: rutTrabjadorCSV,
-        };
-
-        if (empleadorActual == undefined || usuario == undefined) return;
-        const data = await crearTrabajador(
-          trabajador,
-          usuario.rut,
-          empleadorActual.rutempleador,
-          tabOperador,
-        );
-        if (data.ok) {
-          setcuentagrabados((recuento / csvData.length) * 100);
-          trabajadorExisteEnGrilla(rutTrabjadorCSV) ? recuentoExistentes++ : recuentoNuevos++;
-        } else {
-          setcuentagrabados((recuento / csvData.length) * 100);
-          recuentoError = ++recuentoError;
-          rutagregados = [...rutagregados, rutTrabjadorCSV];
-        }
+        arregloRut = [...arregloRut, rutTrabjadorCSV];
       }
     }
 
-    if (recuento - recuentoError > 0) {
-      setspinnerCargar(false);
+    if (arregloRut.length > 500) {
+      return AlertaError.fire({
+        title: 'Error',
+        html: 'No se pueden cargar más de 500 trabajadores a la vez',
+      });
+    }
+
+    const payload: Trabajadoresxrrhh = {
+      acciontraxrrhh: 1,
+      codigounidadrrhh: idunidad,
+      runtrabajador: arregloRut,
+    };
+
+    if (empleadorActual == undefined || usuario == undefined) return;
+
+    try {
+      await crearTrabajador(payload, usuario.rut, empleadorActual.rutempleador, tabOperador);
       AlertaExito.fire({
-        html:
-          `<p>Se han grabado <b>${
-            recuento - recuentoError
-          } persona(s) trabajadora(s)</b> con éxito.</p>` +
-          `
-          <table class="table">
-            <tbody>
-              <tr>
-                <td class="fw-semibold">Nuevos</td>
-                <td>${recuentoNuevos}</td>
-              </tr>
-              <tr>
-                <td class="fw-semibold">Existentes</td>
-                <td>${recuentoExistentes}</td>
-              </tr>
-            </tbody>
-          </table>
-        `,
-        timer: 4500,
-        didClose: async () => {
-          refrescarComponente();
-          setcuentagrabados(0);
-          settextProgress('');
-          setValue('file', null);
-          if (!(recuentoError > 0)) return;
-          const resp = await AlertaConfirmacion.fire({
-            icon: 'info',
-            html: `<p>Existen personas trabajadoras ya registradas en una unidad.</p>
-                  <b>¿Desea verificar los RUN ya asociados a otra unidad?</b>`,
-          });
-
-          if (resp.isDenied || resp.isDismissed) return;
-
-          exportFromJSON({
-            data: rutagregados.map((value) => ({ ['']: value })),
-            fileName: `run-ya-con-unidad`,
-            exportType: 'csv',
-          });
-        },
-      });
-    } else {
-      refrescarComponente();
-      setspinnerCargar(false);
-      AlertaError.fire({
-        icon: 'info',
-        html: 'Las personas trabajadoras ya se encuentran registrados',
+        html: 'Se han grabado las personas trabajadoras con éxito',
         didClose: () => {
-          settextProgress('');
-          setValue('file', null);
+          refrescarComponente();
         },
       });
-      settextProgress('');
+    } catch (error: any) {
+      AlertaError.fire(error.message);
     }
   };
 
   return (
     <>
-      <ProgressBarCustom show={spinnerCargar} text={textProgress} count={cuentagrabados} />
-
       <div className="animate__animate animate__fadeIn">
         <div className="row">
           <Titulo url="">
@@ -809,7 +727,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             <IfContainer show={!pendiente || !loading}>
               <div
                 className="row mb-2"
-                style={{ display: trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
+                style={{ display: datosPagina?.trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
                 <div className="col-md-3">
                   <input
                     type="text"
@@ -818,7 +736,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                     onInput={(e: ChangeEvent<HTMLInputElement>) => {
                       e.preventDefault();
                       settrabajadores(
-                        trabajadores.filter((trabajador) =>
+                        datosPagina?.trabajadores.filter((trabajador) =>
                           trabajador.RunTrabajador.includes(e.target.value.toUpperCase()),
                         ) || [],
                       );
