@@ -98,12 +98,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const handleClose = () => setshow(false);
 
-  const handleDeleteTrabajador = (trabajadores: Trabajadoresunidadrrhh) => {
+  const handleDeleteTrabajador = (trabajador: Trabajadoresunidadrrhh) => {
     const EliminarTrabajador = async () => {
       const TrabajadorAEliminar: Trabajadoresxrrhh = {
         acciontraxrrhh: 3,
         codigounidadrrhh: idunidad,
-        runtrabajador: trabajadores.RunTrabajador,
+        runtrabajador: trabajador.RunTrabajador,
       };
       if (empleadorActual == undefined || usuario == undefined) return;
       const data = await eliminarTrabajador(
@@ -116,9 +116,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
       if (data.ok) {
         refrescarComponente();
+        settrabajadores(trabajadores.filter((t) => t.RunTrabajador !== trabajador.RunTrabajador));
 
         return AlertaExito.fire({
-          html: `Persona trabajadora ${trabajadores.RunTrabajador} fue eliminada con éxito`,
+          html: `Persona trabajadora ${trabajador.RunTrabajador} fue eliminada con éxito`,
         });
       }
       AlertaError.fire({ html: 'Ha ocurrido un problema', icon: 'error' });
@@ -128,7 +129,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       iconHtml:
         '<p style="font-size:72px"><i class="bi bi-exclamation-triangle-fill text-danger animate__animated animate__flash animate__infinite animate__slower"></i></p>',
       title: 'Advertencia',
-      html: `¿Desea eliminar a la persona trabajadora <b>${trabajadores.RunTrabajador}</b>?`,
+      html: `¿Desea eliminar a la persona trabajadora <b>${trabajador.RunTrabajador}</b>?`,
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
     });
@@ -727,7 +728,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             <IfContainer show={!pendiente || !loading}>
               <div
                 className="row mb-2"
-                style={{ display: datosPagina?.trabajadores.length || 0 > 0 ? 'block' : 'none' }}>
+                style={{
+                  display: datosPagina?.trabajadores?.length || 0 > 0 ? 'block' : 'none',
+                }}>
                 <div className="col-md-3">
                   <input
                     type="text"
