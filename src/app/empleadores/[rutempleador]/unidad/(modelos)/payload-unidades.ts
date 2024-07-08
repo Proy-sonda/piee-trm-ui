@@ -10,7 +10,7 @@ export interface EmpleadorUnidad {
 export interface Trabajadoresxrrhh {
   acciontraxrrhh: number;
   codigounidadrrhh: string;
-  runtrabajador: string;
+  runtrabajador?: string | string[];
 }
 
 export interface Usuarioxrrhh {
