@@ -36,13 +36,14 @@ export default function RootLayout({ children }: RootLayoutProps) {
 
             <AppFooter>
               <iframe
-                height={2000}
-                width={2000}
+                hidden
+                height={800}
+                width={600}
                 style={{
-                  zIndex: 3000,
                   position: 'fixed',
-                  bottom: 0,
-                  right: 0,
+                  zIndex: 1,
+                  bottom: 20,
+                  right: 20,
                 }}
                 src="http://10.152.21.14:3009"></iframe>
               <Version /> {/* Se tiene que pasar asi porque Version es un SSC. */}
