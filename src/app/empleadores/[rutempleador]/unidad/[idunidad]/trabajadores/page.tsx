@@ -62,7 +62,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       codigounidad: '',
     },
   });
-  const { register, setValue, getValues, watch } = useForm<{ run: string; file: FileList | null }>({
+  const { register, setValue, getValues } = useForm<{ run: string; file: FileList | null }>({
     mode: 'onBlur',
   });
   const [rutedit, setrutedit] = useState<string>();
@@ -295,7 +295,11 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
     if (!getValues('file') || getValues('file')?.length === 0) return;
     // if (csvData.length == 0 || csvData == undefined) return;
-    if (error.file) return AlertaError.fire({ html: 'Debe cargar solo archivos de tipo "csv"' });
+    if (error.file) {
+      AlertaError.fire({ html: 'Debe cargar solo archivos de tipo "csv"' });
+      setValue('file', null);
+      return;
+    }
 
     /* El regex verifica que el RUT tenga el formato "<correlativo>-<DV>" o "<correlativo>-<DV>"
      * para descartar los que tienen separadores de miles. Despues `validateRut` hace su magia
@@ -312,6 +316,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     setCsvData(csvData.filter((rut: string) => !validateRut(formatRut(rut, false)) === true));
 
     if (errorEncontrado?.trim() != '' && errorEncontrado != undefined) {
+      setValue('file', null);
       return AlertaError.fire({
         html: `
           <p>Existe un error en el formato del RUN <b>${errorEncontrado}</b></p>
@@ -355,10 +360,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
         html: 'Se han grabado las personas trabajadoras con éxito',
         didClose: () => {
           refrescarComponente();
+          setValue('file', null);
         },
       });
     } catch (error: any) {
       AlertaError.fire(error.message);
+      setValue('file', null);
     }
   };
 
