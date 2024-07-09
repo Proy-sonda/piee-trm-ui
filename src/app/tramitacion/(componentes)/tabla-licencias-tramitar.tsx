@@ -1,4 +1,4 @@
-import { BotonVerPdfLicencia } from '@/components';
+import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
@@ -31,6 +31,8 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     tamanoPagina: 5,
   });
 
+  const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
+  const [blobModalPdf, setBlobModalPdf] = useState<Blob>();
   const [loading, setloading] = useState(false);
   const router = useRouter();
   const { setLicencia } = useContext(LicenciaContext);
@@ -64,6 +66,15 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
       <IfContainer show={loading}>
         <SpinnerPantallaCompleta />
       </IfContainer>
+
+      <ModalVisorPdf
+        show={mostrarModalPdf}
+        blobPdf={blobModalPdf}
+        onCerrar={() => {
+          setMostrarModalPdf(false);
+        }}
+      />
+
       <GuiaUsuario guia={listaguia[2]!?.activo && guia} target={target} placement="top-start">
         Aquí aparecen las licencias que coinciden con su búsqueda
         <br />
@@ -404,7 +415,12 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                       idOperador={licencia.operador.idoperador}
                       size="sm"
                       onGenerarPdf={() => setloading(true)}
-                      onPdfGenerado={() => setloading(false)}>
+                      onErrorGenerarPdf={() => setloading(false)}
+                      onPdfGenerado={({ blob }) => {
+                        setloading(false);
+                        setBlobModalPdf(blob);
+                        setMostrarModalPdf(true);
+                      }}>
                       <small className="text-nowrap">VER PDF</small>
                     </BotonVerPdfLicencia>
 

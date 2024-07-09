@@ -1,4 +1,4 @@
-import { BotonVerPdfLicencia } from '@/components';
+import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -45,6 +45,8 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
     tamanoPagina: 5,
   });
 
+  const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
+  const [blobModalPdf, setBlobModalPdf] = useState<Blob>();
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
 
   // prettier-ignore
@@ -123,6 +125,14 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       <IfContainer show={mostrarSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
+
+      <ModalVisorPdf
+        show={mostrarModalPdf}
+        blobPdf={blobModalPdf}
+        onCerrar={() => {
+          setMostrarModalPdf(false);
+        }}
+      />
 
       {datosComprobanteTramitacion && (
         <ModalImprimirPdf
@@ -256,7 +266,12 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     idOperador={licencia.operador.idoperador}
                     size="sm"
                     onGenerarPdf={() => setMostrarSpinner(true)}
-                    onPdfGenerado={() => setMostrarSpinner(false)}>
+                    onErrorGenerarPdf={() => setMostrarSpinner(false)}
+                    onPdfGenerado={({ blob }) => {
+                      setMostrarSpinner(false);
+                      setBlobModalPdf(blob);
+                      setMostrarModalPdf(true);
+                    }}>
                     <small className="text-nowrap">VER PDF</small>
                   </BotonVerPdfLicencia>
                 </Stack>

@@ -4,6 +4,12 @@ import { NoExistePdfLicenciaError, buscarPdfLicencia } from '@/servicios/buscar-
 import { AlertaError, base64ToBlob } from '@/utilidades';
 import React, { ReactNode } from 'react';
 
+export interface PdfLicencia {
+  blob: Blob;
+  folioLicencia: string;
+  idOperador: number;
+}
+
 interface BotonVerPdfLicenciaProps {
   folioLicencia: string;
   idOperador: number;
@@ -11,7 +17,8 @@ interface BotonVerPdfLicenciaProps {
   /** Tamaño del boton (defecto: `md`) */
   size?: 'sm' | 'md' | 'lg';
   onGenerarPdf: () => void;
-  onPdfGenerado: () => void;
+  onPdfGenerado: (pdfLicencia: PdfLicencia) => void;
+  onErrorGenerarPdf: () => void;
 }
 
 const TAMANOS_BOTON: Record<'sm' | 'md' | 'lg', string> = {
@@ -27,6 +34,7 @@ export const BotonVerPdfLicencia: React.FC<BotonVerPdfLicenciaProps> = ({
   size,
   onGenerarPdf,
   onPdfGenerado,
+  onErrorGenerarPdf,
 }) => {
   const buscarPdfLicenciaHandler = async () => {
     onGenerarPdf();
@@ -34,8 +42,13 @@ export const BotonVerPdfLicencia: React.FC<BotonVerPdfLicenciaProps> = ({
     try {
       const { archivo } = await buscarPdfLicencia(folioLicencia, idOperador);
       const blobPdfLicencia = base64ToBlob(archivo, { type: 'application/pdf' });
-      window.open(URL.createObjectURL(blobPdfLicencia), '_blank');
+      onPdfGenerado({
+        blob: blobPdfLicencia,
+        folioLicencia,
+        idOperador,
+      });
     } catch (error) {
+      onErrorGenerarPdf();
       if (error instanceof NoExistePdfLicenciaError) {
         return AlertaError.fire({
           title: 'Error',
@@ -47,8 +60,6 @@ export const BotonVerPdfLicencia: React.FC<BotonVerPdfLicenciaProps> = ({
           html: 'Hubo un error desconocido al generar el PDF de la licencia.',
         });
       }
-    } finally {
-      onPdfGenerado();
     }
   };
 

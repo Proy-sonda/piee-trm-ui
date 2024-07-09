@@ -1,6 +1,6 @@
 import { licenciaCompletoTramitacion } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c1/(modelos)';
 import { buscarZona0 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c1/(servicios)';
-import { BotonVerPdfLicencia } from '@/components';
+import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -37,6 +37,8 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     tamanoPagina: 5,
   });
 
+  const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
+  const [blobModalPdf, setBlobModalPdf] = useState<Blob>();
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
   const [mostrarModalHistorico, setMostrarModalHistorico] = useState(false);
   const [datosLicenciaHistorico, setDatosLicenciaHistorico] =
@@ -123,6 +125,14 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
       <IfContainer show={mostrarSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
+
+      <ModalVisorPdf
+        show={mostrarModalPdf}
+        blobPdf={blobModalPdf}
+        onCerrar={() => {
+          setMostrarModalPdf(false);
+        }}
+      />
 
       {datosComprobanteTramitacion && (
         <ModalComprobanteTramitacion
@@ -215,7 +225,12 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
                       idOperador={licencia.operador.idoperador}
                       size="sm"
                       onGenerarPdf={() => setMostrarSpinner(true)}
-                      onPdfGenerado={() => setMostrarSpinner(false)}>
+                      onErrorGenerarPdf={() => setMostrarSpinner(false)}
+                      onPdfGenerado={({ blob }) => {
+                        setMostrarSpinner(false);
+                        setBlobModalPdf(blob);
+                        setMostrarModalPdf(true);
+                      }}>
                       <small className="text-nowrap">VER PDF</small>
                     </BotonVerPdfLicencia>
                   </Stack>
