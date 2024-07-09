@@ -14,7 +14,12 @@ import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks';
 import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
 import { buscarUnidadesDeRRHH } from '@/servicios';
-import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
+import {
+  AlertaConfirmacion,
+  AlertaError,
+  AlertaExito,
+  AlertaInformacion,
+} from '@/utilidades/alertas';
 import 'animate.css';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -23,7 +28,7 @@ import { Modal } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import { TIPOS_DE_OPERADORESID, TipoOperadorId, Trabajadoresxrrhh } from '../../(modelos)';
-import { TablaTrabajadores } from './(componentes)';
+import { ProgressBarCustom, TablaTrabajadores } from './(componentes)';
 import { Trabajador } from './(modelos)';
 import styles from './trabajadores.module.css';
 const IfContainer = dynamic(() => import('@/components/if-container'));
@@ -45,6 +50,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [unidad, setunidad] = useState('');
   const [unidadEmpleador, setunidadEmpleador] = useState<Unidadesrrhh[] | undefined>();
   const [trabajadores, settrabajadores] = useState<Trabajadoresunidadrrhh[]>([]);
+  const [cargandoPersonas, setcargandoPersonas] = useState(false);
+  const [CantidadCarga, setCantidadCarga] = useState<number>(0);
+  const [CantidadCargada, setCantidadCargada] = useState<number>(0);
 
   const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
   const [csvData, setCsvData] = useState<any[]>([]);
@@ -340,10 +348,48 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
 
     if (arregloRut.length > 500) {
-      return AlertaError.fire({
-        title: 'Error',
-        html: 'No se pueden cargar más de 500 trabajadores a la vez',
+      setCantidadCarga(arregloRut.length);
+      AlertaInformacion.fire({
+        title: 'Información',
+        html: 'Se realizará una carga por lotes de 500 personas trabajadoras, por favor espere...',
+        timer: 2000,
+        didClose: () => setcargandoPersonas(true),
       });
+
+      // Realizar carga por lotes de 500 con el arreglo de RUTs
+      let i = 0;
+      let j = 500;
+      setCantidadCargada(i);
+      while (i < arregloRut.length) {
+        const payload: Trabajadoresxrrhh = {
+          acciontraxrrhh: 1,
+          codigounidadrrhh: idunidad,
+          runtrabajador: arregloRut.slice(i, j),
+        };
+
+        if (empleadorActual == undefined || usuario == undefined) return;
+
+        try {
+          await crearTrabajador(payload, usuario.rut, empleadorActual.rutempleador, tabOperador);
+          i = j;
+          j += 500;
+          setCantidadCargada(i);
+        } catch (error: any) {
+          AlertaError.fire(error.message);
+
+          setValue('file', null);
+        }
+      }
+      setcargandoPersonas(false);
+      AlertaExito.fire({
+        html: `Se han grabado <b>${arregloRut.length}</b> personas trabajadoras con éxito`,
+        didClose: () => {
+          refrescarComponente();
+          setValue('file', null);
+        },
+      });
+
+      return;
     }
 
     const payload: Trabajadoresxrrhh = {
@@ -357,7 +403,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     try {
       await crearTrabajador(payload, usuario.rut, empleadorActual.rutempleador, tabOperador);
       AlertaExito.fire({
-        html: 'Se han grabado las personas trabajadoras con éxito',
+        html: `Se han grabado <b>${arregloRut.length}</b> personas trabajadoras con éxito`,
         didClose: () => {
           refrescarComponente();
           setValue('file', null);
@@ -371,6 +417,12 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   return (
     <>
+      <ProgressBarCustom
+        count={(CantidadCargada / CantidadCarga) * 100}
+        text="Cargando personas trabajadoras..."
+        show={cargandoPersonas}
+      />
+
       <div className="animate__animate animate__fadeIn">
         <div className="row">
           <Titulo url="">
