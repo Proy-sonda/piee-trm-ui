@@ -1,4 +1,3 @@
-import { BotonVerPdfLicencia } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
@@ -399,14 +398,14 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                       <small className="text-nowrap">TRAMITAR</small>
                     </Link> */}
 
-                    <BotonVerPdfLicencia
+                    {/* <BotonVerPdfLicencia
                       folioLicencia={licencia.foliolicencia}
                       idOperador={licencia.operador.idoperador}
                       size="sm"
                       onGenerarPdf={() => setloading(true)}
                       onPdfGenerado={() => setloading(false)}>
                       <small className="text-nowrap">VER PDF</small>
-                    </BotonVerPdfLicencia>
+                    </BotonVerPdfLicencia> */}
 
                     <button
                       ref={index == 0 ? btnNoRecepcion : null}

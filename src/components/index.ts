@@ -2,6 +2,7 @@ export * from './boton-ver-pdf-licencia';
 export * from './form/index';
 export * from './if-container';
 export * from './loading-spinner';
+export * from './modal-visor-pdf';
 export * from './paginacion';
 export * from './spinner-pantalla-completa';
 export * from './stepper/stepper';

@@ -1,4 +1,3 @@
-import { BotonVerPdfLicencia } from '@/components';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
@@ -251,14 +250,14 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     </button>
                   </IfContainer>
 
-                  <BotonVerPdfLicencia
+                  {/* <BotonVerPdfLicencia
                     folioLicencia={licencia.foliolicencia}
                     idOperador={licencia.operador.idoperador}
                     size="sm"
                     onGenerarPdf={() => setMostrarSpinner(true)}
                     onPdfGenerado={() => setMostrarSpinner(false)}>
                     <small className="text-nowrap">VER PDF</small>
-                  </BotonVerPdfLicencia>
+                  </BotonVerPdfLicencia> */}
                 </Stack>
               </td>
             </tr>
