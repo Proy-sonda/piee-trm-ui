@@ -1,11 +1,18 @@
 'use client';
 
+import { AlertaError } from '@/utilidades';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 
 interface ModalVisorPdfProps {
   show: boolean;
+
+  /**
+   * El documento en PDF a renderizar. Si se tiene un string en base 64 del archivo se puede usar
+   * la funcion `base64ToBlob` que esta en la carpeta utilidades.
+   * */
   blobPdf?: Blob;
+
   onCerrar: () => void;
 }
 
@@ -21,6 +28,22 @@ export const ModalVisorPdf: React.FC<ModalVisorPdfProps> = ({ show, blobPdf, onC
 
   const handleCerrar = () => {
     onCerrar();
+  };
+
+  const abrirPdfEnNuevaVentana = () => {
+    if (!blobPdf) {
+      return;
+    }
+
+    try {
+      window.open(URL.createObjectURL(blobPdf), '_blank');
+      handleCerrar();
+    } catch (error) {
+      AlertaError.fire({
+        title: 'Error',
+        html: 'No se pudo abrir el archivo en otra ventana. Por favor intente más tarde',
+      });
+    }
   };
 
   return (
@@ -44,13 +67,16 @@ export const ModalVisorPdf: React.FC<ModalVisorPdfProps> = ({ show, blobPdf, onC
           )}
         </Modal.Body>
         <Modal.Footer className="py-1">
-          <div className="w-100 d-flex flex-column flex-md-row-reverse">
+          <div className="w-100 d-flex flex-column flex-sm-row-reverse">
+            <button type="button" className="btn btn-primary" onClick={abrirPdfEnNuevaVentana}>
+              Abrir en nueva ventana
+            </button>
             <button
               type="button"
-              className="btn btn-danger"
+              className="btn btn-danger mt-2 mt-sm-0 me-sm-2"
               data-bs-dismiss="modal"
               onClick={handleCerrar}>
-              Cerrar
+              Volver
             </button>
           </div>
         </Modal.Footer>
