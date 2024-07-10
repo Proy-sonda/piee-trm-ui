@@ -5,6 +5,7 @@ import AppHeader from '@/components/header/header';
 import Marquesina from '@/components/marquesina';
 import { AuthProvider } from '@/contexts';
 
+import { ChatComponent } from '@/components/chat/chat';
 import ProgressPage from '@/components/progress-bar';
 import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -29,23 +30,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <AuthProvider>
             <AppHeader />
 
-            <main className="bg-white shadow-sm">
+            <main className="bg-white shadow-sm" style={{ zIndex: 2 }}>
               <Marquesina />
               <ProgressPage>{children}</ProgressPage>
             </main>
 
             <AppFooter>
-              <iframe
-                hidden
-                height={800}
-                width={600}
-                style={{
-                  position: 'fixed',
-                  zIndex: 1,
-                  bottom: 20,
-                  right: 20,
-                }}
-                src="http://10.152.21.14:3009"></iframe>
+              <ChatComponent />
               <Version /> {/* Se tiene que pasar asi porque Version es un SSC. */}
             </AppFooter>
           </AuthProvider>

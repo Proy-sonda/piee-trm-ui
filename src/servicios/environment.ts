@@ -33,3 +33,7 @@ export const versionApp = () => {
 export const saltarseClaveUnica = () => {
   return process.env.NEXT_PUBLIC_SALTARSE_CLAVE_UNICA === 'SI';
 };
+
+export const obtenerChatBot = () => {
+  return process.env.NEXT_PUBLIC_CHATBOT_URL;
+}
