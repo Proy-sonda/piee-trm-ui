@@ -3,102 +3,142 @@
 import { Titulo } from '@/components';
 import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import { useMergeFetchObject } from '@/hooks';
+import { calcularPaginas, useFetch, useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores } from '@/servicios';
-import { existe, strIncluye } from '@/utilidades';
-import { isWithinInterval } from 'date-fns';
+import { AlertaConfirmacion, AlertaError, strIncluye } from '@/utilidades';
+import { format } from 'date-fns';
+import exportFromJSON from 'export-from-json';
 import { useEffect, useState } from 'react';
 import { FiltroLicenciasTramitadas, TablaLicenciasTramitadas } from './(componentes)';
-import {
-  FiltroBusquedaLicenciasTramitadas,
-  LicenciaTramitada,
-  hayFiltrosLicenciasTramitadas,
-} from './(modelos)';
+import { FiltroBusquedaLicenciasTramitadas, LicenciaTramitada } from './(modelos)';
 import { buscarEstadosLicencias, buscarLicenciasTramitadas } from './(servicios)';
 
 const LicenciasTramitadasPage = () => {
-  const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
-    licenciasTramitadas: buscarLicenciasTramitadas(),
+  const MAXIMO_LICENCIAS_EXPORTAR = 1_000;
+  const TAMANO_PAGINA = 5;
+
+  const [erroresCombos, combos, cagandoCombos] = useMergeFetchObject({
     empleadores: buscarEmpleadores(''),
     estadosLicencias: buscarEstadosLicencias(),
   });
 
-  const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitada[]>([]);
+  const [paginaActual, setPaginaActual] = useState(0);
+  const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const [licenciasAnteriores, setLicenciasAnteriores] = useState<LicenciaTramitada[]>([]);
+  const [totalLicenciasAnteriores, setTotalLicenciasAnteriores] = useState(0);
   const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltroBusquedaLicenciasTramitadas>({});
 
-  // Actualizar listado de licencias
+  const [errorLicencias, resultadoLicencias, cargandoLicencias] = useFetch(
+    buscarLicenciasTramitadas({
+      ...filtrosBusqueda,
+      pagina: paginaActual,
+      tamanoPagina: TAMANO_PAGINA,
+    }),
+    [filtrosBusqueda, paginaActual],
+  );
+
   useEffect(() => {
-    if (datosBandeja?.licenciasTramitadas) {
-      setLicenciasFiltradas(datosBandeja?.licenciasTramitadas ?? []);
+    if (!resultadoLicencias) {
+      return;
     }
-  }, [datosBandeja]);
 
-  // Filtrar licencias
-  useEffect(() => {
-    const licenciasParaFiltrar = datosBandeja?.licenciasTramitadas ?? [];
+    setLicenciasAnteriores(resultadoLicencias.licencias);
+    setTotalLicenciasAnteriores(calcularPaginas(resultadoLicencias.numerolicencias, TAMANO_PAGINA));
+  }, [resultadoLicencias]);
 
-    setLicenciasFiltradas(licenciasParaFiltrar.filter(licenciaCumple(filtrosBusqueda)));
-  }, [filtrosBusqueda, datosBandeja?.licenciasTramitadas]);
+  const exportarLicenciasCSV = async () => {
+    if (!resultadoLicencias) {
+      return AlertaError.fire({
+        title: 'Error',
+        html: 'No se puede generar CSV porque no se han cargado las licencias. Por favor intente más tarde.',
+      });
+    }
 
-  const licenciaCumple = (filtros: FiltroBusquedaLicenciasTramitadas) => {
-    return (licencia: LicenciaTramitada) => {
-      if (!hayFiltrosLicenciasTramitadas(filtros)) {
-        return true;
+    // Confirmar si desea exportar
+    const { isConfirmed: confirmacionCSV } = await AlertaConfirmacion.fire({
+      html: `¿Desea exportar las licencias tramitadas a CSV?`,
+    });
+
+    if (!confirmacionCSV) {
+      return;
+    }
+
+    // Confirmacion cuando supera el maximo de licencias
+    let licenciasPorSolicitar = resultadoLicencias.numerolicencias;
+    if (resultadoLicencias.numerolicencias > MAXIMO_LICENCIAS_EXPORTAR) {
+      const { isConfirmed: confirmacionLimiteMaximo } = await AlertaConfirmacion.fire({
+        html: 'Hay más de 1000 licencias disponibles. ',
+      });
+
+      if (!confirmacionLimiteMaximo) {
+        return;
       }
 
-      const coincideFolio = strIncluye(licencia.foliolicencia, filtros.folio);
+      licenciasPorSolicitar = MAXIMO_LICENCIAS_EXPORTAR;
+    }
 
-      const coincideRun = strIncluye(licencia.ruttrabajador, filtros.runPersonaTrabajadora);
+    setMostrarSpinner(true);
 
-      const coincideEstado = existe(filtros.idEstado)
-        ? licencia.estadolicencia.idestadolicencia === filtros.idEstado
-        : true;
+    try {
+      const [request] = buscarLicenciasTramitadas({
+        ...filtrosBusqueda,
+        pagina: 0,
+        tamanoPagina: licenciasPorSolicitar,
+      });
+      const { licencias } = await request();
 
-      let enRangoFechas = true;
-      if (filtros.fechaDesde && filtros.fechaHasta) {
-        const coindidePorFechaEmision = isWithinInterval(new Date(licencia.fechaemision), {
-          start: filtros.fechaDesde,
-          end: filtros.fechaHasta,
-        });
+      const data = (licencias ?? []).map((licencia) => ({
+        Operador: licencia.operador.operador,
+        Folio: licencia.foliolicencia,
+        'Entidad de salud': licencia.entidadsalud.nombre,
+        Estado: licencia.estadolicencia.estadolicencia,
+        'RUT Entidad Empleadora': licencia.rutempleador,
+        'Entidad Empleadora': nombreEmpleador(licencia),
+        'RUN Persona Trabajadora': licencia.ruttrabajador,
+        'Nombre Persona Trabajadora': `${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`,
+        'Tipo de Reposo': licencia.tiporeposo.tiporeposo,
+        'Días de Reposo': licencia.ndias,
+        'Inicio de Reposo': format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy'),
+        'Fecha de Emisión': format(new Date(licencia.fechaemision), 'dd-MM-yyyy'),
+        'Tipo de Licencia': licencia.tipolicencia.tipolicencia,
+      }));
 
-        const coincidePorFechaTramitacion = isWithinInterval(new Date(licencia.fechatramitacion), {
-          start: filtros.fechaDesde,
-          end: filtros.fechaHasta,
-        });
+      exportFromJSON({
+        data,
+        fileName: `licencias_tramitadas_${format(Date.now(), 'dd_MM_yyyy_HH_mm_ss')}`,
+        exportType: exportFromJSON.types.csv,
+        delimiter: ';',
+        withBOM: true,
+      });
+    } catch (error) {
+      AlertaError.fire({
+        title: 'Error',
+        html: 'Hubo un error al generar el CSV de las licencias. Por favor intente más tarde.',
+      });
+    } finally {
+      setMostrarSpinner(false);
+    }
+  };
 
-        if (!filtros.tipoPeriodo) {
-          enRangoFechas = coindidePorFechaEmision || coincidePorFechaTramitacion;
-        } else if (filtros.tipoPeriodo === 'fecha-emision') {
-          enRangoFechas = coindidePorFechaEmision;
-        } else if (filtros.tipoPeriodo === 'fecha-tramitacion') {
-          enRangoFechas = coincidePorFechaTramitacion;
-        } else {
-          throw new Error('Filtro de licencias tramitadas: Tipo de periodo desconocido');
-        }
-      }
+  const nombreEmpleador = (licencia: LicenciaTramitada) => {
+    const empleador = (combos?.empleadores ?? []).find((e) =>
+      strIncluye(licencia.rutempleador, e.rutempleador),
+    );
 
-      const coincideEntidadEmpleadora = strIncluye(
-        licencia.rutempleador,
-        filtros.rutEntidadEmpleadora,
-      );
-
-      return (
-        coincideFolio && coincideEstado && coincideRun && enRangoFechas && coincideEntidadEmpleadora
-      );
-    };
+    return empleador?.razonsocial ?? '';
   };
 
   return (
     <>
-      <IfContainer show={cargando}>
+      <IfContainer show={cagandoCombos || cargandoLicencias || mostrarSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
 
-      <IfContainer show={erroresCarga.length > 0}>
-        <h4 className="pb-5 text-center">Error al cargar licencias tramitadas</h4>
+      <IfContainer show={erroresCombos.length > 0}>
+        <h4 className="pb-5 text-center">Error al cargar combos</h4>
       </IfContainer>
 
-      <IfContainer show={erroresCarga.length === 0}>
+      <IfContainer show={erroresCombos.length === 0}>
         <div className="row">
           <Titulo url="">
             <h5>Filtro para Licencias Tramitadas</h5>
@@ -107,24 +147,37 @@ const LicenciasTramitadasPage = () => {
 
         <div className="pt-3 pb-4 border-bottom border-1">
           <FiltroLicenciasTramitadas
-            empleadores={datosBandeja?.empleadores ?? []}
-            estadosLicencias={datosBandeja?.estadosLicencias ?? []}
+            empleadores={combos?.empleadores ?? []}
+            estadosLicencias={combos?.estadosLicencias ?? []}
             onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
           />
         </div>
 
-        <div className="pt-4 row text-center">
-          <h5>LICENCIAS TRAMITADAS</h5>
-        </div>
-
-        <div className="row mt-3">
-          <div className="col-md-12">
-            <TablaLicenciasTramitadas
-              empleadores={datosBandeja?.empleadores ?? []}
-              licencias={licenciasFiltradas}
-            />
+        <IfContainer show={!errorLicencias}>
+          <div className="pt-4 row text-center">
+            <h5>LICENCIAS TRAMITADAS</h5>
           </div>
-        </div>
+
+          <div className="row mt-3">
+            <div className="col-md-12">
+              <TablaLicenciasTramitadas
+                empleadores={combos?.empleadores ?? []}
+                licencias={resultadoLicencias?.licencias ?? licenciasAnteriores}
+                totalPaginas={
+                  resultadoLicencias?.numerolicencias
+                    ? calcularPaginas(resultadoLicencias.numerolicencias, TAMANO_PAGINA)
+                    : totalLicenciasAnteriores
+                }
+                onCambioPagina={setPaginaActual}
+                onExportarCSV={exportarLicenciasCSV}
+              />
+            </div>
+          </div>
+        </IfContainer>
+
+        <IfContainer show={errorLicencias && !cargandoLicencias}>
+          <h4 className="pb-5 text-center">Error al cargar licencias tramitadas</h4>
+        </IfContainer>
       </IfContainer>
     </>
   );

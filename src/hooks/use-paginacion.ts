@@ -8,6 +8,14 @@ interface PaginacionHookProps<T> {
 
 type PaginacionHookReturn<T> = [T[], number, number, (paginaActual: number) => void];
 
+export const calcularPaginas = (datosPorPaginar: any[] | number, tamanoPagina: number) => {
+  if (Array.isArray(datosPorPaginar)) {
+    return Math.ceil(datosPorPaginar.length / tamanoPagina);
+  } else {
+    return Math.ceil(datosPorPaginar / tamanoPagina);
+  }
+};
+
 /**
  * @returns
  * Una tupla con lo siguiente:
@@ -25,7 +33,7 @@ export const usePaginacion = <T>({
   const [datosPaginados, setDatosPaginados] = useState<T[]>([]);
 
   const datosPorPaginar = datos ?? [];
-  const totalPaginas = Math.ceil(datosPorPaginar.length / tamanoPagina);
+  const totalPaginas = calcularPaginas(datosPorPaginar, tamanoPagina);
 
   useEffect(() => {
     cambiarPagina(paginaActual);

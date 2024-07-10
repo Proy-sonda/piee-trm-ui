@@ -88,12 +88,12 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
               label="Consultar por fecha de"
               className="col-12 col-md-6 col-lg-3"
               datos={[
-                { label: 'Emisión', value: 'fecha-emision' },
-                { label: 'Tramitación', value: 'fecha-tramitacion' },
+                { label: 'Emisión', value: 1 },
+                { label: 'Tramitación', value: 2 },
               ]}
-              idElemento={'value'}
-              descripcion={'label'}
-              tipoValor="string"
+              idElemento="value"
+              descripcion="label"
+              tipoValor="number"
             />
 
             <InputFecha
