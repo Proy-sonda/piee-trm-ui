@@ -10,6 +10,7 @@ import {
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import { Titulo } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
+import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks';
 import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
@@ -53,6 +54,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const [cargandoPersonas, setcargandoPersonas] = useState(false);
   const [CantidadCarga, setCantidadCarga] = useState<number>(0);
   const [CantidadCargada, setCantidadCargada] = useState<number>(0);
+  const [cargandoPantallacompleta, setcargandoPantallacompleta] = useState(false);
 
   const { empleadorActual, rolEnEmpleadorActual } = useEmpleadorActual();
   const [csvData, setCsvData] = useState<any[]>([]);
@@ -399,6 +401,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     };
 
     if (empleadorActual == undefined || usuario == undefined) return;
+    setcargandoPantallacompleta(true);
 
     try {
       await crearTrabajador(payload, usuario.rut, empleadorActual.rutempleador, tabOperador);
@@ -412,11 +415,16 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     } catch (error: any) {
       AlertaError.fire(error.message);
       setValue('file', null);
+    } finally {
+      setcargandoPantallacompleta(false);
     }
   };
 
   return (
     <>
+      <IfContainer show={cargandoPantallacompleta}>
+        <SpinnerPantallaCompleta />
+      </IfContainer>
       <ProgressBarCustom
         count={(CantidadCargada / CantidadCarga) * 100}
         text="Cargando personas trabajadoras..."
