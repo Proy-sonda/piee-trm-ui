@@ -2,12 +2,10 @@ import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
-import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import { AlertaConfirmacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
-import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { Badge, Stack, Table } from 'react-bootstrap';
@@ -28,7 +26,10 @@ const ModalImprimirPdf = dynamic(() => import('@/components/modal-comprobante-tr
 
 interface TablaLicenciasTramitadasProps {
   empleadores: Empleador[];
-  licencias?: LicenciaTramitada[];
+  licencias: LicenciaTramitada[];
+  totalPaginas: number;
+  onCambioPagina: (pagina: number) => void;
+  onExportarCSV: () => void;
 }
 
 interface DatosComprobanteTramitacion {
@@ -39,12 +40,11 @@ interface DatosComprobanteTramitacion {
 export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> = ({
   licencias,
   empleadores,
+  totalPaginas,
+  onCambioPagina,
+  onExportarCSV,
 }) => {
-  const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
-    datos: licencias,
-    tamanoPagina: 5,
-  });
-
+  const [paginaActual, setPaginaActual] = useState(0);
   const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
   const [blobModalPdf, setBlobModalPdf] = useState<Blob>();
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
@@ -82,44 +82,6 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
     });
   };
 
-  const exportarLicenciasCSV = async () => {
-    const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Desea exportar las licencias tramitadas a CSV?`,
-    });
-
-    if (!isConfirmed) {
-      return;
-    }
-
-    setMostrarSpinner(true);
-
-    const data = (licencias ?? []).map((licencia) => ({
-      Operador: licencia.operador.operador,
-      Folio: licencia.foliolicencia,
-      'Entidad de salud': licencia.entidadsalud.nombre,
-      Estado: licencia.estadolicencia.estadolicencia,
-      'RUT Entidad Empleadora': licencia.rutempleador,
-      'Entidad Empleadora': nombreEmpleador(licencia),
-      'RUN Persona Trabajadora': licencia.ruttrabajador,
-      'Nombre Persona Trabajadora': nombreTrabajador(licencia),
-      'Tipo de Reposo': licencia.tiporeposo.tiporeposo,
-      'Días de Reposo': licencia.ndias,
-      'Inicio de Reposo': formatearFecha(licencia.fechainicioreposo),
-      'Fecha de Emisión': formatearFecha(licencia.fechaemision),
-      'Tipo de Licencia': licencia.tipolicencia.tipolicencia,
-    }));
-
-    exportFromJSON({
-      data,
-      fileName: `licencias_tramitadas_${format(Date.now(), 'dd_MM_yyyy_HH_mm_ss')}`,
-      exportType: exportFromJSON.types.csv,
-      delimiter: ';',
-      withBOM: true,
-    });
-
-    setMostrarSpinner(false);
-  };
-
   return (
     <>
       <IfContainer show={mostrarSpinner}>
@@ -146,7 +108,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
       )}
 
       <div className="mt-2 mb-4 d-flex align-items-center justify-content-end">
-        <button className="btn btn-sm btn-primary" onClick={exportarLicenciasCSV}>
+        <button className="btn btn-sm btn-primary" onClick={onExportarCSV}>
           Exportar a CSV
         </button>
       </div>
@@ -164,120 +126,132 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
           </tr>
         </thead>
         <tbody>
-          {licenciasPaginadas.map((licencia) => (
-            <tr
-              key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
-              className="text-center align-middle">
-              <td>
-                <Stack direction="vertical" gap={2}>
-                  <span
-                    className="badge rounded-pill"
-                    style={{ background: 'var(--color-blue)', fontWeight: 'normal' }}>
-                    {esLicenciaNoTramitada(licencia) ? 'No Recepcionada' : 'Tramitada'}
-                  </span>
+          {licencias.length > 0 ? (
+            licencias.map((licencia) => (
+              <tr
+                key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
+                className="text-center align-middle">
+                <td>
+                  <Stack direction="vertical" gap={2}>
+                    <span
+                      className="badge rounded-pill"
+                      style={{ background: 'var(--color-blue)', fontWeight: 'normal' }}>
+                      {esLicenciaNoTramitada(licencia) ? 'No Recepcionada' : 'Tramitada'}
+                    </span>
 
-                  <IfContainer show={licenciaFueTramitadaPorEmpleador(licencia)}>
-                    <Badge pill bg="warning" text="dark" style={{ fontWeight: 'normal' }}>
-                      Envío Pendiente
-                    </Badge>
-                  </IfContainer>
+                    <IfContainer show={licenciaFueTramitadaPorEmpleador(licencia)}>
+                      <Badge pill bg="warning" text="dark" style={{ fontWeight: 'normal' }}>
+                        Envío Pendiente
+                      </Badge>
+                    </IfContainer>
 
-                  <IfContainer show={licenciaEnProcesoDeEnvio(licencia)}>
-                    <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
-                      Enviando
-                    </Badge>
-                  </IfContainer>
+                    <IfContainer show={licenciaEnProcesoDeEnvio(licencia)}>
+                      <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
+                        Enviando
+                      </Badge>
+                    </IfContainer>
 
-                  <IfContainer show={licenciaEnProcesoDeConciliacion(licencia)}>
-                    <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
-                      Conciliando
-                    </Badge>
-                  </IfContainer>
+                    <IfContainer show={licenciaEnProcesoDeConciliacion(licencia)}>
+                      <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
+                        Conciliando
+                      </Badge>
+                    </IfContainer>
 
-                  <IfContainer show={licenciaFueEnviadaAlOperador(licencia)}>
-                    <Badge pill bg="primary" style={{ fontWeight: 'normal' }}>
-                      Enviada
-                    </Badge>
-                  </IfContainer>
+                    <IfContainer show={licenciaFueEnviadaAlOperador(licencia)}>
+                      <Badge pill bg="primary" style={{ fontWeight: 'normal' }}>
+                        Enviada
+                      </Badge>
+                    </IfContainer>
 
-                  <IfContainer show={licenciaConErrorDeEnvio(licencia)}>
-                    <Badge pill bg="danger" style={{ fontWeight: 'normal' }}>
-                      Error de envío
-                    </Badge>
-                  </IfContainer>
+                    <IfContainer show={licenciaConErrorDeEnvio(licencia)}>
+                      <Badge pill bg="danger" style={{ fontWeight: 'normal' }}>
+                        Error de envío
+                      </Badge>
+                    </IfContainer>
 
-                  <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
-                    <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
-                      Conciliada
-                    </Badge>
-                  </IfContainer>
-                </Stack>
-              </td>
-              <td className="px-4 py-3">
-                <div className="small mb-1 text-nowrap">{licencia.operador.operador}</div>
-                <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
-                <div className="small mb-1 text-nowrap">{licencia.entidadsalud.nombre}</div>
-              </td>
-              <td>
-                <div className="mb-1 small text-nowrap">
-                  {licencia.estadolicencia.idestadolicencia} -{' '}
-                  {licencia.estadolicencia.estadolicencia}
-                </div>
-              </td>
-              <td>
-                <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
-                <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
-              </td>
-              <td>
-                <div className="mb-1 small text-nowrap">{nombreTrabajador(licencia)}</div>
-                <div className="mb-1 small text-nowrap">RUN: {licencia.ruttrabajador}</div>
-              </td>
-              <td>
-                <div className="mb-1 small text-start text-nowrap">
-                  {licencia.tiporeposo.tiporeposo}: {licencia.ndias} día(s)
-                </div>
-                <div className="mb-1 small text-start text-nowrap">
-                  INICIO REPOSO: {formatearFecha(licencia.fechainicioreposo)}
-                </div>
-                <div className="mb-1 small text-start text-nowrap">
-                  FECHA DE EMISIÓN: {formatearFecha(licencia.fechaemision)}
-                </div>
-                <div className="mb-1 small text-start text-nowrap">
-                  FECHA DE TRAMITACIÓN: {formatearFecha(licencia.fechatramitacion)}
-                </div>
-                <div className="mb-1 small text-start text-nowrap">
-                  {licencia.tipolicencia.tipolicencia}
-                </div>
-              </td>
-              <td>
-                <Stack gap={2}>
-                  <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
-                    <button className="btn btn-sm btn-primary">
-                      <small
-                        className="text-nowrap"
-                        onClick={() => imprimirComprobanteTramitacion(licencia)}>
-                        COMPROBANTE TRAMITACIÓN
-                      </small>
-                    </button>
-                  </IfContainer>
+                    <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
+                      <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
+                        Conciliada
+                      </Badge>
+                    </IfContainer>
+                  </Stack>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="small mb-1 text-nowrap">{licencia.operador.operador}</div>
+                  <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
+                  <div className="small mb-1 text-nowrap">{licencia.entidadsalud.nombre}</div>
+                </td>
+                <td>
+                  <div className="mb-1 small text-nowrap">
+                    {licencia.estadolicencia.idestadolicencia} -{' '}
+                    {licencia.estadolicencia.estadolicencia}
+                  </div>
+                </td>
+                <td>
+                  <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
+                  <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
+                </td>
+                <td>
+                  <div className="mb-1 small text-nowrap">{nombreTrabajador(licencia)}</div>
+                  <div className="mb-1 small text-nowrap">RUN: {licencia.ruttrabajador}</div>
+                </td>
+                <td>
+                  <div className="mb-1 small text-start text-nowrap">
+                    {licencia.tiporeposo.tiporeposo}: {licencia.ndias} día(s)
+                  </div>
+                  <div className="mb-1 small text-start text-nowrap">
+                    INICIO REPOSO: {formatearFecha(licencia.fechainicioreposo)}
+                  </div>
+                  <div className="mb-1 small text-start text-nowrap">
+                    FECHA DE EMISIÓN: {formatearFecha(licencia.fechaemision)}
+                  </div>
+                  <div className="mb-1 small text-start text-nowrap">
+                    FECHA DE TRAMITACIÓN: {formatearFecha(licencia.fechatramitacion)}
+                  </div>
+                  <div className="mb-1 small text-start text-nowrap">
+                    {licencia.tipolicencia.tipolicencia}
+                  </div>
+                </td>
+                <td>
+                  <Stack gap={2}>
+                    <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
+                      <button className="btn btn-sm btn-primary">
+                        <small
+                          className="text-nowrap"
+                          onClick={() => imprimirComprobanteTramitacion(licencia)}>
+                          COMPROBANTE TRAMITACIÓN
+                        </small>
+                      </button>
+                    </IfContainer>
 
-                  <BotonVerPdfLicencia
-                    folioLicencia={licencia.foliolicencia}
-                    idOperador={licencia.operador.idoperador}
-                    size="sm"
-                    onGenerarPdf={() => setMostrarSpinner(true)}
-                    onErrorGenerarPdf={() => setMostrarSpinner(false)}
-                    onPdfGenerado={({ blob }) => {
-                      setMostrarSpinner(false);
-                      setBlobModalPdf(blob);
-                      setMostrarModalPdf(true);
-                    }}>
-                    <small className="text-nowrap">VER PDF</small>
-                  </BotonVerPdfLicencia>
-                </Stack>
-              </td>
+                    <BotonVerPdfLicencia
+                      folioLicencia={licencia.foliolicencia}
+                      idOperador={licencia.operador.idoperador}
+                      size="sm"
+                      onGenerarPdf={() => setMostrarSpinner(true)}
+                      onErrorGenerarPdf={() => setMostrarSpinner(false)}
+                      onPdfGenerado={({ blob }) => {
+                        setMostrarSpinner(false);
+                        setBlobModalPdf(blob);
+                        setMostrarModalPdf(true);
+                      }}>
+                      <small className="text-nowrap">VER PDF</small>
+                    </BotonVerPdfLicencia>
+                  </Stack>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr className="text-center">
+              <td></td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td></td>
             </tr>
-          ))}
+          )}
         </tbody>
       </Table>
 
@@ -285,7 +259,10 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
         <Paginacion
           paginaActual={paginaActual}
           numeroDePaginas={totalPaginas}
-          onCambioPagina={cambiarPagina}
+          onCambioPagina={(pagina) => {
+            setPaginaActual(pagina);
+            onCambioPagina(pagina);
+          }}
         />
       </div>
     </>
