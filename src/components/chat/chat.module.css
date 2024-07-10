@@ -13,3 +13,27 @@
     cursor: pointer;
     z-index: 1000;
 }
+
+.btn-chathover {
+    position: fixed;
+    bottom: 30px;
+    right: 3%;
+    background-color: var(--color-blue);
+    color: white;
+    border: none;
+    border-radius: 20px 0px 20px 0px;
+    width: 240px;
+    height: 60px;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
+}
+
+.btn-chathover div div {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.btn-chathover div div i {
+    font-size: 24px;
+}
