@@ -170,6 +170,7 @@ export const LoginComponent: React.FC<{}> = () => {
           <br />
 
           <InputRut
+            ocultarTooltip
             omitirSignoObligatorio
             label="RUN Persona Usuaria"
             name="rut"
