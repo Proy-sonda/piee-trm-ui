@@ -230,6 +230,7 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
             className={listaguia[1]!?.activo && guia ? 'overlay-marco' : ''}>
             <div className="row mt-3 g-3 align-items-baseline">
               <InputRut
+                ocultarTooltip
                 deshabilitado
                 name="rut"
                 label="RUT Entidad Empleadora"

@@ -1,6 +1,7 @@
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import React, { useContext, useRef, useState } from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { formatRut, validateRut } from 'rutlib';
 
 interface BarraBusquedaEntidadesEmpleadorasProps {
@@ -29,8 +30,20 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
         }`}
         ref={target}>
         <div className="col-12 col-md-3 col-xxl-2 position-relative">
-          <label id="rutBuscar" className="form-label">
-            RUT
+          <label className="form-label" htmlFor="rutBuscar">
+            <span>RUT</span>
+            {
+              <OverlayTrigger
+                placement="top"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => (
+                  <Tooltip id="button-tooltip" {...props}>
+                    {'Se debe ingresar sin puntos y con guión (Ej: 123456-7)'}
+                  </Tooltip>
+                )}>
+                <i className="ms-2 text-primary bi bi-info-circle" style={{ fontSize: '16px' }}></i>
+              </OverlayTrigger>
+            }
           </label>
           <input
             type="text"
@@ -56,7 +69,7 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
         </div>
 
         <div className="col-12 col-md-3 col-xxl-2">
-          <label id="razonSocialBuscar" className="form-label">
+          <label htmlFor="razonSocialBuscar" className="form-label">
             Razón Social
           </label>
           <input
