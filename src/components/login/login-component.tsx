@@ -4,10 +4,12 @@ import { InputClave, InputRut } from '@/components/form';
 import { AuthContext } from '@/contexts';
 import { useFetch } from '@/hooks';
 import { Mensaje, estaMensajeVigente } from '@/modelos/mensaje';
+import { adsUrl } from '@/servicios';
 import {
   AutenticacionTransitoriaError,
   LoginPasswordInvalidoError,
   RutInvalidoError,
+  UsuarioDebeHomologarError,
   UsuarioNoExisteError,
 } from '@/servicios/auth';
 import { BuscarUsuarioSu } from '@/servicios/buscar-super-usuario';
@@ -130,6 +132,12 @@ export const LoginComponent: React.FC<{}> = () => {
         messageError = 'Contraseña inválida';
       } else if (error instanceof AutenticacionTransitoriaError) {
         setShowModalCambiarClave(true);
+      } else if (error instanceof UsuarioDebeHomologarError) {
+        // Nota: el RUN va en base 64 y en parametro 'r' para que sea menos obvio a que se refiere
+        const urlHomologacion = new URL(`${adsUrl()}/homologar`);
+        urlHomologacion.searchParams.set('r', btoa(rut));
+        router.push(urlHomologacion.toString());
+        return;
       } else {
         messageError = 'Ocurrió un problema en el sistema';
       }
