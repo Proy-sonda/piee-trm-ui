@@ -322,7 +322,7 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
           <tbody>
             {licenciasPaginadas.map((licencia, index) => (
               <tr
-                key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
+                key={`${licencia.foliolicencia}/${licencia.operador.idoperador}/${index}`}
                 className="text-center align-middle">
                 <td className="px-4 py-3">
                   {/* Circulo de color */}

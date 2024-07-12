@@ -109,7 +109,9 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
               }
             }}>
             <span className={`me-1 ${styles.circle} ${styles[semaforo.color]}`}></span>
-            <label className="cursor-pointer">{semaforo.label}</label>
+            <label className="cursor-pointer" style={{ fontSize: '13px' }}>
+              {semaforo.label}
+            </label>
           </div>
         ))}
       </div>

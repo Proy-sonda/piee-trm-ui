@@ -35,7 +35,6 @@ const TramitacionPage = () => {
   const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitar[]>([]);
   const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltroBusquedaLicencias>({});
   const [filtroEstado, setFiltroEstado] = useState<FiltroEstadoLicencia>('todos');
-  const [noExisteLicencia, setnoExisteLicencia] = useState(false);
 
   // Actualizar listado de licencias
   useEffect(() => {
@@ -91,11 +90,6 @@ const TramitacionPage = () => {
         licencia.rutempleador,
         filtros.rutEntidadEmpleadora,
       );
-      if (licenciasFiltradas.length == 0) {
-        setnoExisteLicencia(true);
-      } else {
-        setnoExisteLicencia(false);
-      }
 
       return (
         coincideFolio && coincideRun && enRangoFechas && coincideEntidadEmpleadora && coincideColor
@@ -172,72 +166,45 @@ const TramitacionPage = () => {
           />
         </div>
 
-        <div className="py-4 row text-center">
+        <div className="py-4 row">
           <div className="col-12">
-            <div className="d-flex justify-content-between">
-              <div style={{ width: '36px' }}></div>
-              <h5>BANDEJA DE TRAMITACIÓN</h5>
-              <div>
-                <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
-                  <button
-                    className="btn btn-sm border border-0"
-                    style={{ fontSize: '20px' }}
-                    onClick={() => generarCSVLicencias()}>
-                    <i className="bi bi-filetype-csv"></i>
-                  </button>
-                </OverlayTrigger>
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center">
+              <div className="mb-2 mb-md-0 d-flex justify-content-start align-items-center">
+                <h2 className="fs-5 m-0 p-0">BANDEJA DE TRAMITACIÓN</h2>
+                <div className="d-md-none">
+                  <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
+                    <button
+                      className="btn btn-sm border border-0"
+                      style={{ fontSize: '20px' }}
+                      onClick={() => generarCSVLicencias()}>
+                      <i className="bi bi-filetype-csv"></i>
+                    </button>
+                  </OverlayTrigger>
+                </div>
+              </div>
+              <div className="d-flex justify-content-end align-items-center">
+                <div className="d-none d-md-block">
+                  <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
+                    <button
+                      className="btn btn-sm border border-0"
+                      style={{ fontSize: '20px' }}
+                      onClick={() => generarCSVLicencias()}>
+                      <i className="bi bi-filetype-csv"></i>
+                    </button>
+                  </OverlayTrigger>
+                </div>
+                <SemaforoLicencias onEstadoSeleccionado={(x) => setFiltroEstado(x)} />
               </div>
             </div>
           </div>
         </div>
 
-        <div className="row text-end">
-          <SemaforoLicencias onEstadoSeleccionado={(x) => setFiltroEstado(x)} />
-        </div>
-
-        <div className="row mt-3">
+        <div className="row">
           <div className="col-md-12">
-            {/* <div className="text-end">
-              <IfContainer show={!noExisteLicencia}>
-                <ExportarTabla
-                  nombre={`bandeja-tramitacion-${format(new Date(), "dd-MM-yyyy '-' HH-mm")}`}
-                  data={datosBandeja?.empleadores.map((value) => {
-                    return {
-                      idempleador: value.idempleador,
-                      'Rut Empleador': value.rutempleador,
-                      'Razon Social': value.razonsocial,
-                      Telefono: value.telefonohabitual,
-                      'Telefono movil': value.telefonomovil,
-                      Email: value.email,
-                      Estado: value.estadoempleador.estadoempleador,
-                      Direccion: `${value.direccionempleador.calle} ${value.direccionempleador.numero} ${value.direccionempleador.comuna.nombre}`,
-                      CCAF: value.ccaf.nombre,
-                      Tamano: value.tamanoempresa.descripcion,
-                      'Tipo de Entidad Empleadora': value.tipoempleador.tipoempleador,
-                      'Sistema remuneracion': value.sistemaremuneracion.descripcion,
-                      'Fecha Registro': format(
-                        new Date(value.fecharegistro),
-                        'dd/MM/yyyy HH:mm:ss',
-                      ),
-                      'Actividad Laboral': value.actividadlaboral.actividadlaboral.replaceAll(
-                        ',',
-                        ' ',
-                      ),
-                    };
-                  })}
-                />
-              </IfContainer>
-            </div> */}
-
-            <IfContainer show={noExisteLicencia}>
-              <h4 className="text-center mt-5">No existen licencias para mostrar</h4>
-            </IfContainer>
-            <IfContainer show={!noExisteLicencia}>
-              <TablaLicenciasTramitar
-                empleadores={datosBandeja?.empleadores ?? []}
-                licencias={licenciasFiltradas}
-              />
-            </IfContainer>
+            <TablaLicenciasTramitar
+              empleadores={datosBandeja?.empleadores ?? []}
+              licencias={licenciasFiltradas}
+            />
           </div>
         </div>
       </IfContainer>
