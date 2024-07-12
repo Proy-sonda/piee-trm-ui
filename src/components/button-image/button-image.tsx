@@ -19,6 +19,7 @@ export const ButtonImage: React.FC<ButtonImageProps> = ({ configuracionClaveUnic
           {saltarseClaveUnica() ? (
             <Link href={`${adsUrl()}`}>
               <Image
+                priority
                 alt="Imagen del gobierno"
                 className={`cursor-pointer ${styles['gobimg']}`}
                 src={insemp}
@@ -26,7 +27,12 @@ export const ButtonImage: React.FC<ButtonImageProps> = ({ configuracionClaveUnic
             </Link>
           ) : (
             <div>
-              <Image alt="Imagen del gobierno" className={`${styles['gobimg']}`} src={insemp} />
+              <Image
+                priority
+                alt="Imagen del gobierno"
+                className={`${styles['gobimg']}`}
+                src={insemp}
+              />
             </div>
           )}
         </div>

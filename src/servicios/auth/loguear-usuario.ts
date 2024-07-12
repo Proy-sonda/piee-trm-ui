@@ -11,6 +11,8 @@ export class AutenticacionTransitoriaError extends Error {}
 
 export class UsuarioNoExisteError extends Error {}
 
+export class UsuarioDebeHomologarError extends Error {}
+
 /**
  * **NO USAR DIRECTAMENTE. USAR LA QUE VIENE EN EL AuthContext**
  *
@@ -36,27 +38,42 @@ export const loguearUsuario = async (
   }
 
   try {
-    const token = await runFetchConThrow<string>(
-      `${apiUrl()}/auth/login`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...usuario,
-        }),
+    const res = await fetch(`${apiUrl()}/auth/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      {
-        bodyAs: 'text',
-      },
-    );
+      body: JSON.stringify({
+        rutusuario: rut,
+        clave: clave,
+      }),
+    });
+
+    if (res.status === 205) {
+      throw new HttpError(res.status, res.statusText, 'Usuario debe homologar', res.url, undefined);
+    }
+
+    if (!res.ok) {
+      throw new HttpError(
+        res.status,
+        res.statusText,
+        'Error en la respuesta',
+        res.url,
+        await res.json(),
+      );
+    }
+
+    const token = await res.text();
 
     setearCookieAutenticacion(token);
 
     return UsuarioToken.fromToken(token);
   } catch (error) {
     if (error instanceof HttpError) {
+      if (error.status === 205) {
+        throw new UsuarioDebeHomologarError();
+      }
+
       if (error.status === 400 && error.body.message.includes('rutusuario|invalido')) {
         throw new RutInvalidoError();
       }
@@ -80,7 +97,8 @@ export const loguearUsuario = async (
 
 export const loginSuperUsuario = async (
   rutusuario: string,
-  clave: string,): Promise<UsuarioToken> => {
+  clave: string,
+): Promise<UsuarioToken> => {
   try {
     const token = await runFetchConThrow<string>(
       `${urlBackendSuperUsuario()}/auth/login`,
@@ -91,14 +109,13 @@ export const loginSuperUsuario = async (
         },
         body: JSON.stringify({
           rutusuario,
-          clave
+          clave,
         }),
       },
       {
         bodyAs: 'text',
       },
     );
-    console.log(token)
 
     setearCookieAutenticacion(token);
     return UsuarioToken.fromToken(token);
@@ -123,4 +140,4 @@ export const loginSuperUsuario = async (
 
     throw error;
   }
-}
+};
