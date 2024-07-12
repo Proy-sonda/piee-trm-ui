@@ -5,6 +5,7 @@ export interface FiltroBusquedaLicencias {
   fechaHasta?: Date;
   rutEntidadEmpleadora?: string;
   idUnidadRRHH?: number;
+  // filtroSemaforo?: 'por-tramitar' | 'por-vencer' | 'vencido';
 }
 
 export const hayFiltros = (filtros: FiltroBusquedaLicencias) => {
@@ -15,5 +16,6 @@ export const hayFiltros = (filtros: FiltroBusquedaLicencias) => {
     filtros.fechaHasta !== undefined ||
     filtros.rutEntidadEmpleadora !== undefined ||
     filtros.idUnidadRRHH !== undefined
+    // || filtros.filtroSemaforo !== undefined
   );
 };

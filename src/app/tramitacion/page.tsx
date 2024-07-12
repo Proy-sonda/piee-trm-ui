@@ -1,13 +1,14 @@
 'use client';
 
 import { Titulo } from '@/components';
-import ExportarTabla from '@/components/exportar-tabla';
 import { useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores } from '@/servicios';
-import { strIncluye } from '@/utilidades';
+import { AlertaConfirmacion, strIncluye } from '@/utilidades';
 import { format, isWithinInterval } from 'date-fns';
+import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
   FiltroEstadoLicencia,
   FiltroLicencias,
@@ -102,6 +103,47 @@ const TramitacionPage = () => {
     };
   };
 
+  const generarCSVLicencias = async () => {
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      html: `¿Desea exportar las licencias a CSV?`,
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    const data = (datosBandeja?.licenciasParaTramitar ?? [] ?? []).map((licencia) => ({
+      'Código Operador': licencia.operador.idoperador,
+      Operador: licencia.operador.operador,
+      'Folio Licencia': licencia.foliolicencia,
+      'Entidad de Salud': licencia.entidadsalud.nombre,
+      'Código Estado': licencia.estadolicencia.idestadolicencia,
+      'Estado Licencia': licencia.estadolicencia.estadolicencia,
+      'RUT Entidad Empleadora': licencia.rutempleador,
+      'Entidad Empleadora': nombreEmpleador(licencia),
+      'RUN persona trabajadora': licencia.runtrabajador,
+      'Nombre Persona Trabajadora': `${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidopaterno}`,
+      'Tipo Reposo': licencia.tiporeposo.tiporeposo,
+      'Días Reposo': licencia.diasreposo,
+      'Inicio Reposo': format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy'),
+      'Fecha de Emisión': format(new Date(licencia.fechaemision), 'dd-MM-yyyy'),
+      'Tipo Licencia': licencia.tipolicencia.tipolicencia,
+    }));
+
+    exportFromJSON({
+      data,
+      fileName: `licencias_${format(Date.now(), 'dd_MM_yyyy_HH_mm_ss')}`,
+      exportType: exportFromJSON.types.csv,
+      delimiter: ';',
+      withBOM: true,
+    });
+  };
+
+  const nombreEmpleador = (licencia: LicenciaTramitar) => {
+    // prettier-ignore
+    return (datosBandeja?.empleadores ?? []).find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
+  };
+
   return (
     <>
       <IfContainer show={cargando}>
@@ -119,8 +161,7 @@ const TramitacionPage = () => {
           </Titulo>
           <p className="mt-3">
             En esta pantalla se muestran todas las licencias médicas que usted tiene pendiente de
-            tramitación. <br />
-            Puede utilizar los siguientes campos para facilitar su búsqueda.
+            tramitación. Puede utilizar los siguientes campos para facilitar su búsqueda.
           </p>
         </div>
 
@@ -132,7 +173,22 @@ const TramitacionPage = () => {
         </div>
 
         <div className="py-4 row text-center">
-          <h5>BANDEJA DE TRAMITACIÓN</h5>
+          <div className="col-12">
+            <div className="d-flex justify-content-between">
+              <div style={{ width: '36px' }}></div>
+              <h5>BANDEJA DE TRAMITACIÓN</h5>
+              <div>
+                <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
+                  <button
+                    className="btn btn-sm border border-0"
+                    style={{ fontSize: '20px' }}
+                    onClick={() => generarCSVLicencias()}>
+                    <i className="bi bi-filetype-csv"></i>
+                  </button>
+                </OverlayTrigger>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="row text-end">
@@ -141,7 +197,7 @@ const TramitacionPage = () => {
 
         <div className="row mt-3">
           <div className="col-md-12">
-            <div className="text-end">
+            {/* <div className="text-end">
               <IfContainer show={!noExisteLicencia}>
                 <ExportarTabla
                   nombre={`bandeja-tramitacion-${format(new Date(), "dd-MM-yyyy '-' HH-mm")}`}
@@ -171,7 +227,7 @@ const TramitacionPage = () => {
                   })}
                 />
               </IfContainer>
-            </div>
+            </div> */}
 
             <IfContainer show={noExisteLicencia}>
               <h4 className="text-center mt-5">No existen licencias para mostrar</h4>

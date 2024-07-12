@@ -5,4 +5,5 @@ export interface FormularioFiltrarLicencias {
   fechaHasta: Date;
   rutEntidadEmpleadora: string;
   idUnidadRRHH: number;
+  // filtroSemaforo: 'por-tramitar' | 'por-vencer' | 'vencido';
 }

@@ -59,6 +59,7 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
     fechaHasta,
     rutEntidadEmpleadora,
     idUnidadRRHH,
+    // filtroSemaforo,
   }) => {
     onFiltrarLicencias({
       folio: folio.trim() === '' ? undefined : folio,
@@ -66,6 +67,7 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
       idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
+      // filtroSemaforo: esElValorPorDefecto(filtroSemaforo) ? undefined : filtroSemaforo,
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora)
         ? undefined
         : rutEntidadEmpleadora,
@@ -115,9 +117,12 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
           ref={target}
           className={`${listaguia[0]!?.activo && guia ? 'overlay-marco' : ''}`}>
           <div className={`row g-3 align-items-baseline`}>
-            <div className={`col-12 col-md-6 col-lg-3`}>
-              <InputRutBusqueda opcional name="folio" label="Folio" />
-            </div>
+            <InputRutBusqueda
+              opcional
+              name="folio"
+              label="Folio"
+              className="col-12 col-md-6 col-lg-3"
+            />
 
             <InputRutBusqueda
               opcional
@@ -126,25 +131,21 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               className="col-12 col-md-6 col-lg-3"
             />
 
-            <div className={`col-12 col-md-12 col-lg-6`}>
-              <div className="row">
-                <InputFecha
-                  opcional
-                  name="fechaDesde"
-                  noPosteriorA="fechaHasta"
-                  label="Fecha Emisión Desde"
-                  className="col-12 col-md-6 col-lg-6"
-                />
+            <InputFecha
+              opcional
+              name="fechaDesde"
+              noPosteriorA="fechaHasta"
+              label="Fecha Emisión Desde"
+              className="col-12 col-md-6 col-lg-3"
+            />
 
-                <InputFecha
-                  opcional
-                  name="fechaHasta"
-                  noAnteriorA="fechaDesde"
-                  label="Fecha Emisión Hasta"
-                  className="col-12 col-md-6 col-lg-6"
-                />
-              </div>
-            </div>
+            <InputFecha
+              opcional
+              name="fechaHasta"
+              noAnteriorA="fechaDesde"
+              label="Fecha Emisión Hasta"
+              className="col-12 col-md-6 col-lg-3"
+            />
 
             <ComboSimple
               opcional
@@ -167,15 +168,39 @@ export const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               tipoValor="string"
               className="col-12 col-md-6 col-lg-3"
             />
+
+            {/* <ComboSimple
+              opcional
+              name="filtroSemaforo"
+              label="Vencimiento Tramitación"
+              datos={[
+                { label: 'Por Tramitar', value: 'por-tramitar' },
+                { label: 'Por Vencer', value: 'por-vencer' },
+                { label: 'Vencido', value: 'vencido' },
+              ]}
+              idElemento="value"
+              descripcion="label"
+              tipoValor="string"
+              className="col-12 col-md-6 col-lg-3"
+            /> */}
+
+            <div className="col-12 col-md-6 col-lg-6">
+              <label className="d-none d-md-inline-block form-label"> </label>
+              <div className="form-control px-0 mx-0 border border-0 d-flex justify-content-lg-end">
+                <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-md-grow-0">
+                  Filtrar
+                </button>
+              </div>
+            </div>
           </div>
 
-          <div className="mt-4 row">
+          {/* <div className="mt-4 row">
             <div className="d-flex">
-              <button type="submit" className={`btn btn-primary px-4 flex-grow-1 flex-sm-grow-0`}>
+              <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-sm-grow-0">
                 Filtrar
               </button>
             </div>
-          </div>
+          </div> */}
         </form>
       </FormProvider>
     </>
