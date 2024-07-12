@@ -479,10 +479,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
               onSubmit={formulario.handleSubmit(onHandleSubmit)}>
               <div className="row g-3 align-items-baseline">
                 <InputRut
+                  deshabilitado
+                  ocultarTooltip
                   name="run"
                   label="Rut Entidad Empleadora"
                   tipo="run"
-                  deshabilitado
                   className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />
 

@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { Form } from 'react-bootstrap';
+import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
+import IfContainer from '../if-container';
 import { ErroresEditables, InputReciclableBase } from './base-props';
 import { useInputReciclable } from './hooks';
 
@@ -17,6 +18,9 @@ interface InputRutProps
 
   /** Solo se va a llamar si el RUT es valido */
   onBlur?: (rut: string) => Promise<void> | void;
+
+  /** Si se debe ocultar el tooltip de ayuda (default: `false`) */
+  ocultarTooltip?: boolean;
 }
 
 export const InputRut: React.FC<InputRutProps> = ({
@@ -29,6 +33,7 @@ export const InputRut: React.FC<InputRutProps> = ({
   omitirSignoObligatorio,
   onBlur: onBlurInterno,
   errores,
+  ocultarTooltip,
 }) => {
   const MAXIMO_CARACTERES_EN_RUT = 12;
 
@@ -49,7 +54,25 @@ export const InputRut: React.FC<InputRutProps> = ({
   return (
     <>
       <Form.Group className={`${className ?? ''} position-relative`} controlId={idInput}>
-        {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
+        <IfContainer show={textoLabel}>
+          <Form.Label>
+            <span>{textoLabel}</span>
+            {!ocultarTooltip && (
+              <OverlayTrigger
+                placement="top"
+                delay={{ show: 250, hide: 400 }}
+                overlay={(props) => (
+                  <Tooltip id="button-tooltip" {...props}>
+                    {'Se debe ingresar sin puntos y con guión (Ej: 123456-7)'}
+                  </Tooltip>
+                )}>
+                <i className="ms-2 text-primary bi bi-info-circle" style={{ fontSize: '16px' }}></i>
+              </OverlayTrigger>
+            )}
+          </Form.Label>
+        </IfContainer>
+
+        {/* {textoLabel && <Form.Label>{textoLabel}</Form.Label>} */}
 
         <Form.Control
           type="text"

@@ -160,6 +160,7 @@ export const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                 }>
                 <div className="row mb-4 g-3 align-items-baseline">
                   <InputRut
+                    ocultarTooltip
                     deshabilitado
                     name="rut"
                     label="RUN"
