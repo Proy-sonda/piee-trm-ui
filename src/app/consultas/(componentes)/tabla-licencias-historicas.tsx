@@ -5,7 +5,7 @@ import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { AlertaConfirmacion, AlertaError } from '@/utilidades';
+import { AlertaConfirmacion, AlertaInformacion } from '@/utilidades';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
@@ -63,8 +63,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     }
 
     if (mensaje) {
-      AlertaError.fire({
-        titleText: 'Error',
+      AlertaInformacion.fire({
         html: `No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}.`,
       });
       return;
