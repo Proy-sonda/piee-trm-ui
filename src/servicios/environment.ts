@@ -36,4 +36,13 @@ export const saltarseClaveUnica = () => {
 
 export const obtenerChatBot = () => {
   return process.env.NEXT_PUBLIC_CHATBOT_URL;
-}
+};
+
+export const ambiente = (): 'sonda' | 'prod' | 'qa' | 'dev' => {
+  const ambientes = ['sonda', 'prod', 'qa', 'dev'];
+  if (!process.env.NEXT_PUBLIC_AMBIENTE || !ambientes.includes(process.env.NEXT_PUBLIC_AMBIENTE)) {
+    throw new Error('Ambiente no existe o es desconocido');
+  }
+
+  return process.env.NEXT_PUBLIC_AMBIENTE as 'sonda' | 'prod' | 'qa' | 'dev';
+};

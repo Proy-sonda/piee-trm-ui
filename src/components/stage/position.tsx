@@ -1,3 +1,4 @@
+import { KEY_TOKEN_AUTENTICACION } from '@/servicios/auth/cookie-autenticacion';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import styles from './position.module.css';
@@ -28,7 +29,7 @@ const Position: React.FC<PositionProps> = ({ tabActiva }) => {
     ['mantencion-empleadores', { href: '/empleadores', titulo: 'Entidades Empleadoras' }],
   ]);
 
-  const tokenUsuario = cookies().get('token')?.value;
+  const tokenUsuario = cookies().get(KEY_TOKEN_AUTENTICACION)?.value;
   if (!tokenUsuario) {
     return null;
   }

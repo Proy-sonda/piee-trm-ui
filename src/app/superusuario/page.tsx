@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { ambiente } from '@/servicios';
 import { AlertaConfirmacion, AlertaError } from '@/utilidades';
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
 import TablaUsuarios from './(componentes)/tabla-usuarios';
@@ -34,7 +35,7 @@ const SuperUsuario = () => {
   useEffect(() => {
     // obtener la cookie desde el login de adscripcion con nookies
     const cookie = document.cookie;
-    const token = cookie.split('token=')[1];
+    const token = cookie.split(`${ambiente()}-token=`)[1];
     if (token) {
       return;
     }
