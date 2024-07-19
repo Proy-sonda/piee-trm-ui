@@ -30,6 +30,7 @@ interface TablaLicenciasTramitadasProps {
   totalPaginas: number;
   onCambioPagina: (pagina: number) => void;
   onExportarCSV: () => void;
+  paginaActual: number;
 }
 
 interface DatosComprobanteTramitacion {
@@ -43,8 +44,8 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
   totalPaginas,
   onCambioPagina,
   onExportarCSV,
+  paginaActual,
 }) => {
-  const [paginaActual, setPaginaActual] = useState(0);
   const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
   const [blobModalPdf, setBlobModalPdf] = useState<Blob>();
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
@@ -259,10 +260,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
         <Paginacion
           paginaActual={paginaActual}
           numeroDePaginas={totalPaginas}
-          onCambioPagina={(pagina) => {
-            setPaginaActual(pagina);
-            onCambioPagina(pagina);
-          }}
+          onCambioPagina={onCambioPagina}
         />
       </div>
     </>
