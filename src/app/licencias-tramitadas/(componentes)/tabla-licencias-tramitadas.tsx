@@ -29,7 +29,6 @@ interface TablaLicenciasTramitadasProps {
   licencias: LicenciaTramitada[];
   totalPaginas: number;
   onCambioPagina: (pagina: number) => void;
-  onExportarCSV: () => void;
   paginaActual: number;
 }
 
@@ -43,7 +42,6 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
   empleadores,
   totalPaginas,
   onCambioPagina,
-  onExportarCSV,
   paginaActual,
 }) => {
   const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
@@ -107,12 +105,6 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
           }}
         />
       )}
-
-      <div className="mt-2 mb-4 d-flex align-items-center justify-content-end">
-        <button className="btn btn-sm btn-primary" onClick={onExportarCSV}>
-          Exportar a CSV
-        </button>
-      </div>
 
       <Table striped hover responsive>
         <thead>
