@@ -149,7 +149,10 @@ const LicenciasTramitadasPage = () => {
           <FiltroLicenciasTramitadas
             empleadores={combos?.empleadores ?? []}
             estadosLicencias={combos?.estadosLicencias ?? []}
-            onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
+            onFiltrarLicencias={(x) => {
+              setFiltrosBusqueda(x);
+              setPaginaActual(0);
+            }}
           />
         </div>
 
@@ -170,6 +173,7 @@ const LicenciasTramitadasPage = () => {
                 }
                 onCambioPagina={setPaginaActual}
                 onExportarCSV={exportarLicenciasCSV}
+                paginaActual={paginaActual}
               />
             </div>
           </div>
