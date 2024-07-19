@@ -124,7 +124,7 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
               </div>
             </GuiaUsuario>
 
-            <button
+            {/* <button
               type="button"
               className={`btn btn-success mt-3 mt-md-0 ${
                 listaguia[0]!?.nombre.includes('Filtro') && guia ? 'overlay-marco' : ''
@@ -132,7 +132,7 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
               data-bs-toggle="modal"
               data-bs-target="#Addsempresa">
               Inscribe Entidad Empleadora
-            </button>
+            </button> */}
           </div>
         </div>
       </form>
