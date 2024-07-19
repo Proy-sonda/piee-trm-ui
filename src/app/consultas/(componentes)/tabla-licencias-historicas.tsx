@@ -5,9 +5,7 @@ import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { AlertaConfirmacion, AlertaInformacion } from '@/utilidades';
-import { format } from 'date-fns';
-import exportFromJSON from 'export-from-json';
+import { AlertaInformacion } from '@/utilidades';
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
@@ -84,41 +82,6 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     setMostrarModalHistorico(true);
   };
 
-  const exportarLicenciasCSV = async () => {
-    const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Desea exportar las licencias tramitadas a CSV?`,
-    });
-
-    if (!isConfirmed) {
-      return;
-    }
-
-    setMostrarSpinner(true);
-
-    const data = (licencias ?? []).map((licencia) => ({
-      Operador: licencia.operador.operador,
-      Folio: licencia.foliolicencia,
-      Estado: licencia.estadolicencia.estadolicencia,
-      'RUN persona trabajadora': licencia.runtrabajador,
-      'Nombre persona trabajadora': nombreTrabajador(licencia),
-      'Tipo de reposo': licencia.tiporeposo.tiporeposo,
-      'Días de reposo': licencia.diasreposo,
-      'Inicio de reposo': licencia.fechainicioreposo,
-      'Fecha de emisión': licencia.fechaemision,
-      'Tipo de licencia': licencia.tipolicencia.tipolicencia,
-    }));
-
-    exportFromJSON({
-      data,
-      fileName: `licencias_tramitadas_${format(Date.now(), 'dd_MM_yyyy_HH_mm_ss')}`,
-      exportType: exportFromJSON.types.csv,
-      delimiter: ';',
-      withBOM: true,
-    });
-
-    setMostrarSpinner(false);
-  };
-
   return (
     <>
       <IfContainer show={mostrarSpinner}>
@@ -152,12 +115,6 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
           setMostrarModalHistorico(false);
         }}
       />
-
-      <div className="mt-2 mb-4 d-flex align-items-center justify-content-end">
-        <button className="btn btn-sm btn-primary" onClick={exportarLicenciasCSV}>
-          Exportar a CSV
-        </button>
-      </div>
 
       <Table striped hover responsive>
         <thead>

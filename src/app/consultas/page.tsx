@@ -5,9 +5,13 @@ import IfContainer from '@/components/if-container';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { useEstaCargando, useFetch, useHayError, useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores, emptyFetch } from '@/servicios';
+import { AlertaConfirmacion } from '@/utilidades';
+import { format } from 'date-fns';
+import exportFromJSON from 'export-from-json';
 import React, { useState } from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FiltroLicenciasHistoricas, TablaLicenciasHistoricas } from './(componentes)';
-import { FiltroBusquedaLicenciasHistoricas } from './(modelos)';
+import { FiltroBusquedaLicenciasHistoricas, LicenciaHistorica } from './(modelos)';
 import { buscarEstadosLicencias, buscarLicenciasHistoricas } from './(servicios)';
 
 interface ConsultaHistoricosPageProps {}
@@ -27,6 +31,41 @@ const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
 
   const estaCargando = useEstaCargando(cargandoCombos, cargandoLicencias);
   const hayError = useHayError(erroresCombos, errorCargaLicencias);
+
+  const exportarLicenciasCSV = async () => {
+    const { isConfirmed } = await AlertaConfirmacion.fire({
+      html: `¿Desea exportar las licencias tramitadas a CSV?`,
+    });
+
+    if (!isConfirmed) {
+      return;
+    }
+
+    const data = (licenciasHistoricas ?? []).map((licencia) => ({
+      Operador: licencia.operador.operador,
+      Folio: licencia.foliolicencia,
+      Estado: licencia.estadolicencia.estadolicencia,
+      'RUN persona trabajadora': licencia.runtrabajador,
+      'Nombre persona trabajadora': nombreTrabajador(licencia),
+      'Tipo de reposo': licencia.tiporeposo.tiporeposo,
+      'Días de reposo': licencia.diasreposo,
+      'Inicio de reposo': licencia.fechainicioreposo,
+      'Fecha de emisión': licencia.fechaemision,
+      'Tipo de licencia': licencia.tipolicencia.tipolicencia,
+    }));
+
+    exportFromJSON({
+      data,
+      fileName: `licencias_consulta_${format(Date.now(), 'dd_MM_yyyy_HH_mm_ss')}`,
+      exportType: exportFromJSON.types.csv,
+      delimiter: ';',
+      withBOM: true,
+    });
+  };
+
+  const nombreTrabajador = (licencia: LicenciaHistorica) => {
+    return `${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`;
+  };
 
   return (
     <>
@@ -48,8 +87,22 @@ const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
         />
       </div>
 
-      <div className="pt-4 row text-center">
-        <h5>LICENCIAS HISTÓRICAS</h5>
+      <div className="pt-4 row">
+        <div className="col-12">
+          <div className="d-flex justify-content-between align-items-center">
+            <h2 className="fs-5 m-0 p-0">LICENCIAS HISTÓRICAS</h2>
+            <div>
+              <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
+                <button
+                  className="btn btn-sm border border-0"
+                  style={{ fontSize: '20px' }}
+                  onClick={() => exportarLicenciasCSV()}>
+                  <i className="bi bi-filetype-csv"></i>
+                </button>
+              </OverlayTrigger>
+            </div>
+          </div>
+        </div>
       </div>
 
       <IfContainer show={hayError}>
