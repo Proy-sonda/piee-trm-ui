@@ -9,6 +9,7 @@ import { AlertaConfirmacion, AlertaError, strIncluye } from '@/utilidades';
 import { format } from 'date-fns';
 import exportFromJSON from 'export-from-json';
 import { useEffect, useState } from 'react';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FiltroLicenciasTramitadas, TablaLicenciasTramitadas } from './(componentes)';
 import { FiltroBusquedaLicenciasTramitadas, LicenciaTramitada } from './(modelos)';
 import { buscarEstadosLicencias, buscarLicenciasTramitadas } from './(servicios)';
@@ -157,11 +158,25 @@ const LicenciasTramitadasPage = () => {
         </div>
 
         <IfContainer show={!errorLicencias}>
-          <div className="pt-4 row text-center">
-            <h5>LICENCIAS TRAMITADAS</h5>
+          <div className="pt-4 row">
+            <div className="col-12">
+              <div className="d-flex justify-content-between align-items-center">
+                <h2 className="fs-5 m-0 p-0">LICENCIAS TRAMITADAS</h2>
+                <div>
+                  <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
+                    <button
+                      className="btn btn-sm border border-0"
+                      style={{ fontSize: '20px' }}
+                      onClick={() => exportarLicenciasCSV()}>
+                      <i className="bi bi-filetype-csv"></i>
+                    </button>
+                  </OverlayTrigger>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="row mt-3">
+          <div className="row mt-4">
             <div className="col-md-12">
               <TablaLicenciasTramitadas
                 empleadores={combos?.empleadores ?? []}
@@ -172,7 +187,6 @@ const LicenciasTramitadasPage = () => {
                     : totalLicenciasAnteriores
                 }
                 onCambioPagina={setPaginaActual}
-                onExportarCSV={exportarLicenciasCSV}
                 paginaActual={paginaActual}
               />
             </div>
