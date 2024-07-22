@@ -22,18 +22,21 @@ import {
   AlertaInformacion,
 } from '@/utilidades/alertas';
 import 'animate.css';
+import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChangeEvent, FormEvent, useContext, useEffect, useRef, useState } from 'react';
-import { Modal } from 'react-bootstrap';
+import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import { TIPOS_DE_OPERADORESID, TipoOperadorId, Trabajadoresxrrhh } from '../../(modelos)';
 import { ProgressBarCustom, TablaTrabajadores } from './(componentes)';
 import { Trabajador } from './(modelos)';
 import styles from './trabajadores.module.css';
+
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
+
 interface TrabajadoresPageProps {
   params: {
     rutempleador: string;
@@ -420,6 +423,37 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }
   };
 
+  const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const resp = await AlertaConfirmacion.fire({
+      html: `¿Desea exportar las personas trabajadoras a CSV?`,
+    });
+
+    if (resp.isDenied) return;
+    if (resp.isDismissed) return;
+    let data = trabajadores.map((trabajador) => ({
+      ['']: trabajador.RunTrabajador.replaceAll('-', ''),
+    }));
+
+    function padZero(num: number): string {
+      return num < 10 ? `0${num}` : `${num}`;
+    }
+
+    const now = new Date();
+    const exportType = 'csv';
+    const fileName = `${unidad} ${padZero(now.getDate())}-${padZero(
+      now.getMonth() + 1,
+    )}-${now.getFullYear()}-${padZero(now.getHours())}-${padZero(now.getMinutes())}-${padZero(
+      now.getSeconds(),
+    )}`;
+
+    exportFromJSON({
+      data,
+      fileName,
+      exportType,
+    });
+  };
+
   return (
     <>
       <IfContainer show={cargandoPantallacompleta}>
@@ -771,8 +805,39 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
         <div className="row mt-5">
           <div className="col-md-12">
-            <div className="row">
-              <h5 className="text-center">Personas Trabajadoras</h5>
+            <h5 className="text-center">Personas Trabajadoras</h5>
+            <hr />
+          </div>
+        </div>
+
+        <div className="row mb-2">
+          <div className="col-12 col-sm-8 col-md-6 col-lg-4 col-xl-3 col-xxl-2">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Búsqueda por RUN..."
+              onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                e.preventDefault();
+                settrabajadores(
+                  datosPagina?.trabajadores.filter((trabajador) =>
+                    trabajador.RunTrabajador.includes(e.target.value.toUpperCase()),
+                  ) || [],
+                );
+              }}
+            />
+          </div>
+          <div className="col-12 col-sm-4 col-md-6 col-lg-8 col-xl-9 col-xxl-10">
+            <div className="mt-3 mt-sm-0 d-flex justify-content-center align-items-center justify-content-sm-end">
+              <div>
+                <OverlayTrigger overlay={<Tooltip>Exportar trabajadores a CSV</Tooltip>}>
+                  <button
+                    className="btn btn-sm border border-0"
+                    style={{ fontSize: '20px' }}
+                    onClick={(e) => exportarACsv(e)}>
+                    <i className="bi bi-filetype-csv"></i>
+                  </button>
+                </OverlayTrigger>
+              </div>
               {rolEnEmpleadorActual === 'administrador' && (
                 <span
                   className="text-end animate animate__fadeIn"
@@ -785,42 +850,26 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 </span>
               )}
             </div>
+          </div>
+        </div>
 
-            <hr />
+        <div className="mt-4 row">
+          <div className="col-12">
             <IfContainer show={pendiente || loading}>
               <div className="mb-5">
                 <LoadingSpinner titulo="Cargando personas trabajadoras..." />
               </div>
             </IfContainer>
+
             <IfContainer show={!pendiente || !loading}>
-              <div
-                className="row mb-2"
-                style={{
-                  display: datosPagina?.trabajadores?.length || 0 > 0 ? 'block' : 'none',
-                }}>
-                <div className="col-md-3">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Búsqueda por RUN..."
-                    onInput={(e: ChangeEvent<HTMLInputElement>) => {
-                      e.preventDefault();
-                      settrabajadores(
-                        datosPagina?.trabajadores.filter((trabajador) =>
-                          trabajador.RunTrabajador.includes(e.target.value.toUpperCase()),
-                        ) || [],
-                      );
-                    }}
-                  />
-                </div>
-              </div>
               {trabajadores.length > 0 && !pendiente ? (
                 <>
                   <TablaTrabajadores
-                    unidad={unidad}
                     handleDeleteTrabajador={handleDeleteTrabajador}
-                    idunidad={Number(idunidad)}
                     trabajadores={trabajadores}
+                    linkVolver={`/empleadores/${rutempleador}/unidad?operador=${
+                      tabOperador == 3 ? 'imed' : 'medipass'
+                    }`}
                   />
                 </>
               ) : (
@@ -834,27 +883,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
             </IfContainer>
           </div>
         </div>
-        <div
-          className="row mt-2"
-          style={{
-            alignSelf: 'end',
-          }}>
-          <div className="col-md-6"></div>
-          <div className="col-md-6 text-end">
-            <button
-              className="btn btn-danger"
-              onClick={() =>
-                router.push(
-                  `/empleadores/${rutempleador}/unidad?operador=${
-                    tabOperador == 3 ? 'imed' : 'medipass'
-                  }`,
-                )
-              }>
-              Volver
-            </button>
-          </div>
-        </div>
-        <br />
       </div>
 
       <Modal show={show} onHide={handleClose}>

@@ -2,24 +2,20 @@ import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actua
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
-import { AlertaConfirmacion } from '@/utilidades/alertas';
 import { format } from 'date-fns';
-import exportFromJSON from 'export-from-json';
-import { FormEvent } from 'react';
+import Link from 'next/link';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 interface props {
   trabajadores: Trabajadoresunidadrrhh[];
-  unidad: string;
   handleDeleteTrabajador: (trabajador: Trabajadoresunidadrrhh) => void;
-  idunidad: number;
+  linkVolver: string;
 }
 
 export const TablaTrabajadores: React.FC<props> = ({
   trabajadores,
-  unidad,
   handleDeleteTrabajador,
-  idunidad,
+  linkVolver,
 }) => {
   const [trabajadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: trabajadores,
@@ -28,46 +24,8 @@ export const TablaTrabajadores: React.FC<props> = ({
 
   const { rolEnEmpleadorActual } = useEmpleadorActual();
 
-  const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
-    e.preventDefault();
-    const resp = await AlertaConfirmacion.fire({
-      html: `¿Desea exportar las personas trabajadoras a CSV?`,
-    });
-
-    if (resp.isDenied) return;
-    if (resp.isDismissed) return;
-    let data = trabajadores.map((trabajador) => ({
-      ['']: trabajador.RunTrabajador.replaceAll('-', ''),
-    }));
-
-    function padZero(num: number): string {
-      return num < 10 ? `0${num}` : `${num}`;
-    }
-
-    const now = new Date();
-    const exportType = 'csv';
-    const fileName = `${unidad} ${padZero(now.getDate())}-${padZero(
-      now.getMonth() + 1,
-    )}-${now.getFullYear()}-${padZero(now.getHours())}-${padZero(now.getMinutes())}-${padZero(
-      now.getSeconds(),
-    )}`;
-
-    exportFromJSON({
-      data,
-      fileName,
-      exportType,
-    });
-  };
   return (
     <>
-      <div className="d-flex flex-row-reverse">
-        <div className="p-2">
-          <button className="btn btn-primary btn-sm" onClick={exportarACsv}>
-            <span className="d-none d-sm-inline">Exportar a CSV &nbsp; </span>
-            <i className="bi bi-filetype-csv d-inline d-sm-none"></i>
-          </button>
-        </div>
-      </div>
       <Table className="table table-striped">
         <Thead className="align-middle text-center">
           <Tr>
@@ -107,13 +65,22 @@ export const TablaTrabajadores: React.FC<props> = ({
           )}
         </Tbody>
       </Table>
-      <div className="mt-3">
+
+      <div className="mt-4 mb-2 d-flex flex-column flex-sm-row justify-content-sm-between">
         <Paginacion
+          paginaActual={paginaActual}
           numeroDePaginas={totalPaginas}
           onCambioPagina={cambiarPagina}
-          tamano="sm"
-          paginaActual={paginaActual}
         />
+
+        {/* Este div vacio sirve para empujar el boton volver a la derecha cuando no se muestra la paginacion */}
+        <div></div>
+
+        <div>
+          <Link href={linkVolver} className="btn btn-danger d-inline-block">
+            Volver
+          </Link>
+        </div>
       </div>
     </>
   );
