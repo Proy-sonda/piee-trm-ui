@@ -4,7 +4,6 @@ import { Titulo } from '@/components';
 import { useMergeFetchObject } from '@/hooks';
 import { buscarEmpleadores } from '@/servicios';
 import { useEffect, useState } from 'react';
-import { FiltroEstadoLicencia } from './(componentes)';
 import {
   ExportarCSV,
   FiltroLicencias,
@@ -14,7 +13,7 @@ import {
   SpinnerPantallaCompleta,
   TablaLicenciasTramitar,
 } from './(helper)';
-import { FiltroBusquedaLicencias, LicenciaTramitar } from './(modelos)';
+import { Estado } from './(modelos)/estado-licencias';
 import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para-tramitar';
 
 const TramitacionPage = () => {
@@ -23,14 +22,16 @@ const TramitacionPage = () => {
     empleadores: buscarEmpleadores(''),
   });
 
-  const [licenciasFiltradas, setLicenciasFiltradas] = useState<LicenciaTramitar[]>([]);
-  const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltroBusquedaLicencias>({});
-  const [filtroEstado, setFiltroEstado] = useState<FiltroEstadoLicencia>('todos');
+  const [estado, setEstado] = useState<Estado>({
+    licenciasFiltradas: [],
+    filtrosBusqueda: {},
+    filtroEstado: 'todos',
+  });
 
   // Actualizar listado de licencias
   useEffect(() => {
     if (datosBandeja?.licenciasParaTramitar) {
-      setLicenciasFiltradas(datosBandeja?.licenciasParaTramitar ?? []);
+      setEstado((prev) => ({ ...prev, licenciasFiltradas: datosBandeja.licenciasParaTramitar }));
     }
   }, [datosBandeja]);
 
@@ -38,10 +39,13 @@ const TramitacionPage = () => {
   useEffect(() => {
     const licenciasParaFiltrar = datosBandeja?.licenciasParaTramitar ?? [];
 
-    setLicenciasFiltradas(
-      licenciasParaFiltrar.filter(licenciaCumpleFiltros(filtrosBusqueda, filtroEstado)),
-    );
-  }, [filtrosBusqueda, filtroEstado, datosBandeja?.licenciasParaTramitar]);
+    setEstado((prev) => ({
+      ...prev,
+      licenciasFiltradas: licenciasParaFiltrar.filter(
+        licenciaCumpleFiltros(prev.filtrosBusqueda, prev.filtroEstado),
+      ),
+    }));
+  }, [estado.filtrosBusqueda, estado.filtroEstado, datosBandeja?.licenciasParaTramitar]);
 
   return (
     <>
@@ -67,7 +71,7 @@ const TramitacionPage = () => {
         <div className="pt-3 pb-4 border-bottom border-1">
           <FiltroLicencias
             empleadores={datosBandeja?.empleadores ?? []}
-            onFiltrarLicencias={(x) => setFiltrosBusqueda(x)}
+            onFiltrarLicencias={(x) => setEstado((prev) => ({ ...prev, filtrosBusqueda: x }))}
           />
         </div>
 
@@ -90,7 +94,9 @@ const TramitacionPage = () => {
                     empleadores={datosBandeja!?.empleadores}
                   />
                 </div>
-                <SemaforoLicencias onEstadoSeleccionado={(x) => setFiltroEstado(x)} />
+                <SemaforoLicencias
+                  onEstadoSeleccionado={(x) => setEstado((prev) => ({ ...prev, filtroEstado: x }))}
+                />
               </div>
             </div>
           </div>
@@ -100,7 +106,7 @@ const TramitacionPage = () => {
           <div className="col-md-12">
             <TablaLicenciasTramitar
               empleadores={datosBandeja?.empleadores ?? []}
-              licencias={licenciasFiltradas}
+              licencias={estado.licenciasFiltradas}
             />
           </div>
         </div>
