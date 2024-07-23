@@ -15,7 +15,7 @@ interface SemaforoLicenciasProps {
   onEstadoSeleccionado: (estado: FiltroEstadoLicencia) => void | Promise<void>;
 }
 
-export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccionado }) => {
+const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccionado }) => {
   const target = useRef(null);
   const {
     datosGuia: { listaguia, AgregarGuia, guia },
@@ -118,3 +118,5 @@ export const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSe
     </>
   );
 };
+
+export default SemaforoLicencias;

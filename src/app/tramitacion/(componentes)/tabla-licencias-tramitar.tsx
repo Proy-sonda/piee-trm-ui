@@ -1,28 +1,25 @@
 import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
-import Paginacion from '@/components/paginacion';
+
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
-import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import React, { useContext, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { LicenciaContext } from '../(context)/licencia.context';
+import { IfContainer, Paginacion, SpinnerPantallaCompleta } from '../(helper)';
 import { LicenciaTramitar, calcularPlazoVencimiento, licenciaFueDevuelta } from '../(modelos)';
 import styles from './tabla-licencias-tramitar.module.css';
-
-const SpinnerPantallaCompleta = dynamic(() => import('@/components/spinner-pantalla-completa'));
-const IfContainer = dynamic(() => import('@/components/if-container'));
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];
   licencias?: LicenciaTramitar[];
 }
 
-export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
+const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   licencias,
   empleadores,
 }) => {
@@ -308,7 +305,6 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
         className={`table-responsive  ${listaguia[2]!?.activo && guia ? 'overlay-marco' : ''}`}
         ref={target}>
         <Table striped hover responsive ref={target}>
-          {/* <Table striped hover  className="table table-hover table-striped"> */}
           <thead>
             <tr className={`text-center ${styles['text-tr']}`}>
               <th>FOLIO</th>
@@ -320,6 +316,15 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
             </tr>
           </thead>
           <tbody>
+            {licenciasPaginadas.length === 0 && (
+              <>
+                <tr>
+                  <td colSpan={6} className="text-center">
+                    No hay licencias para tramitar
+                  </td>
+                </tr>
+              </>
+            )}
             {licenciasPaginadas.map((licencia, index) => (
               <tr
                 key={`${licencia.foliolicencia}/${licencia.operador.idoperador}/${index}`}
@@ -449,3 +454,5 @@ export const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     </>
   );
 };
+
+export default TablaLicenciasTramitar;
