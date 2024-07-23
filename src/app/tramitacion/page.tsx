@@ -45,7 +45,7 @@ const TramitacionPage = () => {
         licenciaCumpleFiltros(prev.filtrosBusqueda, prev.filtroEstado),
       ),
     }));
-  }, [estado.filtrosBusqueda, estado.filtroEstado, datosBandeja?.licenciasParaTramitar]);
+  }, [estado.filtrosBusqueda, estado.filtroEstado, datosBandeja?.licenciasParaTramitar]); 
 
   return (
     <>

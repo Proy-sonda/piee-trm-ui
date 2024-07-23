@@ -13,6 +13,7 @@ import { LicenciaContext } from '../(context)/licencia.context';
 import { IfContainer, Paginacion, SpinnerPantallaCompleta } from '../(helper)';
 import { LicenciaTramitar, calcularPlazoVencimiento, licenciaFueDevuelta } from '../(modelos)';
 import styles from './tabla-licencias-tramitar.module.css';
+import 'animate.css'
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];
@@ -302,7 +303,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
         </div>
       </GuiaUsuario>
       <div
-        className={`table-responsive  ${listaguia[2]!?.activo && guia ? 'overlay-marco' : ''}`}
+        className={`table-responsive  ${listaguia[2]!?.activo && guia ? 'overlay-marco' : ''} animate__animated animate__fadeIn`}
         ref={target}>
         <Table striped hover responsive ref={target}>
           <thead>
