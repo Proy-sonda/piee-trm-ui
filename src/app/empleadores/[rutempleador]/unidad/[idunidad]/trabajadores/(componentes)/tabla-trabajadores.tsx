@@ -58,8 +58,8 @@ export const TablaTrabajadores: React.FC<props> = ({
             ))
           ) : (
             <Tr>
-              <Td colspan={rolEnEmpleadorActual === 'administrador' ? 4 : 3}>
-                <div className="text-center">No hay trabajadores registrados</div>
+              <Td colspan={rolEnEmpleadorActual === 'administrador' ? 3 : 2}>
+                <div className="text-center">No hay personas trabajadoras registradas.</div>
               </Td>
             </Tr>
           )}
