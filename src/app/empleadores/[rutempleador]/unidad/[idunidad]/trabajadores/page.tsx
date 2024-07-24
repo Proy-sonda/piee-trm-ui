@@ -33,6 +33,7 @@ import { TIPOS_DE_OPERADORESID, TipoOperadorId, Trabajadoresxrrhh } from '../../
 import { ProgressBarCustom, TablaTrabajadores } from './(componentes)';
 import { Trabajador } from './(modelos)';
 import styles from './trabajadores.module.css';
+import Link from 'next/link';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
@@ -536,9 +537,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 <form onSubmit={handleAddTrabajador}>
                   <div className="row mt-1">
                     <div
-                      className={`col-md-8 position-relative ${
-                        listaguia[1]!?.activo && guia && 'overlay-marco'
-                      }`}
+                      className={`col-md-8 position-relative ${listaguia[1]!?.activo && guia && 'overlay-marco'
+                        }`}
                       ref={cargatrabajador}>
                       <h5>Cargar Personas Trabajadoras</h5>
                       <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
@@ -783,9 +783,8 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                           onClick={async () => {
                             if (!getValues('file')) return;
                             const resp = await AlertaConfirmacion.fire({
-                              html: `¿Desea eliminar el fichero <b>${
-                                getValues('file')![0].name
-                              }</b>?`,
+                              html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name
+                                }</b>?`,
                             });
                             if (resp.isConfirmed) {
                               setValue('file', null);
@@ -861,26 +860,14 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               </div>
             </IfContainer>
 
-            <IfContainer show={!pendiente || !loading}>
-              {trabajadores.length > 0 && !pendiente ? (
-                <>
-                  <TablaTrabajadores
-                    handleDeleteTrabajador={handleDeleteTrabajador}
-                    trabajadores={trabajadores}
-                    linkVolver={`/empleadores/${rutempleador}/unidad?operador=${
-                      tabOperador == 3 ? 'imed' : 'medipass'
-                    }`}
-                  />
-                </>
-              ) : (
-                <div className="alert alert-warning text-center">
-                  <b>
-                    No se han encontrado personas trabajadoras en la unidad{' '}
-                    <strong>{unidad}</strong>
-                  </b>
-                </div>
-              )}
-            </IfContainer>
+
+            <TablaTrabajadores
+              handleDeleteTrabajador={handleDeleteTrabajador}
+              trabajadores={trabajadores}
+              linkVolver={`/empleadores/${rutempleador}/unidad?operador=${tabOperador == 3 ? 'imed' : 'medipass'
+                }`}
+            />
+
           </div>
         </div>
       </div>

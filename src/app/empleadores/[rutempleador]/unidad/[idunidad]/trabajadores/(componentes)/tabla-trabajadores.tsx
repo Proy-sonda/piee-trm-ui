@@ -4,6 +4,7 @@ import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { useEffect } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 interface props {
@@ -21,6 +22,7 @@ export const TablaTrabajadores: React.FC<props> = ({
     datos: trabajadores,
     tamanoPagina: 5,
   });
+  
 
   const { rolEnEmpleadorActual } = useEmpleadorActual();
 
@@ -56,11 +58,9 @@ export const TablaTrabajadores: React.FC<props> = ({
             ))
           ) : (
             <Tr>
-              <Td colspan={3}>
-                <div className="alert alert-info text-center">No hay trabajadores registrados</div>
+              <Td colspan={rolEnEmpleadorActual === 'administrador' ? 4 : 3}>
+                <div className="text-center">No hay trabajadores registrados</div>
               </Td>
-              <Td>-</Td>
-              {rolEnEmpleadorActual === 'administrador' && <Td>-</Td>}
             </Tr>
           )}
         </Tbody>
