@@ -41,7 +41,7 @@ export const TablaTrabajadores: React.FC<props> = ({
             trabajadoresPaginados.map((trabajador) => (
               <Tr key={trabajador.RunTrabajador}>
                 <Td>{trabajador.RunTrabajador}</Td>
-                <Td>{format(new Date(trabajador.FechaRegistro), 'dd-MM-yyyy HH:mm:ss')}</Td>
+                <Td>{format(new Date(trabajador.FechaRegistro), 'dd-MM-yyyy')}</Td>
 
                 {rolEnEmpleadorActual === 'administrador' && (
                   <Td>
