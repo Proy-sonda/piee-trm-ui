@@ -6,13 +6,17 @@ import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { AlertaInformacion } from '@/utilidades';
+import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { ModalHistoricoEstadoLicencia } from '.';
 import { LicenciaHistorica } from '../(modelos)';
 import { BuscarHistorialEstadosLmeRequest } from '../(servicios)';
 import styles from './tabla-licencias-historicas.module.css';
+
+import { Empleador } from '@/modelos/empleador';
+import { buscarEmpleadores } from '@/servicios';
 
 const ModalComprobanteTramitacion = dynamic(() =>
   import('@/components/modal-comprobante-tramitacion').then((x) => x.ModalComprobanteTramitacion),
@@ -34,6 +38,34 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     datos: licencias,
     tamanoPagina: 5,
   });
+
+  const [empleadores, setempleadores] = useState<Empleador[]>([]);
+
+  useEffect(() => {
+    const BuscarEmpleadores = async () => {
+      try {
+        const [request] = buscarEmpleadores('');
+        const empleadores = await request();
+        setempleadores(empleadores);
+        console.log(empleadores);
+      } catch (error) {}
+    };
+
+    BuscarEmpleadores();
+  }, []);
+
+  const BusquedaDeEmpleador = (rutEmpleador: string) => {
+    return (
+      <>
+        <div className="mb-1 small text-nowrap">
+          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.razonsocial}
+        </div>
+        <div className="mb-1 small text-nowrap">
+          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.rutempleador || rutEmpleador}
+        </div>
+      </>
+    );
+  };
 
   const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
   const [blobModalPdf, setBlobModalPdf] = useState<Blob>();
@@ -62,7 +94,8 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
 
     if (mensaje) {
       AlertaInformacion.fire({
-        html: `No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}.`,
+        html: `No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}. </br>
+        Puedes revisar mas detalles de su Tramitación en el portal del Operador <b>${licencia.operador.operador}</b>.`,
       });
       return;
     }
@@ -121,6 +154,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
           <tr className={`text-center ${styles['text-tr']}`}>
             <th>FOLIO</th>
             <th>ESTADO</th>
+            <th>EMPLEADOR</th>
             <th>PERSONA TRABAJADORA</th>
             <th>DESCRIPCIÓN</th>
             <th></th>
@@ -137,10 +171,15 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
                   <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
                 </td>
                 <td>
-                  <div className="mb-1 small text-nowrap">
+                  <div className="mb-1 small text-start text-nowrap">
                     {`${licencia.estadolicencia?.idestadolicencia} - ${licencia.estadolicencia?.estadolicencia}`}
                   </div>
+                  <div className="mb-1 small text-start text-nowrap">
+                    FECHA ESTADO:{' '}
+                    {format(new Date(licencia.fechaestadolicencia || new Date()), 'dd-MM-yyyy')}
+                  </div>
                 </td>
+                <td>{BusquedaDeEmpleador(licencia.rutempleador)}</td>
                 <td>
                   <div className="mb-1 small text-nowrap">{nombreTrabajador(licencia)}</div>
                   <div className="mb-1 small text-nowrap">RUN: {licencia.runtrabajador}</div>
@@ -197,11 +236,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
         ) : (
           <tbody>
             <tr className="text-center">
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td></td>
+              <td colSpan={5}>No se han encontrado licencias.</td>
             </tr>
           </tbody>
         )}
