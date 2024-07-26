@@ -44,7 +44,7 @@ export const usePaginacion = <T>({
 
     setPaginaActual(nuevaPaginaActual);
 
-    const desde = pagina * tamanoPagina;
+    const desde = nuevaPaginaActual * tamanoPagina;
     const hasta = desde + tamanoPagina;
     const datosParaTransformar = datosPorPaginar.slice(desde, hasta);
     if (!porCadaElemento) {
