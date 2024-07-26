@@ -95,7 +95,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     if (mensaje) {
       AlertaInformacion.fire({
         html: `No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}. </br>
-        Puedes revisar mas detalles de su Tramitación en el portal del Operador MEDIPASS.`,
+        Puedes revisar mas detalles de su Tramitación en el portal del Operador <b>${licencia.operador.operador}</b>.`,
       });
       return;
     }
@@ -236,7 +236,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
         ) : (
           <tbody>
             <tr className="text-center">
-              <td colSpan={5}>No se han encontraron licencias.</td>
+              <td colSpan={5}>No se han encontrado licencias.</td>
             </tr>
           </tbody>
         )}
