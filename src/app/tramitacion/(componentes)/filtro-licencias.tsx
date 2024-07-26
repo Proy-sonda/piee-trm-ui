@@ -14,9 +14,15 @@ import { AuthContext } from '../../../contexts/auth-context';
 interface FiltroLicenciasProps {
   empleadores: Empleador[];
   onFiltrarLicencias: (formulario: FiltroBusquedaLicencias) => void | Promise<void>;
+  /** Cualquier valor tal que cuando cambie se van a limpiar los filtros */
+  limpiarOnRefresh: any;
 }
 
-const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltrarLicencias }) => {
+const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
+  empleadores,
+  onFiltrarLicencias,
+  limpiarOnRefresh,
+}) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
   const target = useRef(null);
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
@@ -24,6 +30,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
     datosGuia: { AgregarGuia, guia, listaguia },
   } = useContext(AuthContext);
 
+  // Agregar guías de usuario
   useEffect(() => {
     AgregarGuia([
       {
@@ -43,6 +50,11 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
       },
     ]);
   }, []);
+
+  // Limpiar filtros al momento de recargar las licencias
+  useEffect(() => {
+    limpiarCampos();
+  }, [limpiarOnRefresh]);
 
   const [, unidadesRRHH] = useFetch(
     rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),
@@ -69,6 +81,11 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
         ? undefined
         : rutEntidadEmpleadora,
     });
+  };
+
+  const limpiarCampos = () => {
+    formulario.reset();
+    onFiltrarLicencias({});
   };
 
   return (
@@ -181,23 +198,23 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
               className="col-12 col-md-6 col-lg-3"
             /> */}
 
-            <div className="col-12 col-md-6 col-lg-6">
-              <label className="d-none d-md-inline-block form-label"> </label>
+            <div className="col-12 col-md-12 col-lg-6">
+              <label className="d-none d-lg-inline-block form-label"> </label>
               <div className="form-control px-0 mx-0 border border-0 d-flex justify-content-lg-end">
-                <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-md-grow-0">
-                  Filtrar
-                </button>
+                <div className="w-100 d-flex flex-column flex-sm-row-reverse">
+                  <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-sm-grow-0">
+                    Filtrar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => limpiarCampos()}
+                    className="btn btn-secondary mt-2 mt-sm-0 me-sm-2">
+                    Limpiar
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* <div className="mt-4 row">
-            <div className="d-flex">
-              <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-sm-grow-0">
-                Filtrar
-              </button>
-            </div>
-          </div> */}
         </form>
       </FormProvider>
     </>
