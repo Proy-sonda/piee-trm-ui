@@ -14,9 +14,15 @@ import { AuthContext } from '../../../contexts/auth-context';
 interface FiltroLicenciasProps {
   empleadores: Empleador[];
   onFiltrarLicencias: (formulario: FiltroBusquedaLicencias) => void | Promise<void>;
+  /** Cualquier valor tal que cuando cambie se van a limpiar los filtros */
+  limpiarOnRefresh: any;
 }
 
-const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltrarLicencias }) => {
+const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
+  empleadores,
+  onFiltrarLicencias,
+  limpiarOnRefresh,
+}) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
   const target = useRef(null);
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
@@ -24,6 +30,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
     datosGuia: { AgregarGuia, guia, listaguia },
   } = useContext(AuthContext);
 
+  // Agregar guías de usuario
   useEffect(() => {
     AgregarGuia([
       {
@@ -43,6 +50,11 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({ empleadores, onFiltra
       },
     ]);
   }, []);
+
+  // Limpiar filtros al momento de recargar las licencias
+  useEffect(() => {
+    limpiarCampos();
+  }, [limpiarOnRefresh]);
 
   const [, unidadesRRHH] = useFetch(
     rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),

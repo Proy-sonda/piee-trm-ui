@@ -77,6 +77,7 @@ const TramitacionPage = () => {
 
         <div className="pt-3 pb-4 border-bottom border-1">
           <FiltroLicencias
+            limpiarOnRefresh={refresh}
             empleadores={datosBandeja?.empleadores ?? []}
             onFiltrarLicencias={(x) => setEstado((prev) => ({ ...prev, filtrosBusqueda: x }))}
           />
