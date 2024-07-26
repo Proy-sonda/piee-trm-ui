@@ -191,8 +191,7 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>NOMBRE ENTIDAD EMPLEADORA: </b>
-                  LIDER
-                  {/* {empleador?.razonsocial} */}
+                  {empleador?.razonsocial}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FECHA TRAMITACIÓN: </b>
