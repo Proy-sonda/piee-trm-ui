@@ -11,7 +11,7 @@
 
 .header-pdf{
     /* background-image: url('../../../../../../img/header.png'); */
-    background-color: #B4B3B3;
+    background-color: rgb(122, 120, 120) !important;
     border: 2px solid black;
     background-repeat: no-repeat;
     background-size: 100% 100%;

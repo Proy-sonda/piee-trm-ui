@@ -80,7 +80,6 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       onBlobComprobante(pdf.output('blob'));
-      // window.open(pdf.output('bloburl'), '_blank');
       setmodalimprimir(false);
       onComprobanteGenerado();
     });
@@ -107,6 +106,7 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
       </Modal.Header>
       <Modal.Body>
         <div id="contenidoPDF" className={styles.watermark}>
+          <br />
           <div className={`me-5 ms-5 ${styles['label-pdf']}`}>
             <div className={`row ${styles['header-pdf']}`}>
               <div
@@ -116,7 +116,7 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
                   alignItems: 'center',
                   alignSelf: 'center',
                 }}></div>
-              <p>Comprobante de Tramitación</p>
+              <p>COMPROBANTE DE TRAMITACIÓN</p>
             </div>
 
             <div className={styles['fondo-cabecera']}>
@@ -135,69 +135,43 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
                   <b>IDENTIFICACIÓN DE LA PERSONA TRABAJADORA</b>
                 </label>
               </div>
-              <div className="row mt-4">
+              <div className="row mt-2">
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>RUN: </b>
-                    {zonas?.zona0.ruttrabajador}
-                  </label>
+                  <b>RUN: </b>
+                  {zonas?.zona0.ruttrabajador}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FOLIO LICENCIA: </b>
                   {zona1?.foliolicencia}
                 </div>
-              </div>
-              <div className="row mt-2">
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>NOMBRE: </b>
-                    {`${zonas?.zona0.nombres} ${zonas?.zona0.apellidopaterno} ${zonas?.zona0.apellidomaterno}`}
-                  </label>
+                  <b>NOMBRE: </b>
+                  {`${zonas?.zona0.nombres} ${zonas?.zona0.apellidopaterno} ${zonas?.zona0.apellidomaterno}`}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>ESTADO: </b> {zonas?.zona0.estadolicencia.estadolicencia}
-                  </label>
-                </div>
-              </div>
-              <div className="row mt-2">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>FECHA EMISIÓN:</b>{' '}
-                    {format(new Date(zonas?.zona0.fechaemision ?? '01/01/1990'), 'dd/MM/yyyy')}
-                  </label>
+                  <b>ESTADO: </b> {zonas?.zona0.estadolicencia.estadolicencia}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>FECHA ESTADO: </b>
-                    {format(new Date(zonas?.zona0.fechaestado ?? '01/01/1990'), 'dd/MM/yyyy')}
-                  </label>
-                </div>
-              </div>
-              <div className="row mt-2">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>FECHA INICIO REPOSO:</b>{' '}
-                    {format(new Date(zonas?.zona0.fechainicioreposo ?? '01/01/1990'), 'dd/MM/yyyy')}
-                  </label>
+                  <b>FECHA EMISIÓN:</b>{' '}
+                  {format(new Date(zonas?.zona0.fechaemision ?? '01/01/1990'), 'dd/MM/yyyy')}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>N° DE DÍAS:</b> {zonas?.zona0.ndias}
-                  </label>
-                </div>
-              </div>
-              <div className="row mt-2">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>FECHA TERMINO REPOSO: </b>
-                    {format(calcularFechaFin(), 'dd/MM/yyyy')}
-                  </label>
+                  <b>FECHA ESTADO: </b>
+                  {format(new Date(zonas?.zona0.fechaestado ?? '01/01/1990'), 'dd/MM/yyyy')}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>N° DE DÍAS EN PALABRAS:</b> {numeroALetras(zonas?.zona0.ndias ?? 0)}
-                  </label>
+                  <b>FECHA INICIO REPOSO:</b>{' '}
+                  {format(new Date(zonas?.zona0.fechainicioreposo ?? '01/01/1990'), 'dd/MM/yyyy')}
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <b>N° DE DÍAS:</b> {zonas?.zona0.ndias}
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <b>FECHA TERMINO REPOSO: </b>
+                  {format(calcularFechaFin(), 'dd/MM/yyyy')}
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <b>N° DE DÍAS EN PALABRAS:</b> {numeroALetras(zonas?.zona0.ndias ?? 0)}
                 </div>
               </div>
 
@@ -209,51 +183,38 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
               </div>
               <div className="row mt-4">
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>RUT: </b>
-                    {zona1?.rutempleador.replaceAll('-', '')}
-                  </label>
+                  <b>RUT: </b>
+                  {zona1?.rutempleador.replaceAll('-', '')}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>TELÉFONO: </b> {empleador?.telefonohabitual}
-                  </label>
-                </div>
-              </div>
-              <div className="row mt-2">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>NOMBRE ENTIDAD EMPLEADORA: </b>
-                    {empleador?.razonsocial}
-                  </label>
+                  <b>TELÉFONO: </b> {empleador?.telefonohabitual}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>FECHA TRAMITACIÓN: </b>
-                    {ConvertirFecha(zonas!?.zona0!?.fechatramitacion ?? '1900-01-01')}
-                  </label>
-                </div>
-              </div>
-              <div className="row mt-2">
-                <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>ACTIVIDAD LABORAL PERSONA TRABAJADORA: </b>
-                    {zona1?.actividadlaboral.actividadlaboral}
-                  </label>
+                  <b>NOMBRE ENTIDAD EMPLEADORA: </b>
+                  LIDER
+                  {/* {empleador?.razonsocial} */}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <label>
-                    <b>OCUPACIÓN: </b>
-                    {zona1?.ocupacion.ocupacion}
-                  </label>
+                  <b>FECHA TRAMITACIÓN: </b>
+                  {ConvertirFecha(zonas!?.zona0!?.fechatramitacion ?? '1900-01-01')}
                 </div>
-              </div>
-              <div className="row mt-2">
-                <div className="col-md-8 col-xs-8 col-sm-8">
-                  <label>
-                    <b>DIRECCIÓN DONDE CUMPLE FUNCIONES: </b>
-                    {`${zona1?.tipocalle.tipocalle} ${zona1?.direccion} ${zona1?.numero} ${zona1?.depto}, ${zona1?.comuna.nombre}`}
-                  </label>
+
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <b>OCUPACIÓN: </b>
+                  {zona1?.ocupacion.ocupacion}
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <b>USUARIO TRAMITADOR: </b>
+                  {zonas?.zona0.ruttramitacion}
+                </div>
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <b>ACTIVIDAD LABORAL PERSONA TRABAJADORA: </b>
+                  {zona1?.actividadlaboral.actividadlaboral}
+                </div>
+
+                <div className="col-md-6 col-xs-6 col-sm-6">
+                  <b>DIRECCIÓN DONDE CUMPLE FUNCIONES: </b>
+                  {`${zona1?.tipocalle.tipocalle} ${zona1?.direccion} ${zona1?.numero} ${zona1?.depto}, ${zona1?.comuna.nombre}`}
                 </div>
               </div>
               <hr />
