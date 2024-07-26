@@ -133,6 +133,10 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
         <ModalComprobanteTramitacion
           foliolicencia={datosComprobanteTramitacion.folioLicencia}
           idOperadorNumber={datosComprobanteTramitacion.idOperador}
+          onBlobComprobante={(blob) => {
+            setBlobModalPdf(blob);
+            setMostrarModalPdf(true);
+          }}
           onComprobanteGenerado={() => {
             setDatosComprobanteTramitacion(undefined);
             setMostrarSpinner(false);

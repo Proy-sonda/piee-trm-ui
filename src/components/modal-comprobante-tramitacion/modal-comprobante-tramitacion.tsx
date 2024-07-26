@@ -26,12 +26,14 @@ interface ModalComprobanteTramitacionProps {
   refresh?: boolean;
   setCargaPDF?: (carga: boolean) => void;
   actualizaTramitacion?: boolean;
+  onBlobComprobante: (blob: Blob) => void;
 }
 
 export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionProps> = ({
   foliolicencia,
   idOperadorNumber,
   onComprobanteGenerado,
+  onBlobComprobante,
 }) => {
   const [modalimprimir, setmodalimprimir] = useState(false);
 
@@ -77,7 +79,8 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      window.open(pdf.output('bloburl'), '_blank');
+      onBlobComprobante(pdf.output('blob'));
+      // window.open(pdf.output('bloburl'), '_blank');
       setmodalimprimir(false);
       onComprobanteGenerado();
     });
