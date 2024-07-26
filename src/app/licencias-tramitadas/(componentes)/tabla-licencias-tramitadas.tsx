@@ -99,6 +99,10 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
         <ModalImprimirPdf
           foliolicencia={datosComprobanteTramitacion.folioLicencia}
           idOperadorNumber={datosComprobanteTramitacion.idOperador}
+          onBlobComprobante={(blob) => {
+            setBlobModalPdf(blob);
+            setMostrarModalPdf(true);
+          }}
           onComprobanteGenerado={() => {
             setDatosComprobanteTramitacion(undefined);
             setMostrarSpinner(false);
