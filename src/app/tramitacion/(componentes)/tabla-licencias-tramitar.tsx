@@ -25,7 +25,11 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   empleadores,
 }) => {
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
-    datos: licencias,
+    datos:
+      licencias?.sort(
+        (a, b) =>
+          new Date(b.fechaestadolicencia).getTime() - new Date(a.fechaestadolicencia).getTime(),
+      ) ?? [],
     tamanoPagina: 5,
   });
 
