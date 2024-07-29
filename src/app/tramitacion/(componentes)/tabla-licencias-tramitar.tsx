@@ -5,6 +5,7 @@ import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
 import { strIncluye } from '@/utilidades/str-incluye';
+import 'animate.css';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import React, { useContext, useRef, useState } from 'react';
@@ -13,7 +14,6 @@ import { LicenciaContext } from '../(context)/licencia.context';
 import { IfContainer, Paginacion, SpinnerPantallaCompleta } from '../(helper)';
 import { LicenciaTramitar, calcularPlazoVencimiento, licenciaFueDevuelta } from '../(modelos)';
 import styles from './tabla-licencias-tramitar.module.css';
-import 'animate.css'
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];
@@ -303,7 +303,9 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
         </div>
       </GuiaUsuario>
       <div
-        className={`table-responsive  ${listaguia[2]!?.activo && guia ? 'overlay-marco' : ''} animate__animated animate__fadeIn`}
+        className={`table-responsive  ${
+          listaguia[2]!?.activo && guia ? 'overlay-marco' : ''
+        } animate__animated animate__fadeIn`}
         ref={target}>
         <Table striped hover responsive ref={target}>
           <thead>
@@ -352,6 +354,9 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <div className="mb-1 small text-nowrap">
                     {licencia.estadolicencia.idestadolicencia} -{' '}
                     {licencia.estadolicencia.estadolicencia}
+                  </div>
+                  <div className="mb-1 small text-nowrap">
+                    {format(new Date(licencia.fechaestadolicencia), 'dd-MM-yyyy HH:mm:ss')}
                   </div>
 
                   {/* Texto asociado al circulo de color */}
