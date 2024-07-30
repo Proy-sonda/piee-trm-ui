@@ -28,7 +28,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
     datos:
       licencias?.sort(
         (a, b) =>
-          new Date(b.fechaestadolicencia).getTime() - new Date(a.fechaestadolicencia).getTime(),
+          new Date(a.fechaestadolicencia).getTime() - new Date(b.fechaestadolicencia).getTime(),
       ) ?? [],
     tamanoPagina: 5,
   });

@@ -21,6 +21,7 @@ import {
   AlertaExito,
   AlertaInformacion,
 } from '@/utilidades/alertas';
+import { showNotification } from '@/utilidades/notification';
 import 'animate.css';
 import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
@@ -33,7 +34,6 @@ import { TIPOS_DE_OPERADORESID, TipoOperadorId, Trabajadoresxrrhh } from '../../
 import { ProgressBarCustom, TablaTrabajadores } from './(componentes)';
 import { Trabajador } from './(modelos)';
 import styles from './trabajadores.module.css';
-import Link from 'next/link';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
 const LoadingSpinner = dynamic(() => import('@/components/loading-spinner'));
@@ -382,8 +382,31 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           setCantidadCargada(i);
         } catch (error: any) {
           AlertaError.fire(error.message);
-
           setValue('file', null);
+          if (Notification.permission === 'default') {
+            Notification.requestPermission().then((permission) => {
+              if (permission === 'granted') {
+                showNotification(
+                  {
+                    body: `No se ha podido realizar la carga de personas trabajadoras`,
+                    icon: '/logo-fonasa.jpg',
+                  },
+                  'Error',
+                );
+              } else {
+                console.log('El usuario denegó el permiso para las notificaciones.');
+              }
+            });
+          } else if (Notification.permission === 'granted') {
+            // Si el permiso ya fue otorgado
+            showNotification(
+              {
+                body: `No se ha podido realizar la carga de personas trabajadoras`,
+                icon: '/logo-fonasa.jpg',
+              },
+              'Carga de personas trabajadoras',
+            );
+          }
         }
       }
       setcargandoPersonas(false);
@@ -394,6 +417,30 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           setValue('file', null);
         },
       });
+      if (Notification.permission === 'default') {
+        Notification.requestPermission().then((permission) => {
+          if (permission === 'granted') {
+            showNotification(
+              {
+                body: `Se han grabado ${arregloRut.length} personas trabajadoras con éxito`,
+                icon: '/logo-fonasa.jpg',
+              },
+              'Carga de personas trabajadoras',
+            );
+          } else {
+            console.log('El usuario denegó el permiso para las notificaciones.');
+          }
+        });
+      } else if (Notification.permission === 'granted') {
+        // Si el permiso ya fue otorgado
+        showNotification(
+          {
+            body: `Se han grabado ${arregloRut.length} personas trabajadoras con éxito`,
+            icon: '/logo-fonasa.jpg',
+          },
+          'Carga de personas trabajadoras',
+        );
+      }
 
       return;
     }
@@ -423,6 +470,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
       setcargandoPantallacompleta(false);
     }
   };
+  // Paso 1: Pedir permiso para mostrar notificaciones
 
   const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -537,8 +585,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                 <form onSubmit={handleAddTrabajador}>
                   <div className="row mt-1">
                     <div
-                      className={`col-md-8 position-relative ${listaguia[1]!?.activo && guia && 'overlay-marco'
-                        }`}
+                      className={`col-md-8 position-relative ${
+                        listaguia[1]!?.activo && guia && 'overlay-marco'
+                      }`}
                       ref={cargatrabajador}>
                       <h5>Cargar Personas Trabajadoras</h5>
                       <sub style={{ color: 'blue' }}>Agregar RUN Persona Trabajadora</sub>
@@ -783,8 +832,9 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                           onClick={async () => {
                             if (!getValues('file')) return;
                             const resp = await AlertaConfirmacion.fire({
-                              html: `¿Desea eliminar el fichero <b>${getValues('file')![0].name
-                                }</b>?`,
+                              html: `¿Desea eliminar el fichero <b>${
+                                getValues('file')![0].name
+                              }</b>?`,
                             });
                             if (resp.isConfirmed) {
                               setValue('file', null);
@@ -860,14 +910,13 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               </div>
             </IfContainer>
 
-
             <TablaTrabajadores
               handleDeleteTrabajador={handleDeleteTrabajador}
               trabajadores={trabajadores}
-              linkVolver={`/empleadores/${rutempleador}/unidad?operador=${tabOperador == 3 ? 'imed' : 'medipass'
-                }`}
+              linkVolver={`/empleadores/${rutempleador}/unidad?operador=${
+                tabOperador == 3 ? 'imed' : 'medipass'
+              }`}
             />
-
           </div>
         </div>
       </div>
