@@ -136,7 +136,7 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
           </div>
 
           <div className="mt-4 row">
-            <div className="d-flex">
+            <div className="d-flex flex-row-reverse">
               <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-sm-grow-0">
                 Filtrar
               </button>

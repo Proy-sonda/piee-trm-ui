@@ -180,7 +180,18 @@ const LicenciasTramitadasPage = () => {
             <div className="col-md-12">
               <TablaLicenciasTramitadas
                 empleadores={combos?.empleadores ?? []}
-                licencias={resultadoLicencias?.licencias ?? licenciasAnteriores}
+                licencias={
+                  resultadoLicencias?.licencias.sort(
+                    (a, b) =>
+                      new Date(a.fechatramitacion).getTime() -
+                      new Date(b.fechatramitacion).getTime(),
+                  ) ??
+                  licenciasAnteriores.sort(
+                    (a, b) =>
+                      new Date(a.fechatramitacion).getTime() -
+                      new Date(b.fechatramitacion).getTime(),
+                  )
+                }
                 totalPaginas={
                   resultadoLicencias?.numerolicencias
                     ? calcularPaginas(resultadoLicencias.numerolicencias, TAMANO_PAGINA)

@@ -240,13 +240,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
             ))
           ) : (
             <tr className="text-center">
-              <td></td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
-              <td></td>
+              <td colSpan={7}>No hay licencias para mostrar</td>
             </tr>
           )}
         </tbody>
