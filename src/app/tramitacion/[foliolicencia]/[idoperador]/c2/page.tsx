@@ -19,17 +19,15 @@ import { AuthContext } from '@/contexts';
 import { useRefrescarPagina } from '@/hooks';
 import dynamic from 'next/dynamic';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
-import { calidadTrabajador } from '../(modelo)';
-import { LicenciasAnteriores } from '../(modelo)/licencias-anteriores';
-import { buscarCalidadTrabajador } from '../(servicios)';
-import { BuscarLicenciasAnteriores } from '../(servicios)/buscar-licencias-anteriores';
+import { calidadTrabajador, LicenciasAnteriores } from '../(modelo)';
+import { buscarCalidadTrabajador, BuscarLicenciasAnteriores } from '../(servicios)';
 import { EntidadPagadora, EntidadPrevisional, Licenciac2 } from './(modelos)';
 import {
-  ErrorCrearLicenciaC2,
   buscarEntidadPagadora,
   buscarEntidadPrevisional,
   buscarZona2,
   crearLicenciaZ2,
+  ErrorCrearLicenciaC2,
 } from './(servicios)/';
 import { ErrorGuardarCCAF, GuardarCCAF } from './(servicios)/actualiza-ccaf';
 import { ObtenerConfiguracionCalidadPersona } from './(servicios)/obtener-relacion-calidad-trabajador';
@@ -173,6 +171,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       });
 
       resp.then((result) => {
+        console.table(LicenciasAnteriores);
+        console.log(
+          LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoregimenprevisional,
+        );
         if (result.isConfirmed) {
           formulario.setValue(
             'regimen',
@@ -193,8 +195,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
           formulario.setValue(
             'previsional',
-            LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString() +
-              LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.letraentidadprevisional,
+            LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoregimenprevisional == 2
+              ? LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString()
+              : LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString() +
+                  LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.letraentidadprevisional,
           );
 
           formulario.setValue(
@@ -202,10 +206,12 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             format(new Date(LicenciasAnteriores[0].licenciazc2[0].fechacontrato), 'yyyy-MM-dd'),
           );
 
-          formulario.setValue(
-            'entidadremuneradora',
-            LicenciasAnteriores[0].licenciazc2[0].entidadpagadora.identidadpagadora,
-          );
+          setTimeout(() => {
+            formulario.setValue(
+              'entidadremuneradora',
+              LicenciasAnteriores[0].licenciazc2[0].entidadpagadora.identidadpagadora,
+            );
+          }, 600);
         }
       });
     }
@@ -574,7 +580,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       );
 
       setTimeout(() => {
-        console.log(combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora);
         formulario.setValue(
           'entidadremuneradora',
           combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora,
