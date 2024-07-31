@@ -1,7 +1,6 @@
 'use client';
 
 import {
-  actualizarTrabajador,
   buscarTrabajadoresDeUnidad,
   crearTrabajador,
   eliminarTrabajador,
@@ -13,7 +12,7 @@ import { GuiaUsuario } from '@/components/guia-usuario';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { AuthContext } from '@/contexts';
 import { useMergeFetchObject } from '@/hooks';
-import { Trabajadoresunidadrrhh, Unidadesrrhh } from '@/modelos/tramitacion';
+import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
 import { buscarUnidadesDeRRHH } from '@/servicios';
 import {
   AlertaConfirmacion,
@@ -25,14 +24,13 @@ import { showNotification } from '@/utilidades/notification';
 import 'animate.css';
 import exportFromJSON from 'export-from-json';
 import dynamic from 'next/dynamic';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ChangeEvent, FormEvent, useContext, useEffect, useRef, useState } from 'react';
-import { Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { formatRut, validateRut } from 'rutlib';
 import { TIPOS_DE_OPERADORESID, TipoOperadorId, Trabajadoresxrrhh } from '../../(modelos)';
 import { ProgressBarCustom, TablaTrabajadores } from './(componentes)';
-import { Trabajador } from './(modelos)';
 import styles from './trabajadores.module.css';
 
 const IfContainer = dynamic(() => import('@/components/if-container'));
@@ -53,7 +51,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
   const [tabOperador] = useState<TipoOperadorId>(tabOperadorQuery);
   const [unidad, setunidad] = useState('');
-  const [unidadEmpleador, setunidadEmpleador] = useState<Unidadesrrhh[] | undefined>();
   const [trabajadores, settrabajadores] = useState<Trabajadoresunidadrrhh[]>([]);
   const [cargandoPersonas, setcargandoPersonas] = useState(false);
   const [CantidadCarga, setCantidadCarga] = useState<number>(0);
@@ -70,17 +67,10 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   });
   const { rutempleador, idunidad } = params;
 
-  const [editar, seteditar] = useState<Trabajador>({
-    runtrabajador: '',
-    unidad: {
-      codigounidad: '',
-    },
-  });
   const { register, setValue, getValues } = useForm<{ run: string; file: FileList | null }>({
     mode: 'onBlur',
   });
-  const [rutedit, setrutedit] = useState<string>();
-  const [show, setshow] = useState(false);
+
   const [refresh, setRefresh] = useState(0);
   const cargaNomina = useRef(null);
   const [btnenable, setbtnenable] = useState(false);
@@ -109,8 +99,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   }, [datosPagina]);
 
   const refrescarComponente = () => setRefresh(Math.random());
-
-  const handleClose = () => setshow(false);
 
   const handleDeleteTrabajador = (trabajador: Trabajadoresunidadrrhh) => {
     const EliminarTrabajador = async () => {
@@ -147,33 +135,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     }).then((result) => {
       if (result.isConfirmed) EliminarTrabajador();
     });
-  };
-
-  const handleChangeUnidad = (event: ChangeEvent<HTMLSelectElement>) => {
-    seteditar({
-      runtrabajador: editar?.runtrabajador,
-      unidad: {
-        codigounidad: event.target.value,
-      },
-    });
-  };
-
-  const handleSubmitEdit = () => {
-    const ActualizaTrabajador = async () => {
-      if (usuario == undefined || empleadorActual == undefined) return;
-      const data = await actualizarTrabajador(editar, usuario!?.rut, empleadorActual?.rutempleador);
-      if (data.ok) {
-        AlertaExito.fire({
-          html: 'Persona Trabajadora modificada con éxito',
-        });
-        setshow(false);
-        refrescarComponente();
-      } else {
-        AlertaError.fire({ html: 'Se ha producido un error' });
-      }
-    };
-
-    ActualizaTrabajador();
   };
 
   useEffect(() => {
@@ -249,7 +210,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
     ]);
   }, []);
 
-  const router = useRouter();
   const handleAddTrabajador = (e: FormEvent) => {
     e.preventDefault();
     const runTrabajadorNuevo = getValues('run');
@@ -382,6 +342,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           setCantidadCargada(i);
         } catch (error: any) {
           AlertaError.fire(error.message);
+          cargatrabajador;
           setValue('file', null);
           if (Notification.permission === 'default') {
             Notification.requestPermission().then((permission) => {
@@ -920,54 +881,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           </div>
         </div>
       </div>
-
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modificar Persona Trabajadora</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          <div className="row">
-            <div className="col-md-6">
-              <label>Run</label>
-              <input
-                type="text"
-                className="form-control"
-                disabled
-                value={rutedit}
-                onChange={(e) => e.preventDefault}
-              />
-            </div>
-            <div className="col-md-6">
-              <label>Unidad</label>
-              <select
-                className="form-select"
-                value={editar?.unidad.codigounidad}
-                onChange={handleChangeUnidad}>
-                <option value={''}>Seleccionar</option>
-                {unidadEmpleador!?.length || 0 > 0 ? (
-                  unidadEmpleador!?.map(({ CodigoUnidadRRHH, GlosaUnidadRRHH }) => (
-                    <option key={CodigoUnidadRRHH} value={CodigoUnidadRRHH}>
-                      {GlosaUnidadRRHH}
-                    </option>
-                  ))
-                ) : (
-                  <></>
-                )}
-              </select>
-            </div>
-          </div>
-        </Modal.Body>
-        <Modal.Footer>
-          <button className="btn btn-danger" onClick={() => handleClose()}>
-            Volver
-          </button>{' '}
-          &nbsp;
-          <button type="submit" className="btn btn-primary" onClick={() => handleSubmitEdit()}>
-            Grabar
-          </button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 };

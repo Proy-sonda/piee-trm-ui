@@ -19,6 +19,14 @@ import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para
 
 const TramitacionPage = () => {
   const [refresh, recargarBandejaTramitacion] = useRefrescarPagina();
+  const [desahabilitarRecarga, setdesahabilitarRecarga] = useState(false);
+
+  useEffect(() => {
+    setdesahabilitarRecarga(true);
+    setTimeout(() => {
+      setdesahabilitarRecarga(false);
+    }, 30000);
+  }, [refresh]);
 
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
     empleadores: buscarEmpleadores(''),
@@ -92,6 +100,7 @@ const TramitacionPage = () => {
                   <OverlayTrigger
                     overlay={<Tooltip>Volver a cargar bandeja de tramitación</Tooltip>}>
                     <button
+                      disabled={desahabilitarRecarga}
                       className="btn btn-sm border border-0"
                       style={{ fontSize: '20px' }}
                       onClick={() => recargarBandejaTramitacion()}>
@@ -109,6 +118,7 @@ const TramitacionPage = () => {
                   <OverlayTrigger
                     overlay={<Tooltip>Volver a cargar bandeja de tramitación</Tooltip>}>
                     <button
+                      disabled={desahabilitarRecarga}
                       className="btn btn-sm border border-0"
                       style={{ fontSize: '20px' }}
                       onClick={() => recargarBandejaTramitacion()}>
