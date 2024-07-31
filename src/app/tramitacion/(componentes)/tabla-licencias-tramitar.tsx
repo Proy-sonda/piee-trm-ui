@@ -9,7 +9,7 @@ import 'animate.css';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import React, { useContext, useRef, useState } from 'react';
-import { Stack, Table } from 'react-bootstrap';
+import { OverlayTrigger, Stack, Table, Tooltip } from 'react-bootstrap';
 import { LicenciaContext } from '../(context)/licencia.context';
 import { IfContainer, Paginacion, SpinnerPantallaCompleta } from '../(helper)';
 import { LicenciaTramitar, calcularPlazoVencimiento, licenciaFueDevuelta } from '../(modelos)';
@@ -356,8 +356,31 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                 <td>
                   {/* Estado de la licencia */}
                   <div className="mb-1 small text-nowrap">
-                    {licencia.estadolicencia.idestadolicencia} -{' '}
-                    {licencia.estadolicencia.estadolicencia}
+                    {licencia.estadolicencia.idestadolicencia == 6 ||
+                    licencia.estadolicencia.idestadolicencia == 60 ||
+                    licencia.estadolicencia.idestadolicencia == 62 ? (
+                      <>
+                        <OverlayTrigger
+                          overlay={
+                            <Tooltip>
+                              {licencia.motivodevolucion.idmotivodevolucion} -{' '}
+                              {licencia.motivodevolucion.motivodevolucion}
+                            </Tooltip>
+                          }>
+                          <div>
+                            <div style={{ color: 'var(--color-blue)' }}>
+                              {licencia.estadolicencia.idestadolicencia} -{' '}
+                              {licencia.estadolicencia.estadolicencia}
+                            </div>
+                          </div>
+                        </OverlayTrigger>
+                      </>
+                    ) : (
+                      <>
+                        {licencia.estadolicencia.idestadolicencia} -{' '}
+                        {licencia.estadolicencia.estadolicencia}
+                      </>
+                    )}
                   </div>
                   <div className="mb-1 small text-nowrap">
                     {format(new Date(licencia.fechaestadolicencia), 'dd-MM-yyyy HH:mm:ss')}
