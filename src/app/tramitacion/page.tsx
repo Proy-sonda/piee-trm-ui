@@ -19,6 +19,21 @@ import { buscarLicenciasParaTramitar } from './(servicios)/buscar-licencias-para
 
 const TramitacionPage = () => {
   const [refresh, recargarBandejaTramitacion] = useRefrescarPagina();
+  const [desahabilitarRecarga, setdesahabilitarRecarga] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(30);
+
+  useEffect(() => {
+    let timer: NodeJS.Timer;
+    if (desahabilitarRecarga && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timeLeft === 0) {
+      setdesahabilitarRecarga(false);
+      setTimeLeft(30);
+    }
+    return () => clearInterval(timer);
+  }, [desahabilitarRecarga, timeLeft]);
 
   const [erroresCarga, datosBandeja, cargando] = useMergeFetchObject({
     empleadores: buscarEmpleadores(''),
@@ -92,6 +107,7 @@ const TramitacionPage = () => {
                   <OverlayTrigger
                     overlay={<Tooltip>Volver a cargar bandeja de tramitación</Tooltip>}>
                     <button
+                      disabled={desahabilitarRecarga}
                       className="btn btn-sm border border-0"
                       style={{ fontSize: '20px' }}
                       onClick={() => recargarBandejaTramitacion()}>
@@ -109,10 +125,15 @@ const TramitacionPage = () => {
                   <OverlayTrigger
                     overlay={<Tooltip>Volver a cargar bandeja de tramitación</Tooltip>}>
                     <button
+                      disabled={desahabilitarRecarga}
                       className="btn btn-sm border border-0"
                       style={{ fontSize: '20px' }}
-                      onClick={() => recargarBandejaTramitacion()}>
+                      onClick={() => {
+                        recargarBandejaTramitacion();
+                        setdesahabilitarRecarga(true);
+                      }}>
                       <i className="bi bi-arrow-clockwise"></i>
+                      <sub>{desahabilitarRecarga && timeLeft}</sub>
                     </button>
                   </OverlayTrigger>
                   <ExportarCSV
