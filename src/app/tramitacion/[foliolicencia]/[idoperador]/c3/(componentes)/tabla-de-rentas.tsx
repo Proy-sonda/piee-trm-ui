@@ -36,6 +36,7 @@ interface TablaDeRentasProps {
     desde: string;
     hasta: string;
   };
+  onMontoModificado: (monto: number) => void;
 }
 
 export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
@@ -47,6 +48,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
   remuneraciones,
   onClickBotonDesglose,
   rangoPeriodo,
+  onMontoModificado,
 }) => {
   const TIPO_MONTO_NAME = entidadPrevisionalEsAFP(zona2.entidadprevisional)
     ? 'totalRemuneracion'
@@ -107,7 +109,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
       if (typeof value === 'number' && isNaN(value)) {
         return;
       }
-
+      if (campo === 'totalRemuneracion') onMontoModificado(value);
       for (let index = 1; index < remuneraciones.fields.length; index++) {
         formulario.setValue(`${fieldArray}.${index}.${campo}`, value);
       }
