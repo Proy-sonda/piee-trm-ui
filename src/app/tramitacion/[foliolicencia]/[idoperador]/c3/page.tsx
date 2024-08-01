@@ -715,6 +715,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                 filasIncompletas={completitudRemuneraciones.normales}
                 tiposPrevisiones={tiposPrevisiones ?? []}
                 onClickBotonDesglose={setDatosModalDesglose}
+                onMontoModificado={(x: any) =>
+                  formulario.setValue('remuneracionImponiblePrevisional', x)
+                }
               />
             )}
 
@@ -773,6 +776,9 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                   filasIncompletas={completitudRemuneraciones.maternidad}
                   tiposPrevisiones={tiposPrevisiones ?? []}
                   onClickBotonDesglose={setDatosModalDesglose}
+                  onMontoModificado={(x: any) =>
+                    formulario.setValue('remuneracionImponiblePrevisional', x)
+                  }
                 />
               )}
             </IfContainer>

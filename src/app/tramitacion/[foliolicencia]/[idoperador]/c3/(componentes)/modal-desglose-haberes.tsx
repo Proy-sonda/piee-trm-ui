@@ -48,11 +48,46 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
   const formulario = useForm<FormularioDesgloseHaberes>({ mode: 'onBlur' });
   const [mensajeErrorGlobal, setMensajeErrorGlobal] = useState<string>();
   const [abrirPasosDesgloseDeHaberes, setAbrirPasosDesgloseDeHaberes] = useState(false);
+  const [montoExcedido, setmontoExcedido] = useState(false);
+  const [montoExceso, setmontoExceso] = useState(0);
+
+  const { gratificacion, aguinaldos, bono1, bono2, bono3, bono4, bono5, horasExtras, sueldoBase } =
+    formulario.watch();
 
   useEffect(() => {
-    if (!datos.desgloseInicial) {
-      return;
+    let totalSumado =
+      (isNaN(sueldoBase) ? 0 : sueldoBase) +
+      (isNaN(gratificacion) ? 0 : gratificacion) +
+      (isNaN(aguinaldos) ? 0 : aguinaldos) +
+      (isNaN(bono1) ? 0 : bono1) +
+      (isNaN(bono2) ? 0 : bono2) +
+      (isNaN(bono3) ? 0 : bono3) +
+      (isNaN(bono4) ? 0 : bono4) +
+      (isNaN(bono5) ? 0 : bono5) +
+      (isNaN(horasExtras) ? 0 : horasExtras);
+    if (totalSumado > montoTotalCorregido) {
+      setmontoExcedido(true);
+      setmontoExceso(totalSumado - montoTotalCorregido);
+    } else if (totalSumado == montoTotalCorregido) {
+      setmontoExcedido(false);
+      setmontoExceso(0);
+      // recorrer los campos que se encuentren vacios y agregarle un 0
+      Object.keys(formulario.getValues()).forEach((key) => {
+        //@ts-ignore
+        //prettier-ignore
+        if (formulario.getValues()[key] == undefined ||formulario.getValues()[key] == '' || formulario.getValues()[key] == NaN) {
+          //@ts-ignore
+          formulario.setValue(key, 0);
+        }
+      });
+    } else {
+      setmontoExcedido(false);
+      setmontoExceso(0);
     }
+  }, [gratificacion, aguinaldos, bono1, bono2, bono3, bono4, bono5, horasExtras, sueldoBase]);
+
+  useEffect(() => {
+    if (!datos.desgloseInicial) return;
 
     formulario.setValue('sueldoBase', datos.desgloseInicial.sueldoBase);
     formulario.setValue('gratificacion', datos.desgloseInicial.gratificacion);
@@ -157,6 +192,26 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
                   </div>
                 </Collapse>
               </div>
+
+              <IfContainer show={montoExcedido}>
+                <Row>
+                  <Col xs={12}>
+                    <Alert variant="danger" className="d-flex align-items-center fade show">
+                      <span>
+                        El total de los haberes no puede exceder el monto total
+                        <br />
+                        {montoExceso > 0 && (
+                          <span>
+                            {' '}
+                            Se excede por:{' '}
+                            <strong className="text-danger">${montoExceso.toLocaleString()}</strong>
+                          </span>
+                        )}
+                      </span>
+                    </Alert>
+                  </Col>
+                </Row>
+              </IfContainer>
 
               <IfContainer show={mensajeErrorGlobal}>
                 <Row>

@@ -8,3 +8,4 @@ export * from './buscar-regiones';
 export * from './buscar-rentas-sugeridas-y-rango-lme-anteriores';
 export * from './buscar-tipos-documento';
 export * from './tipo-calle';
+export * from './buscar-licencias-anteriores'
