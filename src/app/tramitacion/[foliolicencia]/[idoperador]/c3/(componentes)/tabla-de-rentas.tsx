@@ -109,7 +109,8 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
       if (typeof value === 'number' && isNaN(value)) {
         return;
       }
-      if (campo === 'totalRemuneracion') onMontoModificado(value);
+
+      if (campo === 'totalRemuneracion' || 'montoImponible') onMontoModificado(value);
       for (let index = 1; index < remuneraciones.fields.length; index++) {
         formulario.setValue(`${fieldArray}.${index}.${campo}`, value);
       }
