@@ -53,10 +53,11 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
               ),
             )
           ) : (
-            <Tr>
-              <Td>-</Td>
-              <Td>-</Td>
-            </Tr>
+            <tr>
+              <td colSpan={3} className="align-middle">
+                <p className="text-center">No hay personas usuarias asociadas.</p>
+              </td>
+            </tr>
           )}
         </Tbody>
       </Table>

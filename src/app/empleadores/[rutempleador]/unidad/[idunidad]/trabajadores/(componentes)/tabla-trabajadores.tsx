@@ -2,29 +2,32 @@ import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actua
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
-import { format } from 'date-fns';
 import Link from 'next/link';
-import { useEffect } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 interface props {
   trabajadores: Trabajadoresunidadrrhh[];
   handleDeleteTrabajador: (trabajador: Trabajadoresunidadrrhh) => void;
   linkVolver: string;
+  totalTrabajadores: number;
 }
 
 export const TablaTrabajadores: React.FC<props> = ({
   trabajadores,
   handleDeleteTrabajador,
   linkVolver,
+  totalTrabajadores,
 }) => {
   const [trabajadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: trabajadores,
     tamanoPagina: 5,
   });
-  
-
   const { rolEnEmpleadorActual } = useEmpleadorActual();
+
+  const TransFormarFecha = (fecha: string) => {
+    const fechaArray = fecha.split('-');
+    return fechaArray[2] + '/' + fechaArray[1] + '/' + fechaArray[0];
+  };
 
   return (
     <>
@@ -41,8 +44,7 @@ export const TablaTrabajadores: React.FC<props> = ({
             trabajadoresPaginados.map((trabajador) => (
               <Tr key={trabajador.RunTrabajador}>
                 <Td>{trabajador.RunTrabajador}</Td>
-                <Td>{format(new Date(trabajador.FechaRegistro), 'dd-MM-yyyy')}</Td>
-
+                <Td>{TransFormarFecha(trabajador.FechaRegistro)}</Td>
                 {rolEnEmpleadorActual === 'administrador' && (
                   <Td>
                     <button
@@ -65,6 +67,13 @@ export const TablaTrabajadores: React.FC<props> = ({
           )}
         </Tbody>
       </Table>
+      {trabajadoresPaginados.length > 0 && (
+        <div>
+          Mostrando de <b>{paginaActual * 5 + 1}</b> a{' '}
+          <b>{paginaActual * 5 + trabajadoresPaginados.length}</b> de <b>{totalTrabajadores}</b>{' '}
+          persona(s) trabajadora(s).
+        </div>
+      )}
 
       <div className="mt-4 mb-2 d-flex flex-column flex-sm-row justify-content-sm-between">
         <Paginacion
