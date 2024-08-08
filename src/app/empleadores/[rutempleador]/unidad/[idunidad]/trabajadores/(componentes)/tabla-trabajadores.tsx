@@ -2,9 +2,7 @@ import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actua
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
-import { format } from 'date-fns';
 import Link from 'next/link';
-import { useEffect } from 'react';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 
 interface props {
@@ -22,9 +20,12 @@ export const TablaTrabajadores: React.FC<props> = ({
     datos: trabajadores,
     tamanoPagina: 5,
   });
-  
-
   const { rolEnEmpleadorActual } = useEmpleadorActual();
+
+  const TransFormarFecha = (fecha: string) => {
+    const fechaArray = fecha.split('-');
+    return fechaArray[2] + '/' + fechaArray[1] + '/' + fechaArray[0];
+  };
 
   return (
     <>
@@ -41,8 +42,7 @@ export const TablaTrabajadores: React.FC<props> = ({
             trabajadoresPaginados.map((trabajador) => (
               <Tr key={trabajador.RunTrabajador}>
                 <Td>{trabajador.RunTrabajador}</Td>
-                <Td>{format(new Date(trabajador.FechaRegistro), 'dd-MM-yyyy')}</Td>
-
+                <Td>{TransFormarFecha(trabajador.FechaRegistro)}</Td>
                 {rolEnEmpleadorActual === 'administrador' && (
                   <Td>
                     <button
