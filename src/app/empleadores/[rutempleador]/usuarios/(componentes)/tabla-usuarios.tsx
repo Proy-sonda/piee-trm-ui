@@ -1,5 +1,6 @@
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
+import LeyendaTablas from '@/components/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
@@ -231,16 +232,19 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
             ))
           ) : (
             <Tr>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
-              <Td>-</Td>
+              <Td colSpan={rolEnEmpleadorActual === 'administrador' ? 6 : 5}>
+                <div className="text-center">No hay usuarios registrados.</div>
+              </Td>
             </Tr>
           )}
         </Tbody>
       </Table>
+      <LeyendaTablas
+        totalMostrado={usuariosPaginados.length}
+        totalDatos={usuarios.length}
+        paginaActual={paginaActual}
+        glosaLeyenda="persona(s) usuaria(s)."
+      />
 
       <div className="mt-4 mb-2 d-flex flex-column flex-sm-row justify-content-sm-between">
         <Paginacion

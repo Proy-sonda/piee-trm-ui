@@ -1,5 +1,6 @@
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
 import IfContainer from '@/components/if-container';
+import LeyendaTablas from '@/components/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { AuthContext } from '@/contexts';
@@ -197,6 +198,12 @@ const TablaUnidades = ({
           <b>No se han encontrado unidades de RRHH asociadas a la entidad empleadora.</b>
         </div>
       )}
+      <LeyendaTablas
+        totalDatos={unidades.length}
+        paginaActual={paginaActual}
+        glosaLeyenda="unidad(es) de RRHH."
+        totalMostrado={unidadesPaginadas.length}
+      />
 
       <div className="mt-4 mb-2 d-flex flex-column flex-sm-row justify-content-sm-between">
         <Paginacion

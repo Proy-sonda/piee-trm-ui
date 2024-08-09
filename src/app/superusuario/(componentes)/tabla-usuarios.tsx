@@ -1,3 +1,4 @@
+import LeyendaTablas from '@/components/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
@@ -77,6 +78,12 @@ const TablaUsuarios: React.FC<myAppProps> = ({
           )}
         </Tbody>
       </Table>
+      <LeyendaTablas
+        totalDatos={usuarios.length}
+        paginaActual={paginaActual}
+        totalMostrado={usuariosPaginados.length}
+        glosaLeyenda="usuario(s) encontrado(s)"
+      />
 
       <div className="mt-3">
         <Paginacion
