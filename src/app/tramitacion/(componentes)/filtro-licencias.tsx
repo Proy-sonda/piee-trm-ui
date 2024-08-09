@@ -6,9 +6,11 @@ import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, startOfDay } from 'date-fns';
 import React, { useContext, useEffect, useRef } from 'react';
+import { Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FiltroBusquedaLicencias } from '../(modelos)/filtro-busqueda-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
+import { BuscarTipoLicencia } from '../(servicios)/buscar-tipo-licencia';
 import { AuthContext } from '../../../contexts/auth-context';
 
 interface FiltroLicenciasProps {
@@ -23,7 +25,10 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   onFiltrarLicencias,
   limpiarOnRefresh,
 }) => {
-  const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
+  const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onChange' });
+
+  const [error, tipoLicencia, loading] = useFetch(BuscarTipoLicencia(), []);
+
   const target = useRef(null);
   const rutEmpleadorSeleccionado = formulario.watch('rutEntidadEmpleadora');
   const {
@@ -68,7 +73,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
     fechaHasta,
     rutEntidadEmpleadora,
     idUnidadRRHH,
-    // filtroSemaforo,
+    filtroTipoLicencia,
   }) => {
     onFiltrarLicencias({
       folio: folio.trim() === '' ? undefined : folio,
@@ -80,6 +85,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora)
         ? undefined
         : rutEntidadEmpleadora,
+      tipolicencia: filtroTipoLicencia,
     });
   };
 
@@ -183,37 +189,29 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               className="col-12 col-md-6 col-lg-3"
             />
 
-            {/* <ComboSimple
+            <ComboSimple
               opcional
-              name="filtroSemaforo"
-              label="Vencimiento Tramitación"
-              datos={[
-                { label: 'Por Tramitar', value: 'por-tramitar' },
-                { label: 'Por Vencer', value: 'por-vencer' },
-                { label: 'Vencido', value: 'vencido' },
-              ]}
-              idElemento="value"
-              descripcion="label"
-              tipoValor="string"
+              name="filtroTipoLicencia"
+              label="Tipo Licencia"
+              datos={tipoLicencia ?? []}
+              idElemento="idtipolicencia"
+              descripcion="tipolicencia"
+              tipoValor="number"
               className="col-12 col-md-6 col-lg-3"
-            /> */}
-
-            <div className="col-12 col-md-12 col-lg-6">
-              <label className="d-none d-lg-inline-block form-label"> </label>
-              <div className="form-control px-0 mx-0 border border-0 d-flex justify-content-lg-end">
-                <div className="w-100 d-flex flex-column flex-sm-row-reverse">
-                  <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-sm-grow-0">
-                    Filtrar
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => limpiarCampos()}
-                    className="btn btn-secondary mt-2 mt-sm-0 me-sm-2">
-                    Limpiar
-                  </button>
-                </div>
+            />
+            <Row className="mt-2">
+              <div className="d-flex flex-column flex-sm-row-reverse">
+                <button type="submit" className="btn btn-primary px-4 flex-grow-1 flex-sm-grow-0">
+                  Filtrar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => limpiarCampos()}
+                  className="btn btn-secondary mt-2 mt-sm-0 me-sm-2">
+                  Limpiar
+                </button>
               </div>
-            </div>
+            </Row>
           </div>
         </form>
       </FormProvider>

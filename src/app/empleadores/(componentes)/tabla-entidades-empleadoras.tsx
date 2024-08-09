@@ -1,5 +1,6 @@
 import { GuiaUsuario } from '@/components/guia-usuario';
 import IfContainer from '@/components/if-container';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { AuthContext } from '@/contexts';
@@ -178,6 +179,12 @@ export default function TablaEntidadesEmpleadoras({
           </Tbody>
         </Table>
       </div>
+      <LeyendaTablas
+        totalMostrado={empleadoresPaginados.length}
+        totalDatos={empleadores.length}
+        paginaActual={paginaActual}
+        glosaLeyenda="entidad(es) empleadora(s)."
+      />
       <div className="mt-3">
         <Paginacion
           numeroDePaginas={totalPaginas}

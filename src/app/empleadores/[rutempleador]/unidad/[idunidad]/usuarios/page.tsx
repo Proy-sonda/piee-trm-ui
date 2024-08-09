@@ -322,8 +322,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         </>
       )}
 
-      <div className="row mt-3 text-center">
-        <h5>Personas Usuarias</h5>
+      <div className="row mt-3">
+        <h5 className="text-center">Personas Usuarias</h5>
         <div className="col-md-12 col-sm-12 col-xl-12">
           <IfContainer show={pendiente}>
             <div className="mb-5">

@@ -1,4 +1,5 @@
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Usuariosunidad } from '@/modelos/tramitacion';
@@ -61,6 +62,13 @@ export const TableUsuariosAsociados: React.FC<props> = ({ usuarioAsociado, handl
           )}
         </Tbody>
       </Table>
+
+      <LeyendaTablas
+        totalMostrado={usuariosPaginados.length}
+        totalDatos={usuarioAsociado?.length || 0}
+        paginaActual={paginaActual}
+        glosaLeyenda="persona(s) usuaria(s) asociada(s)."
+      />
 
       <div className="mt-3">
         <Paginacion
