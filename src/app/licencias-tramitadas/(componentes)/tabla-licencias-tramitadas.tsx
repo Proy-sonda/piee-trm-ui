@@ -1,6 +1,6 @@
 import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import IfContainer from '@/components/if-container';
-import LeyendaTablas from '@/components/leyenda-tablas';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { Empleador } from '@/modelos/empleador';

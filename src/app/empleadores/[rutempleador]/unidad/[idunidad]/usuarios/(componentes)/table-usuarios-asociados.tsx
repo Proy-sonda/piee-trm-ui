@@ -1,5 +1,5 @@
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
-import LeyendaTablas from '@/components/leyenda-tablas';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Usuariosunidad } from '@/modelos/tramitacion';

@@ -1,3 +1,4 @@
+import styles from './leyenda-tablas.module.css';
 interface LeyendaTablasProps {
   paginaActual: number;
   totalMostrado: number;
@@ -25,7 +26,7 @@ const LeyendaTablas: React.FC<LeyendaTablasProps> = ({
   return (
     <>
       {totalDatos > 0 && (
-        <div>
+        <div className={styles['font-leyenda']}>
           Mostrando desde <b>{paginaActual * 5 + 1}</b> a <b>{paginaActual * 5 + totalMostrado}</b>{' '}
           de <b>{totalDatos}</b> {glosaLeyenda}
         </div>

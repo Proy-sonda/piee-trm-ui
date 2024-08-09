@@ -1,7 +1,7 @@
 import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 
-import LeyendaTablas from '@/components/leyenda-tablas';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';

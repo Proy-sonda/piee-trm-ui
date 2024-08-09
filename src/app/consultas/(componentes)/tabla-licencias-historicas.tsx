@@ -15,7 +15,7 @@ import { LicenciaHistorica } from '../(modelos)';
 import { BuscarHistorialEstadosLmeRequest } from '../(servicios)';
 import styles from './tabla-licencias-historicas.module.css';
 
-import LeyendaTablas from '@/components/leyenda-tablas';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios';
 

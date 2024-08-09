@@ -1,4 +1,4 @@
-import LeyendaTablas from '@/components/leyenda-tablas';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';

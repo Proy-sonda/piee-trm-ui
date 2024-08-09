@@ -1,6 +1,6 @@
 import { GuiaUsuario } from '@/components/guia-usuario';
 import IfContainer from '@/components/if-container';
-import LeyendaTablas from '@/components/leyenda-tablas';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { AuthContext } from '@/contexts';
