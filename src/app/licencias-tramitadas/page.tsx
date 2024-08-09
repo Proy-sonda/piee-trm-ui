@@ -179,6 +179,7 @@ const LicenciasTramitadasPage = () => {
           <div className="row mt-4">
             <div className="col-md-12">
               <TablaLicenciasTramitadas
+                totalDatos={resultadoLicencias?.numerolicencias ?? 0}
                 empleadores={combos?.empleadores ?? []}
                 licencias={
                   resultadoLicencias?.licencias.sort(
