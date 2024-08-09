@@ -1,3 +1,5 @@
+import { TipoLicencia } from "./tipo-licencia";
+
 export interface FormularioFiltrarLicencias {
   folio: string;
   runPersonaTrabajadora: string;
@@ -5,5 +7,6 @@ export interface FormularioFiltrarLicencias {
   fechaHasta: Date;
   rutEntidadEmpleadora: string;
   idUnidadRRHH: number;
+  filtroTipoLicencia: number;
   // filtroSemaforo: 'por-tramitar' | 'por-vencer' | 'vencido';
 }

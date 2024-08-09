@@ -1,3 +1,5 @@
+import { TipoLicencia } from "./tipo-licencia";
+
 export interface FiltroBusquedaLicencias {
   folio?: string;
   runPersonaTrabajadora?: string;
@@ -5,6 +7,7 @@ export interface FiltroBusquedaLicencias {
   fechaHasta?: Date;
   rutEntidadEmpleadora?: string;
   idUnidadRRHH?: number;
+  tipolicencia?:number;
   // filtroSemaforo?: 'por-tramitar' | 'por-vencer' | 'vencido';
 }
 
@@ -15,7 +18,8 @@ export const hayFiltros = (filtros: FiltroBusquedaLicencias) => {
     filtros.fechaDesde !== undefined ||
     filtros.fechaHasta !== undefined ||
     filtros.rutEntidadEmpleadora !== undefined ||
-    filtros.idUnidadRRHH !== undefined
+    filtros.idUnidadRRHH !== undefined ||
+    filtros.tipolicencia !== undefined
     // || filtros.filtroSemaforo !== undefined
   );
 };

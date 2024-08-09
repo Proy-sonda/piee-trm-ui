@@ -42,8 +42,10 @@ export const licenciaCumpleFiltros = (
         filtros.rutEntidadEmpleadora,
       );
 
+      const coincideTipoLicencia = filtros.tipolicencia === -99999999 ? true : licencia.tipolicencia.idtipolicencia === filtros.tipolicencia;
+
       return (
-        coincideFolio && coincideRun && enRangoFechas && coincideEntidadEmpleadora && coincideColor
+        coincideFolio && coincideRun && enRangoFechas && coincideEntidadEmpleadora && coincideColor && coincideTipoLicencia
       );
     };
   };

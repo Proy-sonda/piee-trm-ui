@@ -60,7 +60,9 @@ const TramitacionPage = () => {
   // Filtrar licencias
   useEffect(() => {
     const licenciasParaFiltrar = licenciasParaTramitar ?? [];
-
+    console.log(estado.filtroEstado);
+    console.log(estado.filtrosBusqueda);
+    console.log(licenciaCumpleFiltros(estado.filtrosBusqueda, estado.filtroEstado));
     setEstado((prev) => ({
       ...prev,
       licenciasFiltradas: licenciasParaFiltrar.filter(
