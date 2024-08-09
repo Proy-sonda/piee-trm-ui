@@ -5,7 +5,7 @@ import { AuthContext } from '@/contexts';
 
 import { Usuariosunidad } from '@/modelos/tramitacion';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
-import React, { ChangeEvent, Fragment, useContext, useEffect, useRef, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useRef, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 
 import styles from './usuarios.module.css';
@@ -46,6 +46,12 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
     TIPOS_DE_OPERADORESID.find((x) => x === Number(search.get('operador'))) ?? 3;
 
   const [tabOperador] = useState<TipoOperadorId>(tabOperadorQuery);
+  const [comboUsuariosAgregar, setcomboUsuariosAgregar] = useState<
+    {
+      rutusuario: string;
+      nombres: string;
+    }[]
+  >([]);
 
   const { rutempleador, idunidad } = params;
   const [unidad, setunidad] = useState('');
@@ -106,7 +112,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       setusuarios(await resp());
     };
     busquedaUsuarios();
-  }, [empleadorActual]);
+  }, [empleadorActual, refresh]);
 
   const [err, datosPagina, pendiente] = useMergeFetchObject(
     {
@@ -117,8 +123,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
   const refrescarComponente = () => setRefresh(Math.random());
 
   useEffect(() => {
-    if (datosPagina?.usuarioAso == undefined) return;
-    setusuariosAsociados(datosPagina!?.usuarioAso);
+    if (datosPagina && datosPagina.usuarioAso) setusuariosAsociados(datosPagina.usuarioAso);
   }, [datosPagina, refrescarComponente]);
 
   useEffect(() => {
@@ -131,7 +136,7 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
           )?.RunUsuario,
       ),
     );
-  }, [usuariosAsociados]);
+  }, [refresh, usuariosAsociados]);
 
   const onHandleSubmit: SubmitHandler<Formulario> = async (data) => {
     const respuesta = await AlertaConfirmacion.fire({
@@ -197,7 +202,11 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
       refrescarComponente();
       AlertaExito.fire({
         html: 'Eliminación realizada con éxito',
-        didClose: () => refrescarComponente(),
+        didClose: () => {
+          refrescarComponente();
+          // cargamos el usuario eliminado en el combo de agregar
+          if (datosPagina && datosPagina.usuarioAso && usuarios) setusuarios([...usuarios]);
+        },
       });
     } catch (error) {
       setspinner(false);
@@ -293,28 +302,11 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
                         }}
                         name="runusuario">
                         <option value={''}>Seleccionar</option>
-                        {usuarios?.length || 0 > 0 ? (
-                          usuarios.map(({ rutusuario, nombres }) => (
-                            <Fragment key={rutusuario}>
-                              {datosPagina?.usuarioAso.find(
-                                (useraso) => useraso.RunUsuario === rutusuario,
-                              ) ? (
-                                <Fragment key={Math.random()}></Fragment>
-                              ) : (
-                                <>
-                                  <option
-                                    key={Math.random()}
-                                    value={rutusuario}
-                                    data-tokens={rutusuario}>
-                                    {rutusuario} / {nombres}
-                                  </option>
-                                </>
-                              )}
-                            </Fragment>
-                          ))
-                        ) : (
-                          <></>
-                        )}
+                        {usuarios.map(({ rutusuario, nombres }) => (
+                          <option key={Math.random()} value={rutusuario} data-tokens={rutusuario}>
+                            {rutusuario} / {nombres}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="col-md-6 align-self-end">
@@ -330,8 +322,8 @@ const UsuariosPageRrhh: React.FC<iUsuarios> = ({ params }) => {
         </>
       )}
 
-      <div className="row mt-3 text-center">
-        <h5>Personas Usuarias</h5>
+      <div className="row mt-3">
+        <h5 className="text-center">Personas Usuarias</h5>
         <div className="col-md-12 col-sm-12 col-xl-12">
           <IfContainer show={pendiente}>
             <div className="mb-5">

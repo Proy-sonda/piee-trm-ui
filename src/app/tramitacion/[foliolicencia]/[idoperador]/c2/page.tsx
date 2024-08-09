@@ -194,19 +194,19 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           );
 
           formulario.setValue(
-            'previsional',
-            LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoregimenprevisional == 2
-              ? LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString()
-              : LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString() +
-                  LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.letraentidadprevisional,
-          );
-
-          formulario.setValue(
             'fechacontratotrabajo',
             format(new Date(LicenciasAnteriores[0].licenciazc2[0].fechacontrato), 'yyyy-MM-dd'),
           );
 
           setTimeout(() => {
+            formulario.setValue(
+              'previsional',
+              LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoregimenprevisional == 2
+                ? LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString()
+                : LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoentidadprevisional.toString() +
+                    LicenciasAnteriores[0].licenciazc2[0].entidadprevisional
+                      .letraentidadprevisional,
+            );
             formulario.setValue(
               'entidadremuneradora',
               LicenciasAnteriores[0].licenciazc2[0].entidadpagadora.identidadpagadora,

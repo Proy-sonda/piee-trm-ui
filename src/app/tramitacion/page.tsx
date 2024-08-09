@@ -60,7 +60,9 @@ const TramitacionPage = () => {
   // Filtrar licencias
   useEffect(() => {
     const licenciasParaFiltrar = licenciasParaTramitar ?? [];
-
+    console.log(estado.filtroEstado);
+    console.log(estado.filtrosBusqueda);
+    console.log(licenciaCumpleFiltros(estado.filtrosBusqueda, estado.filtroEstado));
     setEstado((prev) => ({
       ...prev,
       licenciasFiltradas: licenciasParaFiltrar.filter(
@@ -102,6 +104,11 @@ const TramitacionPage = () => {
           <div className="col-12">
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-center">
               <div className="mb-2 mb-md-0 d-flex justify-content-start align-items-center">
+                <SemaforoLicencias
+                  onEstadoSeleccionado={(x) => setEstado((prev) => ({ ...prev, filtroEstado: x }))}
+                />
+              </div>
+              <div className="mb-2 mb-md-0 d-flex justify-content-center align-items-center">
                 <h2 className="fs-5 m-0 p-0">BANDEJA DE TRAMITACIÓN</h2>
                 <div className="d-md-none d-flex align-items-center">
                   <OverlayTrigger
@@ -120,6 +127,7 @@ const TramitacionPage = () => {
                   />
                 </div>
               </div>
+
               <div className="d-flex justify-content-end align-items-center">
                 <div className="d-none d-md-block">
                   <OverlayTrigger
@@ -141,9 +149,6 @@ const TramitacionPage = () => {
                     empleadores={datosBandeja!?.empleadores}
                   />
                 </div>
-                <SemaforoLicencias
-                  onEstadoSeleccionado={(x) => setEstado((prev) => ({ ...prev, filtroEstado: x }))}
-                />
               </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { useEmpleadorActual } from '@/app/empleadores/(contexts)/empleador-actual-context';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Trabajadoresunidadrrhh } from '@/modelos/tramitacion';
@@ -9,12 +10,14 @@ interface props {
   trabajadores: Trabajadoresunidadrrhh[];
   handleDeleteTrabajador: (trabajador: Trabajadoresunidadrrhh) => void;
   linkVolver: string;
+  totalTrabajadores: number;
 }
 
 export const TablaTrabajadores: React.FC<props> = ({
   trabajadores,
   handleDeleteTrabajador,
   linkVolver,
+  totalTrabajadores,
 }) => {
   const [trabajadoresPaginados, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos: trabajadores,
@@ -65,6 +68,13 @@ export const TablaTrabajadores: React.FC<props> = ({
           )}
         </Tbody>
       </Table>
+
+      <LeyendaTablas
+        totalMostrado={trabajadoresPaginados.length}
+        totalDatos={totalTrabajadores}
+        paginaActual={paginaActual}
+        glosaLeyenda="persona(s) trabajadora(s)."
+      />
 
       <div className="mt-4 mb-2 d-flex flex-column flex-sm-row justify-content-sm-between">
         <Paginacion

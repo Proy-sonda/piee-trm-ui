@@ -1,5 +1,6 @@
 import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import IfContainer from '@/components/if-container';
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { Empleador } from '@/modelos/empleador';
@@ -30,6 +31,7 @@ interface TablaLicenciasTramitadasProps {
   totalPaginas: number;
   onCambioPagina: (pagina: number) => void;
   paginaActual: number;
+  totalDatos: number;
 }
 
 interface DatosComprobanteTramitacion {
@@ -43,6 +45,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
   totalPaginas,
   onCambioPagina,
   paginaActual,
+  totalDatos,
 }) => {
   const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
   const [blobModalPdf, setBlobModalPdf] = useState<Blob>();
@@ -168,7 +171,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
 
                     <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
                       <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
-                        Conciliada
+                        licencias Conciliada
                       </Badge>
                     </IfContainer>
                   </Stack>
@@ -245,6 +248,13 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
           )}
         </tbody>
       </Table>
+
+      <LeyendaTablas
+        paginaActual={paginaActual}
+        totalMostrado={licencias.length}
+        glosaLeyenda="Licencia(s) tramitada(s)."
+        totalDatos={totalDatos}
+      />
 
       <div className="mt-4 mb-2">
         <Paginacion

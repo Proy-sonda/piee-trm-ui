@@ -296,7 +296,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <p>Existe un error en el formato del RUN <b>${errorEncontrado}</b></p>
           <p class="mb-0 pb-0">
             Verifique que cada RUN del documento sea válido y no incluya separadores de miles. El 
-            dígito verificador es opcional. Ejemplo: <b>9789016-1</b> o <b>97890161</b>.
+            guión del dígito verificador es opcional. Ejemplo: <b>9789016-1</b> o <b>97890161</b>.
           </p>`,
       });
     }
@@ -701,21 +701,31 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                   <sub className="d-inline d-sm-none d-xl-inline">
                     Para poder cargar las personas trabajadoras de la unidad <b>{unidad}</b>, solo
                     tiene que seleccionar un archivo (formato CSV) según el{' '}
-                    <a
-                      className={styles['span-link']}
-                      download="formato.csv"
-                      href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                      siguiente formato
-                    </a>
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip>Un RUN por línea y sin puntos (el guión es opcional)</Tooltip>
+                      }>
+                      <a
+                        className={styles['span-link']}
+                        download="formato.csv"
+                        href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                        siguiente formato
+                      </a>
+                    </OverlayTrigger>
                   </sub>
                   <sub className="d-none d-sm-inline d-xl-none">
                     Para poder cargar la nomina de las personas trabajadoras, se debe utilizar el{' '}
-                    <a
-                      className={styles['span-link']}
-                      download="formato.csv"
-                      href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
-                      siguiente formato
-                    </a>
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip>Un RUN por línea y sin puntos (el guión es opcional)</Tooltip>
+                      }>
+                      <a
+                        className={styles['span-link']}
+                        download="formato.csv"
+                        href="data:text/csv;base64,Nzc3MDYxMjcKOTkxMTQ1NWsKNzM1MTMxNTQKMTYwOTY0NDQ4CjUyMDkwOTJrCjU2NzU1NTg2CjExODYwODM0OAoyMjE4MDkxODEKODA1Mzg5MWsKMjM4MzYzMTg3Cg==">
+                        siguiente formato
+                      </a>
+                    </OverlayTrigger>
                   </sub>
                   <div className="row mt-4">
                     <div className="col-md-6 position-relative">
@@ -865,15 +875,21 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
 
         <div className="mt-4 row">
           <div className="col-12">
-            <IfContainer show={pendiente || loading}>
+            <IfContainer show={pendiente && !error}>
               <div className="mb-5">
                 <LoadingSpinner titulo="Cargando personas trabajadoras..." />
               </div>
             </IfContainer>
+            {loading && (
+              <div className="mb-5">
+                <LoadingSpinner titulo="Cargando persona trabajadora..." />
+              </div>
+            )}
 
             <TablaTrabajadores
               handleDeleteTrabajador={handleDeleteTrabajador}
               trabajadores={trabajadores}
+              totalTrabajadores={datosPagina?.trabajadores.length || 0}
               linkVolver={`/empleadores/${rutempleador}/unidad?operador=${
                 tabOperador == 3 ? 'imed' : 'medipass'
               }`}

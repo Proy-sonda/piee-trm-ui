@@ -1,6 +1,7 @@
 import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 
+import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
 import { Empleador } from '@/modelos/empleador';
@@ -477,6 +478,12 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
           </tbody>
         </Table>
       </div>
+      <LeyendaTablas
+        totalDatos={licencias?.length ?? 0}
+        paginaActual={paginaActual}
+        glosaLeyenda="licencia(s) para tramitar."
+        totalMostrado={licenciasPaginadas.length}
+      />
       <div className="mt-4 mb-2">
         <Paginacion
           paginaActual={paginaActual}
