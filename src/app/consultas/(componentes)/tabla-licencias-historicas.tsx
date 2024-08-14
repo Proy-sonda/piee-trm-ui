@@ -88,15 +88,16 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
 
     let mensaje: string | undefined;
     if (!zona0) {
-      mensaje = 'no ha sido tramitada en portal PIEE';
+      mensaje = 'no ha sido tramitada a través de este portal';
     } else if (zona0 && !licenciaCompletoTramitacion(zona0)) {
       mensaje = 'no se ha completado el proceso de tramitación';
     }
 
     if (mensaje) {
       AlertaInformacion.fire({
-        html: `No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}. </br>
-        Puedes revisar mas detalles de su Tramitación en el portal del Operador <b>${licencia.operador.operador}</b>.`,
+        html: `
+        <p>No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}.</p>
+        <p class="mb-0">Puede revisar más detalles de su tramitación en el portal del Operador <b>${licencia.operador.operador}</b>.</p>`,
       });
       return;
     }
