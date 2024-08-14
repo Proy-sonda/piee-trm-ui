@@ -1,98 +1,65 @@
 .label-pdf {
-    font-size: 12px;
-    margin-bottom: 0px;
-    margin-top: 0px;
+  font-size: 12px;
+  margin-bottom: 0px;
+  margin-top: 0px;
 }
 
-.label-pdf > b{
-    text-transform: uppercase;
-    font-weight: bold;
+.label-pdf > b {
+  text-transform: uppercase;
+  font-weight: bold;
 }
 
-.header-pdf{
-    /* background-image: url('../../../../../../img/header.png'); */
-    background-color: rgb(122, 120, 120) !important;
-    border: 2px solid black;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    margin: 0.5px;
-    color: white;
-    font-weight: bold;
-    font-size: 24px;
-    padding: 2%;
+.header-pdf {
+  /* background-image: url('../../../../../../img/header.png'); */
+  background-color: rgb(122, 120, 120) !important;
+  border: 2px solid black;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  margin: 0.5px;
+  color: white;
+  font-weight: bold;
+  font-size: 24px;
+  padding: 2%;
 }
 
-.watermark
-{
-    min-height: 300vh;
-    position: relative;
-    margin: 0;
+.watermark {
+  min-height: 300vh;
+  position: relative;
+  margin: 0;
 }
 
-.watermark:before {
-    /* Posicionar en diagonal */
-    content: "DOCUMENTO NO VÁLIDO PARA TRÁMITES";
-    position: absolute;
-    /* Desplazar marca de agua 50% de su tamaño para centrarla */
-    transform: translate(-50%, -50%);
-    /* Centrar marca de agua en mitad de la pantalla*/
-    top: 50%;
-    left: 50%;
-    /* Rotar texto */
-    transform: rotate(-45deg);
-    /* Tamaño y color del texto */
-    font-size: 35px;
-    font-weight: bold;
-    color: rgba(0, 0, 0, 0.2);
-    /* Z-index para que el texto se muestre por encima de todo */
-    z-index: 9999;
-    /* Margen para que el texto no se pegue a los bordes */
-    margin-left: 50%;
-    margin-top: 20%;
-    /*texto en una misma linea*/
-    white-space: nowrap;
-    inset: 0;
-    /* background: 
-      url('data:image/svg+xml;utf8,<svg style="transform:rotate(-45deg)" xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 50 60"><text x="0" y="25" fill="%23000">Lorem </text></svg>') 
-      0 0/100% 100vh; */
-  }
-
-.header-pdf label{
-    text-align: center;
+.header-pdf label {
+  text-align: center;
 }
-.header-pdf p{
-    text-align: center;
+.header-pdf p {
+  text-align: center;
 }
 
 .fondo-cabecera {
-    /* background-color: #E0E0E0; */
-    border: 2px solid black;
-    padding: 2%;
+  /* background-color: #E0E0E0; */
+  border: 2px solid black;
+  padding: 2%;
 }
 
-.footer-pdf{
-    
-    background-repeat: no-repeat;
-    /* background-size: 100% 100%; */
-    margin: 0.5px;
-    color: white;
-    font-weight: bold;
-    font-size: 36px;
-    padding: 2%;
+.footer-pdf {
+  background-repeat: no-repeat;
+  /* background-size: 100% 100%; */
+  margin: 0.5px;
+  color: white;
+  font-weight: bold;
+  font-size: 36px;
+  padding: 2%;
 }
 
 .row-titulo {
-    margin-top: 4%;
-    margin-bottom: 4%;
-    margin: 0.5px;
-    border: 2px solid black;
-    padding:2%
+  margin-top: 4%;
+  margin-bottom: 4%;
+  margin: 0.5px;
+  border: 2px solid black;
+  padding: 2%;
 }
 
-.row-titulo label{
-    
-    font-size: 14px;
-    text-align: center;
-    
+.row-titulo label {
+  font-size: 14px;
+  text-align: center;
 }
-
