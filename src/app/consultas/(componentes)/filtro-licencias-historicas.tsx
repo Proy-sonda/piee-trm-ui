@@ -110,10 +110,6 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
               ]}
               idElemento={'value'}
               descripcion={'label'}
-              textoOpcionPorDefecto="No Aplica"
-              errores={{
-                obligatorio: 'No puede ser la opción "No Aplica"',
-              }}
             />
 
             <InputFecha
