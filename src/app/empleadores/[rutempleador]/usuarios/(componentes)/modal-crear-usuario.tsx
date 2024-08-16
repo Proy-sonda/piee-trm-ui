@@ -45,7 +45,19 @@ export const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
 
   const [usuarioExistente, setUsuarioExistente] = useState<UsuarioEntidadEmpleadoraAPI>();
 
-  const formulario = useForm<FormularioCrearUsuario>({ mode: 'onBlur' });
+  const formulario = useForm<FormularioCrearUsuario>({
+    mode: 'onBlur',
+    defaultValues: {
+      rut: '',
+      nombres: '',
+      apellidoPaterno: '',
+      apellidoMaterno: '',
+      email: '',
+      confirmarEmail: '',
+      telefono1: '',
+      telefono2: '',
+    },
+  });
 
   const limpiarFormulario = () => {
     formulario.reset();
@@ -210,6 +222,7 @@ export const ModalCrearUsuario: React.FC<ModalCrearUsuarioProps> = ({
                   />
 
                   <InputApellidos
+                    opcional
                     name="apellidoMaterno"
                     label="Apellido materno"
                     className="col-12 col-lg-6 col-xl-3"
