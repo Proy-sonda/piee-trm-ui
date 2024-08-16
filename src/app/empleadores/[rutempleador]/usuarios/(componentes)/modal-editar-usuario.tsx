@@ -50,7 +50,19 @@ export const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
     [idUsuario, empleador],
   );
 
-  const formulario = useForm<FormularioEditarUsuario>({ mode: 'onBlur' });
+  const formulario = useForm<FormularioEditarUsuario>({
+    mode: 'onBlur',
+    defaultValues: {
+      rut: '',
+      nombres: '',
+      apellidoPaterno: '',
+      apellidoMaterno: '',
+      email: '',
+      confirmarEmail: '',
+      telefono1: '',
+      telefono2: '',
+    },
+  });
 
   // Parchar formulario
   useEffect(() => {
@@ -181,6 +193,7 @@ export const ModalEditarUsuario: React.FC<ModalEditarUsuarioProps> = ({
                   />
 
                   <InputApellidos
+                    opcional
                     name="apellidoMaterno"
                     label="Apellido materno"
                     className="col-12 col-lg-6 col-xl-3"

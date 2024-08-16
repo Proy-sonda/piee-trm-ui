@@ -6,7 +6,12 @@ import { useInputReciclable } from './hooks';
 
 interface InputApellidosProps extends InputReciclableBase {}
 
-export const InputApellidos: React.FC<InputApellidosProps> = ({ name, label, className }) => {
+export const InputApellidos: React.FC<InputApellidosProps> = ({
+  name,
+  label,
+  className,
+  opcional,
+}) => {
   const { register, setValue } = useFormContext();
 
   const { idInput, textoLabel, tieneError, mensajeError } = useInputReciclable({
@@ -14,6 +19,7 @@ export const InputApellidos: React.FC<InputApellidosProps> = ({ name, label, cla
     name,
     label: {
       texto: label,
+      opcional,
     },
   });
 
@@ -28,20 +34,20 @@ export const InputApellidos: React.FC<InputApellidosProps> = ({ name, label, cla
           isInvalid={tieneError}
           {...register(name, {
             required: {
+              value: !opcional,
               message: 'Este campo es obligatorio',
-              value: true,
             },
             minLength: {
-              value: 4,
-              message: 'Debe tener al menos 4 caracteres',
+              value: 3,
+              message: 'Debe tener al menos 3 caracteres',
             },
             maxLength: {
               value: 80,
               message: 'Debe tener a lo más 80 caracteres',
             },
             pattern: {
-              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/,
-              message: 'Solo puede contener letras',
+              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\-'\s]+$/,
+              message: "Solo puede contener letras, guiones y/o apóstrofo ( ' )",
             },
             onBlur: (event: any) => {
               const value = event.target.value;

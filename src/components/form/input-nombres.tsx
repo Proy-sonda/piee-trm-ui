@@ -30,16 +30,16 @@ export const InputNombres: React.FC<InputNombresProps> = ({ name, label, classNa
               value: !opcional,
             },
             minLength: {
-              value: 4,
-              message: 'Debe tener al menos 4 caracteres',
+              value: 3,
+              message: 'Debe tener al menos 3 caracteres',
             },
             maxLength: {
               value: 80,
               message: 'Debe tener a lo más 80 caracteres',
             },
             pattern: {
-              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/,
-              message: 'Solo puede contener letras',
+              value: /^[a-zA-ZáéíóúñÁÉÍÓÚÑ\-'\s]+$/,
+              message: "Solo puede contener letras, guiones y/o apóstrofo ( ' )",
             },
             onBlur: (event: any) => {
               const value = event.target.value;
