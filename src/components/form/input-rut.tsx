@@ -118,7 +118,7 @@ export const InputRut: React.FC<InputRutProps> = ({
             onBlur: (event) => {
               const rut = event.target.value ?? '';
 
-              if (validateRut(rut)) {
+              if (validateRut(rut) && rut.length > 3) {
                 setValue(name, formatRut(rut, false));
                 onBlurInterno?.(rut);
               }
