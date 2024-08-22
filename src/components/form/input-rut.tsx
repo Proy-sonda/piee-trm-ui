@@ -86,6 +86,10 @@ export const InputRut: React.FC<InputRutProps> = ({
               value: !opcional,
               message: errores?.obligatorio ?? `El ${tipoInput()} es obligatorio`,
             },
+            minLength: {
+              value: 4,
+              message: 'Debe tener al menos 4 caracteres',
+            },
             validate: {
               esRut: (rut) => {
                 if (opcional && rut === '') {
