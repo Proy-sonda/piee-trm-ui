@@ -21,6 +21,9 @@ interface InputRutProps
 
   /** Si se debe ocultar el tooltip de ayuda (default: `false`) */
   ocultarTooltip?: boolean;
+
+  /** Si permitir el autocompletado o no (default: `true`) */
+  autocompletar?: boolean;
 }
 
 export const InputRut: React.FC<InputRutProps> = ({
@@ -34,6 +37,7 @@ export const InputRut: React.FC<InputRutProps> = ({
   onBlur: onBlurInterno,
   errores,
   ocultarTooltip,
+  autocompletar,
 }) => {
   const MAXIMO_CARACTERES_EN_RUT = 12;
 
@@ -72,17 +76,19 @@ export const InputRut: React.FC<InputRutProps> = ({
           </Form.Label>
         </IfContainer>
 
-        {/* {textoLabel && <Form.Label>{textoLabel}</Form.Label>} */}
-
         <Form.Control
           type="text"
-          autoComplete="new-custom-value"
+          autoComplete={!autocompletar ? 'off' : 'new-custom-value'}
           isInvalid={tieneError}
           disabled={deshabilitado}
           {...register(name, {
             required: {
               value: !opcional,
               message: errores?.obligatorio ?? `El ${tipoInput()} es obligatorio`,
+            },
+            minLength: {
+              value: 4,
+              message: 'Debe tener al menos 4 caracteres',
             },
             validate: {
               esRut: (rut) => {
@@ -112,7 +118,7 @@ export const InputRut: React.FC<InputRutProps> = ({
             onBlur: (event) => {
               const rut = event.target.value ?? '';
 
-              if (validateRut(rut)) {
+              if (validateRut(rut) && rut.length > 3) {
                 setValue(name, formatRut(rut, false));
                 onBlurInterno?.(rut);
               }

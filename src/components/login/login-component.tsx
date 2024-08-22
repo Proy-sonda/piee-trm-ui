@@ -45,7 +45,14 @@ export const LoginComponent: React.FC<{}> = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { usuario, login, loginSU } = useContext(AuthContext);
-  const formulario = useForm<FormularioLogin>({ mode: 'onBlur' });
+  const formulario = useForm<FormularioLogin>({
+    mode: 'onBlur',
+    defaultValues: {
+      rut: '',
+      clave: '',
+    },
+  });
+
   const rutUsuario = formulario.watch('rut');
 
   // Redirigir al usuario si esta logueado
@@ -172,6 +179,7 @@ export const LoginComponent: React.FC<{}> = () => {
           <InputRut
             ocultarTooltip
             omitirSignoObligatorio
+            autocompletar={false}
             label="RUN Persona Usuaria"
             name="rut"
             tipo="run"

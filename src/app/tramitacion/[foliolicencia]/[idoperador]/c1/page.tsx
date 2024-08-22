@@ -239,6 +239,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         formulario.setValue('departamento', LMEEXIS.depto);
         formulario.setValue('telefono', LMEEXIS.telefono);
         formulario.setValue('ocupacion', LMEEXIS.ocupacion.idocupacion.toString());
+        formulario.setValue('otro', LMEEXIS.glosaotraocupacion);
         formulario.setValue(
           'fecharecepcionlme',
           format(new Date(LMEEXIS.fecharecepcion), 'yyyy-MM-dd'),
@@ -584,9 +585,13 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
                 <IfContainer show={Number(ocupacionSeleccionada) == 19}>
                   <div className="col-12 col-sm-6 col-lg-4 col-xl-3 position-relative">
+                    <label htmlFor="otra-ocupacion" className="form-label">
+                      Nombre Otra Ocupación (*)
+                    </label>
                     <input
+                      id="otra-ocupacion"
                       type="text"
-                      className={`mt-2 form-control ${
+                      className={`form-control ${
                         formulario.formState.errors.otro ? 'is-invalid' : ''
                       }`}
                       placeholder="Otra ocupación..."
