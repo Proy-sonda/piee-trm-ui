@@ -21,6 +21,9 @@ interface InputRutProps
 
   /** Si se debe ocultar el tooltip de ayuda (default: `false`) */
   ocultarTooltip?: boolean;
+
+  /** Si permitir el autocompletado o no (default: `true`) */
+  autocompletar?: boolean;
 }
 
 export const InputRut: React.FC<InputRutProps> = ({
@@ -34,6 +37,7 @@ export const InputRut: React.FC<InputRutProps> = ({
   onBlur: onBlurInterno,
   errores,
   ocultarTooltip,
+  autocompletar,
 }) => {
   const MAXIMO_CARACTERES_EN_RUT = 12;
 
@@ -72,11 +76,9 @@ export const InputRut: React.FC<InputRutProps> = ({
           </Form.Label>
         </IfContainer>
 
-        {/* {textoLabel && <Form.Label>{textoLabel}</Form.Label>} */}
-
         <Form.Control
           type="text"
-          autoComplete="new-custom-value"
+          autoComplete={!autocompletar ? 'off' : 'new-custom-value'}
           isInvalid={tieneError}
           disabled={deshabilitado}
           {...register(name, {

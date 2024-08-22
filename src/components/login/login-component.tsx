@@ -89,6 +89,14 @@ export const LoginComponent: React.FC<{}> = () => {
     }
   }, [usuario, mensajes]);
 
+  // Limpia valores del autocompletado al cargar la pagina
+  useEffect(() => {
+    formulario.reset({
+      clave: '',
+      rut: '',
+    });
+  });
+
   const obtenerMensajesDeBienvenida = (mensajes?: Mensaje[]) => {
     const bienvenidaGeneral = (mensajes ?? []).find((m) => m.idmensajegeneral === 2);
     const bienvenidaTramitacion = (mensajes ?? []).find((m) => m.idmensajegeneral === 3);
@@ -172,6 +180,7 @@ export const LoginComponent: React.FC<{}> = () => {
           <InputRut
             ocultarTooltip
             omitirSignoObligatorio
+            autocompletar={false}
             label="RUN Persona Usuaria"
             name="rut"
             tipo="run"
