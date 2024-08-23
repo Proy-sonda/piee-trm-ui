@@ -30,8 +30,8 @@ export const InputNombres: React.FC<InputNombresProps> = ({ name, label, classNa
               value: !opcional,
             },
             minLength: {
-              value: 3,
-              message: 'Debe tener al menos 3 caracteres',
+              value: 2,
+              message: 'Debe tener al menos 2 caracteres',
             },
             maxLength: {
               value: 80,
