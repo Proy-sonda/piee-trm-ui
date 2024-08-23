@@ -20,6 +20,7 @@ export interface LicenciaTramitada {
   estadotramitacion: Estadotramitacion;
   rutempleador: string;
   motivonorecepcion: MotivoNoRecepcion | null;
+  ruttramitacion: string;
 }
 
 interface MotivoNoRecepcion {

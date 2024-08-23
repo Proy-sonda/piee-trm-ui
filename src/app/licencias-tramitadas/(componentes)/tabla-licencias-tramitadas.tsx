@@ -211,6 +211,9 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                   <div className="mb-1 small text-start text-nowrap">
                     {licencia.tipolicencia.tipolicencia}
                   </div>
+                  <div className="mb-1 small text-start text-nowrap">
+                    RUN PERSONA USUARIA TRAMITADORA: {licencia.ruttramitacion}
+                  </div>
                 </td>
                 <td>
                   <Stack gap={2}>
