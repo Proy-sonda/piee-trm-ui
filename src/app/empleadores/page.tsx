@@ -11,7 +11,7 @@ import { buscarEmpleadores } from '@/servicios/buscar-empleadores';
 import { useContext, useEffect, useState } from 'react';
 import { Container } from 'react-bootstrap';
 import BarraBusquedaEntidadesEmpleadoras from './(componentes)/barra-busqueda-entidades-empleadoras';
-import ModalInscribirEntidadEmpleadora from './(componentes)/modal-inscribir-entidad-empleadora';
+
 import TablaEntidadesEmpleadoras from './(componentes)/tabla-entidades-empleadoras';
 import { buscarPermisosPorEmpleador } from './(servicios)/buscar-permisos-por-empleador';
 
@@ -92,8 +92,6 @@ const EmpleadoresPage = () => {
           </IfContainer>
         </div>
       </div>
-
-      <ModalInscribirEntidadEmpleadora onEntidadEmpleadoraCreada={() => refrescarPagina()} />
     </Container>
   );
 };

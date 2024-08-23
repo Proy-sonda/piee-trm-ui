@@ -92,47 +92,6 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
               }}>
               Buscar
             </button>
-
-            <GuiaUsuario
-              guia={listaguia[0]!?.activo && guia}
-              target={target}
-              placement="bottom-end">
-              Botón para inscribir una nueva Entidad Empleadora en el sistema <br />
-              <div className="text-end mt-2">
-                <button
-                  className="btn btn-sm text-white"
-                  onClick={() => {
-                    AgregarGuia([
-                      {
-                        indice: 0,
-                        nombre: 'Filtro de búsquedaa',
-                        activo: false,
-                      },
-                      {
-                        indice: 1,
-                        nombre: 'Tabla Entidad Empleadora',
-                        activo: true,
-                      },
-                    ]);
-                  }}
-                  style={{
-                    border: '1px solid white',
-                  }}>
-                  Continuar &nbsp;
-                  <i className="bi bi-arrow-right"></i>
-                </button>
-              </div>
-            </GuiaUsuario>
-
-            {/* <button
-              type="button"
-              className={`btn btn-success mt-3 mt-md-0 ${
-                listaguia[0]!?.nombre.includes('Filtro') && guia ? 'overlay-marco' : ''
-              }'}`}
-              data-bs-toggle="modal"
-              data-bs-target="#Addsempresa">
-              Inscribe Entidad Empleadora
-            </button> */}
           </div>
         </div>
       </form>
