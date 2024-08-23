@@ -1,17 +1,10 @@
-import { buscarEmpleadorRut } from '@/app/empleadores/(servicios)/buscar-empleador-rut';
-import {
-  buscarZona0,
-  buscarZona1,
-} from '@/app/tramitacion/[foliolicencia]/[idoperador]/c1/(servicios)';
-import { buscarZona2 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c2/(servicios)';
-import { buscarZona3 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c3/(servicios)';
-import { buscarZona4 } from '@/app/tramitacion/[foliolicencia]/[idoperador]/c4/(servicios)';
-import { emptyFetch, useFetch, useMergeFetchObject } from '@/hooks/use-merge-fetch';
+import { useFetch } from '@/hooks/use-merge-fetch';
 import { addDays, format, parse } from 'date-fns';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import { BuscarComprobante } from './(servicios)/buscar-comprobante';
 import styles from './modal-comprobante-tramitacion.module.css';
 import { numeroALetras } from './numero-a-letra';
 
@@ -37,29 +30,18 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
 }) => {
   const [modalimprimir, setmodalimprimir] = useState(false);
 
-  const [, zonas] = useMergeFetchObject(
-    {
-      zona0: buscarZona0(foliolicencia, idOperadorNumber),
-      zona1: buscarZona1(foliolicencia, idOperadorNumber),
-      zona2: buscarZona2(foliolicencia, idOperadorNumber),
-      zona3: buscarZona3(foliolicencia, idOperadorNumber),
-      zona4: buscarZona4(foliolicencia, idOperadorNumber),
-    },
+  const [error, comprobante, pendiente] = useFetch(
+    BuscarComprobante(foliolicencia, idOperadorNumber),
     [foliolicencia, idOperadorNumber],
   );
 
-  const zona1 = zonas?.zona1;
-  const [, empleador] = useFetch(zona1 ? buscarEmpleadorRut(zona1.rutempleador) : emptyFetch(), [
-    zona1,
-  ]);
-
   useEffect(() => {
-    if (!zonas || !empleador) {
+    if (!comprobante || !comprobante?.empleador) {
       return;
     }
 
     setmodalimprimir(true);
-  }, [zonas, empleador]);
+  }, [comprobante, comprobante?.empleador]);
 
   useEffect(() => {
     if (!modalimprimir) {
@@ -92,11 +74,11 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
   };
 
   const calcularFechaFin = () => {
-    if (!zonas || !zonas.zona0.fechainicioreposo) {
+    if (!comprobante || !comprobante.fechainicioreposo) {
       return new Date(1900, 0, 1);
     }
 
-    return addDays(new Date(zonas.zona0.fechainicioreposo), zonas.zona0.ndias);
+    return addDays(new Date(comprobante.fechainicioreposo), comprobante.ndias);
   };
 
   return (
@@ -138,40 +120,40 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
               <div className="row mt-2">
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>RUN: </b>
-                  {zonas?.zona0.ruttrabajador}
+                  {comprobante?.ruttrabajador}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FOLIO LICENCIA: </b>
-                  {zona1?.foliolicencia}
+                  {comprobante?.zc1.foliolicencia}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>NOMBRE: </b>
-                  {`${zonas?.zona0.nombres} ${zonas?.zona0.apellidopaterno} ${zonas?.zona0.apellidomaterno}`}
+                  {`${comprobante?.nombres} ${comprobante?.apellidopaterno} ${comprobante?.apellidomaterno}`}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <b>ESTADO: </b> {zonas?.zona0.estadolicencia.estadolicencia}
+                  <b>ESTADO: </b> {comprobante?.estadolicencia.estadolicencia}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FECHA EMISIÓN:</b>{' '}
-                  {format(new Date(zonas?.zona0.fechaemision ?? '01/01/1990'), 'dd/MM/yyyy')}
+                  {format(new Date(comprobante?.fechaemision ?? '01/01/1990'), 'dd/MM/yyyy')}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FECHA ESTADO: </b>
-                  {format(new Date(zonas?.zona0.fechaestado ?? '01/01/1990'), 'dd/MM/yyyy')}
+                  {format(new Date(comprobante?.fechaestado ?? '01/01/1990'), 'dd/MM/yyyy')}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FECHA INICIO REPOSO:</b>{' '}
-                  {format(new Date(zonas?.zona0.fechainicioreposo ?? '01/01/1990'), 'dd/MM/yyyy')}
+                  {format(new Date(comprobante?.fechainicioreposo ?? '01/01/1990'), 'dd/MM/yyyy')}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <b>N° DE DÍAS:</b> {zonas?.zona0.ndias}
+                  <b>N° DE DÍAS:</b> {comprobante?.ndias}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FECHA TERMINO REPOSO: </b>
                   {format(calcularFechaFin(), 'dd/MM/yyyy')}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <b>N° DE DÍAS EN PALABRAS:</b> {numeroALetras(zonas?.zona0.ndias ?? 0)}
+                  <b>N° DE DÍAS EN PALABRAS:</b> {numeroALetras(comprobante?.ndias ?? 0)}
                 </div>
               </div>
 
@@ -184,36 +166,36 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
               <div className="row mt-4">
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>RUT: </b>
-                  {zona1?.rutempleador.replaceAll('-', '')}
+                  {comprobante?.zc1?.rutempleador.replaceAll('-', '')}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
-                  <b>TELÉFONO: </b> {empleador?.telefonohabitual}
+                  <b>TELÉFONO: </b> {comprobante?.empleador?.telefonohabitual}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>NOMBRE ENTIDAD EMPLEADORA: </b>
-                  {empleador?.razonsocial}
+                  {comprobante?.empleador?.razonsocial}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FECHA TRAMITACIÓN: </b>
-                  {ConvertirFecha(zonas!?.zona0!?.fechatramitacion ?? '1900-01-01')}
+                  {ConvertirFecha(comprobante?.fechatramitacion ?? '1900-01-01')}
                 </div>
 
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>OCUPACIÓN: </b>
-                  {zona1?.ocupacion.ocupacion}
+                  {comprobante?.zc1.ocupacion.ocupacion}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>USUARIO TRAMITADOR: </b>
-                  {zonas?.zona0.ruttramitacion}
+                  {comprobante?.ruttramitacion}
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>ACTIVIDAD LABORAL PERSONA TRABAJADORA: </b>
-                  {zona1?.actividadlaboral.actividadlaboral}
+                  {comprobante?.zc1?.actividadlaboral.actividadlaboral}
                 </div>
 
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>DIRECCIÓN DONDE CUMPLE FUNCIONES: </b>
-                  {`${zona1?.tipocalle.tipocalle} ${zona1?.direccion} ${zona1?.numero} ${zona1?.depto}, ${zona1?.comuna.nombre}`}
+                  {`${comprobante?.zc1?.tipocalle.tipocalle} ${comprobante?.zc1?.direccion} ${comprobante?.zc1?.numero} ${comprobante?.zc1?.depto}, ${comprobante?.zc1?.comuna.nombre}`}
                 </div>
               </div>
               <hr />
