@@ -171,7 +171,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
 
                     <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
                       <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
-                        licencias Conciliada
+                        Licencia Conciliada
                       </Badge>
                     </IfContainer>
                   </Stack>
