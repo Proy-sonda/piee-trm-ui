@@ -171,7 +171,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
 
                     <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
                       <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
-                        licencias Conciliada
+                        Licencia Conciliada
                       </Badge>
                     </IfContainer>
                   </Stack>
@@ -210,6 +210,9 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
                     {licencia.tipolicencia.tipolicencia}
+                  </div>
+                  <div className="mb-1 small text-start text-nowrap">
+                    RUN PERSONA USUARIA TRAMITADORA: {licencia.ruttramitacion}
                   </div>
                 </td>
                 <td>
