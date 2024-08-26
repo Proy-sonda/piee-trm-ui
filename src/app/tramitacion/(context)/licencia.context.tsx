@@ -58,6 +58,7 @@ const InitLicencia: LicenciaTramitar = {
     estadotramitacion: '',
   },
   tramitacioniniciada: false,
+  rutusuariotramita: null,
 };
 
 export const LicenciaContext = createContext<ILicenciaContext>({
