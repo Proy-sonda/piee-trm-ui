@@ -1,5 +1,5 @@
 import { useFetch } from '@/hooks/use-merge-fetch';
-import { addDays, format, parse } from 'date-fns';
+import { addDays, format } from 'date-fns';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useEffect, useState } from 'react';
@@ -67,10 +67,13 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
     });
   }, [modalimprimir]);
 
-  const ConvertirFecha = (fecha_tramitacion: string) => {
-    if (fecha_tramitacion === 'Invalid date') return format(new Date('01/01/1900'), 'dd/MM/yyyy');
-    const fechaParseada = parse(fecha_tramitacion, 'yyyy-MM-dd', new Date());
-    return format(fechaParseada, 'dd/MM/yyyy');
+  const ConvertirFecha = (fecha_tramitacion: string | undefined) => {
+    if (!fecha_tramitacion) return '';
+    if (fecha_tramitacion === 'Invalid date' || fecha_tramitacion === '')
+      return format(new Date('01/01/1900'), 'dd/MM/yyyy');
+    const fechaParseada = format(new Date(fecha_tramitacion), 'dd/MM/yyyy');
+
+    return fechaParseada;
   };
 
   const calcularFechaFin = () => {
@@ -177,7 +180,7 @@ export const ModalComprobanteTramitacion: React.FC<ModalComprobanteTramitacionPr
                 </div>
                 <div className="col-md-6 col-xs-6 col-sm-6">
                   <b>FECHA TRAMITACIÓN: </b>
-                  {ConvertirFecha(comprobante?.fechatramitacion ?? '1900-01-01')}
+                  {ConvertirFecha(comprobante?.fechatramitacion)}
                 </div>
 
                 <div className="col-md-6 col-xs-6 col-sm-6">
