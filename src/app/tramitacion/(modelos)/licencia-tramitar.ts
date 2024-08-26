@@ -22,6 +22,7 @@ export interface LicenciaTramitar {
   estadoTramitacion?: Estadotramitacion;
   fechaultdiatramita: Date;
   tramitacioniniciada?: boolean;
+  rutusuariotramita: string | null | undefined;
 }
 
 interface Entidadsalud {
