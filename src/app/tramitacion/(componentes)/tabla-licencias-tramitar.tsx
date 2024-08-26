@@ -426,14 +426,14 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   <div className="mb-1 small text-start text-nowrap">
                     FECHA DE EMISIÓN: {format(new Date(licencia.fechaemision), 'dd-MM-yyyy')}
                   </div>
+                  <IfContainer show={licencia.rutusuariotramita}>
+                    <div className="mb-1 small text-start text-nowrap">
+                      RUN PERSONA USUARIA TRAMITANDO: {licencia.rutusuariotramita}
+                    </div>
+                  </IfContainer>
                   <div className="mb-1 small text-start text-nowrap">
                     {licencia.tipolicencia.tipolicencia}
                   </div>
-                  <IfContainer show={licencia.rutusuariotramita}>
-                    <div className="mb-1 small text-start text-nowrap">
-                      RUN PERSONA USUARIA TRAMITA: {licencia.rutusuariotramita}
-                    </div>
-                  </IfContainer>
                 </td>
                 <td>
                   <Stack gap={2}>

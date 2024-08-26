@@ -209,10 +209,10 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     FECHA DE TRAMITACIÓN: {formatearFecha(licencia.fechatramitacion)}
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
-                    {licencia.tipolicencia.tipolicencia}
+                    RUN PERSONA USUARIA TRAMITADORA: {licencia.ruttramitacion}
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
-                    RUN PERSONA USUARIA TRAMITADORA: {licencia.ruttramitacion}
+                    {licencia.tipolicencia.tipolicencia}
                   </div>
                 </td>
                 <td>
