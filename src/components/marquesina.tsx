@@ -28,7 +28,7 @@ const Marquesina = () => {
   const mensajeMarquesinaTieneContenido = () => {
     const mensajeLimpio = existe(mensajemarquesina) ? mensajemarquesina.trim() : '';
     // Este regex elimina todos los tags HTML, dejando solo el contenido en su interior
-    return mensajeLimpio.replace(/(<([^>]+)>)/gi, '') !== '';
+    return mensajeLimpio.replace(/(<([^>]+)>)/gi, '').trim() !== '';
   };
 
   return (
