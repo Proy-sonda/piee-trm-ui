@@ -2,6 +2,7 @@
 
 import { useFetch } from '@/hooks';
 import { obtenerMensajes } from '@/servicios/obtiene-mensajes';
+import { existe } from '@/utilidades';
 import { useEffect, useState } from 'react';
 
 const Marquesina = () => {
@@ -24,12 +25,18 @@ const Marquesina = () => {
     }
   }, [mensajes]);
 
+  const mensajeMarquesinaTieneContenido = () => {
+    const mensajeLimpio = existe(mensajemarquesina) ? mensajemarquesina.trim() : '';
+    // Este regex elimina todos los tags HTML, dejando solo el contenido en su interior
+    return mensajeLimpio.replace(/(<([^>]+)>)/gi, '') !== '';
+  };
+
   return (
     <div
       className="alert alert-warning alert-dismissible fade show"
       role="alert"
       style={{
-        display: mensajemarquesina ? 'block' : 'none',
+        display: mensajeMarquesinaTieneContenido() ? 'block' : 'none',
       }}>
       <b dangerouslySetInnerHTML={{ __html: mensajemarquesina }} />
       <button
