@@ -266,45 +266,6 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
             <i className="bi bi-arrow-left"></i>
             &nbsp; Anterior
           </button>
-          &nbsp;
-          <button
-            className="btn btn-sm text-white"
-            onClick={() => {
-              AgregarGuia([
-                {
-                  indice: 0,
-                  nombre: 'Folio Licencia',
-                  activo: true,
-                },
-                {
-                  indice: 1,
-                  nombre: 'semaforo',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Tabla de tramitación',
-                  activo: false,
-                },
-                {
-                  indice: 3,
-                  nombre: 'Botón de tramitación',
-                  activo: false,
-                },
-                {
-                  indice: 4,
-                  nombre: 'Botón no recepción',
-                  activo: false,
-                },
-              ]);
-              window.scrollTo(0, 0);
-            }}
-            style={{
-              border: '1px solid white',
-            }}>
-            Continuar &nbsp;
-            <i className="bi bi-arrow-right"></i>
-          </button>
         </div>
       </GuiaUsuario>
       <div

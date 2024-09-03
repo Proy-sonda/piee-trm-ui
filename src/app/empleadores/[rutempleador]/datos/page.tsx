@@ -198,28 +198,6 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
               &nbsp; Anterior
             </button>
             &nbsp;
-            <button
-              className="btn btn-sm text-white"
-              onClick={() =>
-                AgregarGuia([
-                  {
-                    indice: 0,
-                    nombre: 'Menu lateral',
-                    activo: true,
-                  },
-                  {
-                    indice: 1,
-                    nombre: 'Datos página',
-                    activo: false,
-                  },
-                ])
-              }
-              style={{
-                border: '1px solid white',
-              }}>
-              Continuar &nbsp;
-              <i className="bi bi-arrow-right"></i>
-            </button>
           </div>
         </GuiaUsuario>
 
