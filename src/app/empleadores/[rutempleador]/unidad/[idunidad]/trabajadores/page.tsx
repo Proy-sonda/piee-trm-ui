@@ -664,34 +664,6 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
                       <i className="bi bi-arrow-left"></i>
                       &nbsp; Anterior
                     </button>
-                    &nbsp;
-                    <button
-                      className="btn btn-sm text-white"
-                      onClick={() =>
-                        AgregarGuia([
-                          {
-                            indice: 0,
-                            nombre: 'Menu lateral',
-                            activo: true,
-                          },
-                          {
-                            indice: 1,
-                            nombre: 'Carga trabajador',
-                            activo: false,
-                          },
-                          {
-                            indice: 2,
-                            nombre: 'Carga nomina',
-                            activo: false,
-                          },
-                        ])
-                      }
-                      style={{
-                        border: '1px solid white',
-                      }}>
-                      Continuar &nbsp;
-                      <i className="bi bi-arrow-right"></i>
-                    </button>
                   </div>
                 </GuiaUsuario>
                 <div

@@ -13,7 +13,7 @@ const BarraBusquedaEntidadesEmpleadoras: React.FC<BarraBusquedaEntidadesEmpleado
 }) => {
   const [rut, setRut] = useState('');
   const {
-    datosGuia: { listaguia, guia, AgregarGuia },
+    datosGuia: { listaguia, guia },
   } = useContext(AuthContext);
   const [razonSocial, setRazonSocial] = useState('');
   const [error, seterror] = useState(false);
