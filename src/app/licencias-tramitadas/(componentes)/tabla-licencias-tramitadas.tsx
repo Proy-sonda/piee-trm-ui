@@ -217,7 +217,11 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
+                    <IfContainer
+                      show={
+                        licenciaFueTramitadaPorOperador(licencia) &&
+                        !esLicenciaNoTramitada(licencia)
+                      }>
                       <button className="btn btn-sm btn-primary">
                         <small
                           className="text-nowrap"
