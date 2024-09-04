@@ -142,7 +142,7 @@ export default function TablaEntidadesEmpleadoras({
               <Th style={{ width: '100px' }}>RUT</Th>
               <Th style={{ width: '150px' }}>Razón Social</Th>
 
-              <Th style={{ width: '20px' }}></Th>
+              <Th style={{ width: '20px' }}>Acciones</Th>
             </Tr>
           </Thead>
           <Tbody className="align-middle">
@@ -157,7 +157,7 @@ export default function TablaEntidadesEmpleadoras({
                     </Link>
                   </Td>
                   <Td>{empleador.razonsocial}</Td>
-                  <Td className="text-center">
+                  <Td>
                     <IfContainer show={puedeDesuscribir(empleador)}>
                       <button
                         className="btn btn-danger btn-sm"

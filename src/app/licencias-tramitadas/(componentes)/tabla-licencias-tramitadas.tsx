@@ -122,7 +122,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
             <th className="text-nowrap">ENTIDAD EMPLEADORA</th>
             <th>PERSONA TRABAJADORA</th>
             <th>DESCRIPCIÓN</th>
-            <th></th>
+            <th>ACCIONES</th>
           </tr>
         </thead>
         <tbody>
@@ -217,7 +217,11 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                 </td>
                 <td>
                   <Stack gap={2}>
-                    <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
+                    <IfContainer
+                      show={
+                        licenciaFueTramitadaPorOperador(licencia) &&
+                        !esLicenciaNoTramitada(licencia)
+                      }>
                       <button className="btn btn-sm btn-primary">
                         <small
                           className="text-nowrap"

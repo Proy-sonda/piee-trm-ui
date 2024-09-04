@@ -117,7 +117,7 @@ const TablaUnidades = ({
               <Th>Código</Th>
               <Th>Nombre</Th>
               <Th>Dirección</Th>
-              <Th></Th>
+              <Th className="text-start">Acciones</Th>
             </Tr>
           </Thead>
           <Tbody className="text-center align-middle">

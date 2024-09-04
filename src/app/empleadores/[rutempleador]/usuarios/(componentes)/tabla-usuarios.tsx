@@ -153,7 +153,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
               <Th>Correo electrónico</Th>
             </IfContainer>
             <Th>Rol</Th>
-            {rolEnEmpleadorActual === 'administrador' && <Th></Th>}
+            {rolEnEmpleadorActual === 'administrador' && <Th>Acciones</Th>}
           </Tr>
         </Thead>
         <Tbody className="text-center align-middle">
