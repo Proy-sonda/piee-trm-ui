@@ -185,13 +185,15 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
                   <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
                 </td>
                 <td>
-                  <div className="mb-1 small text-start text-nowrap">
+                  <div className="mb-1 small text-center text-nowrap">
                     {`${licencia.estadolicencia?.idestadolicencia} - ${licencia.estadolicencia?.estadolicencia}`}
                   </div>
-                  <div className="mb-1 small text-start text-nowrap">
-                    FECHA ESTADO:{' '}
-                    {format(new Date(licencia.fechaestadolicencia || new Date()), 'dd-MM-yyyy')}
-                  </div>
+                  {existe(licencia.fechaestadolicencia) &&
+                    licencia.fechaestadolicencia.trim() !== '' && (
+                      <div className="mb-1 small text-center text-nowrap">
+                        {formatearFecha(licencia.fechaestadolicencia)}
+                      </div>
+                    )}
                 </td>
                 <td>{BusquedaDeEmpleador(licencia.rutempleador)}</td>
                 <td>
