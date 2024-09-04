@@ -120,6 +120,11 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     setMostrarModalHistorico(true);
   };
 
+  const formatearFecha = (fecha: string, conHora = true) => {
+    const formato = conHora ? 'dd-MM-yyyy HH:mm:ss' : 'dd-MM-yyyy';
+    return format(new Date(fecha), formato);
+  };
+
   return (
     <>
       <IfContainer show={mostrarSpinner}>
@@ -198,14 +203,14 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
                     {licencia.tiporeposo.tiporeposo}: {licencia.diasreposo} día(s)
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
-                    INICIO REPOSO: {licencia.fechainicioreposo}
+                    INICIO REPOSO: {formatearFecha(licencia.fechainicioreposo, false)}
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
-                    FECHA DE EMISIÓN: {licencia.fechaemision}
+                    FECHA DE EMISIÓN: {formatearFecha(licencia.fechaemision)}
                   </div>
                   {existe(licencia.fechatramitacion) && licencia.fechatramitacion.trim() !== '' && (
                     <div className="mb-1 small text-start text-nowrap">
-                      FECHA DE TRAMITACIÓN: {licencia.fechatramitacion}
+                      FECHA DE TRAMITACIÓN: {formatearFecha(licencia.fechatramitacion)}
                     </div>
                   )}
                   {existe(licencia.ruttramitador) && licencia.ruttramitador.trim() !== '' && (

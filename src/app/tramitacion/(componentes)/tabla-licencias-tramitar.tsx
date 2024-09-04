@@ -385,7 +385,8 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                     INICIO REPOSO: {format(new Date(licencia.fechainicioreposo), 'dd-MM-yyyy')}
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
-                    FECHA DE EMISIÓN: {format(new Date(licencia.fechaemision), 'dd-MM-yyyy')}
+                    FECHA DE EMISIÓN:{' '}
+                    {format(new Date(licencia.fechaemision), 'dd-MM-yyyy HH:mm:ss')}
                   </div>
                   <IfContainer show={licencia.rutusuariotramita}>
                     <div className="mb-1 small text-start text-nowrap">

@@ -64,8 +64,9 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
     return `${licencia.nombres} ${licencia.apellidopaterno} ${licencia.apellidomaterno}`;
   };
 
-  const formatearFecha = (fecha: string) => {
-    return format(new Date(fecha), 'dd-MM-yyyy');
+  const formatearFecha = (fecha: string, conHora = true) => {
+    const formato = conHora ? 'dd-MM-yyyy HH:mm:ss' : 'dd-MM-yyyy';
+    return format(new Date(fecha), formato);
   };
 
   const imprimirComprobanteTramitacion = async (licencia: LicenciaTramitada) => {
@@ -200,7 +201,7 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     {licencia.tiporeposo.tiporeposo}: {licencia.ndias} día(s)
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
-                    INICIO REPOSO: {formatearFecha(licencia.fechainicioreposo)}
+                    INICIO REPOSO: {formatearFecha(licencia.fechainicioreposo, false)}
                   </div>
                   <div className="mb-1 small text-start text-nowrap">
                     FECHA DE EMISIÓN: {formatearFecha(licencia.fechaemision)}
