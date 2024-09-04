@@ -15,6 +15,8 @@ export interface LicenciaHistorica {
   tipolicencia: Tipolicencia;
   estadolicencia: Estadolicencia;
   fechaestadolicencia: string;
+  ruttramitador?: string | null;
+  fechatramitacion?: string | null;
 }
 
 interface Estadolicencia {

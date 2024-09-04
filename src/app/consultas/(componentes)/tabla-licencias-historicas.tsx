@@ -5,7 +5,7 @@ import IfContainer from '@/components/if-container';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { AlertaInformacion } from '@/utilidades';
+import { AlertaInformacion, existe } from '@/utilidades';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
@@ -200,9 +200,16 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
                   <div className="mb-1 small text-start text-nowrap">
                     FECHA DE EMISIÓN: {licencia.fechaemision}
                   </div>
-                  {/* <div className="mb-1 small text-start text-nowrap">
-                  FECHA DE TRAMITACIÓN: {formatearFecha(licencia.fechatramitacion)}
-                </div> */}
+                  {existe(licencia.fechatramitacion) && licencia.fechatramitacion.trim() !== '' && (
+                    <div className="mb-1 small text-start text-nowrap">
+                      FECHA DE TRAMITACIÓN: {licencia.fechatramitacion}
+                    </div>
+                  )}
+                  {existe(licencia.ruttramitador) && licencia.ruttramitador.trim() !== '' && (
+                    <div className="mb-1 small text-start text-nowrap">
+                      TRAMITADA POR: {licencia.ruttramitador}
+                    </div>
+                  )}
                   <div className="mb-1 small text-start text-nowrap">
                     {licencia.tipolicencia.tipolicencia}
                   </div>
