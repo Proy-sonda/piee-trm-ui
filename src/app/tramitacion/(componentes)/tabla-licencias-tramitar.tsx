@@ -281,7 +281,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
               <th>ENTIDAD EMPLEADORA</th>
               <th>PERSONA TRABAJADORA</th>
               <th>DESCRIPCIÓN</th>
-              <th></th>
+              <th>ACCIONES</th>
             </tr>
           </thead>
           <tbody>

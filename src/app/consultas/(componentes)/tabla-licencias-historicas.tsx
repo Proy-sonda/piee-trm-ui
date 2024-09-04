@@ -163,7 +163,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
             <th>EMPLEADOR</th>
             <th>PERSONA TRABAJADORA</th>
             <th>DESCRIPCIÓN</th>
-            <th></th>
+            <th>ACCIONES</th>
           </tr>
         </thead>
         {licencias.length > 0 ? (
@@ -242,7 +242,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
         ) : (
           <tbody>
             <tr className="text-center">
-              <td colSpan={5}>No se han encontrado licencias.</td>
+              <td colSpan={6}>No se han encontrado licencias.</td>
             </tr>
           </tbody>
         )}
