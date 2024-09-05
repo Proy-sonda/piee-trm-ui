@@ -38,7 +38,7 @@ const Marquesina = () => {
       style={{
         display: mensajeMarquesinaTieneContenido() ? 'block' : 'none',
       }}>
-      <b dangerouslySetInnerHTML={{ __html: mensajemarquesina }} />
+      <div dangerouslySetInnerHTML={{ __html: mensajemarquesina }} />
       <button
         type="button"
         className="btn-close"
