@@ -171,10 +171,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       });
 
       resp.then((result) => {
-        console.table(LicenciasAnteriores);
-        console.log(
-          LicenciasAnteriores[0].licenciazc2[0].entidadprevisional.codigoregimenprevisional,
-        );
         if (result.isConfirmed) {
           formulario.setValue(
             'regimen',
@@ -279,7 +275,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   const EntidadPagadora = formulario.watch('entidadremuneradora');
 
   useEffect(() => {
-    if (licencia.tipolicencia.idtipolicencia !== 1) {
+    if (licencia.entidadsalud.identidadsalud !== 1) {
       setccafvisible(false);
       setidccaf(10100);
       return;
@@ -328,7 +324,8 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
             }
           } else {
             setspinnerCombo(false);
-            formulario.setValue('ccaflm', licencia?.ccaf!?.idccaf);
+
+            // formulario.setValue('ccaflm', licencia?.ccaf!?.idccaf);
           }
         }
         setccafvisible(true);
