@@ -1,10 +1,10 @@
 import { obtenerToken, runFetchAbortable, urlBackendTramitacion } from '@/servicios';
 import { existe } from '@/utilidades';
 import { endOfDay, format, startOfDay } from 'date-fns';
-import { FiltroBusquedaLicenciasTramitadas } from '../(modelos)';
+import { FormularioFiltrarLicenciasTramitadas } from '../(modelos)';
 import { LicenciaTramitada } from '../(modelos)/licencia-tramitada';
 
-interface BuscarLicenciasTramitadasRequest extends FiltroBusquedaLicenciasTramitadas {
+interface BuscarLicenciasTramitadasRequest extends Partial<FormularioFiltrarLicenciasTramitadas> {
   pagina: number;
   tamanoPagina: number;
 }
@@ -13,7 +13,8 @@ export const buscarLicenciasTramitadas = (request: BuscarLicenciasTramitadasRequ
   const payload = {
     foliolicencia: request.folio ?? '',
     runtrabajador: request.runPersonaTrabajadora ?? '',
-    estadolicencia: existe(request.idEstado) ? request.idEstado : 0,
+    estadolicencia: existe(request.idEstadoLicencia) ? request.idEstadoLicencia : 0,
+    estadotramitacion: existe(request.idEstadoTramitacion) ? request.idEstadoTramitacion : 0,
     rutempleador: request.rutEntidadEmpleadora ?? '',
     codigounidadRRHH: '',
     indicadortipofecha: existe(request.tipoPeriodo) ? request.tipoPeriodo : 0,
