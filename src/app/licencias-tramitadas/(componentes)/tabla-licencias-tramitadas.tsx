@@ -4,7 +4,6 @@ import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { Empleador } from '@/modelos/empleador';
-import { AlertaConfirmacion } from '@/utilidades';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
@@ -70,14 +69,6 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
   };
 
   const imprimirComprobanteTramitacion = async (licencia: LicenciaTramitada) => {
-    const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: '¿Desea generar el comprobante de tramitación?',
-    });
-
-    if (!isConfirmed) {
-      return;
-    }
-
     setMostrarSpinner(true);
     setDatosComprobanteTramitacion({
       folioLicencia: licencia.foliolicencia,

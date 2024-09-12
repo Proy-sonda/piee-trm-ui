@@ -11,8 +11,12 @@ import exportFromJSON from 'export-from-json';
 import { useEffect, useState } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FiltroLicenciasTramitadas, TablaLicenciasTramitadas } from './(componentes)';
-import { FiltroBusquedaLicenciasTramitadas, LicenciaTramitada } from './(modelos)';
-import { buscarEstadosLicencias, buscarLicenciasTramitadas } from './(servicios)';
+import { FormularioFiltrarLicenciasTramitadas, LicenciaTramitada } from './(modelos)';
+import {
+  buscarEstadosLicencias,
+  buscarEstadosTramitacion,
+  buscarLicenciasTramitadas,
+} from './(servicios)';
 
 const LicenciasTramitadasPage = () => {
   const MAXIMO_LICENCIAS_EXPORTAR = 1_000;
@@ -21,13 +25,16 @@ const LicenciasTramitadasPage = () => {
   const [erroresCombos, combos, cagandoCombos] = useMergeFetchObject({
     empleadores: buscarEmpleadores(''),
     estadosLicencias: buscarEstadosLicencias(),
+    estadosTramitacion: buscarEstadosTramitacion(),
   });
 
   const [paginaActual, setPaginaActual] = useState(0);
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
   const [licenciasAnteriores, setLicenciasAnteriores] = useState<LicenciaTramitada[]>([]);
   const [totalLicenciasAnteriores, setTotalLicenciasAnteriores] = useState(0);
-  const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltroBusquedaLicenciasTramitadas>({});
+  const [filtrosBusqueda, setFiltrosBusqueda] = useState<
+    Partial<FormularioFiltrarLicenciasTramitadas>
+  >({});
 
   const [errorLicencias, resultadoLicencias, cargandoLicencias] = useFetch(
     buscarLicenciasTramitadas({
@@ -150,6 +157,7 @@ const LicenciasTramitadasPage = () => {
           <FiltroLicenciasTramitadas
             empleadores={combos?.empleadores ?? []}
             estadosLicencias={combos?.estadosLicencias ?? []}
+            estadosTramitacion={combos?.estadosTramitacion ?? []}
             onFiltrarLicencias={(x) => {
               setFiltrosBusqueda(x);
               setPaginaActual(0);
@@ -181,18 +189,7 @@ const LicenciasTramitadasPage = () => {
               <TablaLicenciasTramitadas
                 totalDatos={resultadoLicencias?.numerolicencias ?? 0}
                 empleadores={combos?.empleadores ?? []}
-                licencias={
-                  resultadoLicencias?.licencias.sort(
-                    (a, b) =>
-                      new Date(a.fechatramitacion).getTime() -
-                      new Date(b.fechatramitacion).getTime(),
-                  ) ??
-                  licenciasAnteriores.sort(
-                    (a, b) =>
-                      new Date(a.fechatramitacion).getTime() -
-                      new Date(b.fechatramitacion).getTime(),
-                  )
-                }
+                licencias={resultadoLicencias?.licencias ?? licenciasAnteriores}
                 totalPaginas={
                   resultadoLicencias?.numerolicencias
                     ? calcularPaginas(resultadoLicencias.numerolicencias, TAMANO_PAGINA)

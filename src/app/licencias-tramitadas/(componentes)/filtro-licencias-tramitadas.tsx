@@ -6,19 +6,23 @@ import { esFechaInvalida } from '@/utilidades';
 import { endOfDay, startOfDay } from 'date-fns';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
-import { EstadoLicencia } from '../(modelos)';
-import { FiltroBusquedaLicenciasTramitadas } from '../(modelos)/filtro-busqueda-licencias-tramitadas';
+import { EstadoLicencia, EstadoTramitacion } from '../(modelos)';
 import { FormularioFiltrarLicenciasTramitadas } from '../(modelos)/formulario-filtrar-licencias-tramitadas';
+import styles from './filtro-licencias-tramitadas.module.css';
 
 interface FiltroLicenciasTramitadasProps {
   empleadores: Empleador[];
   estadosLicencias: EstadoLicencia[];
-  onFiltrarLicencias: (formulario: FiltroBusquedaLicenciasTramitadas) => void | Promise<void>;
+  estadosTramitacion: EstadoTramitacion[];
+  onFiltrarLicencias: (
+    formulario: Partial<FormularioFiltrarLicenciasTramitadas>,
+  ) => void | Promise<void>;
 }
 
 export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps> = ({
   empleadores,
   estadosLicencias,
+  estadosTramitacion,
   onFiltrarLicencias,
 }) => {
   const formulario = useForm<FormularioFiltrarLicenciasTramitadas>({ mode: 'onBlur' });
@@ -33,7 +37,8 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
   const filtrarLicencias: SubmitHandler<FormularioFiltrarLicenciasTramitadas> = async ({
     folio,
     runPersonaTrabajadora,
-    idEstado,
+    idEstadoLicencia,
+    idEstadoTramitacion,
     tipoPeriodo,
     fechaDesde,
     fechaHasta,
@@ -44,7 +49,8 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
     onFiltrarLicencias({
       folio: folio.trim() === '' ? undefined : folio,
       runPersonaTrabajadora: runPersonaTrabajadora === '' ? undefined : runPersonaTrabajadora,
-      idEstado: esElValorPorDefecto(idEstado) ? undefined : idEstado,
+      idEstadoLicencia: esElValorPorDefecto(idEstadoLicencia) ? undefined : idEstadoLicencia,
+      idEstadoTramitacion: esElValorPorDefecto(idEstadoTramitacion) ? undefined : idEstadoTramitacion,
       tipoPeriodo: esElValorPorDefecto(tipoPeriodo) ? undefined : tipoPeriodo,
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
@@ -57,36 +63,37 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
     <>
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
-          <div className="row g-3 align-items-baseline">
-            <InputRutBusqueda
-              opcional
-              name="folio"
-              label="Folio"
-              className="col-12 col-md-6 col-lg-3"
-            />
+          <div className={styles['contenedor-filtros']}>
+            <InputRutBusqueda opcional name="folio" label="Folio" />
 
             <InputRutBusqueda
               opcional
               name="runPersonaTrabajadora"
               label="RUN Persona Trabajadora"
-              className="col-12 col-md-6 col-lg-3"
             />
 
             <ComboSimple
               opcional
-              name="idEstado"
-              label="Estado"
+              name="idEstadoLicencia"
+              label="Estado de la Licencia"
               datos={estadosLicencias}
               idElemento="idestadolicencia"
               descripcion="estadolicencia"
-              className="col-12 col-md-6 col-lg-3"
+            />
+
+            <ComboSimple
+              opcional
+              name="idEstadoTramitacion"
+              label="Estado de Tramitación"
+              datos={estadosTramitacion}
+              idElemento="idestadotramitacion"
+              descripcion="estadotramitacion"
             />
 
             <ComboSimple
               opcional
               name="tipoPeriodo"
               label="Consultar por fecha de"
-              className="col-12 col-md-6 col-lg-3"
               datos={[
                 { label: 'Emisión', value: 1 },
                 { label: 'Tramitación', value: 2 },
@@ -96,21 +103,9 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
               tipoValor="number"
             />
 
-            <InputFecha
-              opcional
-              name="fechaDesde"
-              noPosteriorA="fechaHasta"
-              label="Fecha Desde"
-              className="col-12 col-md-6 col-lg-3"
-            />
+            <InputFecha opcional name="fechaDesde" noPosteriorA="fechaHasta" label="Fecha Desde" />
 
-            <InputFecha
-              opcional
-              name="fechaHasta"
-              noAnteriorA="fechaDesde"
-              label="Fecha Hasta"
-              className="col-12 col-md-6 col-lg-3"
-            />
+            <InputFecha opcional name="fechaHasta" noAnteriorA="fechaDesde" label="Fecha Hasta" />
 
             <ComboSimple
               opcional
@@ -120,7 +115,6 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
               idElemento="rutempleador"
               descripcion="razonsocial"
               tipoValor="string"
-              className="col-12 col-md-6 col-lg-3"
             />
 
             <ComboSimple
@@ -131,7 +125,6 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
               idElemento="CodigoUnidadRRHH"
               descripcion="GlosaUnidadRRHH"
               tipoValor="string"
-              className="col-12 col-md-6 col-lg-3"
             />
           </div>
 
