@@ -5,6 +5,7 @@ import AppHeader from '@/components/header/header';
 import Marquesina from '@/components/marquesina';
 import { AuthProvider } from '@/contexts';
 
+import { ChatComponent } from '@/components/chat/chat';
 import ProgressPage from '@/components/progress-bar';
 import 'animate.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
@@ -35,7 +36,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
             </main>
 
             <AppFooter>
-              {/* <ChatComponent /> */}
+              <ChatComponent />
               <Version /> {/* Se tiene que pasar asi porque Version es un SSC. */}
             </AppFooter>
           </AuthProvider>
