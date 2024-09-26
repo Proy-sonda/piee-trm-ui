@@ -1,17 +1,13 @@
-import { BotonClaveUnica } from '@/components/clave-unica';
 import insemp from '@/img/Inscribeem.png';
-import { ConfiguracionClaveUnica } from '@/modelos/clave-unica';
 import { adsUrl, saltarseClaveUnica } from '@/servicios';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import styles from './button-image.module.css';
 
-interface ButtonImageProps {
-  configuracionClaveUnica?: ConfiguracionClaveUnica;
-}
+interface ButtonImageProps {}
 
-export const ButtonImage: React.FC<ButtonImageProps> = ({ configuracionClaveUnica }) => {
+export const ButtonImage: React.FC<ButtonImageProps> = ({}) => {
   return (
     <>
       <div className={`m-4 ${styles['gobrad']}`}>
@@ -37,12 +33,9 @@ export const ButtonImage: React.FC<ButtonImageProps> = ({ configuracionClaveUnic
           )}
         </div>
         <div className={`text-center ${styles['pgobcl']}`}>
-          <p className="pt-3 pb-0 small fw-normal text-secondary">
-            Puede inscribir su entidad empleadora usando Clave Única
+          <p className="pt-4 pb-0 fw-normal text-secondary">
+            Puede inscribir su entidad empleadora <Link href={adsUrl()}>aquí</Link>
           </p>
-          <div className="d-flex justify-content-center">
-            <BotonClaveUnica configuracionClaveUnica={configuracionClaveUnica} />
-          </div>
         </div>
       </div>
     </>

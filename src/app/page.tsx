@@ -3,8 +3,6 @@
 import { ButtonImage } from '@/components/button-image';
 import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
-import { useFetch } from '@/hooks';
-import { buscarConfiguracionClaveUnica } from '@/servicios/clave-unica';
 
 interface HomePageProps {
   searchParams: {
@@ -13,8 +11,6 @@ interface HomePageProps {
 }
 
 export default function HomePage({ searchParams }: HomePageProps) {
-  const [, configuracionClaveUnica] = useFetch(buscarConfiguracionClaveUnica());
-
   return (
     <>
       <div className="py-3 py-md-4 container-fluid">
@@ -36,7 +32,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
           </IfContainer>
 
           <div className="col-12 col-md-6">
-            <ButtonImage configuracionClaveUnica={configuracionClaveUnica} />
+            <ButtonImage />
           </div>
           <div className="col-12 col-md-6">
             <LoginComponent />
