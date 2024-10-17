@@ -2,7 +2,6 @@ import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
-import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, startOfDay } from 'date-fns';
 import React, { useContext, useEffect, useRef } from 'react';
@@ -11,6 +10,7 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FiltroBusquedaLicencias } from '../(modelos)/filtro-busqueda-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
 import { BuscarTipoLicencia } from '../(servicios)/buscar-tipo-licencia';
+import { buscarUnidadesRRHHOrdenadas } from '../(servicios)/buscar-unidades-rrhh-ordenadas';
 import { AuthContext } from '../../../contexts/auth-context';
 
 interface FiltroLicenciasProps {
@@ -62,7 +62,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   }, [limpiarOnRefresh]);
 
   const [, unidadesRRHH] = useFetch(
-    rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),
+    rutEmpleadorSeleccionado ? buscarUnidadesRRHHOrdenadas(rutEmpleadorSeleccionado) : emptyFetch(),
     [rutEmpleadorSeleccionado],
   );
 
