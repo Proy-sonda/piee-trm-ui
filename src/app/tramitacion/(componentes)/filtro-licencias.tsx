@@ -1,7 +1,9 @@
 import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
+import { Unidadesrrhh } from '@/modelos';
 import { Empleador } from '@/modelos/empleador';
+import { buscarUnidadesDeRRHH } from '@/servicios';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, startOfDay } from 'date-fns';
 import React, { useContext, useEffect, useRef } from 'react';
@@ -10,7 +12,6 @@ import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { FiltroBusquedaLicencias } from '../(modelos)/filtro-busqueda-licencias';
 import { FormularioFiltrarLicencias } from '../(modelos)/formulario-filtrar-licencias';
 import { BuscarTipoLicencia } from '../(servicios)/buscar-tipo-licencia';
-import { buscarUnidadesRRHHOrdenadas } from '../(servicios)/buscar-unidades-rrhh-ordenadas';
 import { AuthContext } from '../../../contexts/auth-context';
 
 interface FiltroLicenciasProps {
@@ -62,7 +63,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   }, [limpiarOnRefresh]);
 
   const [, unidadesRRHH] = useFetch(
-    rutEmpleadorSeleccionado ? buscarUnidadesRRHHOrdenadas(rutEmpleadorSeleccionado) : emptyFetch(),
+    rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),
     [rutEmpleadorSeleccionado],
   );
 
@@ -81,17 +82,28 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
       idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
-      // filtroSemaforo: esElValorPorDefecto(filtroSemaforo) ? undefined : filtroSemaforo,
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora)
         ? undefined
         : rutEntidadEmpleadora,
-      tipolicencia: filtroTipoLicencia,
+      tipolicencia: esElValorPorDefecto(filtroTipoLicencia) ? undefined : filtroTipoLicencia,
     });
   };
 
   const limpiarCampos = () => {
     formulario.reset();
     onFiltrarLicencias({});
+  };
+
+  const ordenarUnidades = (unidades: Unidadesrrhh[]) => {
+    const unidadesImed = unidades
+      .filter((u) => u.CodigoOperador === 3)
+      .sort((a, b) => a.GlosaUnidadRRHH.localeCompare(b.GlosaUnidadRRHH));
+
+    const unidadesMedipass = unidades
+      .filter((u) => u.CodigoOperador === 4)
+      .sort((a, b) => a.GlosaUnidadRRHH.localeCompare(b.GlosaUnidadRRHH));
+
+    return unidadesImed.concat(unidadesMedipass);
   };
 
   return (
@@ -182,9 +194,12 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               opcional
               name="idUnidadRRHH"
               label="Unidad RRHH"
-              datos={unidadesRRHH}
-              idElemento="CodigoUnidadRRHH"
-              descripcion="GlosaUnidadRRHH"
+              datos={ordenarUnidades(unidadesRRHH ?? [])}
+              idElemento={(u) => `${u.CodigoUnidadRRHH}|${u.CodigoOperador}`}
+              descripcion={(u) => {
+                const operador = u.CodigoOperador === 3 ? 'imed' : 'medipass';
+                return `(${operador}) ${u.GlosaUnidadRRHH}`;
+              }}
               tipoValor="string"
               className="col-12 col-md-6 col-lg-3"
             />

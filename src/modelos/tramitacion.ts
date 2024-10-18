@@ -7,11 +7,11 @@ export interface DatoEmpleadorUnidad {
 }
 
 export interface Usuariosunidad {
-  RunUsuario:             string;
+  RunUsuario: string;
   ApellidoPaternoUsuario: string;
   ApellidoMaternoUsuario: string;
-  NombresUsuario:         string;
-  RolUsuario:             number;
+  NombresUsuario: string;
+  RolUsuario: number;
 }
 
 export interface Usuario {
@@ -26,6 +26,7 @@ export interface Usuario {
 
 export interface Unidadesrrhh {
   CodigoUnidadRRHH: string;
+  CodigoOperador: number;
   GlosaUnidadRRHH: string;
   CodigoRegion: string;
   CodigoComuna: string;
