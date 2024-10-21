@@ -35,7 +35,9 @@ export const licenciaCumpleFiltros = (
     const coincideRun = strIncluye(licencia.runtrabajador, filtros.runPersonaTrabajadora);
 
     let coincideUnidadRRHH = true;
-    if (existe(licencia.codigounidadrrhh) && existe(filtros.idUnidadRRHH)) {
+    if (!existe(licencia.codigounidadrrhh) && existe(filtros.idUnidadRRHH)) {
+      coincideUnidadRRHH = false;
+    } else if (existe(licencia.codigounidadrrhh) && existe(filtros.idUnidadRRHH)) {
       const [codigoUnidad, codigoOperador] = filtros.idUnidadRRHH.split('|');
       coincideUnidadRRHH =
         strIncluye(licencia.codigounidadrrhh, codigoUnidad) &&
