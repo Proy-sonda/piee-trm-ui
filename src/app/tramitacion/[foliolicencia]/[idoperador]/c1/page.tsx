@@ -82,7 +82,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   ];
 
   const formulario = useForm<formularioApp>({
-    mode: 'onBlur',
+    mode: 'onSubmit',
     defaultValues: {
       accion: 'siguiente',
       linkNavegacion: '',
@@ -285,7 +285,13 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
   );
 
   const onHandleSubmit: SubmitHandler<formularioApp> = async (data) => {
-    console.log({ data });
+    if (data.otro == '' && data.ocupacion == '19') {
+      AlertaError.fire({
+        title: 'Campo requerido',
+        html: 'Debe ingresar el nombre de la otra ocupación',
+      });
+      return;
+    }
     if (!(await formulario.trigger()))
       return AlertaError.fire({
         title: 'Hay campos inválidos',
@@ -584,31 +590,12 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 />
 
                 <IfContainer show={Number(ocupacionSeleccionada) == 19}>
-                  <div className="col-12 col-sm-6 col-lg-4 col-xl-3 position-relative">
-                    <label htmlFor="otra-ocupacion" className="form-label">
-                      Nombre Otra Ocupación (*)
-                    </label>
-                    <input
-                      id="otra-ocupacion"
-                      type="text"
-                      className={`form-control ${
-                        formulario.formState.errors.otro ? 'is-invalid' : ''
-                      }`}
-                      placeholder="Otra ocupación..."
-                      {...formulario.register('otro', {
-                        required: {
-                          message: 'El campo otro es obligatorio',
-                          value: Number(ocupacionSeleccionada) == 19 ? true : false,
-                        },
-                      })}
-                    />
-
-                    <IfContainer show={!!formulario.formState.errors.otro}>
-                      <div className="invalid-tooltip">
-                        {formulario.formState.errors.otro?.message}
-                      </div>
-                    </IfContainer>
-                  </div>
+                  <InputRazonSocial
+                    name="otro"
+                    label="Nombre Otra Ocupación"
+                    className={`col-12 col-sm-6 col-lg-4 col-xl-3 is-invalid`}
+                    opcional={ocupacionSeleccionada == '19'}
+                  />
                 </IfContainer>
               </div>
 
