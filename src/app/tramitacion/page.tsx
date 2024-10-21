@@ -2,7 +2,7 @@
 
 import { Titulo } from '@/components';
 import { useFetch, useMergeFetchObject, useRefrescarPagina } from '@/hooks';
-import { buscarEmpleadores } from '@/servicios';
+import { buscarEmpleadores, buscarUnidadesDeRRHH, emptyFetch } from '@/servicios';
 import { useEffect, useState } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
@@ -21,6 +21,7 @@ const TramitacionPage = () => {
   const [refresh, recargarBandejaTramitacion] = useRefrescarPagina();
   const [desahabilitarRecarga, setdesahabilitarRecarga] = useState(true);
   const [timeLeft, setTimeLeft] = useState(30);
+  const [rutEmpleadorSeleccionado, setRutEmpleadorSeleccionado] = useState<string>();
 
   useEffect(() => {
     let timer: NodeJS.Timer;
@@ -44,6 +45,11 @@ const TramitacionPage = () => {
     [refresh],
   );
 
+  const [, unidadesRRHH] = useFetch(
+    rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),
+    [rutEmpleadorSeleccionado],
+  );
+
   const [estado, setEstado] = useState<Estado>({
     licenciasFiltradas: [],
     filtrosBusqueda: {},
@@ -60,9 +66,6 @@ const TramitacionPage = () => {
   // Filtrar licencias
   useEffect(() => {
     const licenciasParaFiltrar = licenciasParaTramitar ?? [];
-    console.log(estado.filtroEstado);
-    console.log(estado.filtrosBusqueda);
-    console.log(licenciaCumpleFiltros(estado.filtrosBusqueda, estado.filtroEstado));
     setEstado((prev) => ({
       ...prev,
       licenciasFiltradas: licenciasParaFiltrar.filter(
@@ -95,8 +98,10 @@ const TramitacionPage = () => {
         <div className="pt-3 pb-4 border-bottom border-1">
           <FiltroLicencias
             limpiarOnRefresh={refresh}
+            unidadesRRHH={unidadesRRHH ?? []}
             empleadores={datosBandeja?.empleadores ?? []}
             onFiltrarLicencias={(x) => setEstado((prev) => ({ ...prev, filtrosBusqueda: x }))}
+            onCambioEmpleadorSeleccionado={setRutEmpleadorSeleccionado}
           />
         </div>
 
@@ -158,6 +163,7 @@ const TramitacionPage = () => {
           <div className="col-md-12">
             <TablaLicenciasTramitar
               empleadores={datosBandeja?.empleadores ?? []}
+              unidadesRRHH={unidadesRRHH ?? []}
               licencias={estado.licenciasFiltradas}
             />
           </div>
