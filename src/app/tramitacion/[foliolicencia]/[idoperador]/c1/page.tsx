@@ -297,6 +297,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         title: 'Hay campos inválidos',
         html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
+    if (data.ocupacion != '19') {
+      formulario.setValue('otro', '');
+    }
 
     const guardadoExitoso = await GuardarZ0Z1();
     if (!guardadoExitoso) {
@@ -593,7 +596,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   <InputRazonSocial
                     name="otro"
                     label="Nombre Otra Ocupación"
-                    className={`col-12 col-sm-6 col-lg-4 col-xl-3 is-invalid`}
+                    className={`col-12 col-sm-6 col-lg-4 col-xl-3`}
                     opcional={ocupacionSeleccionada == '19'}
                   />
                 </IfContainer>
