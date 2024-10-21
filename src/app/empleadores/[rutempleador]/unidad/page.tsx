@@ -4,7 +4,7 @@ import { Titulo } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { emptyFetch, useFetch, useRefrescarPagina } from '@/hooks';
-import { Unidadesrrhh } from '@/modelos/tramitacion';
+import { Unidadesrrhh } from '@/modelos';
 import { buscarUnidadesDeRRHH } from '@/servicios';
 import dynamic from 'next/dynamic';
 import { useSearchParams } from 'next/navigation';

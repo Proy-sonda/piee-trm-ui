@@ -5,7 +5,7 @@ import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { Unidadesrrhh } from '@/modelos/tramitacion';
+import { Unidadesrrhh } from '@/modelos';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import Link from 'next/link';
 import { useContext, useState } from 'react';
@@ -39,7 +39,7 @@ const TablaUnidades = ({
     tamanoPagina: 5,
   });
 
-  const eliminarUnidadDeRRHH = async (unidad: UnidadAccion) => {
+  const eliminarUnidadDeRRHH = async (unidad: Unidadesrrhh) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
       iconColor: 'white',
       iconHtml:
@@ -56,12 +56,25 @@ const TablaUnidades = ({
       return;
     }
 
+    if (empleadorActual == undefined || usuario == undefined) return;
+
     try {
       setMostrarSpinner(true);
 
-      if (empleadorActual == undefined || usuario == undefined) return;
+      const AccionUnidad: UnidadAccion = {
+        accionrrhh: 3,
+        CodigoUnidadRRHH: unidad.CodigoUnidadRRHH,
+        GlosaUnidadRRHH: unidad.GlosaUnidadRRHH,
+        CodigoRegion: unidad.CodigoRegion,
+        CodigoComuna: unidad.CodigoComuna,
+        CodigoTipoCalle: unidad.CodigoTipoCalle,
+        Direccion: unidad.Direccion,
+        Numero: unidad.Numero,
+        BlockDepto: unidad.BlockDepto,
+        Telefono: unidad.Telefono,
+      };
 
-      await eliminarUnidad(unidad, empleadorActual?.rutempleador, usuario?.rut, operador);
+      await eliminarUnidad(AccionUnidad, empleadorActual.rutempleador, usuario.rut, operador);
 
       AlertaExito.fire({
         html: 'Unidad fue eliminada con éxito',
@@ -96,11 +109,7 @@ const TablaUnidades = ({
   const eliminarUnidadInterno = (unidad: Unidadesrrhh) => {
     return (event: any) => {
       event.preventDefault();
-      const AccionUnidad: UnidadAccion = {
-        accionrrhh: 3,
-        ...unidad,
-      };
-      eliminarUnidadDeRRHH(AccionUnidad);
+      eliminarUnidadDeRRHH(unidad);
     };
   };
 

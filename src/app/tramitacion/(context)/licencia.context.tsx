@@ -15,6 +15,7 @@ const InitLicencia: LicenciaTramitar = {
     idccaf: 0,
     nombre: '',
   },
+  codigounidadrrhh: null,
   diasreposo: 0,
   entidadsalud: {
     identidadsalud: 0,
