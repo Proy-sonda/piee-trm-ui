@@ -303,6 +303,10 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       return;
     }
 
+    if (data.ocupacion != '19') {
+      formulario.setValue('otro', '');
+    }
+
     switch (data.accion) {
       case 'guardar':
         break;
@@ -593,7 +597,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   <InputRazonSocial
                     name="otro"
                     label="Nombre Otra Ocupación"
-                    className={`col-12 col-sm-6 col-lg-4 col-xl-3 is-invalid`}
+                    className={`col-12 col-sm-6 col-lg-4 col-xl-3`}
                     opcional={ocupacionSeleccionada == '19'}
                   />
                 </IfContainer>
