@@ -113,14 +113,47 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         const [relacionCalidad] = await ObtenerRelacionCalidadAdjunto(
           zona2?.calidadtrabajador.idcalidadtrabajador,
         );
-        console.log(
-          (await relacionCalidad()).filter(
-            (c) =>
-              c.calidadtrabajador.idcalidadtrabajador ===
-                zona2.calidadtrabajador.idcalidadtrabajador &&
-              c.tipolicencia.idtipolicencia === zona0.tipolicencia.idtipolicencia,
-          ),
-        );
+
+        if (zona0.tipolicencia.idtipolicencia == 5 || zona0.tipolicencia.idtipolicencia == 6) {
+          // buscar si no tiene DIAT o DIEP si no lo tiene se agrega
+
+          settipoDocAdjunto(
+            (await relacionCalidad())
+              .filter(
+                (t) =>
+                  t.tipolicencia.idtipolicencia === zona0.tipolicencia.idtipolicencia &&
+                  t.calidadtrabajador.idcalidadtrabajador ===
+                    zona2.calidadtrabajador.idcalidadtrabajador,
+              )
+              .map((t) => t.tipoadjunto),
+          );
+          setTimeout(async () => {
+            if (
+              !(await relacionCalidad())
+                .filter(
+                  (t) =>
+                    t.tipolicencia.idtipolicencia === zona0.tipolicencia.idtipolicencia &&
+                    t.calidadtrabajador.idcalidadtrabajador ===
+                      zona2.calidadtrabajador.idcalidadtrabajador,
+                )
+                .map((t) => t.tipoadjunto)
+                .some((t) => t.idtipoadjunto == 5)
+            ) {
+              settipoDocAdjunto([
+                ...(await relacionCalidad())
+                  .filter(
+                    (t) =>
+                      t.tipolicencia.idtipolicencia === zona0.tipolicencia.idtipolicencia &&
+                      t.calidadtrabajador.idcalidadtrabajador ===
+                        zona2.calidadtrabajador.idcalidadtrabajador,
+                  )
+                  .map((t) => t.tipoadjunto),
+                { idtipoadjunto: 5, tipoadjunto: 'Diat o Diep' },
+              ]);
+            }
+          }, 2000);
+          return;
+        }
         settipoDocAdjunto(
           (await relacionCalidad())
             .filter(
@@ -484,6 +517,16 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         title: 'Campos Inválidos',
         html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
       });
+    }
+
+    if (zona0?.tipolicencia.idtipolicencia == 5 || zona0?.tipolicencia.idtipolicencia == 6) {
+      if (!datos.documentosAdjuntos.some((d) => d.idtipoadjunto == 5)) {
+        formulario.setFocus('documentosAdjuntos.0.idtipoadjunto');
+        return AlertaError.fire({
+          title: 'Documentos Adjuntos',
+          html: 'Debe adjuntar un DIAT o DIEP',
+        });
+      }
     }
 
     if (!validarCompletitudDeFilas(datos)) {
