@@ -7,5 +7,6 @@ export interface FormularioFiltrarLicenciasHistoricas {
   fechaDesde: Date;
   fechaHasta: Date;
   rutEntidadEmpleadora: string;
-  idUnidadRRHH: string;
+  /** Primero el codigo de la unidad y luego el codigo del operador */
+  idUnidadRRHH: `${string}|${number}`;
 }

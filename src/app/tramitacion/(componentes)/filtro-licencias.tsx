@@ -1,7 +1,12 @@
-import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '@/components/form';
+import {
+  ComboSimple,
+  ComboUnidadesRRHH,
+  InputFecha,
+  InputRutBusqueda,
+  esElValorPorDefecto,
+} from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
-import { Unidadesrrhh } from '@/modelos';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
@@ -94,18 +99,6 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
     onFiltrarLicencias({});
   };
 
-  const ordenarUnidades = (unidades: Unidadesrrhh[]) => {
-    const unidadesImed = unidades
-      .filter((u) => u.CodigoOperador === 3)
-      .sort((a, b) => a.GlosaUnidadRRHH.localeCompare(b.GlosaUnidadRRHH));
-
-    const unidadesMedipass = unidades
-      .filter((u) => u.CodigoOperador === 4)
-      .sort((a, b) => a.GlosaUnidadRRHH.localeCompare(b.GlosaUnidadRRHH));
-
-    return unidadesImed.concat(unidadesMedipass);
-  };
-
   return (
     <>
       <FormProvider {...formulario}>
@@ -190,17 +183,12 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               className="col-12 col-md-6 col-lg-3"
             />
 
-            <ComboSimple
+            <ComboUnidadesRRHH
               opcional
               name="idUnidadRRHH"
               label="Unidad RRHH"
-              datos={ordenarUnidades(unidadesRRHH ?? [])}
-              idElemento={(u) => `${u.CodigoUnidadRRHH}|${u.CodigoOperador}`}
-              descripcion={(u) => {
-                const operador = u.CodigoOperador === 3 ? 'imed' : 'medipass';
-                return `(${operador}) ${u.GlosaUnidadRRHH}`;
-              }}
-              tipoValor="string"
+              unidadesRRHH={unidadesRRHH}
+              rutEmpleadorSeleccionado={rutEmpleadorSeleccionado}
               className="col-12 col-md-6 col-lg-3"
             />
 

@@ -1,4 +1,11 @@
-import { ComboSimple, InputFecha, InputRut, esElValorPorDefecto } from '@/components/form';
+import {
+  ComboSimple,
+  ComboUnidadesRRHH,
+  InputFecha,
+  InputRut,
+  descomponerIdUnidad,
+  esElValorPorDefecto,
+} from '@/components/form';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
@@ -59,7 +66,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora) ? undefined : rutEntidadEmpleadora,
-      idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
+      unidadRRHH: descomponerIdUnidad(idUnidadRRHH),
     });
   };
 
@@ -139,14 +146,12 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
               className="col-12 col-md-6 col-lg-3"
             />
 
-            <ComboSimple
+            <ComboUnidadesRRHH
               opcional
               name="idUnidadRRHH"
               label="Unidad RRHH"
-              datos={unidadesRRHH}
-              idElemento="CodigoUnidadRRHH"
-              descripcion="GlosaUnidadRRHH"
-              tipoValor="string"
+              unidadesRRHH={unidadesRRHH}
+              rutEmpleadorSeleccionado={rutEmpleadorSeleccionado}
               className="col-12 col-md-6 col-lg-3"
             />
           </div>

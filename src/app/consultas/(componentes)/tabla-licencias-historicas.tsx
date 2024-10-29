@@ -49,7 +49,6 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
         const [request] = buscarEmpleadores('');
         const empleadores = await request();
         setempleadores(empleadores);
-        console.log(empleadores);
       } catch (error) {}
     };
 
