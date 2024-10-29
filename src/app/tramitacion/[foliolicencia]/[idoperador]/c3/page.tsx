@@ -486,8 +486,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       if (!datos.documentosAdjuntos.some((d) => d.idtipoadjunto == 5)) {
         formulario.setFocus('documentosAdjuntos.0.idtipoadjunto');
         return AlertaError.fire({
-          title: 'Documentos Adjuntos',
-          html: 'Debe adjuntar un DIAT o DIEP',
+          title: 'Documentos adjuntos obligatorios',
+          html: 'Para poder guardar o continuar con el proceso, debe adjuntar el documento "DIAT o DIEP" en la sección de documentos adjuntos.',
         });
       }
     }
