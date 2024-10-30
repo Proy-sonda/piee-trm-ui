@@ -27,6 +27,8 @@ export interface LicenciaC0 {
   ruttramitacion: string;
   fechaultdiatramita?: string;
   rutempleador: string;
+  codigounidadrrhh: string;
+  glosaunidadrrhh: string;
 }
 
 interface motivonorecepcion {

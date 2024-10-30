@@ -6,10 +6,11 @@ import { useFormContext } from 'react-hook-form';
 import { InputReciclableBase } from './base-props';
 import { ComboSimple, esElValorPorDefecto, valorPorDefectoCombo } from './combo-simple';
 
-interface ComboUnidadesRRHHProps extends InputReciclableBase {
-  rutEmpleadorSeleccionado: string;
-  unidadesRRHH?: Unidadesrrhh[];
-}
+/**
+ * El formato del codigo de unidad en el {@link ComboUnidadesRRHH}. Primero el codigo de la unidad
+ * y luego el codigo del operador, separados por un pipe.
+ */
+export type IdUnidadComboUnidades = `${string}|${number}`;
 
 /**
  * Separa el ID de la unidad obtenido desde el {@link ComboUnidadesRRHH} en el codigo de la unidad
@@ -26,6 +27,11 @@ export const descomponerIdUnidad = (idUnidadRRHH: `${string}|${number}`) => {
     idOperador: parseInt(idOperador, 10),
   };
 };
+
+interface ComboUnidadesRRHHProps extends InputReciclableBase {
+  rutEmpleadorSeleccionado: string;
+  unidadesRRHH?: Unidadesrrhh[];
+}
 
 /**
  * El valor del combo sera un string con el siguiente formato `<codigo unidad>|<id operador>`, por

@@ -1,3 +1,5 @@
+import { IdUnidadComboUnidades } from '@/components';
+
 export interface FormularioFiltrarLicenciasTramitadas {
   folio: string;
   runPersonaTrabajadora: string;
@@ -8,12 +10,18 @@ export interface FormularioFiltrarLicenciasTramitadas {
   fechaDesde: Date;
   fechaHasta: Date;
   rutEntidadEmpleadora: string;
-  idUnidadRRHH: string;
+  idUnidadRRHH: IdUnidadComboUnidades;
 }
 
-export const hayFiltrosLicenciasTramitadas = (
-  filtros: Partial<FormularioFiltrarLicenciasTramitadas>,
-) => {
+export interface FiltrosBuscarLicenciasTramitadas
+  extends Partial<Omit<FormularioFiltrarLicenciasTramitadas, 'idUnidadRRHH'>> {
+  unidadRRHH?: {
+    codigoUnidad: string;
+    idOperador: number;
+  };
+}
+
+export const hayFiltrosLicenciasTramitadas = (filtros: FiltrosBuscarLicenciasTramitadas) => {
   return (
     filtros.folio !== undefined ||
     filtros.runPersonaTrabajadora !== undefined ||
@@ -22,7 +30,7 @@ export const hayFiltrosLicenciasTramitadas = (
     filtros.fechaDesde !== undefined ||
     filtros.fechaHasta !== undefined ||
     filtros.rutEntidadEmpleadora !== undefined ||
-    filtros.idUnidadRRHH !== undefined ||
+    filtros.unidadRRHH !== undefined ||
     filtros.tipoPeriodo !== undefined
   );
 };
