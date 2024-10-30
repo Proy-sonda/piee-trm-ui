@@ -35,13 +35,12 @@ export const licenciaCumpleFiltros = (
     const coincideRun = strIncluye(licencia.runtrabajador, filtros.runPersonaTrabajadora);
 
     let coincideUnidadRRHH = true;
-    if (!existe(licencia.codigounidadrrhh) && existe(filtros.idUnidadRRHH)) {
+    if (!existe(licencia.codigounidadrrhh) && existe(filtros.unidadRRHH)) {
       coincideUnidadRRHH = false;
-    } else if (existe(licencia.codigounidadrrhh) && existe(filtros.idUnidadRRHH)) {
-      const [codigoUnidad, codigoOperador] = filtros.idUnidadRRHH.split('|');
+    } else if (existe(licencia.codigounidadrrhh) && existe(filtros.unidadRRHH)) {
       coincideUnidadRRHH =
-        strIncluye(licencia.codigounidadrrhh, codigoUnidad) &&
-        licencia.operador.idoperador === parseInt(codigoOperador, 10);
+        strIncluye(licencia.codigounidadrrhh, filtros.unidadRRHH.codigoUnidad) &&
+        licencia.operador.idoperador === filtros.unidadRRHH.idOperador;
     }
 
     let enRangoFechas = true;

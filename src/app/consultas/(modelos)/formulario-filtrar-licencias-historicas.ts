@@ -1,3 +1,5 @@
+import { IdUnidadComboUnidades } from '@/components';
+
 export interface FormularioFiltrarLicenciasHistoricas {
   folio: string;
   runPersonaTrabajadora: string;
@@ -7,6 +9,5 @@ export interface FormularioFiltrarLicenciasHistoricas {
   fechaDesde: Date;
   fechaHasta: Date;
   rutEntidadEmpleadora: string;
-  /** Primero el codigo de la unidad y luego el codigo del operador */
-  idUnidadRRHH: `${string}|${number}`;
+  idUnidadRRHH: IdUnidadComboUnidades;
 }

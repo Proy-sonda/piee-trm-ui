@@ -3,6 +3,7 @@ import {
   ComboUnidadesRRHH,
   InputFecha,
   InputRutBusqueda,
+  descomponerIdUnidad,
   esElValorPorDefecto,
 } from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
@@ -86,7 +87,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
       runPersonaTrabajadora: runPersonaTrabajadora === '' ? undefined : runPersonaTrabajadora,
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
-      idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
+      unidadRRHH: descomponerIdUnidad(idUnidadRRHH),
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora)
         ? undefined
         : rutEntidadEmpleadora,

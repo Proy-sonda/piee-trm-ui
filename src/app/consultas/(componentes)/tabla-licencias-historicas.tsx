@@ -59,10 +59,10 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     return (
       <>
         <div className="mb-1 small text-nowrap">
-          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.razonsocial}
+          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.rutempleador || rutEmpleador}
         </div>
         <div className="mb-1 small text-nowrap">
-          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.rutempleador || rutEmpleador}
+          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.razonsocial}
         </div>
       </>
     );
