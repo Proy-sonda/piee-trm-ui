@@ -25,7 +25,7 @@ import esLocale from 'date-fns/locale/es';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Alert, Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { TipoDocumento } from '../(modelo)';
@@ -790,6 +790,32 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
             </IfContainer>
           </Form>
         </FormProvider>
+
+        <Row className="mt-2">
+          <Col xs={12}>
+            <IfContainer
+              show={
+                (zona0?.tipolicencia.idtipolicencia == 5 ||
+                  zona0?.tipolicencia.idtipolicencia == 6) &&
+                tipoDocAdjunto.some((t) => t.idtipoadjunto == 5)
+              }>
+              {zona0?.tipolicencia.idtipolicencia == 5 && (
+                <Alert variant="warning">
+                  <Alert.Heading>Advertencia </Alert.Heading>
+                  Recuerde que es obligatorio adjuntar documento de{' '}
+                  <strong>Denuncia Individual de Accidente del Trabajo (DIAT)</strong>
+                </Alert>
+              )}
+              {zona0?.tipolicencia.idtipolicencia == 6 && (
+                <Alert variant="warning">
+                  <Alert.Heading>Advertencia </Alert.Heading>
+                  Recuerde que es obligatorio adjuntar documento de{' '}
+                  <strong>Denuncia Individual de Enfermedad Profesional (DIEP)</strong>
+                </Alert>
+              )}
+            </IfContainer>
+          </Col>
+        </Row>
 
         <DocumentosAdjuntosC3
           licencia={licencia}
