@@ -9,7 +9,7 @@ import { strIncluye } from '@/utilidades/str-incluye';
 import 'animate.css';
 import { format } from 'date-fns';
 import { useRouter } from 'next/navigation';
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { OverlayTrigger, Stack, Table, Tooltip } from 'react-bootstrap';
 import { LicenciaContext } from '../(context)/licencia.context';
 import { IfContainer, Paginacion, SpinnerPantallaCompleta } from '../(helper)';
@@ -46,6 +46,11 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const {
     datosGuia: { listaguia, guia, AgregarGuia },
   } = useContext(AuthContext);
+
+  useEffect(() => {
+    // Restablecemos la licencia seleccionada
+    setLicencia({} as LicenciaTramitar);
+  }, []);
 
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
