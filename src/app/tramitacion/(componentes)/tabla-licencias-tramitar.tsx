@@ -4,7 +4,6 @@ import { GuiaUsuario } from '@/components/guia-usuario';
 import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import { AuthContext } from '@/contexts';
 import { usePaginacion } from '@/hooks/use-paginacion';
-import { Unidadesrrhh } from '@/modelos';
 import { Empleador } from '@/modelos/empleador';
 import { strIncluye } from '@/utilidades/str-incluye';
 import 'animate.css';
@@ -19,14 +18,12 @@ import styles from './tabla-licencias-tramitar.module.css';
 
 interface TablaLicenciasTramitarProps {
   empleadores: Empleador[];
-  unidadesRRHH: Unidadesrrhh[];
   licencias?: LicenciaTramitar[];
 }
 
 const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   licencias,
   empleadores,
-  unidadesRRHH,
 }) => {
   const [licenciasPaginadas, paginaActual, totalPaginas, cambiarPagina] = usePaginacion({
     datos:
@@ -53,16 +50,6 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
   const nombreEmpleador = (licencia: LicenciaTramitar) => {
     // prettier-ignore
     return empleadores.find((e) => strIncluye(licencia.rutempleador, e.rutempleador))?.razonsocial ?? '';
-  };
-
-  const nombreUnidad = (licencia: LicenciaTramitar) => {
-    const unidad = unidadesRRHH.find(
-      (u) =>
-        u.CodigoUnidadRRHH === licencia.codigounidadrrhh &&
-        u.CodigoOperador === licencia.operador.idoperador,
-    );
-
-    return unidad?.GlosaUnidadRRHH ?? '';
   };
 
   const RedireccionarTramitacion = (licencia: LicenciaTramitar) => {
@@ -420,10 +407,10 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
                   )}
                 </td>
                 <td>
-                  <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
                   <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
-                  {licencia.codigounidadrrhh && (
-                    <div className="mb-1 small text-nowrap">{nombreUnidad(licencia)}</div>
+                  <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
+                  {licencia.glosaunidadrrhh && (
+                    <div className="mb-1 small text-nowrap">{licencia.glosaunidadrrhh}</div>
                   )}
                 </td>
                 <td>

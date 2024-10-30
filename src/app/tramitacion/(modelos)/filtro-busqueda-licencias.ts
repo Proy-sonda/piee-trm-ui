@@ -4,8 +4,10 @@ export interface FiltroBusquedaLicencias {
   fechaDesde?: Date;
   fechaHasta?: Date;
   rutEntidadEmpleadora?: string;
-  /** Primero el codigo de la unidad y luego el codigo del operador */
-  idUnidadRRHH?: `${string}|${number}`;
+  unidadRRHH?: {
+    codigoUnidad: string;
+    idOperador: number;
+  };
   tipolicencia?: number;
 }
 
@@ -16,7 +18,7 @@ export const hayFiltros = (filtros: FiltroBusquedaLicencias) => {
     filtros.fechaDesde !== undefined ||
     filtros.fechaHasta !== undefined ||
     filtros.rutEntidadEmpleadora !== undefined ||
-    filtros.idUnidadRRHH !== undefined ||
+    filtros.unidadRRHH !== undefined ||
     filtros.tipolicencia !== undefined
   );
 };

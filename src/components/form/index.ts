@@ -1,6 +1,7 @@
 export * from './base-props';
 export * from './combo-comuna';
 export * from './combo-simple';
+export * from './combo-unidades-rrhh';
 export * from './input-apellidos';
 export * from './input-archivo';
 export * from './input-block-departamento';

@@ -60,6 +60,7 @@ const InitLicencia: LicenciaTramitar = {
   },
   tramitacioniniciada: false,
   rutusuariotramita: null,
+  glosaunidadrrhh: '',
 };
 
 export const LicenciaContext = createContext<ILicenciaContext>({

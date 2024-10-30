@@ -1,8 +1,15 @@
-import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '@/components/form';
+import {
+  ComboSimple,
+  ComboUnidadesRRHH,
+  InputFecha,
+  InputRutBusqueda,
+  descomponerIdUnidad,
+  esElValorPorDefecto,
+} from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
-import { useFetch } from '@/hooks/use-merge-fetch';
-import { Unidadesrrhh } from '@/modelos';
+import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
+import { buscarUnidadesDeRRHH } from '@/servicios';
 import { esFechaInvalida } from '@/utilidades/es-fecha-invalida';
 import { endOfDay, startOfDay } from 'date-fns';
 import React, { useContext, useEffect, useRef } from 'react';
@@ -15,9 +22,7 @@ import { AuthContext } from '../../../contexts/auth-context';
 
 interface FiltroLicenciasProps {
   empleadores: Empleador[];
-  unidadesRRHH: Unidadesrrhh[];
   onFiltrarLicencias: (formulario: FiltroBusquedaLicencias) => void | Promise<void>;
-  onCambioEmpleadorSeleccionado: (rut?: string) => void | Promise<void>;
   /** Cualquier valor tal que cuando cambie se van a limpiar los filtros */
   limpiarOnRefresh: any;
 }
@@ -26,8 +31,6 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   empleadores,
   onFiltrarLicencias,
   limpiarOnRefresh,
-  unidadesRRHH,
-  onCambioEmpleadorSeleccionado,
 }) => {
   const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onChange' });
 
@@ -38,6 +41,11 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   const {
     datosGuia: { AgregarGuia, guia, listaguia },
   } = useContext(AuthContext);
+
+  const [, unidadesRRHH] = useFetch(
+    rutEmpleadorSeleccionado ? buscarUnidadesDeRRHH(rutEmpleadorSeleccionado) : emptyFetch(),
+    [rutEmpleadorSeleccionado],
+  );
 
   // Agregar guías de usuario
   useEffect(() => {
@@ -65,15 +73,6 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
     limpiarCampos();
   }, [limpiarOnRefresh]);
 
-  useEffect(() => {
-    if (esElValorPorDefecto(rutEmpleadorSeleccionado)) {
-      onCambioEmpleadorSeleccionado(undefined);
-      return;
-    }
-
-    onCambioEmpleadorSeleccionado(rutEmpleadorSeleccionado);
-  }, [rutEmpleadorSeleccionado]);
-
   const filtrarLicencias: SubmitHandler<FormularioFiltrarLicencias> = async ({
     folio,
     runPersonaTrabajadora,
@@ -88,7 +87,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
       runPersonaTrabajadora: runPersonaTrabajadora === '' ? undefined : runPersonaTrabajadora,
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
-      idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
+      unidadRRHH: descomponerIdUnidad(idUnidadRRHH),
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora)
         ? undefined
         : rutEntidadEmpleadora,
@@ -99,18 +98,6 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   const limpiarCampos = () => {
     formulario.reset();
     onFiltrarLicencias({});
-  };
-
-  const ordenarUnidades = (unidades: Unidadesrrhh[]) => {
-    const unidadesImed = unidades
-      .filter((u) => u.CodigoOperador === 3)
-      .sort((a, b) => a.GlosaUnidadRRHH.localeCompare(b.GlosaUnidadRRHH));
-
-    const unidadesMedipass = unidades
-      .filter((u) => u.CodigoOperador === 4)
-      .sort((a, b) => a.GlosaUnidadRRHH.localeCompare(b.GlosaUnidadRRHH));
-
-    return unidadesImed.concat(unidadesMedipass);
   };
 
   return (
@@ -197,17 +184,12 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               className="col-12 col-md-6 col-lg-3"
             />
 
-            <ComboSimple
+            <ComboUnidadesRRHH
               opcional
               name="idUnidadRRHH"
               label="Unidad RRHH"
-              datos={ordenarUnidades(unidadesRRHH ?? [])}
-              idElemento={(u) => `${u.CodigoUnidadRRHH}|${u.CodigoOperador}`}
-              descripcion={(u) => {
-                const operador = u.CodigoOperador === 3 ? 'imed' : 'medipass';
-                return `(${operador}) ${u.GlosaUnidadRRHH}`;
-              }}
-              tipoValor="string"
+              unidadesRRHH={unidadesRRHH}
+              rutEmpleadorSeleccionado={rutEmpleadorSeleccionado}
               className="col-12 col-md-6 col-lg-3"
             />
 

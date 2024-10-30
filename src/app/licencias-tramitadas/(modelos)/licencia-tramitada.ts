@@ -1,5 +1,6 @@
 export interface LicenciaTramitada {
   foliolicencia: string;
+  rutempleador: string;
   operador: Operador;
   ruttrabajador: string;
   apellidopaterno: string;
@@ -13,21 +14,24 @@ export interface LicenciaTramitada {
   otromotivonorecepcion: string;
   licenciasanteriores: number;
   fechatramitacion: string;
+  ruttramitacion: string;
+  codigounidadrrhh: string;
+  glosaunidadrrhh: string;
+  fechaultdiatramita: string;
+  tipolicencia: Tipolicencia;
   estadolicencia: Estadolicencia;
   entidadsalud: Entidadsalud;
-  tipolicencia: Tipolicencia;
-  tiporeposo: Tiporeposo;
   estadotramitacion: Estadotramitacion;
-  rutempleador: string;
-  motivonorecepcion: MotivoNoRecepcion | null;
-  ruttramitacion: string;
+  motivodevolucion: Motivodevolucion;
+  motivonorecepcion: Motivonorecepcion | null;
+  ccaf: Ccaf;
+  tiporeposo: Tiporeposo;
 }
 
-interface MotivoNoRecepcion {
-  idmotivonorecepcion: number;
-  motivonorecepcion: string;
-  solicitaentidadpag: number;
-  solicitaadjunto: number;
+interface Ccaf {
+  idccaf: number;
+  nombre: string;
+  seleccionable: number;
 }
 
 interface Entidadsalud {
@@ -46,6 +50,11 @@ interface Estadotramitacion {
   estadotramitacion: string;
 }
 
+interface Motivodevolucion {
+  idmotivodevolucion: number;
+  motivodevolucion: string;
+}
+
 interface Operador {
   idoperador: number;
   operador: string;
@@ -59,6 +68,13 @@ interface Tipolicencia {
 interface Tiporeposo {
   idtiporeposo: number;
   tiporeposo: string;
+}
+
+interface Motivonorecepcion {
+  idmotivonorecepcion: number;
+  motivonorecepcion: string;
+  solicitaentidadpag: number;
+  solicitaadjunto: number;
 }
 
 export const esLicenciaNoTramitada = (licencia: LicenciaTramitada) => {

@@ -46,6 +46,8 @@ export const noTamitarLicenciaMedica = async (
       },
       tiporeposo: licencia.tiporeposo,
       rutempleador: licencia.rutempleador,
+      codigounidadrrhh: licencia.codigounidadrrhh ?? '',
+      glosaunidadrrhh: licencia.glosaunidadrrhh ?? '',
     });
   } catch (error) {
     throw new NoPuedeCrearZona0Error();

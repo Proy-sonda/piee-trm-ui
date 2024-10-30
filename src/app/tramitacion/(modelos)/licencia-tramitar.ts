@@ -11,6 +11,7 @@ export interface LicenciaTramitar {
   fechainicioreposo: string;
   rutempleador: string;
   codigounidadrrhh: string | null;
+  glosaunidadrrhh: string | null;
   fechaestadolicencia: string;
   ccaf: Ccaf;
   estadolicencia: Estadolicencia;

@@ -11,7 +11,7 @@ import exportFromJSON from 'export-from-json';
 import { useEffect, useState } from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FiltroLicenciasTramitadas, TablaLicenciasTramitadas } from './(componentes)';
-import { FormularioFiltrarLicenciasTramitadas, LicenciaTramitada } from './(modelos)';
+import { FiltrosBuscarLicenciasTramitadas, LicenciaTramitada } from './(modelos)';
 import {
   buscarEstadosLicencias,
   buscarEstadosTramitacion,
@@ -32,9 +32,7 @@ const LicenciasTramitadasPage = () => {
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
   const [licenciasAnteriores, setLicenciasAnteriores] = useState<LicenciaTramitada[]>([]);
   const [totalLicenciasAnteriores, setTotalLicenciasAnteriores] = useState(0);
-  const [filtrosBusqueda, setFiltrosBusqueda] = useState<
-    Partial<FormularioFiltrarLicenciasTramitadas>
-  >({});
+  const [filtrosBusqueda, setFiltrosBusqueda] = useState<FiltrosBuscarLicenciasTramitadas>({});
 
   const [errorLicencias, resultadoLicencias, cargandoLicencias] = useFetch(
     buscarLicenciasTramitadas({

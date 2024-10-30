@@ -1,4 +1,11 @@
-import { ComboSimple, InputFecha, InputRutBusqueda, esElValorPorDefecto } from '@/components/form';
+import {
+  ComboSimple,
+  ComboUnidadesRRHH,
+  InputFecha,
+  InputRutBusqueda,
+  descomponerIdUnidad,
+  esElValorPorDefecto,
+} from '@/components/form';
 import { emptyFetch, useFetch } from '@/hooks/use-merge-fetch';
 import { Empleador } from '@/modelos/empleador';
 import { buscarUnidadesDeRRHH } from '@/servicios/carga-unidad-rrhh';
@@ -7,16 +14,17 @@ import { endOfDay, startOfDay } from 'date-fns';
 import React from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { EstadoLicencia, EstadoTramitacion } from '../(modelos)';
-import { FormularioFiltrarLicenciasTramitadas } from '../(modelos)/formulario-filtrar-licencias-tramitadas';
+import {
+  FiltrosBuscarLicenciasTramitadas,
+  FormularioFiltrarLicenciasTramitadas,
+} from '../(modelos)/formulario-filtrar-licencias-tramitadas';
 import styles from './filtro-licencias-tramitadas.module.css';
 
 interface FiltroLicenciasTramitadasProps {
   empleadores: Empleador[];
   estadosLicencias: EstadoLicencia[];
   estadosTramitacion: EstadoTramitacion[];
-  onFiltrarLicencias: (
-    formulario: Partial<FormularioFiltrarLicenciasTramitadas>,
-  ) => void | Promise<void>;
+  onFiltrarLicencias: (formulario: FiltrosBuscarLicenciasTramitadas) => void | Promise<void>;
 }
 
 export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps> = ({
@@ -55,7 +63,7 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
       fechaDesde: esFechaInvalida(fechaDesde) ? undefined : startOfDay(fechaDesde),
       fechaHasta: esFechaInvalida(fechaHasta) ? undefined : endOfDay(fechaHasta),
       rutEntidadEmpleadora: esElValorPorDefecto(rutEntidadEmpleadora) ? undefined : rutEntidadEmpleadora,
-      idUnidadRRHH: esElValorPorDefecto(idUnidadRRHH) ? undefined : idUnidadRRHH,
+      unidadRRHH: descomponerIdUnidad(idUnidadRRHH),
     });
   };
 
@@ -117,14 +125,12 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
               tipoValor="string"
             />
 
-            <ComboSimple
+            <ComboUnidadesRRHH
               opcional
               name="idUnidadRRHH"
               label="Unidad RRHH"
-              datos={unidadesRRHH}
-              idElemento="CodigoUnidadRRHH"
-              descripcion="GlosaUnidadRRHH"
-              tipoValor="string"
+              unidadesRRHH={unidadesRRHH}
+              rutEmpleadorSeleccionado={rutEmpleadorSeleccionado}
             />
           </div>
 
