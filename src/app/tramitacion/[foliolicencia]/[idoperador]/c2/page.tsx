@@ -113,7 +113,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
         try {
           const [resp] = await buscarLicenciasParaTramitar();
           const licencias = await resp();
-          const licencia = licencias.find(({ foliolicencia }) => foliolicencia == foliolicencia);
+          const licencia = licencias.find(({ foliolicencia: folio }) => folio == foliolicencia);
           if (licencia !== undefined) setLicencia(licencia);
         } catch (error) {}
       };
