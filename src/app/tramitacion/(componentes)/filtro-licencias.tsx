@@ -148,6 +148,9 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               name="folio"
               label="Folio"
               className="col-12 col-md-6 col-lg-3"
+              errores={{
+                rutInvalido: 'El folio es inválido',
+              }}
             />
 
             <InputRutBusqueda

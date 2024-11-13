@@ -81,7 +81,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
               label="Folio Licencia"
               className="col-12 col-md-6 col-lg-3"
               errores={{
-                rutInvalido: 'El folio de licencia es inválido',
+                rutInvalido: 'El folio es inválido',
               }}
               onBlur={() => {
                 formulario.trigger();
