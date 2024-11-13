@@ -16,7 +16,7 @@ export type IdUnidadComboUnidades = `${string}|${number}`;
  * Separa el ID de la unidad obtenido desde el {@link ComboUnidadesRRHH} en el codigo de la unidad
  * y el ID del operador.
  */
-export const descomponerIdUnidad = (idUnidadRRHH: `${string}|${number}`) => {
+export const descomponerIdUnidad = (idUnidadRRHH: IdUnidadComboUnidades) => {
   if (esElValorPorDefecto(idUnidadRRHH)) {
     return undefined;
   }
@@ -36,6 +36,9 @@ interface ComboUnidadesRRHHProps extends InputReciclableBase {
 /**
  * El valor del combo sera un string con el siguiente formato `<codigo unidad>|<id operador>`, por
  * ejemplo "TE01|3", que indica la unidad con código `TE01` de IMED.
+ *
+ * **IMPORTANTE**: Para separar el codigo de la unidad del codigo del operador, usar la funcion {@link descomponerIdUnidad}
+ * en lugar de hacerlo manualmente.
  */
 export const ComboUnidadesRRHH: React.FC<ComboUnidadesRRHHProps> = ({
   name,
@@ -71,6 +74,7 @@ export const ComboUnidadesRRHH: React.FC<ComboUnidadesRRHHProps> = ({
       opcional={opcional}
       name={name}
       label={label}
+      deshabilitado={esElValorPorDefecto(rutEmpleadorSeleccionado)}
       datos={ordenarUnidades(unidadesRRHH ?? [])}
       idElemento={(u) => `${u.CodigoUnidadRRHH}|${u.CodigoOperador}`}
       descripcion={(u) => {
