@@ -474,8 +474,10 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
     };
 
     try {
+      setspinner(true);
       await crearLicenciaZ2(licenciac2);
-      refrescar();
+      setspinner(false);
+
       switch (formulario.getValues('accion')) {
         case 'siguiente':
           setspinner(true);
@@ -488,7 +490,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           AlertaExito.fire({
             html: 'Se ha guardado con éxito',
           });
-
           break;
         case 'navegar':
           router.push(formulario.getValues('linkNavegacion'));
@@ -497,6 +498,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
           throw new Error('Accion desconocida en Paso 3');
       }
     } catch (error) {
+      setspinner(false);
       if (error instanceof ErrorCrearLicenciaC2)
         AlertaError.fire({
           html: `Ha ocurrido un problema: ${ErrorCrearLicenciaC2}`,
