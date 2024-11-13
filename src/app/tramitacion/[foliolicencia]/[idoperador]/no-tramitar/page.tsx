@@ -479,7 +479,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
               Por favor indique el motivo por el cual no se tramitará esta licencia:
             </h6>
             <p className="mb-3 small">
-              Aquí deberá marcar la opción por la que rechaza la tramitación de la licencia medica
+              Aquí deberá marcar la opción por la que rechaza la tramitación de la licencia médica
             </p>
             <IfContainer show={solicitadEntidadPagadora || solicitudAdjunto}>
               <p>
