@@ -119,7 +119,7 @@ const TramitacionPage = () => {
                     </button>
                   </OverlayTrigger>
                   <ExportarCSV
-                    licenciaTramitar={licenciasParaTramitar ?? []}
+                    licenciaTramitar={estado.licenciasFiltradas ?? []}
                     empleadores={datosBandeja!?.empleadores}
                   />
                 </div>
@@ -142,7 +142,7 @@ const TramitacionPage = () => {
                     </button>
                   </OverlayTrigger>
                   <ExportarCSV
-                    licenciaTramitar={licenciasParaTramitar ?? []}
+                    licenciaTramitar={estado.licenciasFiltradas ?? []}
                     empleadores={datosBandeja!?.empleadores}
                   />
                 </div>

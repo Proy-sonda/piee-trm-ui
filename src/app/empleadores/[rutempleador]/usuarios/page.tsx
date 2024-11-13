@@ -159,6 +159,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
           <div>
             <OverlayTrigger overlay={<Tooltip>Exportar personas usuarias a CSV</Tooltip>}>
               <button
+                disabled={!usuarios || usuarios.length === 0}
                 className="btn btn-sm border border-0"
                 style={{ fontSize: '24px' }}
                 onClick={() => exportarUsuariosCSV()}>

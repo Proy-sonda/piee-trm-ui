@@ -171,6 +171,7 @@ const LicenciasTramitadasPage = () => {
                 <div>
                   <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
                     <button
+                      disabled={!resultadoLicencias || resultadoLicencias.numerolicencias === 0}
                       className="btn btn-sm border border-0"
                       style={{ fontSize: '20px' }}
                       onClick={() => exportarLicenciasCSV()}>

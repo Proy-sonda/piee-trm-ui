@@ -94,6 +94,7 @@ const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
             <div>
               <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
                 <button
+                  disabled={!licenciasHistoricas || licenciasHistoricas.length === 0}
                   className="btn btn-sm border border-0"
                   style={{ fontSize: '20px' }}
                   onClick={() => exportarLicenciasCSV()}>
