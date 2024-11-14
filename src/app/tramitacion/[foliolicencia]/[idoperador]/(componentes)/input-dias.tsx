@@ -52,31 +52,47 @@ export const InputDias: React.FC<InputDiasProps> = ({
     unirConFieldArray,
   });
 
+  const transformarDias = (dias: string | number | undefined) => {
+    if (typeof dias === 'number' && !isNaN(dias)) {
+      return dias;
+    } else if (typeof dias === 'number' && isNaN(dias)) {
+      return undefined;
+    } else if (typeof dias === 'string' && dias === '') {
+      return undefined;
+    } else if (typeof dias === 'string') {
+      return parseInt(dias, 10);
+    } else {
+      return undefined;
+    }
+  };
+
   return (
     <>
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
         {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
-          type="number"
+          type="text"
           inputMode="numeric"
           maxLength={2}
           disabled={deshabilitado === true}
           style={{ textAlign: 'right' }}
           isInvalid={tieneError}
           {...register(name, {
-            valueAsNumber: true,
+            setValueAs: transformarDias,
             required: {
               value: !opcional,
               message: 'Este campo es obligatorio',
             },
             min: {
               value: minDiasFinal,
-              message: `No puede ingresar menos de ${minDiasFinal} días`,
+              message: `No puede ingresar menos de ${minDiasFinal} día${
+                minDiasFinal > 1 ? 's' : ''
+              }`,
             },
             max: {
               value: maxDiasFinal,
-              message: `No puede ingresar más de ${maxDiasFinal} días`,
+              message: `No puede ingresar más de ${maxDiasFinal} día${maxDiasFinal > 1 ? 's' : ''}`,
             },
             validate: {
               estaEnRango: (dias) => {
@@ -102,7 +118,7 @@ export const InputDias: React.FC<InputDiasProps> = ({
               if (event.target.value.length > 2) {
                 event.target.value = event.target.value.slice(0, 2);
               }
-              const regex = /[^0-9-]/g; // solo números enteros
+              const regex = /[^0-9]/g; // solo números enteros positivos
               let dias = event.target.value as string;
 
               if (regex.test(dias)) {

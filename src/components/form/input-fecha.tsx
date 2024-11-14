@@ -121,6 +121,7 @@ export const InputFecha: React.FC<InputFechaProps> = ({
         {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
         <Form.Control
+          formNoValidate
           type="date"
           autoComplete="new-custom-value"
           disabled={deshabilitado === true}

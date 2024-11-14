@@ -1,30 +1,22 @@
 'use client';
 import { LicenciaContext } from '@/app/tramitacion/(context)/licencia.context';
 import { buscarLicenciasParaTramitar } from '@/app/tramitacion/(servicios)/buscar-licencias-para-tramitar';
-import { InputFecha } from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import { AuthContext } from '@/contexts';
 import { emptyFetch, useEstaCargando, useFetch, useHayError, useRefrescarPagina } from '@/hooks';
 import { FetchError, HttpError } from '@/servicios';
 import { AlertaError, AlertaExito } from '@/utilidades/alertas';
-import { format } from 'date-fns';
+import { endOfDay, format, parse, startOfDay } from 'date-fns';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Col, Form, FormGroup, Row, Stack } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, useFieldArray, useForm } from 'react-hook-form';
-import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
 import { BotonesNavegacion, Cabecera } from '../(componentes)';
-import { InputDias } from '../(componentes)/input-dias';
 import { buscarZona2 } from '../c2/(servicios)';
 import { DatosModalConfirmarTramitacion, ModalConfirmarTramitacion } from './(componentes)';
-import {
-  FormularioC4,
-  PasoC4Props,
-  RangoLmeAnterioresSugerido,
-  estaLicenciaAnteriorCompleta,
-  licenciaAnteriorTieneCamposValidos,
-} from './(modelos)';
+import { FormularioLicenciasAnteriores } from './(componentes)/formulario-licencias-anteriores';
+import { FormularioC4, PasoC4Props, RangoLmeAnterioresSugerido } from './(modelos)';
 import {
   buscarFechasDeLicenciasAnteriores,
   buscarRangoLmeAnterioresSugeridos,
@@ -68,8 +60,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   const router = useRouter();
   const chkInforLicencia = useRef(null);
-  const totalDias = useRef(null);
-  const btnEliminar = useRef(null);
+
   const {
     datosGuia: { listaguia, AgregarGuia, guia },
   } = useContext(AuthContext);
@@ -108,12 +99,26 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   const [cargandoRango, setcargandoRango] = useState(false);
   const [rangoSugerido, setrangoSugerido] = useState<RangoLmeAnterioresSugerido>();
 
-  const [filasIncompletas, setFilasIncompletas] = useState<number[]>([]);
-
   const [refresh, refrescarZona4] = useRefrescarPagina();
 
   const [errZona2, zona2, cargandoZona2] = useFetch(buscarZona2(foliolicencia, idOperadorNumber));
 
+  const [errorZona4, zona4, cargandoZona4] = useFetch(
+    buscarZona4(foliolicencia, idOperadorNumber),
+    [refresh],
+  );
+
+  const [, fechasLicenciasAnteriores] = useFetch(
+    LicenciaSeleccionada && rangoSugerido
+      ? buscarFechasDeLicenciasAnteriores(LicenciaSeleccionada.runtrabajador, rangoSugerido)
+      : emptyFetch(),
+    [LicenciaSeleccionada, rangoSugerido],
+  );
+
+  const hayError = useHayError(errZona2, errRango, errorZona4);
+  const cargando = useEstaCargando(cargandoZona2, cargandoRango, cargandoZona4);
+
+  // Carga licencia desde el contexto y busca rango sugerido de licencias
   useEffect(() => {
     if (LicenciaSeleccionada.foliolicencia == '') {
       const buscarLicencia = async () => {
@@ -150,63 +155,15 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     }
   }, [LicenciaSeleccionada, zona2]);
 
-  const [errorZona4, zona4, cargandoZona4] = useFetch(
-    buscarZona4(foliolicencia, idOperadorNumber),
-    [refresh],
-  );
-
-  const [, fechasLicenciasAnteriores] = useFetch(
-    LicenciaSeleccionada && rangoSugerido
-      ? buscarFechasDeLicenciasAnteriores(LicenciaSeleccionada.runtrabajador, rangoSugerido)
-      : emptyFetch(),
-    [LicenciaSeleccionada, rangoSugerido],
-  );
-
-  const hayError = useHayError(errZona2, errRango, errorZona4);
-  const cargando = useEstaCargando(cargandoZona2, cargandoRango, cargandoZona4);
-
-  // Limpiar errores al no informar licencias
-  useEffect(() => {
-    if (!informarLicencias) {
-      for (let index = 0; index < licenciasAnteriores.fields.length; index++) {
-        formulario.setValue(`licenciasAnteriores.${index}.dias`, undefined as any);
-        formulario.setValue(`licenciasAnteriores.${index}.desde`, undefined as any);
-        formulario.setValue(`licenciasAnteriores.${index}.hasta`, undefined as any);
-      }
-
-      formulario.clearErrors();
-    }
-  }, [informarLicencias]);
-
   // Parchar cambios o crear filas de ser necesario
   useEffect(() => {
-    // Crear si no existen
-    if (!zona4 && licenciasAnteriores.fields.length === 0) {
-      for (let index = 0; index < TOTAL_DE_LICENCIAS_ANTERIORES; index++) {
-        licenciasAnteriores.append({
-          dias: undefined,
-          desde: undefined,
-          hasta: undefined,
-        } as any);
-      }
-    }
-
     // Crear si hay zona 4
     if (zona4 && licenciasAnteriores.fields.length === 0) {
       for (const licenciaZ4 of zona4) {
         licenciasAnteriores.append({
           dias: licenciaZ4.lmandias,
-          desde: licenciaZ4.lmafechadesde,
-          hasta: licenciaZ4.lmafechahasta,
-        } as any);
-      }
-
-      let filasRestantes = TOTAL_DE_LICENCIAS_ANTERIORES - zona4.length;
-      while (filasRestantes-- > 0) {
-        licenciasAnteriores.append({
-          dias: undefined,
-          desde: undefined,
-          hasta: undefined,
+          desde: parse(licenciaZ4.lmafechadesde, 'yyyy-MM-dd', startOfDay(new Date())),
+          hasta: parse(licenciaZ4.lmafechahasta, 'yyyy-MM-dd', endOfDay(new Date())),
         } as any);
       }
 
@@ -220,43 +177,19 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         const licenciaZ4 = zona4[index];
         licenciasAnteriores.update(index, {
           dias: licenciaZ4.lmandias,
-          desde: licenciaZ4.lmafechadesde as any,
-          hasta: licenciaZ4.lmafechahasta as any,
-        });
-      }
-
-      // Borrar el resto de filas
-      while (index++ < TOTAL_DE_LICENCIAS_ANTERIORES) {
-        licenciasAnteriores.update(index, {
-          dias: undefined as any,
-          desde: undefined as any,
-          hasta: undefined as any,
+          desde: parse(licenciaZ4.lmafechadesde, 'yyyy-MM-dd', startOfDay(new Date())),
+          hasta: parse(licenciaZ4.lmafechahasta, 'yyyy-MM-dd', endOfDay(new Date())),
         });
       }
 
       formulario.setValue('informarLicencia', zona4.length !== 0);
     }
-  }, [zona4, rangoSugerido]);
+  }, [zona4]);
 
   const onSubmitForm: SubmitHandler<FormularioC4> = async (datos) => {
-    /** Se puede filtrar por cualquiera de los campos de la fila que sea valida */
-    const licenciasInformadas = obtenerLicenciasInformadas(datos);
-
-    if (!(await formulario.trigger()))
-      return AlertaError.fire({
-        title: 'Campos Inválidos',
-        html: 'Revise que todos los campos se hayan completado correctamente antes de continuar.',
-      });
-
-    if (!validarQueFilasEstenCompletas(datos))
-      return AlertaError.fire({
-        title: 'Filas Incompletas',
-        html: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
-      });
-
     const datosLimpios: FormularioC4 = {
       ...datos,
-      licenciasAnteriores: licenciasInformadas,
+      licenciasAnteriores: !datos.informarLicencia ? [] : datos.licenciasAnteriores,
     };
 
     switch (datosLimpios.accion) {
@@ -342,32 +275,6 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     return true;
   };
 
-  const obtenerLicenciasInformadas = (datos: FormularioC4) => {
-    return !datos.informarLicencia
-      ? []
-      : datos.licenciasAnteriores.filter(licenciaAnteriorTieneCamposValidos);
-  };
-
-  const validarQueFilasEstenCompletas = (datos: FormularioC4) => {
-    const filasMalas: number[] = [];
-
-    for (let index = 0; index < datos.licenciasAnteriores.length; index++) {
-      const licencia = datos.licenciasAnteriores[index];
-
-      if (!licenciaAnteriorTieneCamposValidos(licencia)) {
-        continue;
-      }
-
-      if (licenciaAnteriorTieneCamposValidos(licencia) && !estaLicenciaAnteriorCompleta(licencia)) {
-        filasMalas.push(index + 1);
-      }
-    }
-
-    setFilasIncompletas(filasMalas);
-
-    return filasMalas.length === 0;
-  };
-
   const tramitarLaLicencia = async () => {
     cerrarModal();
 
@@ -407,25 +314,21 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
     let index = 0;
     for (index = 0; index < fechasLicenciasAnteriores.length; index++) {
       const licenciaZ4 = fechasLicenciasAnteriores[index];
-      licenciasAnteriores.update(index, {
+      licenciasAnteriores.append({
         dias: licenciaZ4.lmandias,
         desde: format(new Date(licenciaZ4.lmafechadesde), 'yyyy-MM-dd') as any,
         hasta: format(new Date(licenciaZ4.lmafechahasta), 'yyyy-MM-dd') as any,
       });
     }
 
-    // Borrar el resto de filas
-    while (index++ < TOTAL_DE_LICENCIAS_ANTERIORES) {
-      licenciasAnteriores.update(index, {
-        dias: undefined as any,
-        desde: undefined as any,
-        hasta: undefined as any,
-      });
-    }
-
     formulario.setValue('informarLicencia', true);
 
     setMostrarMensajeLA(false);
+  };
+
+  const formatearFechaRango = (fecha?: string) => {
+    // Se para de yyyy-MM-dd -> dd/MM/yyyy
+    return fecha?.split('-').reverse().join('/') ?? '';
   };
 
   return (
@@ -509,6 +412,16 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
         <Row className="mt-2 mb-3">
           <Col xs={12}>
+            <Alert variant="warning" className="d-flex align-items-center fade show">
+              <i className="bi bi-exclamation-triangle me-2"></i>
+              Solo podrá informar un máximo de {TOTAL_DE_LICENCIAS_ANTERIORES} licencias médicas
+              anteriores cuya fecha de emisión haya sido entre el{' '}
+              {formatearFechaRango(rangoSugerido?.desde)} y{' '}
+              {formatearFechaRango(rangoSugerido?.hasta)}.
+            </Alert>
+          </Col>
+
+          <Col xs={12}>
             <FormGroup controlId="informarLicencias" className="ps-0">
               <GuiaUsuario guia={guia && listaguia[1]!?.activo} target={chkInforLicencia}>
                 Al marcar este campo, se pueden informar licencias médicas <br /> anteriores a la
@@ -580,26 +493,17 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
           </Col>
         </Row>
 
-        <IfContainer show={informarLicencias && filasIncompletas.length !== 0}>
-          <Row>
-            <Col xs={12}>
-              <Alert variant="danger" className="d-flex align-items-center fade show">
-                <i className="bi bi-exclamation-triangle me-2"></i>
-                <span>
-                  Las siguientes filas están incompletas:
-                  {filasIncompletas.reduce(
-                    (acc, fila, index) => `${acc}${index !== 0 ? ',' : ''} ${fila}`,
-                    '',
-                  )}
-                </span>
-              </Alert>
-            </Col>
-          </Row>
-        </IfContainer>
+        <FormularioLicenciasAnteriores
+          licenciasAnteriores={licenciasAnteriores}
+          maximoLicencias={TOTAL_DE_LICENCIAS_ANTERIORES}
+          rangoSugerido={rangoSugerido}
+          informarLicencias={informarLicencias}
+        />
 
         <FormProvider {...formulario}>
           <form id="tramitacionC4" onSubmit={formulario.handleSubmit(onSubmitForm)} noValidate>
-            <Row>
+            {/* TODO: Hay que eliminar este código. Lo que deje aca por si acaso lo necesito como referencia. */}
+            {/*  <Row>
               <Col xs={12}>
                 <Table className="table table-bordered">
                   <Thead>
@@ -875,7 +779,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
                   </Tbody>
                 </Table>
               </Col>
-            </Row>
+            </Row> */}
 
             <BotonesNavegacion
               formId="tramitacionC4"

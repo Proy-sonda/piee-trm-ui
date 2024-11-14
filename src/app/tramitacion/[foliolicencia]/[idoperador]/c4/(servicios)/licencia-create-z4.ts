@@ -18,8 +18,10 @@ export const crearLicenciaZ4 = (request: LicenciaCrearZ4Request) => {
     },
     licenciazc4: request.licenciasAnteriores.map((licencia) => ({
       lmandias: licencia.dias,
-      lmafechadesde: format(licencia.desde, 'yyyy-MM-dd'),
-      lmafechahasta: format(licencia.hasta, 'yyyy-MM-dd'),
+      lmafechadesde:
+        licencia.desde instanceof Date ? format(licencia.desde, 'yyyy-MM-dd') : licencia.desde,
+      lmafechahasta:
+        licencia.hasta instanceof Date ? format(licencia.hasta, 'yyyy-MM-dd') : licencia.hasta,
     })),
   };
 
