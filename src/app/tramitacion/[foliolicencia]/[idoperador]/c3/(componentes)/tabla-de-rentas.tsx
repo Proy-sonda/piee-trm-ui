@@ -91,6 +91,8 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
       montoIncapacidad: undefined,
       totalRemuneracion: undefined,
     } as any);
+
+    formulario.clearErrors(`${fieldArray}.${index}`);
   };
 
   const nrodias = useRef(null);
@@ -286,7 +288,10 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                               campo: 'montoImponible',
                               fieldArrayName: fieldArray,
                             }}
-                            onBlur={autoCompletarColumna(index, 'montoImponible')}
+                            onBlur={(e) => {
+                              autoCompletarColumna(index, 'montoImponible')(e);
+                              formulario.trigger(`${fieldArray}.${index}.desgloseHaberes`);
+                            }}
                           />
                         </div>
                       </Td>
@@ -371,7 +376,10 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                               campo: 'totalRemuneracion',
                               fieldArrayName: fieldArray,
                             }}
-                            onBlur={autoCompletarColumna(index, 'totalRemuneracion')}
+                            onBlur={(e) => {
+                              autoCompletarColumna(index, 'totalRemuneracion')(e);
+                              formulario.trigger(`${fieldArray}.${index}.desgloseHaberes`);
+                            }}
                           />
                         </div>
                       </Td>
@@ -509,6 +517,12 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                             index,
                             campo: 'desgloseHaberes',
                             fieldArrayName: fieldArray,
+                          }}
+                          errores={{
+                            montoNoCoincide:
+                              TIPO_MONTO_NAME === 'montoImponible'
+                                ? 'No coincide con monto en Imponible Deshaucio'
+                                : 'No coincide con monto en Total Remuneración',
                           }}
                         />
                       </div>
