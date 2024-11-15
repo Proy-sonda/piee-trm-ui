@@ -146,7 +146,7 @@ const LicenciasTramitadasPage = () => {
 
       <IfContainer show={erroresCombos.length === 0}>
         <div className="row">
-          <Titulo url="">
+          <Titulo url="" omitirGuiaUsuario>
             <h5>Filtro para Licencias Tramitadas</h5>
           </Titulo>
         </div>
