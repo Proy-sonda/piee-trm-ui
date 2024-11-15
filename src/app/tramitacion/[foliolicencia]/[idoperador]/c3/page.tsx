@@ -661,6 +661,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       {/* El ModalDesgloseDeHaberes debe estar fuera del FormProvider porque usa un formulario separado */}
       <ModalDesgloseDeHaberes
         datos={datosModalDesglose}
+        configuracion={configuracion ?? []}
         onCerrar={limpiarModalDesglose}
         onGuardarDesglose={(fieldArray, index, desglose): void => {
           formulario.setValue(`${fieldArray}.${index}.desgloseHaberes`, desglose);
