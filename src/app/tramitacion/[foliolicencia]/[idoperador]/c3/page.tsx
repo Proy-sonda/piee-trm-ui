@@ -18,6 +18,7 @@ import {
   useWindowSize,
 } from '@/hooks';
 import { FetchError, HttpError } from '@/servicios';
+import { BuscarConfiguracion } from '@/servicios/buscar-configuracion';
 import { capitalizar } from '@/utilidades';
 import { AlertaConfirmacion, AlertaError, AlertaExito } from '@/utilidades/alertas';
 import { format, parse, startOfMonth } from 'date-fns';
@@ -194,6 +195,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   );
 
   const router = useRouter();
+
+  const [, configuracion] = useFetch(BuscarConfiguracion());
 
   const [completitudRemuneraciones, setCompletitudRemuneraciones] = useState({
     normales: [] as number[],
@@ -713,6 +716,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
             {zona2 && (
               <TablaDeRentas
+                configuracion={configuracion ?? []}
                 titulo="RENTAS DE MESES ANTERIORES A LA FECHA DE LA INCAPACIDAD"
                 fieldArray="remuneraciones"
                 zona2={zona2}
@@ -737,7 +741,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                   </Col>
 
                   <Col xs={12} sm={4}>
-                    <InputMonto opcional name="remuneracionImponiblePrevisional" />
+                    <InputMonto
+                      opcional
+                      name="remuneracionImponiblePrevisional"
+                      configuracion={configuracion ?? []}
+                    />
                   </Col>
                 </>
               ) : (
@@ -746,7 +754,11 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
                     Remuneración imponible previsional mes anterior inicio licencia médica:
                   </span>
 
-                  <InputMonto opcional name="remuneracionImponiblePrevisional" />
+                  <InputMonto
+                    opcional
+                    name="remuneracionImponiblePrevisional"
+                    configuracion={configuracion ?? []}
+                  />
                 </Col>
               )}
 
@@ -774,6 +786,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
               {zona2 && (
                 <TablaDeRentas
+                  configuracion={configuracion ?? []}
                   titulo="EN CASO DE LICENCIAS MATERNALES (TIPO 3) SE DEBE LLENAR ADEMÁS EL RECUADRO SIGUIENTE"
                   fieldArray="remuneracionesMaternidad"
                   zona2={zona2}

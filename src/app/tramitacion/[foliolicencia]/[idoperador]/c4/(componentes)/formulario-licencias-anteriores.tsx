@@ -4,7 +4,7 @@ import { InputFecha } from '@/components';
 import IfContainer from '@/components/if-container';
 import { AlertaError } from '@/utilidades';
 import { addDays, endOfDay, format, isWithinInterval, parse, startOfDay } from 'date-fns';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { FormProvider, SubmitHandler, UseFieldArrayReturn, useForm } from 'react-hook-form';
 import { Table, Tbody, Td, Th, Thead, Tr } from 'react-super-responsive-table';
@@ -26,6 +26,13 @@ export const FormularioLicenciasAnteriores: React.FC<FormularioLicenciasAnterior
   rangoSugerido,
 }) => {
   const formulario = useForm<FormularioAgregarLicencia>({ mode: 'onBlur' });
+
+  // Limpiar errores cuando no se informen licencias
+  useEffect(() => {
+    if (!informarLicencias) {
+      formulario.clearErrors();
+    }
+  }, [informarLicencias]);
 
   const agregarLicenciaAnterior: SubmitHandler<FormularioAgregarLicencia> = async (datos) => {
     if (!rangoSugerido) {
@@ -88,6 +95,7 @@ export const FormularioLicenciasAnteriores: React.FC<FormularioLicenciasAnterior
                   name="dias"
                   label="Días de Licencia"
                   minDias={1}
+                  maxDias={126}
                   deshabilitado={licenciasAnteriores.fields.length >= maximoLicencias}
                   className="col-12 col-sm-5 col-md-3 col-lg-3 col-xl-3 col-xxl-2"
                 />

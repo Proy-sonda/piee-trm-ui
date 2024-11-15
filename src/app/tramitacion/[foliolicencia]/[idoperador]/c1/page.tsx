@@ -399,8 +399,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     };
 
     try {
+      setspinnerCompleta(true);
       await crearLicenciaZ0(licenciaC0);
       await crearLicenciaZ1(licenciaC1);
+      setspinnerCompleta(false);
+
       respuesta = true;
       switch (formulario.getValues('accion')) {
         case 'siguiente':
@@ -415,6 +418,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
       return respuesta;
     } catch (error) {
+      setspinnerCompleta(false);
+
       if (error instanceof ErrorCrearLicencia) {
         respuesta = false;
         AlertaError.fire({
@@ -433,6 +438,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       }
 
       return false;
+    } finally {
+      setspinnerCompleta(false);
     }
   };
 

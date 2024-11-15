@@ -74,7 +74,9 @@ export const ComboUnidadesRRHH: React.FC<ComboUnidadesRRHHProps> = ({
       opcional={opcional}
       name={name}
       label={label}
-      deshabilitado={esElValorPorDefecto(rutEmpleadorSeleccionado)}
+      deshabilitado={
+        esElValorPorDefecto(rutEmpleadorSeleccionado) || (unidadesRRHH ?? []).length === 0
+      }
       datos={ordenarUnidades(unidadesRRHH ?? [])}
       idElemento={(u) => `${u.CodigoUnidadRRHH}|${u.CodigoOperador}`}
       descripcion={(u) => {

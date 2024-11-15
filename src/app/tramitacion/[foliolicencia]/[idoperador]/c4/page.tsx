@@ -167,7 +167,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
         } as any);
       }
 
-      formulario.setValue('informarLicencia', zona4.length === 0);
+      formulario.setValue('informarLicencia', zona4.length !== 0);
     }
 
     // Parchar cuando las filas ya estan creadas
@@ -187,6 +187,11 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
   }, [zona4]);
 
   const onSubmitForm: SubmitHandler<FormularioC4> = async (datos) => {
+    if (informarLicencias && datos.licenciasAnteriores.length === 0) {
+      AlertaError.fire({ html: 'Debe ingresar al menos una licencia anterior.' });
+      return;
+    }
+
     const datosLimpios: FormularioC4 = {
       ...datos,
       licenciasAnteriores: !datos.informarLicencia ? [] : datos.licenciasAnteriores,
@@ -415,7 +420,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
             <Alert variant="warning" className="d-flex align-items-center fade show">
               <i className="bi bi-exclamation-triangle me-2"></i>
               Solo podrá informar un máximo de {TOTAL_DE_LICENCIAS_ANTERIORES} licencias médicas
-              anteriores cuya fecha de emisión haya sido entre el{' '}
+              anteriores cuya fecha de inicio haya sido entre el{' '}
               {formatearFechaRango(rangoSugerido?.desde)} y{' '}
               {formatearFechaRango(rangoSugerido?.hasta)}.
             </Alert>

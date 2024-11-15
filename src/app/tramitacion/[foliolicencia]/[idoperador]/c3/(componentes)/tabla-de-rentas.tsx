@@ -2,9 +2,8 @@ import { ComboSimple, InputMesAno } from '@/components/form';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import IfContainer from '@/components/if-container';
 import { AuthContext } from '@/contexts';
-import { useFetch } from '@/hooks';
+import { Configuracion } from '@/modelos/configuracion';
 import { ENUM_CONFIGURACION } from '@/modelos/enum/configuracion';
-import { BuscarConfiguracion } from '@/servicios/buscar-configuracion';
 import { existe } from '@/utilidades';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { Alert, Col, Row } from 'react-bootstrap';
@@ -25,6 +24,7 @@ import { InputMonto } from './input-monto';
 import { DatosModalDesgloseHaberes } from './modal-desglose-haberes';
 
 interface TablaDeRentasProps {
+  configuracion: Configuracion[];
   titulo: string;
   filasIncompletas: number[];
   tiposPrevisiones: EntidadPrevisional[];
@@ -40,6 +40,7 @@ interface TablaDeRentasProps {
 }
 
 export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
+  configuracion,
   titulo,
   zona2,
   fieldArray,
@@ -55,9 +56,9 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
     : 'montoImponible';
 
   const formulario = useFormContext<FormularioC3>();
-  const [, configuracion] = useFetch(BuscarConfiguracion());
   const [desglosehaberesopcional, setdesglosehaberesopcional] = useState(true);
 
+  // Busca configuracion para tabla de rentas
   useEffect(() => {
     if (configuracion) {
       // validamos la fecha de vigencia sea mayor a la fecha actual
@@ -281,6 +282,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                               index !== 0 ||
                               entidadPrevisionalEsAFP(zona2.entidadprevisional)
                             }
+                            configuracion={configuracion ?? []}
                             deshabilitado={entidadPrevisionalEsAFP(zona2.entidadprevisional)}
                             name={`${fieldArray}.${index}.montoImponible`}
                             unirConFieldArray={{
@@ -369,6 +371,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                               index !== 0 ||
                               !entidadPrevisionalEsAFP(zona2.entidadprevisional)
                             }
+                            configuracion={configuracion ?? []}
                             deshabilitado={!entidadPrevisionalEsAFP(zona2.entidadprevisional)}
                             name={`${fieldArray}.${index}.totalRemuneracion`}
                             unirConFieldArray={{
@@ -388,6 +391,7 @@ export const TablaDeRentas: React.FC<TablaDeRentasProps> = ({
                       <InputMonto
                         opcional
                         name={`${fieldArray}.${index}.montoIncapacidad`}
+                        configuracion={configuracion ?? []}
                         unirConFieldArray={{
                           index,
                           campo: 'montoIncapacidad',
