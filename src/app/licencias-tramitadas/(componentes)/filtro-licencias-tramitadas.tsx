@@ -72,7 +72,14 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
           <div className={styles['contenedor-filtros']}>
-            <InputRutBusqueda opcional name="folio" label="Folio" />
+            <InputRutBusqueda
+              opcional
+              name="folio"
+              label="Folio"
+              errores={{
+                rutInvalido: 'El folio es inválido',
+              }}
+            />
 
             <InputRutBusqueda
               opcional

@@ -1,4 +1,5 @@
 import IfContainer from '@/components/if-container';
+import { Configuracion } from '@/modelos/configuracion';
 import { capitalizar, esFechaInvalida } from '@/utilidades';
 import { format } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
@@ -26,6 +27,7 @@ export interface DatosModalDesgloseHaberes {
 
 interface ModalDesgloseDeHaberesProps {
   datos: DatosModalDesgloseHaberes;
+  configuracion: Configuracion[];
   onCerrar: () => void;
   onGuardarDesglose: (
     fieldArray: TipoRemuneracion,
@@ -39,6 +41,7 @@ type FormularioDesgloseHaberes = DesgloseDeHaberes;
 
 export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
   datos,
+  configuracion,
   onCerrar,
   onGuardarDesglose,
   onDescartarDesglose,
@@ -236,55 +239,55 @@ export const ModalDesgloseDeHaberes: React.FC<ModalDesgloseDeHaberesProps> = ({
                   <tr>
                     <td className="align-middle">Sueldo Base</td>
                     <td>
-                      <InputMonto name="sueldoBase" />
+                      <InputMonto name="sueldoBase" configuracion={configuracion} />
                     </td>
                   </tr>
                   <tr>
                     <td className="align-middle">Gratificación</td>
                     <td>
-                      <InputMonto name="gratificacion" />
+                      <InputMonto name="gratificacion" configuracion={configuracion} />
                     </td>
                   </tr>
                   <tr>
                     <td className="align-middle">Horas Extras</td>
                     <td>
-                      <InputMonto name="horasExtras" />
+                      <InputMonto name="horasExtras" configuracion={configuracion} />
                     </td>
                   </tr>
                   <tr>
                     <td className="align-middle">Aguinaldos</td>
                     <td>
-                      <InputMonto name="aguinaldos" />
+                      <InputMonto name="aguinaldos" configuracion={configuracion} />
                     </td>
                   </tr>
                   <tr>
                     <td className="align-middle">Bono 1</td>
                     <td>
-                      <InputMonto name="bono1" />
+                      <InputMonto name="bono1" configuracion={configuracion} />
                     </td>
                   </tr>
                   <tr>
                     <td className="align-middle">Bono 2</td>
                     <td>
-                      <InputMonto name="bono2" />
+                      <InputMonto name="bono2" configuracion={configuracion} />
                     </td>
                   </tr>
                   <tr>
                     <td className="align-middle">Bono 3</td>
                     <td>
-                      <InputMonto name="bono3" />
+                      <InputMonto name="bono3" configuracion={configuracion} />
                     </td>
                   </tr>
                   <tr>
                     <td className="align-middle">Bono 4</td>
                     <td>
-                      <InputMonto name="bono4" />
+                      <InputMonto name="bono4" configuracion={configuracion} />
                     </td>
                   </tr>
                   <tr>
                     <td className="align-middle">Bono 5</td>
                     <td>
-                      <InputMonto name="bono5" />
+                      <InputMonto name="bono5" configuracion={configuracion} />
                     </td>
                   </tr>
                 </tbody>

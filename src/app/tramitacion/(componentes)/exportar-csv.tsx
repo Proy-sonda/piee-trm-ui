@@ -12,6 +12,7 @@ const ExportarCSV: React.FC<ExportarCSVProps> = ({ licenciaTramitar, empleadores
   return (
     <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
       <button
+        disabled={!licenciaTramitar || licenciaTramitar.length === 0}
         className="btn btn-sm border border-0"
         style={{ fontSize: '20px' }}
         onClick={() => generarCSVLicencias(licenciaTramitar, empleadores)}>

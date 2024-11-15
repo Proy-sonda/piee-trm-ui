@@ -25,7 +25,6 @@ export const InformacionLicencia: React.FC<InformacionLicenciaProps> = ({
     if (licencia && onLicenciaCargada) {
       onLicenciaCargada(licencia);
     }
-    console.log(licencia);
 
     if (noTramitar && licencia.foliolicencia == '') {
       const buscarLicencia = async () => {

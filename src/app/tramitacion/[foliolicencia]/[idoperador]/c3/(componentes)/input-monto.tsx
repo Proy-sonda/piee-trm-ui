@@ -1,13 +1,14 @@
 import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { useInputReciclable } from '@/components/form/hooks';
-import { useFetch } from '@/hooks';
+import { Configuracion } from '@/modelos/configuracion';
 import { ENUM_CONFIGURACION } from '@/modelos/enum/configuracion';
-import { BuscarConfiguracion } from '@/servicios/buscar-configuracion';
 import React, { useEffect, useState } from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 
 interface InputMontoImponibleProps extends InputReciclableBase, UnibleConFormArray {
+  configuracion: Configuracion[];
+
   /** (defecto: `0`) */
   montoMinimo?: number;
 
@@ -30,11 +31,13 @@ export const InputMonto: React.FC<InputMontoImponibleProps> = ({
   montoMaximo,
   deshabilitado,
   unirConFieldArray,
+  configuracion,
   onBlur: onBlurHandler,
 }) => {
   const montoMinimoFinal = montoMinimo ?? 0;
-  const [, configuracion] = useFetch(BuscarConfiguracion());
+  // const [, configuracion] = useFetch(BuscarConfiguracion());
   const [montoMaximoFinal, setmontoMaximoFinal] = useState(montoMaximo ?? 5000000);
+
   useEffect(() => {
     if (configuracion) {
       const fechaActual = new Date();

@@ -1,11 +1,14 @@
-import { InputReciclableBase, UnibleConFormArray } from '@/components/form';
+import { ErroresEditables, InputReciclableBase, UnibleConFormArray } from '@/components/form';
 import { useInputReciclable } from '@/components/form/hooks';
 import React from 'react';
 import { Form, FormGroup } from 'react-bootstrap';
 import { useFormContext } from 'react-hook-form';
 import { DesgloseDeHaberes, existeDesglose, totalDesglose } from '../(modelos)';
 
-interface InputDesgloseDeHaberes extends InputReciclableBase, UnibleConFormArray {
+interface InputDesgloseDeHaberes
+  extends InputReciclableBase,
+    UnibleConFormArray,
+    ErroresEditables<'montoNoCoincide'> {
   /**
    * Nombre de la propiedad `name` usada en el campo de monto imponible para validar que el
    * desglose coincida con este.
@@ -18,6 +21,7 @@ export const InputDesgloseDeHaberes: React.FC<InputDesgloseDeHaberes> = ({
   opcional,
   unirConFieldArray,
   montoImponibleName,
+  errores,
 }) => {
   const { register, getValues } = useFormContext();
 
@@ -51,7 +55,7 @@ export const InputDesgloseDeHaberes: React.FC<InputDesgloseDeHaberes> = ({
                 const montoTotalEnBruto = getValues(montoImponibleName);
                 const montoTotal = isNaN(montoTotalEnBruto) ? 0 : getValues(montoImponibleName);
                 if (totalDesglose(desglose) !== montoTotal) {
-                  return 'No coincide con monto imponible';
+                  return errores?.montoNoCoincide ?? 'Monto no coincide';
                 }
               },
             },

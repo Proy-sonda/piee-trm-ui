@@ -107,7 +107,10 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
   const [licenciasAnteriores, setlicenciasAnteriores] = useState<LicenciasAnteriores[]>([]);
 
-  const [, LMEEXIS] = useFetch(buscarZona1(folio, Number(idoperador)), [folio, idoperador]);
+  const [, LMEEXIS, cargandoLMEEXIS] = useFetch(buscarZona1(folio, Number(idoperador)), [
+    folio,
+    idoperador,
+  ]);
   const [, licencia, cargandoData] = useMergeFetchObject(
     {
       LMEZONAC2: buscarZona2(folio, Number(idoperador)),
@@ -222,17 +225,19 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     const busquedaEmpleador = async () => {
       const [requestEmpleador] = buscarEmpleador(LicenciaSeleccionada.rutempleador);
 
+      if (cargandoLMEEXIS) {
+        return;
+      }
+
       const empleador = await requestEmpleador();
-      console.log({ empleador });
       if (empleador === undefined) {
         seterrorEmpleador(true);
         return;
       }
 
       formulario.setValue('razon', empleador.razonsocial);
-      if (LMEEXIS != undefined) {
+      if (LMEEXIS !== undefined) {
         formulario.setValue('region', LMEEXIS.comuna.idcomuna.substring(0, 2));
-        console.log(LMEEXIS.comuna.idcomuna);
         formulario.setValue('comuna', LMEEXIS.comuna.idcomuna);
         formulario.setValue('calle', LMEEXIS.direccion);
         formulario.setValue('numero', LMEEXIS.numero);
@@ -245,22 +250,17 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
           format(new Date(LMEEXIS.fecharecepcion), 'yyyy-MM-dd'),
         );
         formulario.setValue('tipo', LMEEXIS.tipocalle.idtipocalle.toString());
-
         formulario.setValue(
           'actividadlaboral',
           LMEEXIS.actividadlaboral.idactividadlaboral.toString(),
         );
-
-        return;
-      }
-      setspinnerCompleta(true);
-      setTimeout(() => {
+      } else {
+        setspinnerCompleta(true);
         formulario.setValue('tipo', empleador.direccionempleador.tipocalle.idtipocalle.toString());
         formulario.setValue(
           'region',
           empleador.direccionempleador.comuna.region.idregion.toString(),
         );
-
         formulario.setValue('calle', empleador.direccionempleador.calle);
         formulario.setValue('numero', empleador.direccionempleador.numero);
         formulario.setValue('departamento', empleador.direccionempleador.depto);
@@ -274,10 +274,10 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
           formulario.setValue('comuna', empleador.direccionempleador.comuna.idcomuna);
           setspinnerCompleta(false);
         }, 50);
-      }, 1000);
+      }
     };
     busquedaEmpleador();
-  }, [LMEEXIS, LicenciaSeleccionada, refrescar]);
+  }, [LMEEXIS, LicenciaSeleccionada, refrescar, cargandoLMEEXIS]);
 
   useEffect(
     () => (!cargandoCombos ? setfadeinOut('animate__animated animate__fadeOut') : setfadeinOut('')),
@@ -399,8 +399,11 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
     };
 
     try {
+      setspinnerCompleta(true);
       await crearLicenciaZ0(licenciaC0);
       await crearLicenciaZ1(licenciaC1);
+      setspinnerCompleta(false);
+
       respuesta = true;
       switch (formulario.getValues('accion')) {
         case 'siguiente':
@@ -415,6 +418,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
 
       return respuesta;
     } catch (error) {
+      setspinnerCompleta(false);
+
       if (error instanceof ErrorCrearLicencia) {
         respuesta = false;
         AlertaError.fire({
@@ -433,6 +438,8 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       }
 
       return false;
+    } finally {
+      setspinnerCompleta(false);
     }
   };
 
