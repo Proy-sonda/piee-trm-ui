@@ -2,7 +2,7 @@ import {
   ComboSimple,
   ComboUnidadesRRHH,
   InputFecha,
-  InputRutBusqueda,
+  InputRut,
   descomponerIdUnidad,
   esElValorPorDefecto,
 } from '@/components/form';
@@ -143,7 +143,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
           ref={target}
           className={`${listaguia[0]!?.activo && guia ? 'overlay-marco' : ''}`}>
           <div className={`row g-3 align-items-baseline`}>
-            <InputRutBusqueda
+            <InputRut
               opcional
               name="folio"
               label="Folio"
@@ -153,10 +153,11 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
               }}
             />
 
-            <InputRutBusqueda
+            <InputRut
               opcional
               name="runPersonaTrabajadora"
               label="RUN Persona Trabajadora"
+              tipo="run"
               className="col-12 col-md-6 col-lg-3"
             />
 
