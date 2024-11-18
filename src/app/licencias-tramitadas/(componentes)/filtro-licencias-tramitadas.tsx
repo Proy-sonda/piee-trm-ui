@@ -2,7 +2,7 @@ import {
   ComboSimple,
   ComboUnidadesRRHH,
   InputFecha,
-  InputRutBusqueda,
+  InputRut,
   descomponerIdUnidad,
   esElValorPorDefecto,
 } from '@/components/form';
@@ -72,7 +72,7 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
       <FormProvider {...formulario}>
         <form onSubmit={formulario.handleSubmit(filtrarLicencias)}>
           <div className={styles['contenedor-filtros']}>
-            <InputRutBusqueda
+            <InputRut
               opcional
               name="folio"
               label="Folio"
@@ -81,10 +81,11 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
               }}
             />
 
-            <InputRutBusqueda
+            <InputRut
               opcional
               name="runPersonaTrabajadora"
               label="RUN Persona Trabajadora"
+              tipo="run"
             />
 
             <ComboSimple

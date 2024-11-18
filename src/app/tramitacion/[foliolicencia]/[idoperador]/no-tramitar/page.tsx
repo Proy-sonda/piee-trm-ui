@@ -869,7 +869,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                     </GuiaUsuario>
                     <div ref={comboEntidadEmpleadora}>
                       <div
-                        className={`${
+                        className={`mb-3 ${
                           listaguia.find((lg) => lg.nombre == 'entidadpagadora')!?.activo &&
                           guia &&
                           'overlay-marco'
@@ -879,7 +879,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                             !licencia || !esLicenciaFONASA(licencia) || !solicitadEntidadPagadora
                           }
                           name="entidadPagadoraLetra"
-                          label="Entidad encargada de pagar subsidios de incapacidad laboral"
+                          label="Si su entidad empleadora tiene convenio con alguna CCAF para el pago de subsidios, debe indicarla con el fin de informar el no pago de subsidio por esta acción"
                           datos={comboFiltradoEntidadPagadora}
                           idElemento="identidadpagadora"
                           descripcion="entidadpagadora"
