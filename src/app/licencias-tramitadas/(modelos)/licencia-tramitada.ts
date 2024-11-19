@@ -104,3 +104,7 @@ export const licenciaEnProcesoDeEnvio = ({ estadotramitacion }: LicenciaTramitad
 export const licenciaEnProcesoDeConciliacion = ({ estadotramitacion }: LicenciaTramitada) => {
   return [31].includes(estadotramitacion.idestadotramitacion);
 };
+
+export const licenciaTramitadaEnOperador = ({ estadotramitacion }: LicenciaTramitada) => {
+  return [4].includes(estadotramitacion.idestadotramitacion);
+};

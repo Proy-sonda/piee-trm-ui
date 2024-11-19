@@ -15,7 +15,10 @@ import { LicenciaHistorica } from '../(modelos)';
 import { BuscarHistorialEstadosLmeRequest } from '../(servicios)';
 import styles from './tabla-licencias-historicas.module.css';
 
-import { esLicenciaNoTramitada } from '@/app/licencias-tramitadas/(modelos)';
+import {
+  esLicenciaNoTramitada,
+  licenciaTramitadaEnOperador,
+} from '@/app/licencias-tramitadas/(modelos)';
 import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios';
@@ -93,6 +96,8 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
       mensaje = 'no se ha completado el proceso de tramitación';
     } else if (esLicenciaNoTramitada(zona0 as any)) {
       mensaje = 'esta fue no recepcionada';
+    } else if (licenciaTramitadaEnOperador(zona0 as any)) {
+      mensaje = 'el operador aún no ha confirmado la tramitación';
     }
 
     if (mensaje) {
