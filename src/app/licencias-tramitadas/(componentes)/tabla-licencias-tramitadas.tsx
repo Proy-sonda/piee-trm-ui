@@ -182,7 +182,9 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                 <td>
                   <div className="mb-1 small text-nowrap">{licencia.rutempleador}</div>
                   <div className="mb-1 small text-nowrap">{nombreEmpleador(licencia)}</div>
-                  <div className="mb-1 small text-nowrap">{licencia.glosaunidadrrhh}</div>
+                  <div className="mb-1 small text-nowrap">
+                    <b>{licencia.glosaunidadrrhh}</b>
+                  </div>
                 </td>
                 <td>
                   <div className="mb-1 small text-nowrap">{nombreTrabajador(licencia)}</div>
