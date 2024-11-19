@@ -96,7 +96,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
       mensaje = 'no se ha completado el proceso de tramitación';
     } else if (esLicenciaNoTramitada(zona0 as any)) {
       mensaje = 'esta fue no recepcionada';
-    } else if (licenciaTramitadaEnOperador(zona0 as any)) {
+    } else if (!licenciaTramitadaEnOperador(zona0 as any)) {
       mensaje = 'el operador aún no ha confirmado la tramitación';
     }
 
