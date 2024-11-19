@@ -32,7 +32,7 @@ const FiltroLicencias: React.FC<FiltroLicenciasProps> = ({
   onFiltrarLicencias,
   limpiarOnRefresh,
 }) => {
-  const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onChange' });
+  const formulario = useForm<FormularioFiltrarLicencias>({ mode: 'onBlur' });
 
   const [error, tipoLicencia, loading] = useFetch(BuscarTipoLicencia(), []);
 
