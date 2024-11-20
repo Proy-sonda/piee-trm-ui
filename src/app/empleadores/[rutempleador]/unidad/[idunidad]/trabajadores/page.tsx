@@ -851,7 +851,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
               <div>
                 <OverlayTrigger overlay={<Tooltip>Exportar trabajadores a CSV</Tooltip>}>
                   <button
-                    // disabled={!trabajadores || trabajadores.length === 0} // TODO: descomentar cuando termine proceso de QA
+                    disabled={!trabajadores || trabajadores.length === 0}
                     className="btn btn-sm border border-0"
                     style={{ fontSize: '20px' }}
                     onClick={(e) => exportarACsv(e)}>
