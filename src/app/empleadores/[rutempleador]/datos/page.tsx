@@ -23,7 +23,7 @@ import { useEmpleadorActual } from '../../(contexts)/empleador-actual-context';
 import { Titulo } from '@/components';
 import { GuiaUsuario } from '@/components/guia-usuario';
 import dynamic from 'next/dynamic';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
   buscarActividadesLaborales,
   buscarCajasDeCompensacion,
@@ -231,19 +231,21 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
               />
 
               <div className={`col-12 col-md-6 col-lg-4`}>
-                <label className="form-label">CCAF a la cual está afiliada (*)</label>
-                <OverlayTrigger
-                  placement="top"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={(props) => (
-                    <Tooltip id="button-tooltip" {...props}>
-                      {'Caja de Compensación de Asignación Familiar (CCAF)'}
-                    </Tooltip>
-                  )}>
-                  <i
-                    className="ms-2 text-primary bi bi-info-circle"
-                    style={{ fontSize: '16px' }}></i>
-                </OverlayTrigger>
+                <Form.Label>
+                  <span>Caja de Compensación de Asignación Familiar (CCAF) (*)</span>
+                  <OverlayTrigger
+                    placement="top"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) => (
+                      <Tooltip id="button-tooltip" {...props}>
+                        {'Caja de Compensación de Asignación Familiar (CCAF)'}
+                      </Tooltip>
+                    )}>
+                    <i
+                      className="ms-2 text-primary bi bi-info-circle"
+                      style={{ fontSize: '16px' }}></i>
+                  </OverlayTrigger>
+                </Form.Label>
 
                 <ComboSimple
                   name="cajaCompensacionId"
@@ -263,19 +265,22 @@ const DatosEmpleadoresPage: React.FC<DatosEmpleadoresPageProps> = ({}) => {
               />
 
               <div className={`col-12 col-md-6 col-lg-4`}>
-                <label className="form-label">N° de trabajadores (*)</label>
-                <OverlayTrigger
-                  placement="top"
-                  delay={{ show: 250, hide: 400 }}
-                  overlay={(props) => (
-                    <Tooltip id="button-tooltip" {...props}>
-                      {'Cantidad de personas trabajadoras en la entidad empleadora'}
-                    </Tooltip>
-                  )}>
-                  <i
-                    className="ms-2 text-primary bi bi-info-circle"
-                    style={{ fontSize: '16px' }}></i>
-                </OverlayTrigger>
+                <Form.Label>
+                  <span>Cantidad de personas trabajadoras en la entidad empleadora (*)</span>
+                  <OverlayTrigger
+                    placement="top"
+                    delay={{ show: 250, hide: 400 }}
+                    overlay={(props) => (
+                      <Tooltip id="button-tooltip" {...props}>
+                        {'Cantidad de personas trabajadoras en la entidad empleadora'}
+                      </Tooltip>
+                    )}>
+                    <i
+                      className="ms-2 text-primary bi bi-info-circle"
+                      style={{ fontSize: '16px' }}></i>
+                  </OverlayTrigger>
+                </Form.Label>
+
                 <ComboSimple
                   name="tamanoEmpresaId"
                   datos={comboTamanoEmpresa}
