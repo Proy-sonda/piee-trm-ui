@@ -32,11 +32,7 @@ import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { TipoDocumento } from '../(modelo)';
 import { buscarTiposDocumento } from '../(servicios)';
 import { buscarZona0 } from '../c1/(servicios)';
-import {
-  crearIdEntidadPrevisional,
-  entidadPrevisionalEsAFP,
-  esTrabajadorIndependiente,
-} from '../c2/(modelos)';
+import { crearIdEntidadPrevisional, entidadPrevisionalEsAFP } from '../c2/(modelos)';
 import { buscarEntidadPrevisional, buscarZona2 } from '../c2/(servicios)';
 import {
   DatosModalDesgloseHaberes,
@@ -264,7 +260,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   // Agregar las filas de remuneraciones (parchar o crear)
   useEffect(() => {
-    if (!licencia || !zona2 || !tiposPrevisiones) {
+    if (!licencia || !zona2 || !tiposPrevisiones || !periodosSugeridos) {
       return;
     }
     // Existe zona C3 en la base de datos (parchar)
@@ -274,34 +270,49 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       formulario.setValue('porcentajeDesahucio', zona3.porcentajeDesahucio);
 
       const idsTiposPrevision = tiposPrevisiones.map(crearIdEntidadPrevisional);
+
       // REMUNERACIONES NORMALES
       if (remuneraciones.fields.length === 0) {
-        // Parchar lo que venga desde la API
-        for (let index = 0; index < zona3.rentas.length; index++) {
-          const renta = zona3.rentas[index];
-          const idTipoPrevision = idsTiposPrevision.find((id) => id === renta.idPrevision);
+        // periodos sugeridos > rentas.length => Autocompletar filas
+        // periodos sugeridos < rentas.length => Tomar la cantidad de periodos sugeridos
+        const periodosNormales = periodosSugeridos.periodosSugeridosNormales.length;
+        for (let index = 0; index < periodosNormales; index++) {
+          if (index < zona3.rentas.length) {
+            const renta = zona3.rentas[index];
+            const idTipoPrevision = idsTiposPrevision.find((id) => id === renta.idPrevision);
 
-          remuneraciones.append({
-            prevision: idTipoPrevision ?? valorPorDefectoCombo('string'),
-            periodoRenta: renta.periodo,
-            dias: renta.dias,
-            montoImponible: !entidadPrevisionalEsAFP(zona2.entidadprevisional)
-              ? renta.montoImponible
-              : 0,
-            totalRemuneracion: entidadPrevisionalEsAFP(zona2.entidadprevisional)
-              ? renta.totalRemuneracion
-              : 0,
-            montoIncapacidad: renta.montoIncapacidad,
-            diasIncapacidad: renta.diasIncapacidad,
-            desgloseHaberes: renta.desgloseHaberes,
-          });
+            remuneraciones.append({
+              prevision: idTipoPrevision ?? valorPorDefectoCombo('string'),
+              periodoRenta: renta.periodo,
+              dias: renta.dias,
+              montoImponible: !entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                ? renta.montoImponible
+                : 0,
+              totalRemuneracion: entidadPrevisionalEsAFP(zona2.entidadprevisional)
+                ? renta.totalRemuneracion
+                : 0,
+              montoIncapacidad: renta.montoIncapacidad,
+              diasIncapacidad: renta.diasIncapacidad,
+              desgloseHaberes: renta.desgloseHaberes,
+            });
+          }
         }
 
-        // Rellenar las filas faltantes
-        const periodosNormalesEsperados = esTrabajadorIndependiente(zona2) ? 12 : 3;
-        let filasRestantes = periodosNormalesEsperados - zona3.rentas.length;
-        while (filasRestantes-- > 0) {
-          remuneraciones.append(datosFilaVacia());
+        const diferenciaFilas = periodosNormales - zona3.rentas.length;
+        if (diferenciaFilas > 0) {
+          // Rellenar las filas faltantes
+          for (let index = zona3.rentas.length; index < periodosNormales; index++) {
+            const periodo = periodosSugeridos.periodosSugeridosNormales[index];
+            const idTipoPrevision = idsTiposPrevision.find(
+              (id) => id === crearIdEntidadPrevisional(zona2.entidadprevisional),
+            );
+
+            remuneraciones.append({
+              ...datosFilaVacia(),
+              prevision: idTipoPrevision ?? valorPorDefectoCombo('string'),
+              periodoRenta: parse(periodo, 'yyyy-MM', startOfMonth(new Date())),
+            });
+          }
         }
       }
 
@@ -345,7 +356,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     }
 
     // No existe zona C3 en la base de datos (crear filas)
-    if (zona2 && !zona3 && periodosSugeridos) {
+    if (zona2 && !zona3) {
       if (remuneraciones.fields.length === 0) {
         for (const periodo of periodosSugeridos.periodosSugeridosNormales) {
           remuneraciones.append({
@@ -370,7 +381,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
 
   // Refresca los valores de la zona 3
   useEffect(() => {
-    if (!zona2 || !zona3 || !licencia || !tiposPrevisiones) {
+    if (!zona2 || !zona3 || !licencia || !tiposPrevisiones || !periodosSugeridos) {
       return;
     }
 
@@ -379,9 +390,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     // REMUNERACIONES NORMALES
     if (remuneraciones.fields.length > 0) {
       // Parchar lo que venga desde la API
-
-      const periodosNormalesEsperados = esTrabajadorIndependiente(zona2) ? 12 : 3;
-
+      const periodosNormalesEsperados = periodosSugeridos.periodosSugeridosNormales.length;
       for (let index = 0; index < periodosNormalesEsperados; index++) {
         if (index < zona3.rentas.length) {
           const renta = zona3.rentas[index];
@@ -458,7 +467,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         documentosAdjuntos.update(index, zona3.licenciazc3adjuntos[index]);
       }
     }
-  }, [zona3, formulario, licencia, zona2, tiposPrevisiones]);
+  }, [zona3, formulario, licencia, zona2, tiposPrevisiones, periodosSugeridos]);
 
   const datosFilaVacia = () => {
     return {
