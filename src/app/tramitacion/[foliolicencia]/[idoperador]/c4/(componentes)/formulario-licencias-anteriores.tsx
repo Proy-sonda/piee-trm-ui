@@ -79,6 +79,7 @@ export const FormularioLicenciasAnteriores: React.FC<FormularioLicenciasAnterior
           <FormProvider {...formulario}>
             <Form
               id="formularioLicenciasAnteriores"
+              noValidate
               onSubmit={formulario.handleSubmit(agregarLicenciaAnterior)}>
               <Row className="g-3 align-items-baseline">
                 <div className={`col-12 col-sm-5 col-md-4 col-lg-3 col-xl-3 col-xxl-2`}>
