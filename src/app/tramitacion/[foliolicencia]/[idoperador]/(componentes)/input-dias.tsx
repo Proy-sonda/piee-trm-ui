@@ -124,8 +124,8 @@ export const InputDias: React.FC<InputDiasProps> = ({
               }
             },
             onBlur: (event) => {
-              const monto = event.target.valueAsNumber ?? NaN;
-              onBlurHandler?.(monto);
+              const monto = event.target.value ?? '';
+              onBlurHandler?.(parseInt(monto));
             },
           })}
         />
