@@ -108,7 +108,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
             style={{
               border: '1px solid white',
             }}>
-            Siguiente &nbsp;
+            Continuar &nbsp;
             <i className="bi bi-arrow-right"></i>
           </button>
         </div>
@@ -165,7 +165,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
             style={{
               border: '1px solid white',
             }}>
-            Siguiente &nbsp;
+            Continuar &nbsp;
             <i className="bi bi-arrow-right"></i>
           </button>
         </div>
@@ -230,7 +230,7 @@ export const FiltroLicenciasHistoricas: React.FC<FiltroLicenciasHistoricasProps>
             style={{
               border: '1px solid white',
             }}>
-            Siguiente &nbsp;
+            Continuar &nbsp;
             <i className="bi bi-arrow-right"></i>
           </button>
         </div>
