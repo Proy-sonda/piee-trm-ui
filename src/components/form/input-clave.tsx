@@ -162,7 +162,12 @@ export const InputClave: React.FC<InputClaveProps> = ({
           <InputGroup.Text
             className="btn btn-primary"
             title={verClave ? 'Ocultar clave' : 'Ver clave'}
-            onClick={() => setVerClave((x) => !x)}>
+            // onClick={() => setVerClave((x) => !x)}
+            onMouseDown={() => setVerClave(true)}
+            onMouseUp={() => setVerClave(false)}
+            onMouseLeave={() => setVerClave(false)}
+            onTouchStart={() => setVerClave(true)}
+            onTouchEnd={() => setVerClave(false)}>
             <i className={`bi ${verClave ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`}></i>
           </InputGroup.Text>
 
