@@ -1,0 +1,58 @@
+.filtrocolor {
+    display: inline-flex;
+    margin-left: 2%;
+    background-color: #8c9cbc;
+    color: white;
+    width: 120px;
+    margin: 2px;
+    height: 45px;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 6px 6px 6px 6px;
+  }
+  .filtrocolor:hover {
+    background-color: var(--color-blue);
+  }
+
+
+  .contenedor-filtros {
+    width: 100%;
+    display: grid;
+    gap: 1rem;
+    justify-content: space-between;
+    align-content: end;
+    grid-template-columns: 1fr;
+  }
+  
+  /* Small devices (landscape phones, 576px and up) */
+  @media (min-width: 576px) {
+    .contenedor-filtros {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  /* Medium devices (tablets, 768px and up) */
+  @media (min-width: 768px) {
+    .contenedor-filtros {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  /* Large devices (desktops, 992px and up) */
+  @media (min-width: 992px) {
+    .contenedor-filtros {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+  
+  /* X-Large devices (large desktops, 1200px and up) */
+  @media (min-width: 1200px) {
+    .contenedor-filtros {
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    }
+  }
+  
+  /* XX-Large devices (larger desktops, 1400px and up) */
+  @media (min-width: 1400px) {
+  }
+  

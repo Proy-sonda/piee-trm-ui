@@ -74,7 +74,7 @@ const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
       </IfContainer>
 
       <div className="row">
-        <Titulo url="" omitirGuiaUsuario>
+        <Titulo url="">
           <h5>Filtro para Licencias Históricas</h5>
         </Titulo>
       </div>

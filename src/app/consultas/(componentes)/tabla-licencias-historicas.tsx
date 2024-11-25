@@ -8,7 +8,7 @@ import { usePaginacion } from '@/hooks/use-paginacion';
 import { AlertaInformacion, existe } from '@/utilidades';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Stack, Table } from 'react-bootstrap';
 import { ModalHistoricoEstadoLicencia } from '.';
 import { LicenciaHistorica } from '../(modelos)';
@@ -19,7 +19,9 @@ import {
   esLicenciaNoTramitada,
   licenciaTramitadaEnOperador,
 } from '@/app/licencias-tramitadas/(modelos)';
+import { GuiaUsuario } from '@/components/guia-usuario';
 import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
+import { AuthContext } from '@/contexts';
 import { Empleador } from '@/modelos/empleador';
 import { buscarEmpleadores } from '@/servicios';
 
@@ -43,7 +45,12 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     datos: licencias,
     tamanoPagina: 5,
   });
+  const {
+    datosGuia: { AgregarGuia, guia, listaguia },
+  } = useContext(AuthContext);
 
+  const tablaRef = useRef(null);
+  const estadoRef = useRef(null);
   const [empleadores, setempleadores] = useState<Empleador[]>([]);
 
   useEffect(() => {
@@ -131,6 +138,143 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
 
   return (
     <>
+      <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={tablaRef} placement="top-start">
+        Tabla con los datos de las licencias médicas históricas
+        <br />
+        <div className="text-end mt-3">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 1,
+                  nombre: 'filtro',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'fechaperiodo',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Tabla',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+          &nbsp;
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              if (licencias.length === 0) {
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Filtros',
+                    activo: true,
+                  },
+                ]);
+                return;
+              }
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtros',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'fechaPeriodo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'entidad empleadora',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Tabla',
+                  activo: false,
+                },
+                {
+                  indice: 4,
+                  nombre: 'Descargar',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            Continuar &nbsp;
+            <i className="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </GuiaUsuario>
+      <GuiaUsuario guia={listaguia[4]!?.activo && guia} target={estadoRef} placement="top-start">
+        Estado y la fecha de la licencia médica
+        <br />
+        <div className="text-end mt-3">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 1,
+                  nombre: 'filtro',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'fechaperiodo',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'unidad',
+                  activo: false,
+                },
+                {
+                  indice: 4,
+                  nombre: 'tabla',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+          &nbsp;
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtros',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            Continuar &nbsp;
+            <i className="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </GuiaUsuario>
       <IfContainer show={mostrarSpinner}>
         <SpinnerPantallaCompleta />
       </IfContainer>
@@ -167,7 +311,12 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
         }}
       />
 
-      <Table striped hover responsive>
+      <Table
+        striped
+        hover
+        responsive
+        ref={tablaRef}
+        className={`${listaguia[3]!?.activo && guia && 'overlay-marco'}`}>
         <thead>
           <tr className={`text-center ${styles['text-tr']}`}>
             <th>FOLIO</th>
@@ -180,7 +329,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
         </thead>
         {licencias.length > 0 ? (
           <tbody>
-            {licenciasPaginadas.map((licencia) => (
+            {licenciasPaginadas.map((licencia, index) => (
               <tr
                 key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
                 className="text-center align-middle">
@@ -189,15 +338,21 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
                   <div className="small mb-1 text-nowrap">{licencia.foliolicencia}</div>
                 </td>
                 <td>
-                  <div className="mb-1 small text-center text-nowrap">
-                    {`${licencia.estadolicencia?.idestadolicencia} - ${licencia.estadolicencia?.estadolicencia}`}
+                  <div
+                    ref={index === 0 ? estadoRef : null}
+                    className={`mb-1 small text-center text-nowrap ${
+                      index === 0 && listaguia[4]!?.activo && guia && 'overlay-marco'
+                    }`}>
+                    <div>
+                      {`${licencia.estadolicencia?.idestadolicencia} - ${licencia.estadolicencia?.estadolicencia}`}
+                    </div>
+                    {existe(licencia.fechaestadolicencia) &&
+                      licencia.fechaestadolicencia.trim() !== '' && (
+                        <div className="mb-1 small text-center text-nowrap">
+                          {formatearFecha(licencia.fechaestadolicencia)}
+                        </div>
+                      )}
                   </div>
-                  {existe(licencia.fechaestadolicencia) &&
-                    licencia.fechaestadolicencia.trim() !== '' && (
-                      <div className="mb-1 small text-center text-nowrap">
-                        {formatearFecha(licencia.fechaestadolicencia)}
-                      </div>
-                    )}
                 </td>
                 <td>{BusquedaDeEmpleador(licencia.rutempleador)}</td>
                 <td>
