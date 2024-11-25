@@ -103,6 +103,7 @@ const TramitacionPage = () => {
               <div className="mb-2 mb-md-0 d-flex justify-content-start align-items-center">
                 <SemaforoLicencias
                   onEstadoSeleccionado={(x) => setEstado((prev) => ({ ...prev, filtroEstado: x }))}
+                  qlicencias={estado.licenciasFiltradas?.length ?? 0}
                 />
               </div>
               <div className="mb-2 mb-md-0 d-flex justify-content-center align-items-center">

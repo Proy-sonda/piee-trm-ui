@@ -152,9 +152,9 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
         </div>
       </GuiaUsuario>
       <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={btnTramitar} placement="top-start">
-        Presione {'"Tramitar"'} para iniciar la tramitación de esta licencia, <br />
-        o continuar con la tramitación si es que previamente ya ha <br />
-        comenzado a trabajar con esta
+        Presione el botón {'"Tramitar"'} para iniciar el proceso de tramitación de la licencia
+        médica, <br />
+        o bien para continuar con un proceso en curso.
         <br />
         <div className="text-end mt-3">
           <button

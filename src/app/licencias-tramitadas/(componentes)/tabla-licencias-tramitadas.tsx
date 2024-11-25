@@ -1,13 +1,15 @@
 import { BotonVerPdfLicencia, ModalVisorPdf } from '@/components';
+import { GuiaUsuario } from '@/components/guia-usuario';
 import IfContainer from '@/components/if-container';
 import LeyendaTablas from '@/components/leyenda-tablas/leyenda-tablas';
 import Paginacion from '@/components/paginacion';
 import SpinnerPantallaCompleta from '@/components/spinner-pantalla-completa';
+import { AuthContext } from '@/contexts';
 import { Empleador } from '@/modelos/empleador';
 import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
-import React, { useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { Badge, Stack, Table } from 'react-bootstrap';
 import {
   LicenciaTramitada,
@@ -49,6 +51,13 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
   const [mostrarModalPdf, setMostrarModalPdf] = useState(false);
   const [blobModalPdf, setBlobModalPdf] = useState<Blob>();
   const [mostrarSpinner, setMostrarSpinner] = useState(false);
+  const {
+    datosGuia: { listaguia, AgregarGuia, guia },
+  } = useContext(AuthContext);
+
+  const tablaRef = useRef(null);
+  const estadoRef = useRef(null);
+  const estadoOperador = useRef(null);
 
   // prettier-ignore
   const [datosComprobanteTramitacion, setDatosComprobanteTramitacion] = useState<DatosComprobanteTramitacion>();
@@ -105,7 +114,256 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
         />
       )}
 
-      <Table striped hover responsive>
+      <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={tablaRef} placement="top-end">
+        Tabla con las licencias médicas
+        <br /> que se encuentran tramitadas <br />
+        en el sistema
+        <br />
+        <div className="text-end mt-3">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtros',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'fechaPeriodo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Entidad empleadora',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+          &nbsp;
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              if (licencias.length === 0) {
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Filtros',
+                    activo: true,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'fechaPeriodo',
+                    activo: false,
+                  },
+                  {
+                    indice: 2,
+                    nombre: 'Entidad empleadora',
+                    activo: false,
+                  },
+                  {
+                    indice: 3,
+                    nombre: 'Tabla',
+                    activo: false,
+                  },
+                ]);
+                return;
+              }
+
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtros',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'fechaPeriodo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Entidad empleadora',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Tabla',
+                  activo: false,
+                },
+                {
+                  indice: 4,
+                  nombre: 'Estados',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            Continuar &nbsp;
+            <i className="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </GuiaUsuario>
+      <GuiaUsuario guia={listaguia[4]!?.activo && guia} target={estadoRef} placement="top-end">
+        Estados en los que se encuentra la <br />
+        licencia médica después de finalizar <br />
+        el proceso de tramitación
+        <br />
+        <div className="text-end mt-3">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtros',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'fechaPeriodo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Entidad empleadora',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Tabla',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+          &nbsp;
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtros',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'fechaPeriodo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Entidad empleadora',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Tabla',
+                  activo: false,
+                },
+                {
+                  indice: 4,
+                  nombre: 'Estados',
+                  activo: false,
+                },
+                {
+                  indice: 5,
+                  nombre: 'Estados operador',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            Continuar &nbsp;
+            <i className="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </GuiaUsuario>
+
+      <GuiaUsuario guia={listaguia[5]!?.activo && guia} target={estadoOperador} placement="top-end">
+        Estado del operador en el que se encuentra <br /> la licencia médica
+        <div className="text-end mt-3">
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtros',
+                  activo: false,
+                },
+                {
+                  indice: 1,
+                  nombre: 'fechaPeriodo',
+                  activo: false,
+                },
+                {
+                  indice: 2,
+                  nombre: 'Entidad empleadora',
+                  activo: false,
+                },
+                {
+                  indice: 3,
+                  nombre: 'Tabla',
+                  activo: false,
+                },
+                {
+                  indice: 4,
+                  nombre: 'Estados',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            <i className="bi bi-arrow-left"></i>
+            &nbsp; Anterior
+          </button>
+          &nbsp;
+          <button
+            className="btn btn-sm text-white"
+            onClick={() => {
+              AgregarGuia([
+                {
+                  indice: 0,
+                  nombre: 'Filtros',
+                  activo: true,
+                },
+              ]);
+            }}
+            style={{
+              border: '1px solid white',
+            }}>
+            Continuar &nbsp;
+            <i className="bi bi-arrow-right"></i>
+          </button>
+        </div>
+      </GuiaUsuario>
+
+      <Table
+        striped
+        hover
+        responsive
+        ref={tablaRef}
+        className={`${listaguia[3]!?.activo && guia ? 'overlay-marco' : ''}`}>
         <thead>
           <tr className={`text-center ${styles['text-tr']}`}>
             <th></th>
@@ -119,12 +377,18 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
         </thead>
         <tbody>
           {licencias.length > 0 ? (
-            licencias.map((licencia) => (
+            licencias.map((licencia, index) => (
               <tr
                 key={`${licencia.foliolicencia}/${licencia.operador.idoperador}`}
                 className="text-center align-middle">
                 <td>
-                  <Stack direction="vertical" gap={2}>
+                  <Stack
+                    ref={index === 0 ? estadoRef : null}
+                    direction="vertical"
+                    gap={2}
+                    className={`${
+                      index === 0 && `${listaguia[4]!?.activo && guia ? 'overlay-marco' : ''}`
+                    }`}>
                     <span
                       className="badge rounded-pill"
                       style={{ background: 'var(--color-blue)', fontWeight: 'normal' }}>
@@ -174,7 +438,11 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                   <div className="small mb-1 text-nowrap">{licencia.entidadsalud.nombre}</div>
                 </td>
                 <td>
-                  <div className="mb-1 small text-nowrap">
+                  <div
+                    ref={index === 0 ? estadoOperador : null}
+                    className={`mb-1 small text-nowrap ${
+                      index === 0 && listaguia[5]!?.activo && guia && 'overlay-marco'
+                    }`}>
                     {licencia.estadolicencia.idestadolicencia} -{' '}
                     {licencia.estadolicencia.estadolicencia}
                   </div>

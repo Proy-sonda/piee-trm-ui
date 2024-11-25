@@ -13,9 +13,13 @@ type Semaforo = {
 
 interface SemaforoLicenciasProps {
   onEstadoSeleccionado: (estado: FiltroEstadoLicencia) => void | Promise<void>;
+  qlicencias?: number;
 }
 
-const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccionado }) => {
+const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({
+  onEstadoSeleccionado,
+  qlicencias,
+}) => {
   const target = useRef(null);
   const {
     datosGuia: { listaguia, AgregarGuia, guia },
@@ -30,7 +34,7 @@ const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccion
   return (
     <>
       <GuiaUsuario guia={listaguia[1]!?.activo && guia} target={target} placement="top-end">
-        Semaforo para filtrar la bandeja de tramitación <br />
+        Semáforo para filtrar la bandeja de tramitación <br />
         dependiendo del color seleccionado
         <br />
         <div className="text-end mt-3">
@@ -66,6 +70,21 @@ const SemaforoLicencias: React.FC<SemaforoLicenciasProps> = ({ onEstadoSeleccion
           <button
             className="btn btn-sm text-white"
             onClick={() => {
+              if (qlicencias === 0) {
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Filtro de licencias',
+                    activo: true,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'semaforo',
+                    activo: false,
+                  },
+                ]);
+                return;
+              }
               AgregarGuia([
                 {
                   indice: 0,
