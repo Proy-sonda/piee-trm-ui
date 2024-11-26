@@ -231,7 +231,7 @@ const TablaLicenciasTramitar: React.FC<TablaLicenciasTramitarProps> = ({
         target={btnNoRecepcion}
         placement="top-start">
         Presione {'"No Recepcionar"'}, para indicar que esta licencia no corresponde <br />
-        a su Entidad Empleadora (por ejemplo, cuando no hay vinculo laboral)
+        a su Entidad Empleadora (por ejemplo, cuando no hay vínculo laboral)
         <br />
         <div className="text-end mt-3">
           <button
