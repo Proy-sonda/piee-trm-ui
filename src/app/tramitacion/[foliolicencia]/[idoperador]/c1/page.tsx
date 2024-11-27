@@ -533,6 +533,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 <InputFecha
                   label="Fecha Recepción LME"
                   name="fecharecepcionlme"
+                  deshabilitado
                   className={`col-12 col-sm-6 col-lg-4 col-xl-3`}
                   opcional
                   noAnteriorA="fechaemision"
