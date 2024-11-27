@@ -15,6 +15,7 @@ import {
 import { BuscarUsuarioSu } from '@/servicios/buscar-super-usuario';
 import { obtenerMensajes } from '@/servicios/obtiene-mensajes';
 import { AlertaConfirmacion, AlertaExito, existe } from '@/utilidades';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useContext, useEffect, useState } from 'react';
 import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
@@ -175,7 +176,6 @@ export const LoginComponent: React.FC<{}> = () => {
             Ingresa tus credenciales de acceso al Portal Integrado para Entidades Empleadoras
           </label>
           <br />
-
           <InputRut
             ocultarTooltip
             omitirSignoObligatorio
@@ -185,7 +185,6 @@ export const LoginComponent: React.FC<{}> = () => {
             tipo="run"
             className="mb-3 mt-3"
           />
-
           <InputClave
             omitirSignoObligatorio
             label="Clave de acceso"
@@ -193,17 +192,29 @@ export const LoginComponent: React.FC<{}> = () => {
             className="mb-3"
           />
 
-          <div className="mt-3 pt-2 w-100 d-flex flex-column-reverse flex-lg-row align-items-lg-center justify-content-lg-between">
-            <label
+          <p
+            className="mb-0 small cursor-pointer text-end text-decoration-underline"
+            style={{ color: 'blue' }}
+            onClick={() => setShowModalRecuperarClave(true)}>
+            Recuperar clave de acceso
+          </p>
+
+          <div className="my-3 w-100 d-flex flex-column">
+            {/* <label
               className="cursor-pointer mt-3 mt-lg-0 text-center text-decoration-underline"
               style={{ color: 'blue' }}
               onClick={() => setShowModalRecuperarClave(true)}>
               Recuperar clave de acceso
-            </label>
+            </label> */}
             <button type="submit" className="btn btn-primary text-nowrap">
               Ingresar al Portal
             </button>
           </div>
+
+          <p className="mb-0 small">
+            ¿Aún no inscribe su entidad empleadora? Puede realizarlo desde{' '}
+            <Link href={`${adsUrl()}/inicio-adscripcion`}>aquí</Link>.
+          </p>
         </form>
       </FormProvider>
 

@@ -41,7 +41,7 @@ const SuperUsuario = () => {
     }
 
     if (!usuario?.rut) {
-      router.push('/');
+      router.push('/login');
     }
   }, [usuario]);
 
