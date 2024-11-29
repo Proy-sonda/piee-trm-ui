@@ -21,7 +21,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
-import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { FormProvider, SubmitErrorHandler, SubmitHandler, useForm } from 'react-hook-form';
 import { InformacionLicencia } from '../(componentes)';
 import { buscarCajasDeCompensacion } from '../(servicios)';
 import { buscarZona0 } from '../c1/(servicios)';
@@ -50,6 +50,8 @@ import { ObtenerSolicitudEntidadEmpleadora } from './(servicios)/obtener-solicit
 const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   params: { foliolicencia, idoperador },
 }) => {
+  const MENSAJE_DOCUMENTO_OBLIGATORIO = 'Este campo es obligatorio';
+
   const idOperadorNumber = parseInt(idoperador, 10);
   const [mostrarCCAF, setmostrarCCAF] = useState(false);
 
@@ -300,12 +302,32 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     (m) => m.idmotivonorecepcion === parseInt(motivoRechazo, 10),
   );
 
+  const debeAdjuntarArchivo = () => {
+    return (
+      motivoRechazoSeleccionado &&
+      (motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado) || adjuntodoc)
+    );
+  };
+
+  const formularioInvalido: SubmitErrorHandler<FormularioNoTramitarLicencia> = async () => {
+    const documentos = formulario.getValues('documentoAdjunto');
+    if (debeAdjuntarArchivo() && !documentos.item(0)) {
+      formulario.setError('documentoAdjunto', { message: MENSAJE_DOCUMENTO_OBLIGATORIO });
+    }
+  };
+
   const noTramitarLicencia: SubmitHandler<FormularioNoTramitarLicencia> = async (datos) => {
     if (datos.entidadPagadoraId < 0) {
       datos.entidadPagadoraId = 10100;
     }
     if (!licencia) {
       throw new Error('FALTA LICENCIA PARA TRAMITAR');
+    }
+
+    const adjunto = datos.documentoAdjunto ? datos.documentoAdjunto.item(0) : null;
+    if (debeAdjuntarArchivo() && !adjunto) {
+      formulario.setError('documentoAdjunto', { message: MENSAJE_DOCUMENTO_OBLIGATORIO });
+      return;
     }
 
     try {
@@ -491,7 +513,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
           </Row>
 
           <FormProvider {...formulario}>
-            <Form onSubmit={formulario.handleSubmit(noTramitarLicencia)}>
+            <Form onSubmit={formulario.handleSubmit(noTramitarLicencia, formularioInvalido)}>
               <Row>
                 <Col xs={12} md={7} lg={8}>
                   <GuiaUsuario
@@ -750,11 +772,6 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
                         }`}
                         ref={adjuntodoc}>
                         <InputArchivo
-                          opcional={
-                            !motivoRechazoSeleccionado ||
-                            (!motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado) &&
-                              !adjuntodoc)
-                          }
                           name="documentoAdjunto"
                           label="Adjuntar Documento"
                           className="mt-3"

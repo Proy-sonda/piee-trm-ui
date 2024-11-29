@@ -34,7 +34,37 @@ interface InputArchivoProps extends InputReciclableBase {
   tamanoMaximo?: number;
 }
 
-/** El valor del input va a ser un  {@link FileList} */
+/**
+ * El valor del input va a ser un  {@link FileList}.
+ *
+ * **Importante**: La opcion `opcional` solo sirve para poner el (*) de obligatorio en el label, no
+ * valida el valor del campo. La validez de obligatoriedad se debe hacer en el submit handler y el
+ * submit error handler del formulario, ya que si se pone en este input muestra el error de
+ * obligatorio apenas se abre el modal para seleccionar un archivo. Para mostrar el error se tiene
+ * que hacer asi:
+ *
+ *  ```typescript
+ *  // En la plantilla
+ *  <InputArchivo name="documentos"  {* Otros campos *} />
+ *
+ *  // Submit handler
+ *  const formularioValido: SubmitHandler<Formulario> = async ({ documentos }) => {
+ *    const documento = documentos.item(0);
+ *    if (!documento) { // O cualquier otra condicion
+ *      formulario.setError('documentos', { message: 'Este campo es obligatorio' });
+ *      return; // No olvidar, para no seguir procesando el formulario
+ *    }
+ *  }
+ *
+ *  // Submit error handler
+ *  const formularioInvalido: SubmitErrorHandler<Formulario> = async () => {
+ *    const documentos = formulario.getValues('documentos');
+ *    if (!documentos.item(0)) {
+ *      formulario.setError('documentos', { message: 'Este campo es obligatorio' });
+ *    }
+ *  }
+ *  ```
+ */
 export const InputArchivo: React.FC<InputArchivoProps> = ({
   name,
   label,
@@ -63,6 +93,8 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({
       <FormGroup controlId={idInput} className={`${className ?? ''} position-relative`}>
         {textoLabel && <Form.Label>{textoLabel}</Form.Label>}
 
+        {/* No usar la validacion required porque aparece el error de validacion cuando se abre el 
+        modal para seleccionar el archivo. */}
         <Form.Control
           type="file"
           isInvalid={tieneError}
@@ -70,10 +102,6 @@ export const InputArchivo: React.FC<InputArchivoProps> = ({
           disabled={deshabilitado}
           multiple={multiple !== undefined && multiple === true}
           {...register(name, {
-            required: {
-              value: !opcional,
-              message: 'Este campo es obligatorio',
-            },
             validate: {
               tamanoMinimoPermitido: (archivos: FileList) => {
                 if (!tamanoMinimo) {
