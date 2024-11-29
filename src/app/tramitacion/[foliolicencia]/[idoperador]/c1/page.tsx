@@ -247,7 +247,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         formulario.setValue('otro', LMEEXIS.glosaotraocupacion);
         formulario.setValue(
           'fecharecepcionlme',
-          format(new Date(LMEEXIS.fecharecepcion), 'yyyy-MM-dd'),
+          format(new Date(LicenciaSeleccionada.fechaemision), 'yyyy-dd-MM'),
         );
         formulario.setValue('tipo', LMEEXIS.tipocalle.idtipocalle.toString());
         formulario.setValue(
@@ -265,7 +265,10 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         formulario.setValue('numero', empleador.direccionempleador.numero);
         formulario.setValue('departamento', empleador.direccionempleador.depto);
         formulario.setValue('telefono', empleador.telefonohabitual);
-        formulario.setValue('fecharecepcionlme', format(new Date(), 'yyyy-MM-dd'));
+        formulario.setValue(
+          'fecharecepcionlme',
+          format(new Date(LicenciaSeleccionada.fechaemision), 'yyyy-dd-MM'),
+        );
         formulario.setValue(
           'actividadlaboral',
           empleador.actividadlaboral.idactividadlaboral.toString(),
