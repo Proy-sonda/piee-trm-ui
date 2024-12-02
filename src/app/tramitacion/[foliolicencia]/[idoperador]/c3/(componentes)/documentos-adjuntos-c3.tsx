@@ -18,6 +18,7 @@ import { Alert, Col, Form, Row } from 'react-bootstrap';
 import {
   FieldError,
   FormProvider,
+  SubmitErrorHandler,
   SubmitHandler,
   UseFieldArrayReturn,
   useForm,
@@ -72,6 +73,8 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     }
   }, [configuracion]);
 
+  const MENSAJE_DOCUMENTO_OBLIGATORIO = 'Este campo es obligatorio';
+
   const formulario = useForm<FormularioAdjuntarDocumentoC3>({ mode: 'onBlur' });
 
   const [tiposDocumentosFiltrados, setTiposDocumentosFiltrados] = useState<TipoDocumento[]>([]);
@@ -99,7 +102,11 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
     idTipoDocumento,
     documentos,
   }) => {
-    const documento = documentos.item(0)!;
+    const documento = documentos.item(0);
+    if (!documento) {
+      formulario.setError('documentos', { message: MENSAJE_DOCUMENTO_OBLIGATORIO });
+      return;
+    }
 
     if (documentosAdjuntos.fields.some((d) => nombreDocumentoAdjunto(d) === documento.name)) {
       return AlertaError.fire({
@@ -110,6 +117,13 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
 
     documentosAdjuntos.prepend({ idtipoadjunto: idTipoDocumento, documento });
     formulario.reset();
+  };
+
+  const formularioInvalido: SubmitErrorHandler<FormularioAdjuntarDocumentoC3> = async () => {
+    const documentos = formulario.getValues('documentos');
+    if (!documentos.item(0)) {
+      formulario.setError('documentos', { message: MENSAJE_DOCUMENTO_OBLIGATORIO });
+    }
   };
 
   const eliminarDocumento = async (index: number) => {
@@ -249,7 +263,9 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
         </IfContainer>
 
         <FormProvider {...formulario}>
-          <Form id="adjuntarDocumentoC3" onSubmit={formulario.handleSubmit(adjuntarDocumento)}>
+          <Form
+            id="adjuntarDocumentoC3"
+            onSubmit={formulario.handleSubmit(adjuntarDocumento, formularioInvalido)}>
             <Row className="g-3 align-items-baseline">
               <GuiaUsuario guia={listaguia[4]!?.activo && guia} target={tipoDoc}>
                 Seleccione el tipo de documento a adjuntar

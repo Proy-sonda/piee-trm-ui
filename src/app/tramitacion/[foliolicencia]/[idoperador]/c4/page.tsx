@@ -338,7 +338,7 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
   return (
     <>
-      {LicenciaSeleccionada.foliolicencia !== '' && (
+      {LicenciaSeleccionada.foliolicencia !== '' && datosModalConfirmarTramitacion.show && (
         <>
           <ModalConfirmarTramitacion
             datos={{

@@ -1,10 +1,12 @@
 import {
-  LicenciaTramitar,
   esLicenciaMaternidad,
+  LicenciaTramitar,
 } from '@/app/tramitacion/(modelos)/licencia-tramitar';
 import IfContainer from '@/components/if-container';
 import LoadingSpinner from '@/components/loading-spinner';
 import { emptyFetch, useFetch, useMergeFetchArray } from '@/hooks/use-merge-fetch';
+import { ENUM_CONFIGURACION } from '@/modelos/enum/configuracion';
+import { BuscarConfiguracion } from '@/servicios/buscar-configuracion';
 import { capitalizar } from '@/utilidades';
 import { addDays, format } from 'date-fns';
 import esLocale from 'date-fns/locale/es';
@@ -22,6 +24,7 @@ import {
 } from '../../c2/(modelos)/entidad-previsional';
 import { buscarEntidadPrevisional } from '../../c2/(servicios)/buscar-entidad-previsional';
 import { buscarZona2 } from '../../c2/(servicios)/buscar-z2';
+import { existeDesglose, LicenciaC3 } from '../../c3/(modelos)';
 import { buscarZona3 } from '../../c3/(servicios)/buscar-z3';
 
 interface ModalConfirmarTramitacionProps {
@@ -51,6 +54,8 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
       buscarZona3(datos.folioLicencia, datos.idOperador),
       buscarTiposDocumento(),
     ]);
+
+  const [, configuracion] = useFetch(BuscarConfiguracion());
 
   const [zonas, setzonas] = useState<any[]>([]);
 
@@ -84,8 +89,13 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
       return;
     }
 
+    if (!zona3 || buscarErroresZona3(zona3).length > 0) {
+      setHayErrores(true);
+      return;
+    }
+
     setHayErrores(false);
-  }, [erroresZona, zonas, cargandoZonas]);
+  }, [erroresZona, zonas, cargandoZonas, configuracion]);
 
   const handleCerrar = () => {
     onCerrar();
@@ -145,6 +155,53 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
     return tipoDocumento?.tipoadjunto ?? '-';
   };
 
+  const buscarErroresZona3 = (z3: LicenciaC3) => {
+    const errores: string[] = [];
+
+    if (z3.licenciazc3adjuntos.length === 0) {
+      errores.push('Se debe incluir al menos un documento adjunto.');
+    }
+
+    if (z3.rentas.length === 0) {
+      errores.push('Debe informar al menos una renta.');
+    }
+
+    const fechaActual = new Date();
+    const configDesglose = (configuracion ?? []).find(
+      (x) => x.codigoparametro === ENUM_CONFIGURACION.VALIDA_INGRESO_HABERES,
+    );
+    if (
+      configDesglose &&
+      configDesglose.valor != '2' &&
+      new Date(configDesglose.fechavigencia) > fechaActual
+    ) {
+      const desglosesValidos = z3.rentas.some((renta) => !existeDesglose(renta.desgloseHaberes));
+      if (desglosesValidos) {
+        errores.push('Tiene rentas que no cuentan con desglose.');
+      }
+    }
+
+    return errores;
+  };
+
+  const formatearErroresZona3 = (z3?: LicenciaC3) => {
+    if (!z3) {
+      return <li className="mb-1">No se han completados los datos del paso 3.</li>;
+    }
+
+    const erroresZona3 = buscarErroresZona3(z3).map((error, index) => <li key={index}>{error}</li>);
+    if (erroresZona3.length !== 0) {
+      return (
+        <li className="mb-1">
+          <li className="mb-1">Hay campos inválidos en los datos del paso 3.</li>
+          <ul>{...erroresZona3}</ul>
+        </li>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <>
       <Modal show={datos.show} size="xl" backdrop="static" centered>
@@ -155,20 +212,20 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
         <Modal.Body>
           <IfContainer show={!cargandoZonas && hayErrores}>
             <Row>
-              <Col xs={12} className="my-5">
-                <div className="text-center">
-                  <h1 className="fs-4">Error al crear resumen de datos</h1>
-                  <IfContainer show={!zona1}>
-                    <p>No se han completados los datos del paso 1.</p>
-                  </IfContainer>
+              <Col xs={12} className="my-3 my-md-5">
+                <div className="mx-auto" style={{ maxWidth: '500px' }}>
+                  <h1 className="fs-4 mb-4">Error al crear resumen de datos</h1>
+                  <ul>
+                    <IfContainer show={!zona1}>
+                      <li className="mb-1">No se han completados los datos del paso 1.</li>
+                    </IfContainer>
 
-                  <IfContainer show={!zona2}>
-                    <p>No se han completados los datos del paso 2.</p>
-                  </IfContainer>
+                    <IfContainer show={!zona2}>
+                      <li className="mb-1">No se han completados los datos del paso 2.</li>
+                    </IfContainer>
 
-                  <IfContainer show={!zona3}>
-                    <p>No se han completados los datos del paso 3.</p>
-                  </IfContainer>
+                    {formatearErroresZona3(zona3)}
+                  </ul>
 
                   <IfContainer show={erroresZona.length > 0}>
                     <p>
