@@ -236,6 +236,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       }
 
       formulario.setValue('razon', empleador.razonsocial);
+      console.log(LicenciaSeleccionada.fechaemision);
       if (LMEEXIS !== undefined) {
         formulario.setValue('region', LMEEXIS.comuna.idcomuna.substring(0, 2));
         formulario.setValue('comuna', LMEEXIS.comuna.idcomuna);
