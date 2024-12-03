@@ -83,7 +83,7 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
         guia={listaguia[0]!?.activo && guia}
         target={formularioRef}
         placement="top-start">
-        Utilice estos filtros para refinar la búsqueda <br /> de licencias tramitadas
+        Utilice los siguientes filtros para la búsqueda <br /> de licencias médicas tramitadas
         <br />
         <div className="text-end mt-3">
           <button
@@ -155,8 +155,8 @@ export const FiltroLicenciasTramitadas: React.FC<FiltroLicenciasTramitadasProps>
               guia={listaguia[1]!?.activo && guia}
               target={fechaPeriodo}
               placement="top-start">
-              Seleccione el tipo de fecha para filtrar <br /> las licencias tramitadas con los
-              campos <br /> <b>Fecha Desde - Fecha Hasta</b>
+              Seleccione el rango de fecha para filtrar las licencias <br /> médicas tramitadas en
+              dicho periodo
               <br />
               <div className="text-end mt-3">
                 <button
