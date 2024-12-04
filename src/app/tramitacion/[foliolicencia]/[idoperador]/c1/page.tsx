@@ -534,7 +534,19 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   <InputFecha label="Fecha Emisión" name="fechaemision" />
                 </div>
 
-                <InputFecha
+                <div className="col-12 col-sm-6 col-lg-4 col-xl-3">
+                  <label>Fecha de recepción LME</label>
+                  <p
+                    className="mt-3 ms-2"
+                    style={{
+                      fontWeight: 'bold',
+                    }}>
+                    {new Date(LicenciaSeleccionada.fechaemision)
+                      .toLocaleDateString('es-CL')
+                      .replaceAll('-', '/')}
+                  </p>
+                </div>
+                {/* <InputFecha
                   label="Fecha Recepción LME"
                   name="fecharecepcionlme"
                   deshabilitado
@@ -544,7 +556,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   errores={{
                     anteriorADesde: 'La fecha no puede ser menor a la emisión',
                   }}
-                />
+                /> */}
 
                 <ComboSimple
                   name="region"
