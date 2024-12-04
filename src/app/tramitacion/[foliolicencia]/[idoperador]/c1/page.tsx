@@ -248,7 +248,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         formulario.setValue('otro', LMEEXIS.glosaotraocupacion);
         formulario.setValue(
           'fecharecepcionlme',
-          format(new Date(LicenciaSeleccionada.fechaemision), 'yyyy-MM-dd'),
+          new Date(LicenciaSeleccionada.fechaemision)
+            .toLocaleDateString('es-CL')
+            .replaceAll('-', '/'),
         );
         formulario.setValue('tipo', LMEEXIS.tipocalle.idtipocalle.toString());
         formulario.setValue(
@@ -268,7 +270,9 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
         formulario.setValue('telefono', empleador.telefonohabitual);
         formulario.setValue(
           'fecharecepcionlme',
-          format(new Date(LicenciaSeleccionada.fechaemision), 'yyyy-MM-dd'),
+          new Date(LicenciaSeleccionada.fechaemision)
+            .toLocaleDateString('es-CL')
+            .replaceAll('-', '/'),
         );
         formulario.setValue(
           'actividadlaboral',
@@ -535,28 +539,14 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                 </div>
 
                 <div className="col-12 col-sm-6 col-lg-4 col-xl-3">
-                  <label>Fecha de recepción LME</label>
-                  <p
-                    className="mt-3 ms-2"
-                    style={{
-                      fontWeight: 'bold',
-                    }}>
-                    {new Date(LicenciaSeleccionada.fechaemision)
-                      .toLocaleDateString('es-CL')
-                      .replaceAll('-', '/')}
-                  </p>
+                  <label className="form-label">Fecha de recepción LME</label>
+                  <input
+                    type="text"
+                    disabled
+                    className="form-control"
+                    {...formulario.register('fecharecepcionlme')}
+                  />
                 </div>
-                {/* <InputFecha
-                  label="Fecha Recepción LME"
-                  name="fecharecepcionlme"
-                  deshabilitado
-                  className={`col-12 col-sm-6 col-lg-4 col-xl-3`}
-                  opcional
-                  noAnteriorA="fechaemision"
-                  errores={{
-                    anteriorADesde: 'La fecha no puede ser menor a la emisión',
-                  }}
-                /> */}
 
                 <ComboSimple
                   name="region"

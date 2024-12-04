@@ -10,7 +10,7 @@ import { strIncluye } from '@/utilidades/str-incluye';
 import { format } from 'date-fns';
 import dynamic from 'next/dynamic';
 import React, { useContext, useRef, useState } from 'react';
-import { Badge, Stack, Table } from 'react-bootstrap';
+import { Badge, OverlayTrigger, Stack, Table, Tooltip } from 'react-bootstrap';
 import {
   LicenciaTramitada,
   esLicenciaNoTramitada,
@@ -114,49 +114,75 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
         />
       )}
 
-      <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={tablaRef} placement="top-end">
-        Tabla con las licencias médicas
-        <br /> que se encuentran tramitadas <br />
-        en el sistema
-        <br />
-        <div className="text-end mt-3">
-          <button
-            className="btn btn-sm text-white"
-            onClick={() => {
-              AgregarGuia([
-                {
-                  indice: 0,
-                  nombre: 'Filtros',
-                  activo: false,
-                },
-                {
-                  indice: 1,
-                  nombre: 'fechaPeriodo',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Entidad empleadora',
-                  activo: true,
-                },
-              ]);
-            }}
-            style={{
-              border: '1px solid white',
-            }}>
-            <i className="bi bi-arrow-left"></i>
-            &nbsp; Anterior
-          </button>
-          &nbsp;
-          <button
-            className="btn btn-sm text-white"
-            onClick={() => {
-              if (licencias.length === 0) {
+      <section>
+        <GuiaUsuario guia={listaguia[3]!?.activo && guia} target={tablaRef} placement="top-end">
+          Tabla con las licencias médicas
+          <br /> que se encuentran tramitadas <br />
+          en el sistema
+          <br />
+          <div className="text-end mt-3">
+            <button
+              className="btn btn-sm text-white"
+              onClick={() => {
                 AgregarGuia([
                   {
                     indice: 0,
                     nombre: 'Filtros',
+                    activo: false,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'fechaPeriodo',
+                    activo: false,
+                  },
+                  {
+                    indice: 2,
+                    nombre: 'Entidad empleadora',
                     activo: true,
+                  },
+                ]);
+              }}
+              style={{
+                border: '1px solid white',
+              }}>
+              <i className="bi bi-arrow-left"></i>
+              &nbsp; Anterior
+            </button>
+            &nbsp;
+            <button
+              className="btn btn-sm text-white"
+              onClick={() => {
+                if (licencias.length === 0) {
+                  AgregarGuia([
+                    {
+                      indice: 0,
+                      nombre: 'Filtros',
+                      activo: true,
+                    },
+                    {
+                      indice: 1,
+                      nombre: 'fechaPeriodo',
+                      activo: false,
+                    },
+                    {
+                      indice: 2,
+                      nombre: 'Entidad empleadora',
+                      activo: false,
+                    },
+                    {
+                      indice: 3,
+                      nombre: 'Tabla',
+                      activo: false,
+                    },
+                  ]);
+                  return;
+                }
+
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Filtros',
+                    activo: false,
                   },
                   {
                     indice: 1,
@@ -173,190 +199,169 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     nombre: 'Tabla',
                     activo: false,
                   },
+                  {
+                    indice: 4,
+                    nombre: 'Estados',
+                    activo: true,
+                  },
                 ]);
-                return;
-              }
+              }}
+              style={{
+                border: '1px solid white',
+              }}>
+              Continuar &nbsp;
+              <i className="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </GuiaUsuario>
+        <GuiaUsuario guia={listaguia[4]!?.activo && guia} target={estadoRef} placement="top-end">
+          Estados en los que se encuentra la <br />
+          licencia médica después de finalizar <br />
+          el proceso de tramitación
+          <br />
+          <div className="text-end mt-3">
+            <button
+              className="btn btn-sm text-white"
+              onClick={() => {
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Filtros',
+                    activo: false,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'fechaPeriodo',
+                    activo: false,
+                  },
+                  {
+                    indice: 2,
+                    nombre: 'Entidad empleadora',
+                    activo: false,
+                  },
+                  {
+                    indice: 3,
+                    nombre: 'Tabla',
+                    activo: true,
+                  },
+                ]);
+              }}
+              style={{
+                border: '1px solid white',
+              }}>
+              <i className="bi bi-arrow-left"></i>
+              &nbsp; Anterior
+            </button>
+            &nbsp;
+            <button
+              className="btn btn-sm text-white"
+              onClick={() => {
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Filtros',
+                    activo: false,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'fechaPeriodo',
+                    activo: false,
+                  },
+                  {
+                    indice: 2,
+                    nombre: 'Entidad empleadora',
+                    activo: false,
+                  },
+                  {
+                    indice: 3,
+                    nombre: 'Tabla',
+                    activo: false,
+                  },
+                  {
+                    indice: 4,
+                    nombre: 'Estados',
+                    activo: false,
+                  },
+                  {
+                    indice: 5,
+                    nombre: 'Estados operador',
+                    activo: true,
+                  },
+                ]);
+              }}
+              style={{
+                border: '1px solid white',
+              }}>
+              Continuar &nbsp;
+              <i className="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </GuiaUsuario>
 
-              AgregarGuia([
-                {
-                  indice: 0,
-                  nombre: 'Filtros',
-                  activo: false,
-                },
-                {
-                  indice: 1,
-                  nombre: 'fechaPeriodo',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Entidad empleadora',
-                  activo: false,
-                },
-                {
-                  indice: 3,
-                  nombre: 'Tabla',
-                  activo: false,
-                },
-                {
-                  indice: 4,
-                  nombre: 'Estados',
-                  activo: true,
-                },
-              ]);
-            }}
-            style={{
-              border: '1px solid white',
-            }}>
-            Continuar &nbsp;
-            <i className="bi bi-arrow-right"></i>
-          </button>
-        </div>
-      </GuiaUsuario>
-      <GuiaUsuario guia={listaguia[4]!?.activo && guia} target={estadoRef} placement="top-end">
-        Estados en los que se encuentra la <br />
-        licencia médica después de finalizar <br />
-        el proceso de tramitación
-        <br />
-        <div className="text-end mt-3">
-          <button
-            className="btn btn-sm text-white"
-            onClick={() => {
-              AgregarGuia([
-                {
-                  indice: 0,
-                  nombre: 'Filtros',
-                  activo: false,
-                },
-                {
-                  indice: 1,
-                  nombre: 'fechaPeriodo',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Entidad empleadora',
-                  activo: false,
-                },
-                {
-                  indice: 3,
-                  nombre: 'Tabla',
-                  activo: true,
-                },
-              ]);
-            }}
-            style={{
-              border: '1px solid white',
-            }}>
-            <i className="bi bi-arrow-left"></i>
-            &nbsp; Anterior
-          </button>
-          &nbsp;
-          <button
-            className="btn btn-sm text-white"
-            onClick={() => {
-              AgregarGuia([
-                {
-                  indice: 0,
-                  nombre: 'Filtros',
-                  activo: false,
-                },
-                {
-                  indice: 1,
-                  nombre: 'fechaPeriodo',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Entidad empleadora',
-                  activo: false,
-                },
-                {
-                  indice: 3,
-                  nombre: 'Tabla',
-                  activo: false,
-                },
-                {
-                  indice: 4,
-                  nombre: 'Estados',
-                  activo: false,
-                },
-                {
-                  indice: 5,
-                  nombre: 'Estados operador',
-                  activo: true,
-                },
-              ]);
-            }}
-            style={{
-              border: '1px solid white',
-            }}>
-            Continuar &nbsp;
-            <i className="bi bi-arrow-right"></i>
-          </button>
-        </div>
-      </GuiaUsuario>
-
-      <GuiaUsuario guia={listaguia[5]!?.activo && guia} target={estadoOperador} placement="top-end">
-        Estado del operador en el que se encuentra <br /> la licencia médica
-        <div className="text-end mt-3">
-          <button
-            className="btn btn-sm text-white"
-            onClick={() => {
-              AgregarGuia([
-                {
-                  indice: 0,
-                  nombre: 'Filtros',
-                  activo: false,
-                },
-                {
-                  indice: 1,
-                  nombre: 'fechaPeriodo',
-                  activo: false,
-                },
-                {
-                  indice: 2,
-                  nombre: 'Entidad empleadora',
-                  activo: false,
-                },
-                {
-                  indice: 3,
-                  nombre: 'Tabla',
-                  activo: false,
-                },
-                {
-                  indice: 4,
-                  nombre: 'Estados',
-                  activo: true,
-                },
-              ]);
-            }}
-            style={{
-              border: '1px solid white',
-            }}>
-            <i className="bi bi-arrow-left"></i>
-            &nbsp; Anterior
-          </button>
-          &nbsp;
-          <button
-            className="btn btn-sm text-white"
-            onClick={() => {
-              AgregarGuia([
-                {
-                  indice: 0,
-                  nombre: 'Filtros',
-                  activo: true,
-                },
-              ]);
-            }}
-            style={{
-              border: '1px solid white',
-            }}>
-            Continuar &nbsp;
-            <i className="bi bi-arrow-right"></i>
-          </button>
-        </div>
-      </GuiaUsuario>
+        <GuiaUsuario
+          guia={listaguia[5]!?.activo && guia}
+          target={estadoOperador}
+          placement="top-end">
+          Estado del operador en el que se encuentra <br /> la licencia médica
+          <div className="text-end mt-3">
+            <button
+              className="btn btn-sm text-white"
+              onClick={() => {
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Filtros',
+                    activo: false,
+                  },
+                  {
+                    indice: 1,
+                    nombre: 'fechaPeriodo',
+                    activo: false,
+                  },
+                  {
+                    indice: 2,
+                    nombre: 'Entidad empleadora',
+                    activo: false,
+                  },
+                  {
+                    indice: 3,
+                    nombre: 'Tabla',
+                    activo: false,
+                  },
+                  {
+                    indice: 4,
+                    nombre: 'Estados',
+                    activo: true,
+                  },
+                ]);
+              }}
+              style={{
+                border: '1px solid white',
+              }}>
+              <i className="bi bi-arrow-left"></i>
+              &nbsp; Anterior
+            </button>
+            &nbsp;
+            <button
+              className="btn btn-sm text-white"
+              onClick={() => {
+                AgregarGuia([
+                  {
+                    indice: 0,
+                    nombre: 'Filtros',
+                    activo: true,
+                  },
+                ]);
+              }}
+              style={{
+                border: '1px solid white',
+              }}>
+              Continuar &nbsp;
+              <i className="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </GuiaUsuario>
+      </section>
 
       <Table
         striped
@@ -389,46 +394,98 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     className={`${
                       index === 0 && `${listaguia[4]!?.activo && guia ? 'overlay-marco' : ''}`
                     }`}>
-                    <span
-                      className="badge rounded-pill"
-                      style={{ background: 'var(--color-blue)', fontWeight: 'normal' }}>
-                      {esLicenciaNoTramitada(licencia) ? 'No Recepcionada' : 'Tramitada'}
-                    </span>
+                    <OverlayTrigger
+                      overlay={
+                        <Tooltip>
+                          {esLicenciaNoTramitada(licencia)
+                            ? 'La licencia no se recepcionó.'
+                            : 'La licencia se tramitó.'}
+                        </Tooltip>
+                      }>
+                      <span
+                        className="badge rounded-pill"
+                        style={{ background: 'var(--color-blue)', fontWeight: 'normal' }}>
+                        {esLicenciaNoTramitada(licencia) ? 'No Recepcionada' : 'Tramitada'}
+                      </span>
+                    </OverlayTrigger>
 
                     <IfContainer show={licenciaFueTramitadaPorEmpleador(licencia)}>
-                      <Badge pill bg="warning" text="dark" style={{ fontWeight: 'normal' }}>
-                        Envío Pendiente
-                      </Badge>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip>
+                            La licencia tramitada (o no recepcionada) está lista para ser enviada al
+                            operador.{' '}
+                          </Tooltip>
+                        }>
+                        <Badge pill bg="warning" text="dark" style={{ fontWeight: 'normal' }}>
+                          Envío Pendiente
+                        </Badge>
+                      </OverlayTrigger>
                     </IfContainer>
 
                     <IfContainer show={licenciaEnProcesoDeEnvio(licencia)}>
-                      <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
-                        Enviando
-                      </Badge>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip>
+                            La tramitación se encuentra en proceso de envió hacía el operador.
+                          </Tooltip>
+                        }>
+                        <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
+                          Enviando
+                        </Badge>
+                      </OverlayTrigger>
                     </IfContainer>
 
                     <IfContainer show={licenciaEnProcesoDeConciliacion(licencia)}>
-                      <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
-                        Conciliando
-                      </Badge>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip>
+                            El proceso de conciliación tomó la licencia, es decir, se actualiza el
+                            estado de la licencia con el que tienen los operadores.{' '}
+                          </Tooltip>
+                        }>
+                        <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
+                          Conciliando
+                        </Badge>
+                      </OverlayTrigger>
                     </IfContainer>
 
                     <IfContainer show={licenciaFueEnviadaAlOperador(licencia)}>
-                      <Badge pill bg="primary" style={{ fontWeight: 'normal' }}>
-                        Enviada
-                      </Badge>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip>La tramitación se envió con éxito al operador. </Tooltip>
+                        }>
+                        <Badge pill bg="primary" style={{ fontWeight: 'normal' }}>
+                          Enviada
+                        </Badge>
+                      </OverlayTrigger>
                     </IfContainer>
 
                     <IfContainer show={licenciaConErrorDeEnvio(licencia)}>
-                      <Badge pill bg="danger" style={{ fontWeight: 'normal' }}>
-                        Error de envío
-                      </Badge>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip>
+                            Hubo un error de envío de la tramitación hacía el operador.{' '}
+                          </Tooltip>
+                        }>
+                        <Badge pill bg="danger" style={{ fontWeight: 'normal' }}>
+                          Error de envío
+                        </Badge>
+                      </OverlayTrigger>
                     </IfContainer>
 
                     <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
-                      <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
-                        Licencia Conciliada
-                      </Badge>
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip>
+                            La licencia fue conciliada, es decir, fue sincronizado el estado del
+                            portal con el operador.{' '}
+                          </Tooltip>
+                        }>
+                        <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
+                          Licencia Conciliada
+                        </Badge>
+                      </OverlayTrigger>
                     </IfContainer>
                   </Stack>
                 </td>
