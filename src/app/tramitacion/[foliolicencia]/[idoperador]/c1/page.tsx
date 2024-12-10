@@ -389,7 +389,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
       },
       depto: formulario.getValues('departamento'),
       direccion: formulario.getValues('calle'),
-      fecharecepcion: format(new Date(formulario.getValues('fecharecepcionlme')), 'yyyy-MM-dd'),
+      fecharecepcion: LicenciaSeleccionada.fechaemision,
       foliolicencia: folio,
       glosaotraocupacion: formulario.getValues('otro') || '',
       ocupacion: {
