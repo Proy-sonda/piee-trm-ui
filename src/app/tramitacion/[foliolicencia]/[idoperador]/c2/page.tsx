@@ -155,10 +155,26 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
   useEffect(() => {
     if (combos?.ZONA2) {
       if (comboCalidadTrabajador.length > 0) {
-        formulario.setValue(
-          'calidad',
-          combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
-        );
+        if (
+          !comboCalidadTrabajador.find(
+            (c) => c.idcalidadtrabajador == combos?.ZONA2.calidadtrabajador.idcalidadtrabajador,
+          )
+        ) {
+          formulario.setValue('calidad', '-99999999');
+          formulario.setValue('entidadremuneradora', '');
+        } else {
+          formulario.setValue(
+            'calidad',
+            combos!?.ZONA2.calidadtrabajador?.idcalidadtrabajador.toString(),
+          );
+
+          setTimeout(() => {
+            formulario.setValue(
+              'entidadremuneradora',
+              combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora,
+            );
+          }, 600);
+        }
       }
     }
   }, [comboCalidadTrabajador]);
@@ -557,11 +573,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       );
 
       formulario.setValue(
-        'calidad',
-        combos!?.LMEEXISTEZONA2.calidadtrabajador.idcalidadtrabajador.toString(),
-      );
-
-      formulario.setValue(
         'contratoIndefinido',
         combos!?.LMEEXISTEZONA2.codigocontratoindef == 1 ? '1' : '2',
       );
@@ -579,10 +590,6 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
       );
 
       setTimeout(() => {
-        formulario.setValue(
-          'entidadremuneradora',
-          combos!?.LMEEXISTEZONA2.entidadpagadora.identidadpagadora,
-        );
         formulario.setValue(
           'previsional',
           formulario.getValues('regimen') == 1
@@ -1114,6 +1121,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
               />
 
               <ComboSimple
+                deshabilitado={idcalidad == '-99999999'}
                 idElemento="identidadpagadora"
                 descripcion="entidadpagadora"
                 label="Entidad Pagadora Subsidio o Mantener remuneración"
