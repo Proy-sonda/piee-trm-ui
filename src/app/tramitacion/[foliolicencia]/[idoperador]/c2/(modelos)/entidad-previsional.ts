@@ -9,7 +9,7 @@ export interface EntidadPrevisional {
   vigente: number;
 }
 
-type EntidadPrevisionalBasica = Pick<
+export type EntidadPrevisionalBasica = Pick<
   EntidadPrevisional,
   'codigoentidadprevisional' | 'codigoregimenprevisional' | 'letraentidadprevisional'
 >;

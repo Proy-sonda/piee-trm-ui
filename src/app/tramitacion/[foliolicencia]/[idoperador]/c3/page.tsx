@@ -32,7 +32,7 @@ import { BotonesNavegacion, Cabecera } from '../(componentes)';
 import { TipoDocumento } from '../(modelo)';
 import { buscarTiposDocumento } from '../(servicios)';
 import { buscarZona0 } from '../c1/(servicios)';
-import { crearIdEntidadPrevisional, entidadPrevisionalEsAFP } from '../c2/(modelos)';
+import { Licenciac2, crearIdEntidadPrevisional, entidadPrevisionalEsAFP } from '../c2/(modelos)';
 import { buscarEntidadPrevisional, buscarZona2 } from '../c2/(servicios)';
 import {
   DatosModalDesgloseHaberes,
@@ -483,6 +483,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
   };
 
   const onSubmitForm: SubmitHandler<FormularioC3> = async (datos) => {
+    if (!zona2) {
+      throw new Error('No se ha cargado la zona 2');
+    }
+
     if (!(await formulario.trigger())) {
       formulario.setFocus('remuneraciones.0.dias');
       return AlertaError.fire({
@@ -504,7 +508,7 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       }
     }
 
-    const resultado = validarCompletitudDeFilas(datos);
+    const resultado = validarCompletitudDeFilas(datos, zona2);
     if (resultado.hayErrores) {
       if (resultado.enRentasNormales) {
         formulario.setFocus('remuneraciones.0.dias');
@@ -525,10 +529,10 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
         ? 0
         : datos.remuneracionImponiblePrevisional,
       remuneraciones: datos.remuneraciones
-        .filter(remuneracionEstaCompleta)
+        .filter((x) => remuneracionEstaCompleta(x, zona2.entidadprevisional))
         .map(limpiarRemuneracion),
       remuneracionesMaternidad: datos.remuneracionesMaternidad
-        .filter(remuneracionEstaCompleta)
+        .filter((x) => remuneracionEstaCompleta(x, zona2.entidadprevisional))
         .map(limpiarRemuneracion),
     };
 
@@ -629,14 +633,14 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     return true;
   };
 
-  const validarCompletitudDeFilas = (datos: FormularioC3) => {
+  const validarCompletitudDeFilas = (datos: FormularioC3, zona2: Licenciac2) => {
     const errores = { normales: [] as number[], maternidad: [] as number[] };
     for (let i = 0; i < datos.remuneraciones.length; i++) {
       const remuneracion = datos.remuneraciones[i];
 
       if (
-        remuneracionTieneAlgunCampoValido(remuneracion) &&
-        !remuneracionEstaCompleta(remuneracion)
+        remuneracionTieneAlgunCampoValido(remuneracion, zona2.entidadprevisional) &&
+        !remuneracionEstaCompleta(remuneracion, zona2.entidadprevisional)
       ) {
         errores.normales.push(i + 1);
       }
@@ -646,8 +650,8 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       const remuneracion = datos.remuneracionesMaternidad[i];
 
       if (
-        remuneracionTieneAlgunCampoValido(remuneracion) &&
-        !remuneracionEstaCompleta(remuneracion)
+        remuneracionTieneAlgunCampoValido(remuneracion, zona2.entidadprevisional) &&
+        !remuneracionEstaCompleta(remuneracion, zona2.entidadprevisional)
       ) {
         errores.maternidad.push(i + 1);
       }

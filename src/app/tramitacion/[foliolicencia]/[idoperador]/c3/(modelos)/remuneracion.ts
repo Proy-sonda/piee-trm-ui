@@ -1,4 +1,5 @@
 import { esFechaInvalida } from '@/utilidades';
+import { EntidadPrevisionalBasica, entidadPrevisionalEsAFP } from '../../c2/(modelos)';
 import { DesgloseDeHaberes, existeDesglose } from './desglose-de-haberes';
 
 export interface Remuneracion {
@@ -18,28 +19,37 @@ export interface Remuneracion {
   desgloseHaberes: DesgloseDeHaberes | Record<string, never>;
 }
 
-export const remuneracionEstaCompleta = (fila: Remuneracion) => {
-  return (
-    fila.prevision !== '' &&
-    !esFechaInvalida(fila.periodoRenta) &&
-    fila.dias &&
-    !isNaN(fila.dias) &&
-    !isNaN(fila.montoImponible) &&
-    !isNaN(fila.totalRemuneracion)
-  );
+export const remuneracionEstaCompleta = (
+  fila: Remuneracion,
+  entidadPrevisional: EntidadPrevisionalBasica,
+) => {
+  const camposComunesCompletos =
+    fila.prevision !== '' && !esFechaInvalida(fila.periodoRenta) && fila.dias && !isNaN(fila.dias);
+
+  const estaMontoCompleto = entidadPrevisionalEsAFP(entidadPrevisional)
+    ? !isNaN(fila.totalRemuneracion)
+    : !isNaN(fila.montoImponible);
+
+  return camposComunesCompletos && estaMontoCompleto;
 };
 
-export const remuneracionTieneAlgunCampoValido = (fila: Remuneracion) => {
-  return (
+export const remuneracionTieneAlgunCampoValido = (
+  fila: Remuneracion,
+  entidadPrevisional: EntidadPrevisionalBasica,
+) => {
+  const camposComunesCompletos =
     fila.prevision !== '' ||
     !esFechaInvalida(fila.periodoRenta) ||
     (fila.dias && !isNaN(fila.dias)) ||
-    !isNaN(fila.montoImponible) ||
-    !isNaN(fila.totalRemuneracion) ||
     !isNaN(fila.montoIncapacidad) ||
     !isNaN(fila.diasIncapacidad) ||
-    existeDesglose(fila.desgloseHaberes)
-  );
+    existeDesglose(fila.desgloseHaberes);
+
+  const estaMontoValido = entidadPrevisionalEsAFP(entidadPrevisional)
+    ? !isNaN(fila.totalRemuneracion)
+    : !isNaN(fila.montoImponible);
+
+  return camposComunesCompletos || estaMontoValido;
 };
 
 export const limpiarRemuneracion = (remuneracion: Remuneracion): Remuneracion => {
