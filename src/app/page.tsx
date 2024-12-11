@@ -48,46 +48,7 @@ export default function HomePage({ searchParams }: HomePageProps) {
               </div>
               <p className="text-center mt-2 mt-sm-3 mb-0">Ingresar al sistema</p>
             </Link>
-
-            {/* VERSION CON BOTONES */}
-            {/* <Link
-              href={`${adsUrl()}/inicio-adscripcion`}
-              className="fs-6 text-center btn btn-primary btn-lg"
-              style={{ width: '200px', height: '70px', alignContent: 'center' }}>
-              Inscribir Entidad Empleadora
-            </Link>
-
-            <Link
-              href="/login"
-              className="fs-6 text-center btn btn-primary btn-lg ms-5"
-              style={{ width: '200px', height: '70px', alignContent: 'center' }}>
-              Ingresar al Sistema
-            </Link> */}
           </div>
-
-          {/* VERSION ORIGINAL */}
-          {/* <IfContainer show={searchParams.redirectTo}>
-            <div className="col-12">
-              <div
-                className="alert alert-danger d-flex align-items-center alert-dismissible fade show"
-                role="alert">
-                <i className="bi bi-exclamation-triangle me-2"></i>
-                <span>Su sesión ha expirado</span>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="alert"
-                  aria-label="Close"></button>
-              </div>
-            </div>
-          </IfContainer>
-
-          <div className="col-12 col-md-6">
-            <ButtonImage />
-          </div>
-          <div className="col-12 col-md-6">
-            <LoginComponent />
-          </div> */}
         </div>
       </div>
     </>
