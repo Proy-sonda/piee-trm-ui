@@ -8,3 +8,4 @@ export * from './file-to-base64';
 export * from './formatear-bytes';
 export * from './obtener-dominio';
 export * from './str-incluye';
+export * from './wait';

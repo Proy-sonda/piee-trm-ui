@@ -288,8 +288,13 @@ const C4Page: React.FC<PasoC4Props> = ({ params: { foliolicencia, idoperador } }
 
       await tramitarLicenciaMedica(foliolicencia, idOperadorNumber);
 
-      AlertaExito.fire({
-        html: `Su licencia <b>${foliolicencia}</b> ha sido enviada al operador <b>${LicenciaSeleccionada?.operador.operador}</b>, cuando el operador la reciba se generará el comprobante de tramitación, el cual podrá verificar en la pestaña <b>Licencias Tramitadas</b>`,
+      setMostrarSpinner(false);
+
+      await AlertaExito.fire({
+        html: `
+          Su licencia <b>${foliolicencia}</b> ha sido enviada al operador <b>${LicenciaSeleccionada?.operador.operador}</b>, 
+          cuando el operador la reciba se generará el comprobante de tramitación, el cual podrá verificar en la pestaña 
+          <b>Licencias Tramitadas</b>`,
         timer: 10000,
       });
 

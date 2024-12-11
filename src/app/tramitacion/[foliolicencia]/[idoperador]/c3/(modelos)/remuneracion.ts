@@ -22,8 +22,10 @@ export const remuneracionEstaCompleta = (fila: Remuneracion) => {
   return (
     fila.prevision !== '' &&
     !esFechaInvalida(fila.periodoRenta) &&
+    fila.dias &&
     !isNaN(fila.dias) &&
-    !(isNaN(fila.montoImponible) && isNaN(fila.totalRemuneracion))
+    !isNaN(fila.montoImponible) &&
+    !isNaN(fila.totalRemuneracion)
   );
 };
 
@@ -31,7 +33,7 @@ export const remuneracionTieneAlgunCampoValido = (fila: Remuneracion) => {
   return (
     fila.prevision !== '' ||
     !esFechaInvalida(fila.periodoRenta) ||
-    !isNaN(fila.dias) ||
+    (fila.dias && !isNaN(fila.dias)) ||
     !isNaN(fila.montoImponible) ||
     !isNaN(fila.totalRemuneracion) ||
     !isNaN(fila.montoIncapacidad) ||
@@ -43,7 +45,7 @@ export const remuneracionTieneAlgunCampoValido = (fila: Remuneracion) => {
 export const limpiarRemuneracion = (remuneracion: Remuneracion): Remuneracion => {
   return {
     ...remuneracion,
-    dias: isNaN(remuneracion.dias) ? 0 : remuneracion.dias,
+    dias: !remuneracion.dias || isNaN(remuneracion.dias) ? 0 : remuneracion.dias,
     montoImponible: isNaN(remuneracion.montoImponible) ? 0 : remuneracion.montoImponible,
     totalRemuneracion: isNaN(remuneracion.totalRemuneracion) ? 0 : remuneracion.totalRemuneracion,
     montoIncapacidad: isNaN(remuneracion.montoIncapacidad) ? 0 : remuneracion.montoIncapacidad,

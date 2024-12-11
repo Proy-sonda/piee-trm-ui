@@ -504,8 +504,14 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
       }
     }
 
-    if (!validarCompletitudDeFilas(datos)) {
-      formulario.setFocus('remuneraciones.0.dias');
+    const resultado = validarCompletitudDeFilas(datos);
+    if (resultado.hayErrores) {
+      if (resultado.enRentasNormales) {
+        formulario.setFocus('remuneraciones.0.dias');
+      } else if (resultado.enRentasMaternales) {
+        formulario.setFocus('remuneracionesMaternidad.0.dias');
+      }
+
       return AlertaError.fire({
         title: 'Remuneraciones Incompletas',
         html: 'Revise que todas filas esten completas. Si no desea incluir una fila, debe asegurarse de que esta se encuentre en blanco.',
@@ -648,7 +654,13 @@ const C3Page: React.FC<C3PageProps> = ({ params: { foliolicencia, idoperador } }
     }
 
     setCompletitudRemuneraciones(errores);
-    return errores.normales.length === 0 && errores.maternidad.length === 0;
+    const resultado = {
+      hayErrores: errores.normales.length !== 0 || errores.maternidad.length !== 0,
+      enRentasNormales: errores.normales.length !== 0,
+      enRentasMaternales: errores.maternidad.length !== 0,
+    };
+    return resultado;
+    // return errores.normales.length === 0 && errores.maternidad.length === 0;
   };
 
   const limpiarModalDesglose = () => {
