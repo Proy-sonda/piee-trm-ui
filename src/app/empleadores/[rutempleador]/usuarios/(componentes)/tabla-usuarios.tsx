@@ -72,7 +72,7 @@ const TablaUsuarios: React.FC<TablaUsuariosProps> = ({
       if (esElUsuarioConectado(usuario)) {
         await logout();
 
-        router.replace('/');
+        router.replace('/login');
       }
     } catch (error: any) {
       AlertaError.fire({

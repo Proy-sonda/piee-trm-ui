@@ -17,7 +17,7 @@ const Usuario: React.FC = () => {
     try {
       await logout();
 
-      router.push('/');
+      router.push('/login');
     } catch (error) {
       console.error('ERROR EN LOGOUT: ', error);
 

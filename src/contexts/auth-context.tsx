@@ -135,7 +135,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         logout();
 
-        router.push('/');
+        router.push('/login');
       }
     })();
   }, []);
@@ -220,7 +220,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       } catch (error) {
         console.error('[SESION TIMER] ERROR EN LOGOUT: ', error);
       } finally {
-        router.push('/');
+        router.push('/login');
       }
     }
   };

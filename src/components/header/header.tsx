@@ -22,7 +22,7 @@ const AppHeader: React.FC<AppHeaderProps> = ({}) => {
         } ${usuario?.rutsuper && styles['login-sup']}`}>
         <div className="container-lg">
           <div className="w-100 d-flex align-items-center justify-content-between">
-            <Link href="/">
+            <Link href="/login">
               <img src={svg.src} alt="Fonasa" className={styles['logo-fonasa'] + ' img-fluid'} />
             </Link>
 
