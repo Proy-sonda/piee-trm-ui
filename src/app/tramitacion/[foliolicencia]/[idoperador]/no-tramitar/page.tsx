@@ -305,13 +305,13 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
   const debeAdjuntarArchivo = () => {
     return (
       motivoRechazoSeleccionado &&
-      (motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado) || adjuntodoc)
+      (motivoRechazoSolicitaAdjunto(motivoRechazoSeleccionado) || solicitudAdjunto)
     );
   };
 
   const formularioInvalido: SubmitErrorHandler<FormularioNoTramitarLicencia> = async () => {
     const documentos = formulario.getValues('documentoAdjunto');
-    if (debeAdjuntarArchivo() && !documentos.item(0)) {
+    if (debeAdjuntarArchivo() && !documentos?.item(0)) {
       formulario.setError('documentoAdjunto', { message: MENSAJE_DOCUMENTO_OBLIGATORIO });
     }
   };
@@ -324,7 +324,8 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
       throw new Error('FALTA LICENCIA PARA TRAMITAR');
     }
 
-    const adjunto = datos.documentoAdjunto ? datos.documentoAdjunto.item(0) : null;
+    const adjunto = datos.documentoAdjunto.length > 0 ? datos.documentoAdjunto.item(0) : null;
+
     if (debeAdjuntarArchivo() && !adjunto) {
       formulario.setError('documentoAdjunto', { message: MENSAJE_DOCUMENTO_OBLIGATORIO });
       return;
