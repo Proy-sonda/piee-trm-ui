@@ -3,7 +3,7 @@ import { AlertaConfirmacion } from '@/utilidades';
 export default function ExportarTabla({ data, nombre }: any) {
   // exportar los datos a csv
   const exportarCSV = async () => {
-    const resp = await AlertaConfirmacion.fire({ html: '¿Desea exportar los datos a CSV?' });
+    const resp = await AlertaConfirmacion.fire({ html: '¿Desea exportar los datos?' });
     if (!resp.isConfirmed) return;
     const csv = data.map((row: any) => {
       return Object.values(row).join(',');

@@ -81,7 +81,7 @@ export const ComboUnidadesRRHH: React.FC<ComboUnidadesRRHHProps> = ({
       idElemento={(u) => `${u.CodigoUnidadRRHH}|${u.CodigoOperador}`}
       descripcion={(u) => {
         const operador = u.CodigoOperador === 3 ? 'imed' : 'medipass';
-        return `(${operador}) ${u.GlosaUnidadRRHH}`;
+        return `(${operador.toUpperCase()}) ${u.GlosaUnidadRRHH.toUpperCase()}`;
       }}
       tipoValor="string"
       className={className}

@@ -436,7 +436,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
   const exportarACsv = async (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
     const resp = await AlertaConfirmacion.fire({
-      html: `¿Desea exportar las personas trabajadoras a CSV?`,
+      html: `¿Desea exportar las personas trabajadoras?`,
     });
 
     if (resp.isDenied) return;
@@ -849,7 +849,7 @@ const TrabajadoresPage: React.FC<TrabajadoresPageProps> = ({ params }) => {
           <div className="col-12 col-sm-4 col-md-6 col-lg-8 col-xl-9 col-xxl-10">
             <div className="mt-3 mt-sm-0 d-flex justify-content-center align-items-center justify-content-sm-end">
               <div>
-                <OverlayTrigger overlay={<Tooltip>Exportar trabajadores a CSV</Tooltip>}>
+                <OverlayTrigger overlay={<Tooltip>Exportar trabajadores</Tooltip>}>
                   <button
                     disabled={!trabajadores || trabajadores.length === 0}
                     className="btn btn-sm border border-0"

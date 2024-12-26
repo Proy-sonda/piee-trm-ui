@@ -24,8 +24,11 @@ type TabLink = {
 const Position: React.FC<PositionProps> = ({ tabActiva }) => {
   const tabsMap = new Map<TipoTab, TabLink>([
     ['tramitacion', { href: '/tramitacion', titulo: 'Bandeja de Tramitación' }],
-    ['licencias-tramitadas', { href: '/licencias-tramitadas', titulo: 'Licencias Tramitadas' }],
-    ['consultas', { href: '/consultas', titulo: 'Consultas' }],
+    [
+      'licencias-tramitadas',
+      { href: '/licencias-tramitadas', titulo: 'Licencias Médicas Tramitadas' },
+    ],
+    ['consultas', { href: '/consultas', titulo: 'Consultas Licencias Médicas' }],
     ['mantencion-empleadores', { href: '/empleadores', titulo: 'Entidades Empleadoras' }],
   ]);
 

@@ -340,7 +340,6 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
             <Row className="mt-4">
               <Col xs={12}>
                 <h2 className="fs-5 text-center">Rentas de meses anteriores a la incapacidad</h2>
-                <h3 className="fs-6 text-center">Rentas</h3>
               </Col>
             </Row>
 
@@ -443,7 +442,9 @@ export const ModalConfirmarTramitacion: React.FC<ModalConfirmarTramitacionProps>
 
             <Row className="mt-3">
               <Col xs={12}>
-                <h2 className="fs-5 text-center">Licencias Anteriores en los Últimos 6 meses</h2>
+                <h2 className="fs-5 text-center">
+                  Licencias Médicas anteriores en los últimos 6 meses
+                </h2>
               </Col>
             </Row>
 

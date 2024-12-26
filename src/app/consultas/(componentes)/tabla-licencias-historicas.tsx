@@ -69,10 +69,11 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     return (
       <>
         <div className="mb-1 small text-nowrap">
-          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.rutempleador || rutEmpleador}
+          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.razonsocial}
         </div>
         <div className="mb-1 small text-nowrap">
-          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.razonsocial}
+          RUT/RUN:{' '}
+          {empleadores.find((e) => e.rutempleador == rutEmpleador)?.rutempleador || rutEmpleador}
         </div>
       </>
     );
@@ -110,8 +111,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
     if (mensaje) {
       AlertaInformacion.fire({
         html: `
-        <p>No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}.</p>
-        <p class="mb-0">Puede revisar más detalles de su tramitación en el portal del Operador <b>${licencia.operador.operador}</b>.</p>`,
+        <p>No es posible generar el comprobante de tramitación para la licencia con folio <b>${licencia.foliolicencia}</b> debido a que ${mensaje}.</p>`,
       });
       return;
     }
@@ -321,7 +321,7 @@ export const TablaLicenciasHistoricas: React.FC<TablaLicenciasHistoricasProps> =
           <tr className={`text-center ${styles['text-tr']}`}>
             <th>FOLIO</th>
             <th>ESTADO</th>
-            <th>EMPLEADOR</th>
+            <th>ENTIDAD EMPLEADORA</th>
             <th>PERSONA TRABAJADORA</th>
             <th>DESCRIPCIÓN</th>
             <th>ACCIONES</th>

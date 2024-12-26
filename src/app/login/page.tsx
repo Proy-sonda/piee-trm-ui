@@ -2,6 +2,8 @@
 
 import IfContainer from '@/components/if-container';
 import { LoginComponent } from '@/components/login/login-component';
+import { useRouter } from 'next/navigation';
+import { Col, Row } from 'react-bootstrap';
 
 interface HomePageProps {
   searchParams: {
@@ -10,8 +12,22 @@ interface HomePageProps {
 }
 
 export default function HomePage({ searchParams }: HomePageProps) {
+  const router = useRouter();
   return (
     <>
+      <Row>
+        <Col xs={12} className="ms-4 mt-4">
+          <i
+            className="bi bi-house-door-fill"
+            style={{
+              fontSize: '24px',
+              color: 'var(--color-blue)',
+              cursor: 'pointer',
+            }}
+            onClick={() => router.push('/')}
+            title="Ir al inicio"></i>
+        </Col>
+      </Row>
       <div className="py-5 container-fluid">
         <div className="row align-items-center">
           <IfContainer show={searchParams.redirectTo}>

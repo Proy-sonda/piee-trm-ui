@@ -325,7 +325,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
     }
 
     const adjunto = datos.documentoAdjunto!?.length > 0 ? datos.documentoAdjunto.item(0) : null;
-    console.log(adjunto);
+    
 
     if (debeAdjuntarArchivo() && !adjunto) {
       formulario.setError('documentoAdjunto', { message: MENSAJE_DOCUMENTO_OBLIGATORIO });

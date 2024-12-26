@@ -67,7 +67,7 @@ export const InputRut: React.FC<InputRutProps> = ({
                 delay={{ show: 250, hide: 400 }}
                 overlay={(props) => (
                   <Tooltip id="button-tooltip" {...props}>
-                    {'Se debe ingresar sin puntos y con guión (Ej: 123456-7)'}
+                    {'Se debe ingresar sin puntos y con guión (Ej: 12345678-9)'}
                   </Tooltip>
                 )}>
                 <i className="ms-2 text-primary bi bi-info-circle" style={{ fontSize: '16px' }}></i>

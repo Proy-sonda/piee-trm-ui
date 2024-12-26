@@ -81,12 +81,8 @@ const TramitacionPage = () => {
       <IfContainer show={erroresCarga.length === 0 || errorLicencias}>
         <div className="row">
           <Titulo url="">
-            <h5>Filtro para Licencias pendientes de Tramitar</h5>
+            <h5>FILTRO PARA LICENCIAS MÉDICAS PENDIENTES DE TRAMITAR</h5>
           </Titulo>
-          <p className="mt-3">
-            En esta pantalla se muestran todas las licencias médicas que usted tiene pendiente de
-            tramitación. Puede utilizar los siguientes campos para facilitar su búsqueda.
-          </p>
         </div>
 
         <div className="pt-3 pb-4 border-bottom border-1">
