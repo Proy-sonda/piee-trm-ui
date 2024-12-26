@@ -805,7 +805,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
 
                     formulario.setValue('previsional', e.target.value);
                   }}>
-                  <option value={''}>Seleccionar</option>
+                  <option value={''}>SELECCIONAR...</option>
                   {entidadPrevisional.length > 0 ? (
                     entidadPrevisional.map(
                       ({
@@ -819,16 +819,16 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                             <option
                               value={codigoentidadprevisional + letraentidadprevisional}
                               key={codigoentidadprevisional + letraentidadprevisional}>
-                              {glosa.toLowerCase().charAt(0).toUpperCase() +
-                                glosa.slice(1).toLowerCase()}
+                              {glosa.toUpperCase().charAt(0).toUpperCase() +
+                                glosa.slice(1).toUpperCase()}
                             </option>
                           ) : (
                             <option
                               value={codigoentidadprevisional + letraentidadprevisional}
                               key={codigoentidadprevisional + letraentidadprevisional}>
                               [{letraentidadprevisional}]{' '}
-                              {glosa.toLowerCase().charAt(0).toUpperCase() +
-                                glosa.slice(1).toLowerCase()}
+                              {glosa.toUpperCase().charAt(0).toUpperCase() +
+                                glosa.slice(1).toUpperCase()}
                             </option>
                           )
                         ) : (
