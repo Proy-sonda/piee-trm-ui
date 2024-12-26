@@ -74,7 +74,7 @@ export const ComboComuna: React.FC<ComboComunaProps> = ({
           <option value={COMUNA_POR_DEFECTO}>{textoOpcionPorDefecto ?? 'SELECCIONAR...'}</option>
           {comunasRegionSeleccionada.map(({ idcomuna, nombre }) => (
             <option key={idcomuna} value={idcomuna}>
-              {nombre}
+              {nombre.toUpperCase()}
             </option>
           ))}
         </Form.Select>
