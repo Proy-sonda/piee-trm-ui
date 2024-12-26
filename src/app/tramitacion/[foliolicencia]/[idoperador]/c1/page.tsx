@@ -513,7 +513,7 @@ const C1Page: React.FC<myprops> = ({ params: { foliolicencia: folio, idoperador 
                   deshabilitado
                   ocultarTooltip
                   name="run"
-                  label="Rut Entidad Empleadora"
+                  label="RUT/RUN Entidad Empleadora"
                   tipo="run"
                   className="col-12 col-sm-6 col-lg-4 col-xl-3"
                 />

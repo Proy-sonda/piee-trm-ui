@@ -34,7 +34,7 @@ const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
 
   const exportarLicenciasCSV = async () => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Desea exportar las licencias tramitadas a CSV?`,
+      html: `¿Desea exportar las licencias tramitadas?`,
     });
 
     if (!isConfirmed) {
@@ -92,7 +92,7 @@ const ConsultaHistoricosPage: React.FC<ConsultaHistoricosPageProps> = ({}) => {
           <div className="d-flex justify-content-between align-items-center">
             <h2 className="fs-5 m-0 p-0">LICENCIAS HISTÓRICAS</h2>
             <div>
-              <OverlayTrigger overlay={<Tooltip>Exportar licencias a CSV</Tooltip>}>
+              <OverlayTrigger overlay={<Tooltip>Exportar</Tooltip>}>
                 <button
                   disabled={!licenciasHistoricas || licenciasHistoricas.length === 0}
                   className="btn btn-sm border border-0"

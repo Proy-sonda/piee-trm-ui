@@ -17,12 +17,6 @@ export default function HomePage({ searchParams }: HomePageProps) {
             Bienvenido al Portal Integrado para Entidades Empleadoras de Tramitación de Licencias
             Médicas
           </h1>
-          <p>
-            Si es la primera vez que ingresa al portal presione la imagen{' '}
-            <b>Inscribir Entidad Empleadora</b> para registrar su entidad empleadora y empezar a
-            usar el sistema. Si ya tiene inscrita su entidad empleadora, presione la imagen{' '}
-            <b>Ingresar al Sistema</b> para tramitar sus licencias.
-          </p>
         </div>
 
         <div className="mt-5 d-flex align-items-center">
@@ -35,7 +29,10 @@ export default function HomePage({ searchParams }: HomePageProps) {
                 style={{ width: '190px', height: '190px' }}>
                 <Image fill alt="Imagen de adscripcion" src="/adscripcion.png" />
               </div>
-              <p className="text-center mt-2 mt-sm-3 mb-0">Inscribir Entidad Empleadora</p>
+              <p className="text-center mt-2 mt-sm-3 mb-0">
+                Si es la primera vez que ingresa al portal, presione la imagen “Inscribir Entidad
+                Empleadora”
+              </p>
             </Link>
 
             <Link
@@ -46,7 +43,9 @@ export default function HomePage({ searchParams }: HomePageProps) {
                 style={{ width: '190px', height: '190px' }}>
                 <Image fill alt="Imagen de adscripcion" src="/logintramitacion.png" />
               </div>
-              <p className="text-center mt-2 mt-sm-3 mb-0">Ingresar al sistema</p>
+              <p className="text-center mt-2 mt-sm-3 mb-0">
+                Si ya tiene inscrita su entidad, presione aquí
+              </p>
             </Link>
           </div>
         </div>

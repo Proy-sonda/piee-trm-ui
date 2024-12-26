@@ -22,10 +22,17 @@
   padding: 2%;
 }
 
-.watermark {
-  min-height: 300vh;
-  position: relative;
-  margin: 0;
+.watermark::after {
+  /* min-height: 300vh;
+  margin: 0; */
+  position: absolute;
+  content: "Documento no valido para tramites";
+    top: 30%;
+    left: 25%;
+    transform: translate(-50%, -50%) rotate(-30deg); /* Rota 30 grados en sentido antihorario */
+    color: rgba(0, 0, 0, 0.15);
+    font-size: 30px;
+    font-weight: bold;
 }
 
 .header-pdf label {
