@@ -240,7 +240,7 @@ export const DocumentosAdjuntosC3: React.FC<DocumentosAdjuntosC3Props> = ({
         <h5>Documentos Adjuntos</h5>
         <p>
           Se recomienda adjuntar liquidaciones generadas por su sistema de remuneración (Excel,
-          Word, PDF, etc.). El tamaño de cada archivo debe estar entre{' '}
+          Word, PDF). El tamaño de cada archivo debe estar entre{' '}
           {formatBytes(tamanoMinimoDocumentoBytes)} y {formatBytes(tamanoMaximoDocumentoBytes)}.
         </p>
 

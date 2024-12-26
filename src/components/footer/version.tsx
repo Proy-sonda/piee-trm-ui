@@ -17,7 +17,13 @@ export default async function Version() {
 
   return (
     <>
-      <div className="mt-2 text-center text-secondary">Versión: {version}</div>
+      <div
+        className="mt-2 text-center text-secondary"
+        style={{
+          display: 'none',
+        }}>
+        Versión: {version}
+      </div>
     </>
   );
 }

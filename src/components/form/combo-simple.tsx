@@ -145,11 +145,11 @@ export const ComboSimple = <T extends Record<string, any>>({
                 ? VALOR_POR_DEFECTO_EN_TIPO_NUMBER
                 : VALOR_POR_DEFECTO_EN_TIPO_STRING
             }>
-            {textoOpcionPorDefecto ?? 'Seleccionar'}
+            {textoOpcionPorDefecto ?? 'SELECCIONAR...'}
           </option>
           {(datos ?? []).map((dato) => (
             <option key={calcularId(dato)} value={calcularId(dato)}>
-              {calcularDescripcion(dato)}
+              {calcularDescripcion(dato).toUpperCase()}
             </option>
           ))}
         </Form.Select>

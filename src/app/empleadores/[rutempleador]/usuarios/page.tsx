@@ -107,7 +107,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
 
   const exportarUsuariosCSV = async () => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Desea exportar las personas usuarias a CSV?`,
+      html: `¿Desea exportar las personas usuarias?`,
     });
 
     if (!isConfirmed) {
@@ -157,7 +157,7 @@ const UsuariosPage: React.FC<UsuariosPageProps> = ({}) => {
           xxl={8}
           className="d-flex flex-row flex-md-row justify-content-sm-end">
           <div>
-            <OverlayTrigger overlay={<Tooltip>Exportar personas usuarias a CSV</Tooltip>}>
+            <OverlayTrigger overlay={<Tooltip>Exportar personas usuarias</Tooltip>}>
               <button
                 disabled={!usuarios || usuarios.length === 0}
                 className="btn btn-sm border border-0"

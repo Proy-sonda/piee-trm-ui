@@ -8,7 +8,7 @@ import { Empleador } from "@/modelos/empleador";
 
 export const generarCSVLicencias = async (licencias:LicenciaTramitar[], empleador:Empleador[]) => {
     const { isConfirmed } = await AlertaConfirmacion.fire({
-      html: `¿Desea exportar las licencias a CSV?`,
+      html: `¿Desea exportar las licencias?`,
     });
 
     if (!isConfirmed) {

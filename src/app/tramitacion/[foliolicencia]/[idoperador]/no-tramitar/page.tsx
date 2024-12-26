@@ -324,7 +324,7 @@ const NoRecepcionarLicenciaPage: React.FC<NoRecepcionarLicenciaPageProps> = ({
       throw new Error('FALTA LICENCIA PARA TRAMITAR');
     }
 
-    const adjunto = datos.documentoAdjunto.length > 0 ? datos.documentoAdjunto.item(0) : null;
+    const adjunto = datos.documentoAdjunto!?.length > 0 ? datos.documentoAdjunto.item(0) : null;
 
     if (debeAdjuntarArchivo() && !adjunto) {
       formulario.setError('documentoAdjunto', { message: MENSAJE_DOCUMENTO_OBLIGATORIO });
