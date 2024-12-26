@@ -835,7 +835,7 @@ const C2Page: React.FC<myprops> = ({ params: { foliolicencia, idoperador } }) =>
                           <option
                             key={codigoentidadprevisional + letraentidadprevisional}
                             value={codigoentidadprevisional}>
-                            {glosa}
+                            {glosa.toUpperCase()}
                           </option>
                         ),
                     )
