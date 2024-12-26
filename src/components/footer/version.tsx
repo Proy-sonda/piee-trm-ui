@@ -7,22 +7,23 @@ export default async function Version() {
   const rutaArchivoInformacionApp = path.join(process.cwd(), 'public', 'appinfo.json');
 
   let version = '';
+  let versionConHash = '';
   if (existsSync(rutaArchivoInformacionApp)) {
     const appInfoJSON = await readFile(rutaArchivoInformacionApp, 'utf-8');
     const appInfo = JSON.parse(appInfoJSON);
-    version = appInfo.version ?? versionApp();
+    versionConHash = appInfo.version ?? versionApp();
   } else {
     version = versionApp();
   }
 
+  if (versionConHash) {
+    version = versionConHash.split(' ')[0];
+  }
+
   return (
     <>
-      <div
-        className="mt-2 text-center text-secondary"
-        style={{
-          display: 'none',
-        }}>
-        Versión: {version}
+      <div className="mt-2 text-center text-secondary">
+        Versión: {version} &nbsp;<p style={{ display: 'none' }}>{versionConHash.split(' ')[1]}</p>
       </div>
     </>
   );

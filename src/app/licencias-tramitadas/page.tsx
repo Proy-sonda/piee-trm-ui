@@ -169,7 +169,7 @@ const LicenciasTramitadasPage = () => {
               <div className="d-flex justify-content-between align-items-center">
                 <h2 className="fs-5 m-0 p-0">LICENCIAS TRAMITADAS</h2>
                 <div>
-                  <OverlayTrigger overlay={<Tooltip>Exportar licencias</Tooltip>}>
+                  <OverlayTrigger overlay={<Tooltip>Exportar</Tooltip>}>
                     <button
                       disabled={!resultadoLicencias || resultadoLicencias.numerolicencias === 0}
                       className="btn btn-sm border border-0"

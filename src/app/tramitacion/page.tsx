@@ -105,8 +105,7 @@ const TramitacionPage = () => {
               <div className="mb-2 mb-md-0 d-flex justify-content-center align-items-center">
                 <h2 className="fs-5 m-0 p-0">BANDEJA DE TRAMITACIÓN</h2>
                 <div className="d-md-none d-flex align-items-center">
-                  <OverlayTrigger
-                    overlay={<Tooltip>Volver a cargar bandeja de tramitación</Tooltip>}>
+                  <OverlayTrigger overlay={<Tooltip>Refrescar</Tooltip>}>
                     <button
                       disabled={desahabilitarRecarga}
                       className="btn btn-sm border border-0"
@@ -124,8 +123,7 @@ const TramitacionPage = () => {
 
               <div className="d-flex justify-content-end align-items-center">
                 <div className="d-none d-md-block">
-                  <OverlayTrigger
-                    overlay={<Tooltip>Volver a cargar bandeja de tramitación</Tooltip>}>
+                  <OverlayTrigger overlay={<Tooltip>Refrescar</Tooltip>}>
                     <button
                       disabled={desahabilitarRecarga}
                       className="btn btn-sm border border-0"
