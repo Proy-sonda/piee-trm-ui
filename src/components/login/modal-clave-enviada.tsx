@@ -5,9 +5,15 @@ interface ModalClaveEnviadaProps {
   show: boolean;
   correos: string;
   onCerrarModal: () => void;
+  rutEnvia: string;
 }
 
-const ModalClaveEnviada: React.FC<ModalClaveEnviadaProps> = ({ show, onCerrarModal, correos }) => {
+const ModalClaveEnviada: React.FC<ModalClaveEnviadaProps> = ({
+  show,
+  onCerrarModal,
+  correos,
+  rutEnvia,
+}) => {
   const handleCerrarModal = () => {
     onCerrarModal();
   };
@@ -29,17 +35,16 @@ const ModalClaveEnviada: React.FC<ModalClaveEnviadaProps> = ({ show, onCerrarMod
         </Modal.Header>
         <Modal.Body>
           <div className="row text-center" style={{ textAlign: 'justify' }}>
-            <p>¡Felicitaciones!</p>
             <p>
               {UnCorreo ? (
                 <>
-                  Hemos creado y enviado a su correo {correos} una nueva clave temporal para acceder
-                  al Portal de Tramitación.
+                  Hemos creado y enviado al siguiente correo registrado {correos} bajo el Rut{' '}
+                  {rutEnvia} una nueva clave temporal para acceder al Portal de Tramitación.
                 </>
               ) : (
                 <>
-                  Hemos creado y enviado a sus correos {correos} una nueva clave temporal para
-                  acceder al Portal de Tramitación.
+                  Hemos creado y enviado a los siguientes correos registrados {correos} bajo el Rut{' '}
+                  {rutEnvia} una nueva clave temporal para acceder al Portal de Tramitación.
                 </>
               )}
             </p>

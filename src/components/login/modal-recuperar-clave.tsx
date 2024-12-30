@@ -12,6 +12,7 @@ interface FormularioRecuperarClave {
 
 interface ModalRecuperarClaveProps {
   show: boolean;
+  setrutEnviaClave: (rut: string) => void;
   onCerrarModal: () => void;
   onClaveEnviada: (correos: string) => void;
 }
@@ -19,6 +20,7 @@ interface ModalRecuperarClaveProps {
 const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
   show,
   onClaveEnviada,
+  setrutEnviaClave,
   onCerrarModal,
 }) => {
   const formulario = useForm<FormularioRecuperarClave>({ mode: 'onBlur' });
@@ -26,6 +28,7 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
   const resetearFormulario = () => formulario.reset();
 
   const enviarClaveTemporal: SubmitHandler<FormularioRecuperarClave> = async ({ rut }) => {
+    setrutEnviaClave(rut);
     try {
       const resp = await recuperarClave(rut);
       resetearFormulario();

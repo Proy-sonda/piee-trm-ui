@@ -43,6 +43,7 @@ export const LoginComponent: React.FC<{}> = () => {
   const [inicioComoSuperusuario, setInicioComoSuperusuario] = useState(false);
   const [sinUsuarioEnTRM, setsinUsuarioEnTRM] = useState(false);
   const [correosEnviados, setcorreosEnviados] = useState<string>();
+  const [rutEnviaClave, setrutEnviaClave] = useState<string>('');
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -233,6 +234,7 @@ export const LoginComponent: React.FC<{}> = () => {
       <ModalRecuperarClave
         show={showModalRecuperarClave}
         onCerrarModal={() => setShowModalRecuperarClave(false)}
+        setrutEnviaClave={setrutEnviaClave}
         onClaveEnviada={(correos: string) => {
           setShowModalRecuperarClave(false);
           setShowModalClaveEnviada(true);
@@ -244,6 +246,7 @@ export const LoginComponent: React.FC<{}> = () => {
         show={showModalClaveEnviada}
         onCerrarModal={() => setShowModalClaveEnviada(false)}
         correos={correosEnviados || ''}
+        rutEnvia={rutEnviaClave}
       />
     </>
   );
