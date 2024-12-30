@@ -1,15 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 
 interface ModalClaveEnviadaProps {
   show: boolean;
+  correos: string;
   onCerrarModal: () => void;
 }
 
-const ModalClaveEnviada: React.FC<ModalClaveEnviadaProps> = ({ show, onCerrarModal }) => {
+const ModalClaveEnviada: React.FC<ModalClaveEnviadaProps> = ({ show, onCerrarModal, correos }) => {
   const handleCerrarModal = () => {
     onCerrarModal();
   };
+  const [UnCorreo, setUnCorreo] = useState(false);
+
+  useEffect(() => {
+    if (correos && correos.split(',').length > 1) {
+      setUnCorreo(false);
+    } else {
+      setUnCorreo(true);
+    }
+  }, [correos]);
 
   return (
     <>
@@ -21,11 +31,19 @@ const ModalClaveEnviada: React.FC<ModalClaveEnviadaProps> = ({ show, onCerrarMod
           <div className="row text-center" style={{ textAlign: 'justify' }}>
             <p>¡Felicitaciones!</p>
             <p>
-              Hemos creado y enviado a su correo una nueva clave temporal para acceder al Portal de
-              Tramitación.
+              {UnCorreo ? (
+                <>
+                  Hemos creado y enviado a su correo {correos} una nueva clave temporal para acceder
+                  al Portal de Tramitación.
+                </>
+              ) : (
+                <>
+                  Hemos creado y enviado a sus correos {correos} una nueva clave temporal para
+                  acceder al Portal de Tramitación.
+                </>
+              )}
             </p>
-            {/* Descomentar cuando se implemente la vigencia de la clave temporal */}
-            {/* <p>Esta clave tiene una vigencia de 48 horas</p> */}
+            <p></p>
           </div>
         </Modal.Body>
         <Modal.Footer>

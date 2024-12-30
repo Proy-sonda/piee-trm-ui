@@ -13,7 +13,7 @@ interface FormularioRecuperarClave {
 interface ModalRecuperarClaveProps {
   show: boolean;
   onCerrarModal: () => void;
-  onClaveEnviada: () => void;
+  onClaveEnviada: (correos: string) => void;
 }
 
 const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
@@ -27,11 +27,10 @@ const ModalRecuperarClave: React.FC<ModalRecuperarClaveProps> = ({
 
   const enviarClaveTemporal: SubmitHandler<FormularioRecuperarClave> = async ({ rut }) => {
     try {
-      await recuperarClave(rut);
-
+      const resp = await recuperarClave(rut);
       resetearFormulario();
 
-      onClaveEnviada();
+      onClaveEnviada(resp.correos);
     } catch (error) {
       if (error instanceof HttpError) {
         return Swal.fire({

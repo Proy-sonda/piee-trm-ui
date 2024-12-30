@@ -1,8 +1,9 @@
+import { RecuerarClave } from '@/modelos/recuperarclave';
 import { apiUrl } from '../environment';
 import { runFetchConThrow } from '../fetch';
 
 export const recuperarClave = (rutUsuario: string) => {
-  return runFetchConThrow<void>(`${apiUrl()}/auth/recover`, {
+  return runFetchConThrow<RecuerarClave>(`${apiUrl()}/auth/recover`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

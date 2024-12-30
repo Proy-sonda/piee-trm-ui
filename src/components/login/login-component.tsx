@@ -42,6 +42,7 @@ export const LoginComponent: React.FC<{}> = () => {
   const [, mensajes] = useFetch(obtenerMensajes());
   const [inicioComoSuperusuario, setInicioComoSuperusuario] = useState(false);
   const [sinUsuarioEnTRM, setsinUsuarioEnTRM] = useState(false);
+  const [correosEnviados, setcorreosEnviados] = useState<string>();
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -232,15 +233,17 @@ export const LoginComponent: React.FC<{}> = () => {
       <ModalRecuperarClave
         show={showModalRecuperarClave}
         onCerrarModal={() => setShowModalRecuperarClave(false)}
-        onClaveEnviada={() => {
+        onClaveEnviada={(correos: string) => {
           setShowModalRecuperarClave(false);
           setShowModalClaveEnviada(true);
+          setcorreosEnviados(correos);
         }}
       />
 
       <ModalClaveEnviada
         show={showModalClaveEnviada}
         onCerrarModal={() => setShowModalClaveEnviada(false)}
+        correos={correosEnviados || ''}
       />
     </>
   );
