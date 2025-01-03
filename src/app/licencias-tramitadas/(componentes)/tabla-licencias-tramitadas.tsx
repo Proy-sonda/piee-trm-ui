@@ -12,14 +12,10 @@ import dynamic from 'next/dynamic';
 import React, { useContext, useRef, useState } from 'react';
 import { Badge, OverlayTrigger, Stack, Table, Tooltip } from 'react-bootstrap';
 import {
-  LicenciaTramitada,
   esLicenciaNoTramitada,
-  licenciaConErrorDeEnvio,
-  licenciaEnProcesoDeConciliacion,
-  licenciaEnProcesoDeEnvio,
-  licenciaFueEnviadaAlOperador,
-  licenciaFueTramitadaPorEmpleador,
+  licenciaFueTramitada,
   licenciaFueTramitadaPorOperador,
+  LicenciaTramitada,
 } from '../(modelos)';
 import styles from './tabla-licencias-tramitadas.module.css';
 
@@ -371,9 +367,9 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
         className={`${listaguia[3]!?.activo && guia ? 'overlay-marco' : ''}`}>
         <thead>
           <tr className={`text-center ${styles['text-tr']}`}>
-            <th></th>
+            <th>ESTADO TRAMITACIÓN</th>
             <th>FOLIO</th>
-            <th>ESTADO</th>
+            <th>ESTADO LICENCIA MÉDICA</th>
             <th className="text-nowrap">ENTIDAD EMPLEADORA</th>
             <th>PERSONA TRABAJADORA</th>
             <th>DESCRIPCIÓN</th>
@@ -394,98 +390,17 @@ export const TablaLicenciasTramitadas: React.FC<TablaLicenciasTramitadasProps> =
                     className={`${
                       index === 0 && `${listaguia[4]!?.activo && guia ? 'overlay-marco' : ''}`
                     }`}>
-                    <OverlayTrigger
-                      overlay={
-                        <Tooltip>
-                          {esLicenciaNoTramitada(licencia)
-                            ? 'La licencia no se recepcionó.'
-                            : 'La licencia se tramitó.'}
-                        </Tooltip>
-                      }>
-                      <span
-                        className="badge rounded-pill"
-                        style={{ background: 'var(--color-blue)', fontWeight: 'normal' }}>
-                        {esLicenciaNoTramitada(licencia) ? 'No Recepcionada' : 'Tramitada'}
-                      </span>
-                    </OverlayTrigger>
-
-                    <IfContainer show={licenciaFueTramitadaPorEmpleador(licencia)}>
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip>
-                            La licencia tramitada (o no recepcionada) está lista para ser enviada al
-                            operador.{' '}
-                          </Tooltip>
-                        }>
-                        <Badge pill bg="warning" text="dark" style={{ fontWeight: 'normal' }}>
-                          Envío Pendiente
-                        </Badge>
-                      </OverlayTrigger>
-                    </IfContainer>
-
-                    <IfContainer show={licenciaEnProcesoDeEnvio(licencia)}>
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip>
-                            La tramitación se encuentra en proceso de envió hacía el operador.
-                          </Tooltip>
-                        }>
-                        <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
-                          Enviando
-                        </Badge>
-                      </OverlayTrigger>
-                    </IfContainer>
-
-                    <IfContainer show={licenciaEnProcesoDeConciliacion(licencia)}>
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip>
-                            El proceso de conciliación tomó la licencia, es decir, se actualiza el
-                            estado de la licencia con el que tienen los operadores.{' '}
-                          </Tooltip>
-                        }>
-                        <Badge pill bg="secondary" style={{ fontWeight: 'normal' }}>
-                          Conciliando
-                        </Badge>
-                      </OverlayTrigger>
-                    </IfContainer>
-
-                    <IfContainer show={licenciaFueEnviadaAlOperador(licencia)}>
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip>La tramitación se envió con éxito al operador. </Tooltip>
-                        }>
-                        <Badge pill bg="primary" style={{ fontWeight: 'normal' }}>
-                          Enviada
-                        </Badge>
-                      </OverlayTrigger>
-                    </IfContainer>
-
-                    <IfContainer show={licenciaConErrorDeEnvio(licencia)}>
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip>
-                            Hubo un error de envío de la tramitación hacía el operador.{' '}
-                          </Tooltip>
-                        }>
-                        <Badge pill bg="danger" style={{ fontWeight: 'normal' }}>
-                          Error de envío
-                        </Badge>
-                      </OverlayTrigger>
-                    </IfContainer>
-
-                    <IfContainer show={licenciaFueTramitadaPorOperador(licencia)}>
-                      <OverlayTrigger
-                        overlay={
-                          <Tooltip>
-                            La licencia fue conciliada, es decir, fue sincronizado el estado del
-                            portal con el operador.{' '}
-                          </Tooltip>
-                        }>
+                   
+                    <IfContainer show={licenciaFueTramitada(licencia)}>
                         <Badge pill bg="success" style={{ fontWeight: 'normal' }}>
-                          Licencia Conciliada
+                         Tramitada
                         </Badge>
-                      </OverlayTrigger>
+                    </IfContainer>
+
+                    <IfContainer show={!licenciaFueTramitada(licencia)}>
+                        <Badge pill bg="warning" style={{ fontWeight: 'normal', color:'black' }}>
+                         Tramitación en Proceso
+                        </Badge>
                     </IfContainer>
                   </Stack>
                 </td>
