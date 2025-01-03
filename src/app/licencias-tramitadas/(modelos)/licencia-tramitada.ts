@@ -85,7 +85,11 @@ export const licenciaFueTramitada = ({ estadotramitacion }: LicenciaTramitada) =
   return [4].includes(estadotramitacion.idestadotramitacion);
 } 
 
+
 export const licenciaFueTramitadaPorOperador = ({ estadotramitacion }: LicenciaTramitada) => {
   return estadotramitacion.idestadotramitacion === 4;
 };
 
+export const licenciaTramitadaEnOperador = ({ estadotramitacion }: LicenciaTramitada) => {
+  return [4].includes(estadotramitacion.idestadotramitacion);
+};
